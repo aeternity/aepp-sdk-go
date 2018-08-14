@@ -54,8 +54,22 @@ func init() {
 func inspect(cmd *cobra.Command, args []string) {
 	for _, object := range args {
 
+		// name
 		if strings.HasSuffix(object, ".aet") {
-
+			p := operations.NewGetNameParams().WithName(object)
+			if r, err := epochCli.Operations.GetName(p); err == nil {
+				utils.PrintObjectT("Name", r.Payload)
+			} else {
+				switch err.(type) {
+				case *operations.GetNameBadRequest:
+					utils.PrintError("Bad request:", err.(*operations.GetNameBadRequest).Payload)
+				case *operations.GetNameNotFound:
+					utils.PrintError("Name not found:", err.(*operations.GetNameNotFound).Payload)
+				default:
+					utils.Pp("Unknown error:", err)
+				}
+			}
+			continue
 		}
 
 		switch object[0:3] {

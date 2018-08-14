@@ -73,7 +73,7 @@ var playCmd = &cobra.Command{
 		for {
 			p := operations.NewGetBlockByHashParams().WithHash(prevHash)
 			if r, err := epochCli.Operations.GetBlockByHash(p); err == nil {
-				utils.PrintObjectT(r.Payload, " <<>> <<>> <<>> ")
+				utils.PrintObjectT(" <<>> <<>> <<>> ", r.Payload)
 			} else {
 				switch err.(type) {
 				case *operations.GetBlockByHashBadRequest:

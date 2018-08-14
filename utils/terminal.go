@@ -26,6 +26,7 @@ func right(str string, length int, pad string) string {
 	return str + times(pad, length-len(str))
 }
 
+// Pp pretty print
 func Pp(data ...interface{}) {
 	for i := 0; i < len(data); i += 2 {
 		fmt.Println(right(fmt.Sprintf("%v", data[i]), 50, "_"), data[i+1])
@@ -81,17 +82,26 @@ func printTx(o models.SingleTxObject) {
 	}
 }
 
-// PrintObject pretty print an object obtained from the api
-func PrintObject(i interface{}) {
-	PrintObjectT(i, "")
+func printName(o *models.NameEntry) {
+	Pp(
+		"Name", o.Name,
+		"Name hash", o.NameHash,
+		"Name TTL", o.NameTTL,
+	)
 }
 
+// PrintObject pretty print an object obtained from the api
+func PrintObject(i interface{}) {
+	PrintObjectT("", i)
+}
+
+// PrintError print error
 func PrintError(code string, e *models.Error) {
 	Pp(code, e.Reason)
 }
 
 // PrintObjectT pretty print an object obtained from the api with a title
-func PrintObjectT(i interface{}, title string) {
+func PrintObjectT(title string, i interface{}) {
 	if len(title) > 0 {
 		fmt.Println(title)
 	}
@@ -104,6 +114,8 @@ func PrintObjectT(i interface{}, title string) {
 		printNodeVersion(i.(*models.Version))
 	case models.SingleTxObject:
 		printTx(i.(models.SingleTxObject))
+	case *models.NameEntry:
+		printName(i.(*models.NameEntry))
 	default:
 		fmt.Printf("Pretty printer not available for type %v", i)
 	}
