@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/aeternity/aepp-sdk-go/models"
+	"github.com/aeternity/aepp-sdk-go/generated/models"
 )
 
 func times(str string, n int) (out string) {

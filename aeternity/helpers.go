@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	apiclient "github.com/aeternity/aepp-sdk-go/client"
-	"github.com/aeternity/aepp-sdk-go/client/operations"
-	"github.com/aeternity/aepp-sdk-go/models"
+	apiclient "github.com/aeternity/aepp-sdk-go/generated/client"
+	"github.com/aeternity/aepp-sdk-go/generated/client/operations"
+	"github.com/aeternity/aepp-sdk-go/generated/models"
 	"github.com/aeternity/aepp-sdk-go/rlp"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"

@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"os"
 
-	apiclient "github.com/aeternity/aepp-sdk-go/client"
+	apiclient "github.com/aeternity/aepp-sdk-go/generated/client"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
 	"github.com/spf13/cobra"

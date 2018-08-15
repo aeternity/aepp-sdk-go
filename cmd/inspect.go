@@ -19,7 +19,7 @@ import (
 	"strings"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
-	"github.com/aeternity/aepp-sdk-go/client/operations"
+	"github.com/aeternity/aepp-sdk-go/generated/client/operations"
 	"github.com/aeternity/aepp-sdk-go/utils"
 
 	"github.com/spf13/cobra"
