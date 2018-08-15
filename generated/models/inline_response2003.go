@@ -15,8 +15,8 @@ import (
 // swagger:model inline_response_200_3
 type InlineResponse2003 struct {
 
-	// Count
-	Count int64 `json:"count,omitempty"`
+	// pubkey
+	Pubkey string `json:"pubkey,omitempty"`
 }
 
 // Validate validates this inline response 200 3

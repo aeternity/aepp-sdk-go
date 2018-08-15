@@ -11,21 +11,24 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// InlineResponse2004 inline response 200 4
-// swagger:model inline_response_200_4
-type InlineResponse2004 struct {
+// ContractStoreStore contract store store
+// swagger:model ContractStore_store
+type ContractStoreStore struct {
 
-	// Count
-	Count int64 `json:"count,omitempty"`
+	// key
+	Key string `json:"key,omitempty"`
+
+	// value
+	Value string `json:"value,omitempty"`
 }
 
-// Validate validates this inline response 200 4
-func (m *InlineResponse2004) Validate(formats strfmt.Registry) error {
+// Validate validates this contract store store
+func (m *ContractStoreStore) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
 // MarshalBinary interface implementation
-func (m *InlineResponse2004) MarshalBinary() ([]byte, error) {
+func (m *ContractStoreStore) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -33,8 +36,8 @@ func (m *InlineResponse2004) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *InlineResponse2004) UnmarshalBinary(b []byte) error {
-	var res InlineResponse2004
+func (m *ContractStoreStore) UnmarshalBinary(b []byte) error {
+	var res ContractStoreStore
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

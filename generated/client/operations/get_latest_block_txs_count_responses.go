@@ -47,7 +47,7 @@ func NewGetLatestBlockTxsCountOK() *GetLatestBlockTxsCountOK {
 The count of transactions in the latest block
 */
 type GetLatestBlockTxsCountOK struct {
-	Payload *models.InlineResponse2003
+	Payload *models.InlineResponse2004
 }
 
 func (o *GetLatestBlockTxsCountOK) Error() string {
@@ -56,7 +56,7 @@ func (o *GetLatestBlockTxsCountOK) Error() string {
 
 func (o *GetLatestBlockTxsCountOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.InlineResponse2003)
+	o.Payload = new(models.InlineResponse2004)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

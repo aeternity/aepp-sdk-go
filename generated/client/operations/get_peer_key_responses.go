@@ -54,7 +54,7 @@ func NewGetPeerKeyOK() *GetPeerKeyOK {
 Node's peer public key
 */
 type GetPeerKeyOK struct {
-	Payload *models.InlineResponse2004
+	Payload *models.InlineResponse2005
 }
 
 func (o *GetPeerKeyOK) Error() string {
@@ -63,7 +63,7 @@ func (o *GetPeerKeyOK) Error() string {
 
 func (o *GetPeerKeyOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.InlineResponse2004)
+	o.Payload = new(models.InlineResponse2005)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

@@ -16,7 +16,7 @@ import (
 
 // RegisteredOracles registered oracles
 // swagger:model RegisteredOracles
-type RegisteredOracles []*RegisteredOraclesInner
+type RegisteredOracles []*RegisteredOracle
 
 // Validate validates this registered oracles
 func (m RegisteredOracles) Validate(formats strfmt.Registry) error {

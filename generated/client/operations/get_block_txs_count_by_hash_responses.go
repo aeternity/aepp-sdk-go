@@ -61,7 +61,7 @@ func NewGetBlockTxsCountByHashOK() *GetBlockTxsCountByHashOK {
 The count of transactions in the block
 */
 type GetBlockTxsCountByHashOK struct {
-	Payload *models.InlineResponse2003
+	Payload *models.InlineResponse2004
 }
 
 func (o *GetBlockTxsCountByHashOK) Error() string {
@@ -70,7 +70,7 @@ func (o *GetBlockTxsCountByHashOK) Error() string {
 
 func (o *GetBlockTxsCountByHashOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.InlineResponse2003)
+	o.Payload = new(models.InlineResponse2004)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

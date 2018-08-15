@@ -54,7 +54,7 @@ func NewGetPendingBlockTxsCountOK() *GetPendingBlockTxsCountOK {
 The count of transactions in the pending block
 */
 type GetPendingBlockTxsCountOK struct {
-	Payload *models.InlineResponse2003
+	Payload *models.InlineResponse2004
 }
 
 func (o *GetPendingBlockTxsCountOK) Error() string {
@@ -63,7 +63,7 @@ func (o *GetPendingBlockTxsCountOK) Error() string {
 
 func (o *GetPendingBlockTxsCountOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.InlineResponse2003)
+	o.Payload = new(models.InlineResponse2004)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

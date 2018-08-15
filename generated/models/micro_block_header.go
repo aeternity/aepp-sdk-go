@@ -22,9 +22,6 @@ type MicroBlockHeader struct {
 	// height
 	Height int64 `json:"height,omitempty"`
 
-	// key hash
-	KeyHash EncodedHash `json:"key_hash,omitempty"`
-
 	// prev hash
 	PrevHash EncodedHash `json:"prev_hash,omitempty"`
 
@@ -49,10 +46,6 @@ func (m *MicroBlockHeader) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateHash(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateKeyHash(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -87,22 +80,6 @@ func (m *MicroBlockHeader) validateHash(formats strfmt.Registry) error {
 	if err := m.Hash.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("hash")
-		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *MicroBlockHeader) validateKeyHash(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.KeyHash) { // not required
-		return nil
-	}
-
-	if err := m.KeyHash.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("key_hash")
 		}
 		return err
 	}

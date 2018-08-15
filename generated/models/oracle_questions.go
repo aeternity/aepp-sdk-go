@@ -16,7 +16,7 @@ import (
 
 // OracleQuestions oracle questions
 // swagger:model OracleQuestions
-type OracleQuestions []*OracleQuestionsInner
+type OracleQuestions []*OracleQuestion
 
 // Validate validates this oracle questions
 func (m OracleQuestions) Validate(formats strfmt.Registry) error {

@@ -11,9 +11,9 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// OracleQuestionsInner oracle questions inner
-// swagger:model OracleQuestions_inner
-type OracleQuestionsInner struct {
+// OracleQuestion oracle question
+// swagger:model OracleQuestion
+type OracleQuestion struct {
 
 	// expires at
 	ExpiresAt int64 `json:"expires_at,omitempty"`
@@ -28,13 +28,13 @@ type OracleQuestionsInner struct {
 	QueryID string `json:"query_id,omitempty"`
 }
 
-// Validate validates this oracle questions inner
-func (m *OracleQuestionsInner) Validate(formats strfmt.Registry) error {
+// Validate validates this oracle question
+func (m *OracleQuestion) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
 // MarshalBinary interface implementation
-func (m *OracleQuestionsInner) MarshalBinary() ([]byte, error) {
+func (m *OracleQuestion) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -42,8 +42,8 @@ func (m *OracleQuestionsInner) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *OracleQuestionsInner) UnmarshalBinary(b []byte) error {
-	var res OracleQuestionsInner
+func (m *OracleQuestion) UnmarshalBinary(b []byte) error {
+	var res OracleQuestion
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

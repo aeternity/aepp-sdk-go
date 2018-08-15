@@ -11,15 +11,15 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// RegisteredOraclesInner registered oracles inner
-// swagger:model RegisteredOracles_inner
-type RegisteredOraclesInner struct {
+// RegisteredOracle registered oracle
+// swagger:model RegisteredOracle
+type RegisteredOracle struct {
 
-	// address
-	Address string `json:"address,omitempty"`
+	// expires
+	Expires int64 `json:"expires,omitempty"`
 
-	// expires at
-	ExpiresAt int64 `json:"expires_at,omitempty"`
+	// id
+	ID string `json:"id,omitempty"`
 
 	// query fee
 	QueryFee int64 `json:"query_fee,omitempty"`
@@ -31,13 +31,13 @@ type RegisteredOraclesInner struct {
 	ResponseFormat string `json:"response_format,omitempty"`
 }
 
-// Validate validates this registered oracles inner
-func (m *RegisteredOraclesInner) Validate(formats strfmt.Registry) error {
+// Validate validates this registered oracle
+func (m *RegisteredOracle) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
 // MarshalBinary interface implementation
-func (m *RegisteredOraclesInner) MarshalBinary() ([]byte, error) {
+func (m *RegisteredOracle) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -45,8 +45,8 @@ func (m *RegisteredOraclesInner) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *RegisteredOraclesInner) UnmarshalBinary(b []byte) error {
-	var res RegisteredOraclesInner
+func (m *RegisteredOracle) UnmarshalBinary(b []byte) error {
+	var res RegisteredOracle
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

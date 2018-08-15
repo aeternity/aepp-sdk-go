@@ -81,7 +81,7 @@ func (a *Client) CompileContract(params *CompileContractParams) (*CompileContrac
 }
 
 /*
-DecodeData Decode Sophia data encoded according to Sophia ABI.
+DecodeData Decode Sophia return data encoded according to Sophia ABI.
 */
 func (a *Client) DecodeData(params *DecodeDataParams) (*DecodeDataOK, error) {
 	// TODO: Validate the params before sending
@@ -161,6 +161,34 @@ func (a *Client) GetAccountBalance(params *GetAccountBalanceParams) (*GetAccount
 		return nil, err
 	}
 	return result.(*GetAccountBalanceOK), nil
+
+}
+
+/*
+GetAccountByPubkey Get an account by public key
+*/
+func (a *Client) GetAccountByPubkey(params *GetAccountByPubkeyParams) (*GetAccountByPubkeyOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetAccountByPubkeyParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "GetAccountByPubkey",
+		Method:             "GET",
+		PathPattern:        "/accounts/{pubkey}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{""},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetAccountByPubkeyReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetAccountByPubkeyOK), nil
 
 }
 
@@ -445,6 +473,34 @@ func (a *Client) GetBlockTxsCountByHeight(params *GetBlockTxsCountByHeightParams
 }
 
 /*
+GetChannelByPubkey Get channel by public key
+*/
+func (a *Client) GetChannelByPubkey(params *GetChannelByPubkeyParams) (*GetChannelByPubkeyOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetChannelByPubkeyParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "GetChannelByPubkey",
+		Method:             "GET",
+		PathPattern:        "/channels/{pubkey}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{""},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetChannelByPubkeyReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetChannelByPubkeyOK), nil
+
+}
+
+/*
 GetCommitmentHash Compute commitment hash for a given salt and name. Commitment hash must be computed client side. This endpoint is for verifying client's implementations.
 */
 func (a *Client) GetCommitmentHash(params *GetCommitmentHashParams) (*GetCommitmentHashOK, error) {
@@ -469,6 +525,34 @@ func (a *Client) GetCommitmentHash(params *GetCommitmentHashParams) (*GetCommitm
 		return nil, err
 	}
 	return result.(*GetCommitmentHashOK), nil
+
+}
+
+/*
+GetContract Get a contract by pubkey
+*/
+func (a *Client) GetContract(params *GetContractParams) (*GetContractOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetContractParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "GetContract",
+		Method:             "GET",
+		PathPattern:        "/contracts/{pubkey}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{""},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetContractReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetContractOK), nil
 
 }
 
@@ -501,6 +585,34 @@ func (a *Client) GetContractCallFromTx(params *GetContractCallFromTxParams) (*Ge
 }
 
 /*
+GetContractCode Get contract code by pubkey
+*/
+func (a *Client) GetContractCode(params *GetContractCodeParams) (*GetContractCodeOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetContractCodeParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "GetContractCode",
+		Method:             "GET",
+		PathPattern:        "/contracts/{pubkey}/code",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{""},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetContractCodeReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetContractCodeOK), nil
+
+}
+
+/*
 GetContractPoI Get a proof of inclusion for a contract
 */
 func (a *Client) GetContractPoI(params *GetContractPoIParams) (*GetContractPoIOK, error) {
@@ -525,6 +637,34 @@ func (a *Client) GetContractPoI(params *GetContractPoIParams) (*GetContractPoIOK
 		return nil, err
 	}
 	return result.(*GetContractPoIOK), nil
+
+}
+
+/*
+GetContractStore Get contract store by pubkey
+*/
+func (a *Client) GetContractStore(params *GetContractStoreParams) (*GetContractStoreOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetContractStoreParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "GetContractStore",
+		Method:             "GET",
+		PathPattern:        "/contracts/{pubkey}/store",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{""},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetContractStoreReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetContractStoreOK), nil
 
 }
 
@@ -1061,6 +1201,118 @@ func (a *Client) GetName(params *GetNameParams) (*GetNameOK, error) {
 }
 
 /*
+GetNameEntryByName Get name entry from naming system
+*/
+func (a *Client) GetNameEntryByName(params *GetNameEntryByNameParams) (*GetNameEntryByNameOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetNameEntryByNameParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "GetNameEntryByName",
+		Method:             "GET",
+		PathPattern:        "/names/{name}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{""},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetNameEntryByNameReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetNameEntryByNameOK), nil
+
+}
+
+/*
+GetOracleByPubkey Get an oracle by public key
+*/
+func (a *Client) GetOracleByPubkey(params *GetOracleByPubkeyParams) (*GetOracleByPubkeyOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetOracleByPubkeyParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "GetOracleByPubkey",
+		Method:             "GET",
+		PathPattern:        "/oracles/{pubkey}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{""},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetOracleByPubkeyReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetOracleByPubkeyOK), nil
+
+}
+
+/*
+GetOracleQueriesByPubkey Get oracle queries by public key
+*/
+func (a *Client) GetOracleQueriesByPubkey(params *GetOracleQueriesByPubkeyParams) (*GetOracleQueriesByPubkeyOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetOracleQueriesByPubkeyParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "GetOracleQueriesByPubkey",
+		Method:             "GET",
+		PathPattern:        "/oracles/{pubkey}/queries",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{""},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetOracleQueriesByPubkeyReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetOracleQueriesByPubkeyOK), nil
+
+}
+
+/*
+GetOracleQueryByPubkeyAndQueryID Get an oracle query by public key and query ID
+*/
+func (a *Client) GetOracleQueryByPubkeyAndQueryID(params *GetOracleQueryByPubkeyAndQueryIDParams) (*GetOracleQueryByPubkeyAndQueryIDOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetOracleQueryByPubkeyAndQueryIDParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "GetOracleQueryByPubkeyAndQueryId",
+		Method:             "GET",
+		PathPattern:        "/oracles/{pubkey}/queries/{query-id}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{""},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetOracleQueryByPubkeyAndQueryIDReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetOracleQueryByPubkeyAndQueryIDOK), nil
+
+}
+
+/*
 GetOracleQuestions Get active oracle questions
 */
 func (a *Client) GetOracleQuestions(params *GetOracleQuestionsParams) (*GetOracleQuestionsOK, error) {
@@ -1117,6 +1369,34 @@ func (a *Client) GetPeerKey(params *GetPeerKeyParams) (*GetPeerKeyOK, error) {
 }
 
 /*
+GetPeerPubkey Get peer public key
+*/
+func (a *Client) GetPeerPubkey(params *GetPeerPubkeyParams) (*GetPeerPubkeyOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetPeerPubkeyParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "GetPeerPubkey",
+		Method:             "GET",
+		PathPattern:        "/peers/pubkey",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{""},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetPeerPubkeyReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetPeerPubkeyOK), nil
+
+}
+
+/*
 GetPeers Get node Peers
 */
 func (a *Client) GetPeers(params *GetPeersParams) (*GetPeersOK, error) {
@@ -1141,6 +1421,34 @@ func (a *Client) GetPeers(params *GetPeersParams) (*GetPeersOK, error) {
 		return nil, err
 	}
 	return result.(*GetPeersOK), nil
+
+}
+
+/*
+GetPendingAccountTransactionsByPubkey Get pending account transactions by public key
+*/
+func (a *Client) GetPendingAccountTransactionsByPubkey(params *GetPendingAccountTransactionsByPubkeyParams) (*GetPendingAccountTransactionsByPubkeyOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetPendingAccountTransactionsByPubkeyParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "GetPendingAccountTransactionsByPubkey",
+		Method:             "GET",
+		PathPattern:        "/accounts/{pubkey}/transactions/pending",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{""},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetPendingAccountTransactionsByPubkeyReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetPendingAccountTransactionsByPubkeyOK), nil
 
 }
 
@@ -1229,6 +1537,34 @@ func (a *Client) GetPubKey(params *GetPubKeyParams) (*GetPubKeyOK, error) {
 }
 
 /*
+GetStatus Get the status of a node
+*/
+func (a *Client) GetStatus(params *GetStatusParams) (*GetStatusOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetStatusParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "GetStatus",
+		Method:             "GET",
+		PathPattern:        "/status",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{""},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetStatusReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetStatusOK), nil
+
+}
+
+/*
 GetTop Get the top block (either key or micro block)
 */
 func (a *Client) GetTop(params *GetTopParams) (*GetTopOK, error) {
@@ -1281,6 +1617,34 @@ func (a *Client) GetTopBlock(params *GetTopBlockParams) (*GetTopBlockOK, error) 
 		return nil, err
 	}
 	return result.(*GetTopBlockOK), nil
+
+}
+
+/*
+GetTransactionByHash Get a transaction by hash
+*/
+func (a *Client) GetTransactionByHash(params *GetTransactionByHashParams) (*GetTransactionByHashOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetTransactionByHashParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "GetTransactionByHash",
+		Method:             "GET",
+		PathPattern:        "/transactions/{hash}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{""},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetTransactionByHashReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetTransactionByHashOK), nil
 
 }
 
@@ -1365,6 +1729,34 @@ func (a *Client) GetTransactionFromBlockLatest(params *GetTransactionFromBlockLa
 		return nil, err
 	}
 	return result.(*GetTransactionFromBlockLatestOK), nil
+
+}
+
+/*
+GetTransactionInfoByHash Get a transaction info by hash
+*/
+func (a *Client) GetTransactionInfoByHash(params *GetTransactionInfoByHashParams) (*GetTransactionInfoByHashOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetTransactionInfoByHashParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "GetTransactionInfoByHash",
+		Method:             "GET",
+		PathPattern:        "/transactions/{hash}/info",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{""},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetTransactionInfoByHashReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetTransactionInfoByHashOK), nil
 
 }
 
@@ -2317,6 +2709,34 @@ func (a *Client) PostSpendTx(params *PostSpendTxParams) (*PostSpendTxOK, error) 
 		return nil, err
 	}
 	return result.(*PostSpendTxOK), nil
+
+}
+
+/*
+PostTransaction Post a new transaction
+*/
+func (a *Client) PostTransaction(params *PostTransactionParams) (*PostTransactionOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewPostTransactionParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "PostTransaction",
+		Method:             "POST",
+		PathPattern:        "/ng-transactions",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &PostTransactionReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*PostTransactionOK), nil
 
 }
 
