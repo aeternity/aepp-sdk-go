@@ -33,21 +33,9 @@ func Pp(data ...interface{}) {
 	}
 }
 
-func printGenericBlock(o *models.GenericBlock) {
+func printBlock(hash models.EncodedHash, o models.Header) {
 	Pp(
-		"Block Hash", o.Hash,
-		"Block Height", o.Height,
-		"Previous block hash", o.PrevHash,
-		"Miner", o.Miner,
-		"Beneficiary", o.Beneficiary,
-		"State hash", o.StateHash,
-		"Time", time.Unix(0, o.Time*int64(time.Millisecond)).Format(time.RFC3339),
-		"Transactions", o.TxsHash,
-	)
-}
-func printTopBlock(o *models.Top) {
-	Pp(
-		"Block Hash", o.Hash,
+		"Block Hash", hash,
 		"Block Height", o.Height,
 		"Previous block hash", o.PrevHash,
 		"Miner", o.Miner,
@@ -107,9 +95,9 @@ func PrintObjectT(title string, i interface{}) {
 	}
 	switch i.(type) {
 	case *models.GenericBlock:
-		printGenericBlock(i.(*models.GenericBlock))
+		printBlock(i.(*models.GenericBlock).Hash, i.(*models.GenericBlock).Header)
 	case *models.Top:
-		printTopBlock(i.(*models.Top))
+		printBlock(models.EncodedHash(i.(*models.Top).Hash), i.(*models.Top).Header)
 	case *models.Version:
 		printNodeVersion(i.(*models.Version))
 	case models.SingleTxObject:
