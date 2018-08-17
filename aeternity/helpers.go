@@ -42,20 +42,30 @@ func SignEncodeTx(kp *KeyPair, tx models.EncodedHash) (signedEncodedTx, signedEn
 	if err != nil {
 		return
 	}
+	fmt.Println("txStr", txStr)
+	fmt.Println("txRaw", string(txRaw))
 	// sign the transaction
 	sigRaw := kp.Sign(txRaw)
 	if err != nil {
 		return
 	}
 	// create a message of the transaction and signature
-	data := []interface{}{
-		[]uint{11},
-		[]uint{1},
+	data := struct {
+		Tag        uint
+		Vsn        uint
+		Signatures [][]byte
+		TxRaw      []byte
+	}{
+		11,
+		1,
 		[][]byte{sigRaw},
 		txRaw,
 	}
+
+	fmt.Println(data)
 	// encode the message using rlp
 	rlpTxRaw, err := rlp.EncodeToBytes(data)
+	fmt.Println(rlpTxRaw)
 	// encode the rlp message with the prefix
 	signedEncodedTx = encodeP(PrefixTx, rlpTxRaw)
 	// compute the hash
@@ -73,15 +83,15 @@ func Spend(epochCli *apiclient.Epoch, sender *KeyPair, recipientAddress string, 
 		return
 	}
 	// calculate the absolute ttl for the transaction
-	absoluteTTL := t.Payload.Height + Config.Client.TxTTL
+	absoluteTTL := t.Payload.Height + Config.P.Client.TxTTL
 	// create spend transaction
 	ps, err := epochCli.Operations.PostSpend(operations.NewPostSpendParams().WithBody(&models.SpendTx{
 		RecipientPubkey: models.EncodedHash(recipientAddress),
 		Sender:          models.EncodedHash(sender.Address),
 		Amount:          &amount,
 		TTL:             absoluteTTL,
-		Fee:             &Config.Client.Fee,
-		Payload:         &Config.Tuning.TxPayload,
+		Fee:             &Config.P.Client.Fee,
+		Payload:         &Config.P.Tuning.TxPayload,
 	}))
 	if err != nil {
 		return
