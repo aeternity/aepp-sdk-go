@@ -1,25 +1,27 @@
 package aeternity
 
-const (
+// HashPrefix a prefix for an aeternity object hash
+type HashPrefix string
 
+const (
 	// PrefixAccount prefix of an account address
-	PrefixAccount = "ak$"
+	PrefixAccount = HashPrefix("ak$")
 	// PrefixTx prefix of a transaction
-	PrefixTx = "tx$"
+	PrefixTx = HashPrefix("tx$")
 	// PrefixTxHash prefix of a transaction hash
-	PrefixTxHash = "th$"
+	PrefixTxHash = HashPrefix("th$")
 	// PrefixBlockHash prefix of a block hash
-	PrefixBlockHash = "bh$"
+	PrefixBlockHash = HashPrefix("bh$")
 	// PrefixContract prefix of a contract address
-	PrefixContract = "ct$"
+	PrefixContract = HashPrefix("ct$")
 	// PrefixNameHash prefix of an a name hash
-	PrefixNameHash = "nh$"
+	PrefixNameHash = HashPrefix("nh$")
 	// PrefixSignature prefix of an a signature
-	PrefixSignature = "sg$"
+	PrefixSignature = HashPrefix("sg$")
 	// PrefixBlockTxHash prefix of a block transaction hash
-	PrefixBlockTxHash = "bx$"
+	PrefixBlockTxHash = HashPrefix("bx$")
 	// PrefixBlockStateHash prefix of a block state hash
-	PrefixBlockStateHash = "bs$"
+	PrefixBlockStateHash = HashPrefix("bs$")
 	// PrefixChannel prefix of a channel
-	PrefixChannel = "ch$"
+	PrefixChannel = HashPrefix("ch$")
 )
