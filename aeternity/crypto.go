@@ -5,6 +5,8 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"math/rand"
+	"strings"
 
 	"github.com/aeternity/aepp-sdk-go/aesecb"
 	"github.com/btcsuite/btcutil/base58"
@@ -80,6 +82,17 @@ func hash(in []byte) (out []byte, err error) {
 	return
 }
 
+// namehash calculate the namehash of a string
+// TODO: link to the
+func namehash(name string) []byte {
+	buf := make([]byte, 32)
+	for _, s := range strings.Split(name, ".") {
+		sh, _ := hash([]byte(s))
+		buf, _ = hash(append(buf, sh...))
+	}
+	return buf
+}
+
 // Sign a message with a private key
 func (k *KeyPair) Sign(message []byte) (signature []byte) {
 	signature = ed25519.Sign(k.SigningKey, message)
@@ -150,4 +163,18 @@ func decrypt(key, ciphertext []byte) {
 	// a padding oracle.
 
 	fmt.Printf("%s\n", ciphertext)
+}
+
+// randomBytes returns securely generated random bytes.
+// It will return an error if the system's secure random
+// number generator fails to function correctly, in which
+// case the caller should not continue.
+func randomBytes(n int) ([]byte, error) {
+	b := make([]byte, n)
+	_, err := rand.Read(b)
+	// Note that err == nil only if we read len(b) bytes.
+	if err != nil {
+		return nil, err
+	}
+	return b, nil
 }
