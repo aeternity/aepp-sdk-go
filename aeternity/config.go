@@ -13,6 +13,7 @@ import (
 )
 
 const (
+	// ConfigFilename default configuration file name
 	ConfigFilename = "aecli.config"
 )
 
@@ -23,12 +24,17 @@ type EpochConfig struct {
 	WebsocketURL string `yaml:"websocket_url" mapstructure:"websocket_url"`
 }
 
-type AetNameConfig struct {
-	TTL       int64 `yaml:"ttl" mapstructure:"ttl"`
-	ClientTTL int64 `yaml:"client_ttl" mapstructure:"client_ttl"`
+// AensConfig configurations for Aens
+type AensConfig struct {
+	TTL         int64 `yaml:"ttl" mapstructure:"ttl"`
+	ClientTTL   int64 `yaml:"client_ttl" mapstructure:"client_ttl"`
+	PreClaimFee int64 `yaml:"preclaim_fee" mapstructure:"preclaim_fee"`
+	ClaimFee    int64 `yaml:"claim_fee" mapstructure:"claim_fee"`
+	UpdateFee   int64 `yaml:"update_fee" mapstructure:"update_fee"`
 }
 
-type AetContractConfig struct {
+// ContractConfig configurations for contracts
+type ContractConfig struct {
 	Gas       int64 `yaml:"gas" mapstructure:"gas"`
 	GasPrice  int64 `yaml:"gas_price" mapstructure:"gas_price"`
 	Deposit   int64 `yaml:"deposit" mapstructure:"deposit"`
@@ -37,11 +43,11 @@ type AetContractConfig struct {
 
 // ClientConfig client paramters configuration
 type ClientConfig struct {
-	TxTTL      int64             `yaml:"tx_ttl" mapstructure:"tx_ttl"`
-	Fee        int64             `yaml:"fee" mapstructure:"fee"`
-	DefaultKey string            `yaml:"default_key_name" mapstructure:"default_key_name"`
-	Names      AetNameConfig     `yaml:"names" mapstructure:"names"`
-	Contracts  AetContractConfig `yaml:"contracts" mapstructure:"contracts"`
+	TxTTL      int64          `yaml:"tx_ttl" mapstructure:"tx_ttl"`
+	Fee        int64          `yaml:"fee" mapstructure:"fee"`
+	DefaultKey string         `yaml:"default_key_name" mapstructure:"default_key_name"`
+	Names      AensConfig     `yaml:"names" mapstructure:"names"`
+	Contracts  ContractConfig `yaml:"contracts" mapstructure:"contracts"`
 }
 
 // TuningConfig fine tuning of parameters of the client
@@ -71,8 +77,8 @@ type ConfigSchema struct {
 //Defaults generate configuration defaults
 func (c *ProfileConfig) Defaults() *ProfileConfig {
 	c.Client = ClientConfig{
-		Contracts: AetContractConfig{},
-		Names:     AetNameConfig{},
+		Contracts: ContractConfig{},
+		Names:     AensConfig{},
 	}
 	// for server
 	utils.DefaultIfEmptyStr(&c.Epoch.URL, "https://sdk-testnet.aepps.com")
@@ -82,7 +88,13 @@ func (c *ProfileConfig) Defaults() *ProfileConfig {
 	utils.DefaultIfEmptyStr(&c.Client.DefaultKey, "wallet.key")
 	utils.DefaultIfEmptyInt64(&c.Client.TxTTL, 500)
 	utils.DefaultIfEmptyInt64(&c.Client.Fee, 1)
+	// for aens
 	utils.DefaultIfEmptyInt64(&c.Client.Names.TTL, 500)
+	utils.DefaultIfEmptyInt64(&c.Client.Names.ClientTTL, 500)
+	utils.DefaultIfEmptyInt64(&c.Client.Names.PreClaimFee, 1)
+	utils.DefaultIfEmptyInt64(&c.Client.Names.ClaimFee, 1)
+	utils.DefaultIfEmptyInt64(&c.Client.Names.UpdateFee, 1)
+	// for contracts
 	utils.DefaultIfEmptyInt64(&c.Client.Contracts.Gas, 40000000)
 	utils.DefaultIfEmptyInt64(&c.Client.Contracts.GasPrice, 1)
 	// for tuning
