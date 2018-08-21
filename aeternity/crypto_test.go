@@ -100,3 +100,27 @@ func Test_decode(t *testing.T) {
 		})
 	}
 }
+
+func Test_namehash(t *testing.T) {
+	// ('welghmolql.aet') == 'nm$2KrC4asc6fdv82uhXDwfiqB1TY2htjhnzwzJJKLxidyMymJRUQ'
+	type args struct {
+		name string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{"ok", args{"welghmolql.aet"}, "nm$2KrC4asc6fdv82uhXDwfiqB1TY2htjhnzwzJJKLxidyMymJRUQ"},
+		{"ok", args{"welghmolql"}, "nm$2nLRBu1FyukEvJuMANjFzx8mubMFeyG2mJ2QpQoYKymYe1d2sr"},
+		{"ok", args{""}, "nm$2q1DrgEuxRNCWRp5nTs6FyA7moSEzrPVUSTEpkpFsM4hRL4Dkb"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := encodeP(PrefixNameHash, namehash(tt.args.name))
+			if got != tt.want {
+				t.Errorf("namehash() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
