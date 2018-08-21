@@ -16,7 +16,7 @@ import (
 type InlineResponse2001 struct {
 
 	// Height
-	Hash int64 `json:"hash,omitempty"`
+	Height int64 `json:"height,omitempty"`
 }
 
 // Validate validates this inline response 200 1

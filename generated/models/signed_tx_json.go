@@ -22,7 +22,7 @@ import (
 // swagger:model SignedTxJSON
 type SignedTxJSON struct {
 
-	// block hash
+	// Value "none" means no block in the chain includes the transaction
 	BlockHash EncodedHash `json:"block_hash,omitempty"`
 
 	// block height

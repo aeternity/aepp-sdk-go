@@ -2153,6 +2153,34 @@ func (a *Client) PostContractCreate(params *PostContractCreateParams) (*PostCont
 }
 
 /*
+PostContractCreateCompute Compute the call_data for SOPHIA and get a contract_create transaction object
+*/
+func (a *Client) PostContractCreateCompute(params *PostContractCreateComputeParams) (*PostContractCreateComputeOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewPostContractCreateComputeParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "PostContractCreateCompute",
+		Method:             "POST",
+		PathPattern:        "/tx/contract/create/compute",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &PostContractCreateComputeReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*PostContractCreateComputeOK), nil
+
+}
+
+/*
 PostNameClaim Get a name_claim transaction object
 */
 func (a *Client) PostNameClaim(params *PostNameClaimParams) (*PostNameClaimOK, error) {

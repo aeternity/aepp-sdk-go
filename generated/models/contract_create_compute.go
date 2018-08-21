@@ -13,35 +13,32 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// ContractCallCompute contract call compute
-// swagger:model ContractCallCompute
-type ContractCallCompute struct {
+// ContractCreateCompute contract create compute
+// swagger:model ContractCreateCompute
+type ContractCreateCompute struct {
 
 	// Amount
 	// Required: true
 	// Minimum: 0
 	Amount *int64 `json:"amount"`
 
-	// Contract call data function arguments
+	// Contract call data init function arguments
 	// Required: true
 	Arguments *string `json:"arguments"`
 
-	// Contract caller pub_key
+	// Contract's code
 	// Required: true
-	Caller *string `json:"caller"`
+	Code *string `json:"code"`
 
-	// Contract's pub_key
+	// Deposit
 	// Required: true
-	Contract *string `json:"contract"`
+	// Minimum: 0
+	Deposit *int64 `json:"deposit"`
 
 	// Transaction fee
 	// Required: true
 	// Minimum: 0
 	Fee *int64 `json:"fee"`
-
-	// Contract call data function
-	// Required: true
-	Function *string `json:"function"`
 
 	// Contract gas
 	// Required: true
@@ -53,8 +50,12 @@ type ContractCallCompute struct {
 	// Minimum: 0
 	GasPrice *int64 `json:"gas_price"`
 
-	// Caller's nonce
+	// Owner's nonce
 	Nonce int64 `json:"nonce,omitempty"`
+
+	// Contract owner pub_key
+	// Required: true
+	Owner *string `json:"owner"`
 
 	// Transaction TTL
 	// Minimum: 0
@@ -67,8 +68,8 @@ type ContractCallCompute struct {
 	VMVersion *int64 `json:"vm_version"`
 }
 
-// Validate validates this contract call compute
-func (m *ContractCallCompute) Validate(formats strfmt.Registry) error {
+// Validate validates this contract create compute
+func (m *ContractCreateCompute) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateAmount(formats); err != nil {
@@ -79,19 +80,15 @@ func (m *ContractCallCompute) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateCaller(formats); err != nil {
+	if err := m.validateCode(formats); err != nil {
 		res = append(res, err)
 	}
 
-	if err := m.validateContract(formats); err != nil {
+	if err := m.validateDeposit(formats); err != nil {
 		res = append(res, err)
 	}
 
 	if err := m.validateFee(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateFunction(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -100,6 +97,10 @@ func (m *ContractCallCompute) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateGasPrice(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateOwner(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -117,7 +118,7 @@ func (m *ContractCallCompute) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractCallCompute) validateAmount(formats strfmt.Registry) error {
+func (m *ContractCreateCompute) validateAmount(formats strfmt.Registry) error {
 
 	if err := validate.Required("amount", "body", m.Amount); err != nil {
 		return err
@@ -130,7 +131,7 @@ func (m *ContractCallCompute) validateAmount(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractCallCompute) validateArguments(formats strfmt.Registry) error {
+func (m *ContractCreateCompute) validateArguments(formats strfmt.Registry) error {
 
 	if err := validate.Required("arguments", "body", m.Arguments); err != nil {
 		return err
@@ -139,25 +140,29 @@ func (m *ContractCallCompute) validateArguments(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractCallCompute) validateCaller(formats strfmt.Registry) error {
+func (m *ContractCreateCompute) validateCode(formats strfmt.Registry) error {
 
-	if err := validate.Required("caller", "body", m.Caller); err != nil {
+	if err := validate.Required("code", "body", m.Code); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *ContractCallCompute) validateContract(formats strfmt.Registry) error {
+func (m *ContractCreateCompute) validateDeposit(formats strfmt.Registry) error {
 
-	if err := validate.Required("contract", "body", m.Contract); err != nil {
+	if err := validate.Required("deposit", "body", m.Deposit); err != nil {
+		return err
+	}
+
+	if err := validate.MinimumInt("deposit", "body", int64(*m.Deposit), 0, false); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *ContractCallCompute) validateFee(formats strfmt.Registry) error {
+func (m *ContractCreateCompute) validateFee(formats strfmt.Registry) error {
 
 	if err := validate.Required("fee", "body", m.Fee); err != nil {
 		return err
@@ -170,16 +175,7 @@ func (m *ContractCallCompute) validateFee(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractCallCompute) validateFunction(formats strfmt.Registry) error {
-
-	if err := validate.Required("function", "body", m.Function); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *ContractCallCompute) validateGas(formats strfmt.Registry) error {
+func (m *ContractCreateCompute) validateGas(formats strfmt.Registry) error {
 
 	if err := validate.Required("gas", "body", m.Gas); err != nil {
 		return err
@@ -192,7 +188,7 @@ func (m *ContractCallCompute) validateGas(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractCallCompute) validateGasPrice(formats strfmt.Registry) error {
+func (m *ContractCreateCompute) validateGasPrice(formats strfmt.Registry) error {
 
 	if err := validate.Required("gas_price", "body", m.GasPrice); err != nil {
 		return err
@@ -205,7 +201,16 @@ func (m *ContractCallCompute) validateGasPrice(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractCallCompute) validateTTL(formats strfmt.Registry) error {
+func (m *ContractCreateCompute) validateOwner(formats strfmt.Registry) error {
+
+	if err := validate.Required("owner", "body", m.Owner); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *ContractCreateCompute) validateTTL(formats strfmt.Registry) error {
 
 	if swag.IsZero(m.TTL) { // not required
 		return nil
@@ -218,7 +223,7 @@ func (m *ContractCallCompute) validateTTL(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractCallCompute) validateVMVersion(formats strfmt.Registry) error {
+func (m *ContractCreateCompute) validateVMVersion(formats strfmt.Registry) error {
 
 	if err := validate.Required("vm_version", "body", m.VMVersion); err != nil {
 		return err
@@ -236,7 +241,7 @@ func (m *ContractCallCompute) validateVMVersion(formats strfmt.Registry) error {
 }
 
 // MarshalBinary interface implementation
-func (m *ContractCallCompute) MarshalBinary() ([]byte, error) {
+func (m *ContractCreateCompute) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -244,8 +249,8 @@ func (m *ContractCallCompute) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *ContractCallCompute) UnmarshalBinary(b []byte) error {
-	var res ContractCallCompute
+func (m *ContractCreateCompute) UnmarshalBinary(b []byte) error {
+	var res ContractCreateCompute
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}
