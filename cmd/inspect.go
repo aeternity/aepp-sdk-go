@@ -57,7 +57,7 @@ func inspect(cmd *cobra.Command, args []string) {
 		// name
 		if strings.HasSuffix(object, ".aet") {
 			p := operations.NewGetNameParams().WithName(object)
-			if r, err := epochCli.Operations.GetName(p); err == nil {
+			if r, err := aeCli.Operations.GetName(p); err == nil {
 				utils.PrintObjectT("Name", r.Payload)
 			} else {
 				switch err.(type) {
@@ -72,11 +72,11 @@ func inspect(cmd *cobra.Command, args []string) {
 			continue
 		}
 
-		switch object[0:3] {
+		switch aeternity.HashPrefix(object[0:3]) {
 		case aeternity.PrefixAccount:
 			// account balance
 			p := operations.NewGetAccountBalanceParams().WithAddress(object)
-			if r, err := epochCli.Operations.GetAccountBalance(p); err == nil {
+			if r, err := aeCli.Operations.GetAccountBalance(p); err == nil {
 				utils.Pp("Balance", r.Payload.Balance)
 			} else {
 				switch err.(type) {
@@ -92,7 +92,7 @@ func inspect(cmd *cobra.Command, args []string) {
 		case aeternity.PrefixBlockHash:
 			// block
 			p := operations.NewGetBlockByHashParams().WithHash(object)
-			if r, err := epochCli.Operations.GetBlockByHash(p); err == nil {
+			if r, err := aeCli.Operations.GetBlockByHash(p); err == nil {
 				utils.PrintObject(r.Payload)
 			} else {
 				switch err.(type) {
@@ -108,9 +108,9 @@ func inspect(cmd *cobra.Command, args []string) {
 			// transaction
 			p := operations.NewGetTxParams().
 				WithTxHash(object).
-				WithTxEncoding(&aeternity.Config.Tuning.ResponseEncoding)
+				WithTxEncoding(&aeternity.Config.P.Tuning.ResponseEncoding)
 
-			if r, err := epochCli.Operations.GetTx(p); err == nil {
+			if r, err := aeCli.Operations.GetTx(p); err == nil {
 				utils.PrintObject(r.Payload)
 			} else {
 				switch err.(type) {
@@ -127,7 +127,7 @@ func inspect(cmd *cobra.Command, args []string) {
 			// block transaction
 			p := operations.NewGetTransactionFromBlockHashParams().
 				WithHash(object)
-			if r, err := epochCli.Operations.GetTransactionFromBlockHash(p); err == nil {
+			if r, err := aeCli.Operations.GetTransactionFromBlockHash(p); err == nil {
 				utils.PrintObject(r.Payload)
 			} else {
 				switch err.(type) {

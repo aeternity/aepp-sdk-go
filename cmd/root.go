@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"os"
 
-	apiclient "github.com/aeternity/aepp-sdk-go/generated/client"
+	"github.com/aeternity/aepp-sdk-go/utils"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
 	"github.com/spf13/cobra"
@@ -42,7 +42,7 @@ to quickly create a Cobra application.`,
 
 var cfgFile string
 var debug bool
-var epochCli *apiclient.Epoch
+var aeCli *aeternity.Ae
 
 // Execute adds all child commands to the root command sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
@@ -75,24 +75,26 @@ func initConfig() {
 	if len(cfgFile) > 0 { // enable ability to specify config file via flag
 		viper.SetConfigFile(cfgFile)
 	}
-
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		viper.Unmarshal(&aeternity.Config)
 		aeternity.Config.Defaults()
 		aeternity.Config.Validate()
+		aeternity.Config.ConfigPath = viper.ConfigFileUsed()
 	} else {
-		// switch err.(type) {
-		// case viper.ConfigFileNotFoundError:
-		// 	if do := utils.AskYes("A configuration file was not found, would you like to generate one?", true); do {
-		// 		aeternity.GenerateDefaultConfig("config/"+aeternity.ConfigFilename+".yaml", RootCmd.Version)
-		// 		fmt.Println("Configuration created")
-		// 	}
-		// }
-		// fmt.Println("Configuration file not found!!")
-		// os.Exit(1)
-		aeternity.Config = aeternity.ConfigSchema{}
-		aeternity.Config.Defaults()
+		switch err.(type) {
+		case viper.ConfigFileNotFoundError:
+			if do := utils.AskYes("A configuration file was not found, would you like to generate one?", true); do {
+				aeternity.GenerateDefaultConfig("config/"+aeternity.ConfigFilename+".yaml", RootCmd.Version)
+				aeternity.Config.Save()
+				fmt.Println("Configuration created")
+			} else {
+				fmt.Println("Configuration file not found!!")
+				os.Exit(1)
+			}
+		}
+
 	}
-	epochCli = aeternity.NewCli(aeternity.Config.Epoch.URL, debug)
+
+	aeCli = aeternity.NewCli(aeternity.Config.P.Epoch.URL, debug)
 }

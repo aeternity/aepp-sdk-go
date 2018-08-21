@@ -17,7 +17,6 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
 	"github.com/aeternity/aepp-sdk-go/utils"
@@ -57,46 +56,50 @@ var spendCmd = &cobra.Command{
 	Use:   "spend",
 	Short: "Print the aeternity wallet spend",
 	Long:  ``,
-	Args:  cobra.ExactArgs(3),
+	//Args:  cobra.ExactArgs(3),
 	Run: func(cmd *cobra.Command, args []string) {
 
-		pkPath := ""
-		amount := int64(-1)
-		recipient := ""
-		var err error = nil
-		// find arguments
-		for _, a := range args {
-			if strings.HasPrefix(a, aeternity.PrefixAccount) {
-				recipient = a
-			} else if ok, v := utils.IsPositiveInt64(a); ok {
-				amount = v
-			} else {
-				pkPath = a
-			}
-		}
-		if len(pkPath) == 0 {
-			err = fmt.Errorf("Missing key path")
-		}
-		if len(recipient) == 0 {
-			err = fmt.Errorf("Missing recipient")
-		}
-		if amount <= 0 {
-			err = fmt.Errorf("Amount must be a strictly positve int")
-		}
+		// pkPath := ""
+		// amount := int64(-1)
+		// recipient := ""
+		// var err error = nil
+		// // find arguments
+		// for _, a := range args {
+		// 	if strings.HasPrefix(a, aeternity.PrefixAccount) {
+		// 		recipient = a
+		// 	} else if ok, v := utils.IsPositiveInt64(a); ok {
+		// 		amount = v
+		// 	} else {
+		// 		pkPath = a
+		// 	}
+		// }
+		// if len(pkPath) == 0 {
+		// 	err = fmt.Errorf("Missing key path")
+		// }
+		// if len(recipient) == 0 {
+		// 	err = fmt.Errorf("Missing recipient")
+		// }
+		// if amount <= 0 {
+		// 	err = fmt.Errorf("Amount must be a strictly positve int")
+		// }
 
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+		// if err != nil {
+		// 	fmt.Println(err)
+		// 	os.Exit(1)
+		// }
 
-		// load the private key
-		kp, err := aeternity.Load(pkPath)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+		// // load the private key
+		// kp, err := aeternity.Load(pkPath)
+		// if err != nil {
+		// 	fmt.Println(err)
+		// 	os.Exit(1)
+		// }
 
-		txHash, signature, err := aeternity.Spend(epochCli, kp, recipient, amount)
+		kp, _ := aeternity.Load("7d7d43238efe877a76371a23886f7c9924d8ba35dc6845d9db50b7a906a44c5311f23e7f2b4f46a4cca4d6a7ff7b5770adacf4460dab5d24dac35fcfc8b776e3")
+		recipient := "ak$2uLM25PWdhrTQfuxgJiM8E5sZREzUoB5iFnukHCz1uAZYBMqwo"
+		amount := int64(20)
+
+		txHash, signature, err := aeCli.WithKeyPair(kp).Spend(recipient, amount)
 		// TODO: print also the ttl
 		utils.Pp(
 			"Sender Address", kp.Address,
@@ -124,6 +127,7 @@ func init() {
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
+
 	// walletCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
 }
