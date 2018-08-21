@@ -15,7 +15,7 @@ const (
 	// PrefixContract prefix of a contract address
 	PrefixContract = HashPrefix("ct$")
 	// PrefixNameHash prefix of an a name hash
-	PrefixNameHash = HashPrefix("nh$")
+	PrefixNameHash = HashPrefix("nm$")
 	// PrefixSignature prefix of an a signature
 	PrefixSignature = HashPrefix("sg$")
 	// PrefixBlockTxHash prefix of a block transaction hash
@@ -24,4 +24,6 @@ const (
 	PrefixBlockStateHash = HashPrefix("bs$")
 	// PrefixChannel prefix of a channel
 	PrefixChannel = HashPrefix("ch$")
+	// PrefixNameCommitment prefix of a name commmitemtn hash
+	PrefixNameCommitment = HashPrefix("cm$")
 )
