@@ -17,9 +17,6 @@ import (
 // swagger:model OracleQuery
 type OracleQuery struct {
 
-	// expires
-	Expires int64 `json:"expires,omitempty"`
-
 	// fee
 	Fee int64 `json:"fee,omitempty"`
 
@@ -44,6 +41,9 @@ type OracleQuery struct {
 	// sender nonce
 	// Minimum: 0
 	SenderNonce *int64 `json:"sender_nonce,omitempty"`
+
+	// ttl
+	TTL int64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this oracle query

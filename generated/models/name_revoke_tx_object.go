@@ -19,7 +19,7 @@ import (
 // NameRevokeTxObject name revoke tx object
 // swagger:model NameRevokeTxObject
 type NameRevokeTxObject struct {
-	vsnField *int64
+	versionField *int64
 
 	NameRevokeTx
 }
@@ -34,14 +34,14 @@ func (m *NameRevokeTxObject) SetType(val string) {
 
 }
 
-// Vsn gets the vsn of this subtype
-func (m *NameRevokeTxObject) Vsn() *int64 {
-	return m.vsnField
+// Version gets the version of this subtype
+func (m *NameRevokeTxObject) Version() *int64 {
+	return m.versionField
 }
 
-// SetVsn sets the vsn of this subtype
-func (m *NameRevokeTxObject) SetVsn(val *int64) {
-	m.vsnField = val
+// SetVersion sets the version of this subtype
+func (m *NameRevokeTxObject) SetVersion(val *int64) {
+	m.versionField = val
 }
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
@@ -62,7 +62,7 @@ func (m *NameRevokeTxObject) UnmarshalJSON(raw []byte) error {
 
 		Type string `json:"type"`
 
-		Vsn *int64 `json:"vsn"`
+		Version *int64 `json:"version"`
 	}
 	buf = bytes.NewBuffer(raw)
 	dec = json.NewDecoder(buf)
@@ -79,7 +79,7 @@ func (m *NameRevokeTxObject) UnmarshalJSON(raw []byte) error {
 		return errors.New(422, "invalid type value: %q", base.Type)
 	}
 
-	result.vsnField = base.Vsn
+	result.versionField = base.Version
 
 	result.NameRevokeTx = data.NameRevokeTx
 
@@ -105,12 +105,12 @@ func (m NameRevokeTxObject) MarshalJSON() ([]byte, error) {
 	b2, err = json.Marshal(struct {
 		Type string `json:"type"`
 
-		Vsn *int64 `json:"vsn"`
+		Version *int64 `json:"version"`
 	}{
 
 		Type: m.Type(),
 
-		Vsn: m.Vsn(),
+		Version: m.Version(),
 	},
 	)
 	if err != nil {
@@ -124,7 +124,7 @@ func (m NameRevokeTxObject) MarshalJSON() ([]byte, error) {
 func (m *NameRevokeTxObject) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateVsn(formats); err != nil {
+	if err := m.validateVersion(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -139,9 +139,9 @@ func (m *NameRevokeTxObject) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *NameRevokeTxObject) validateVsn(formats strfmt.Registry) error {
+func (m *NameRevokeTxObject) validateVersion(formats strfmt.Registry) error {
 
-	if err := validate.Required("vsn", "body", m.Vsn()); err != nil {
+	if err := validate.Required("version", "body", m.Version()); err != nil {
 		return err
 	}
 

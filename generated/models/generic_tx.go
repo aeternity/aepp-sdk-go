@@ -28,16 +28,16 @@ type GenericTx interface {
 	Type() string
 	SetType(string)
 
-	// vsn
+	// version
 	// Required: true
-	Vsn() *int64
-	SetVsn(*int64)
+	Version() *int64
+	SetVersion(*int64)
 }
 
 type genericTx struct {
 	typeField string
 
-	vsnField *int64
+	versionField *int64
 }
 
 // Type gets the type of this polymorphic type
@@ -50,14 +50,14 @@ func (m *genericTx) SetType(val string) {
 
 }
 
-// Vsn gets the vsn of this polymorphic type
-func (m *genericTx) Vsn() *int64 {
-	return m.vsnField
+// Version gets the version of this polymorphic type
+func (m *genericTx) Version() *int64 {
+	return m.versionField
 }
 
-// SetVsn sets the vsn of this polymorphic type
-func (m *genericTx) SetVsn(val *int64) {
-	m.vsnField = val
+// SetVersion sets the version of this polymorphic type
+func (m *genericTx) SetVersion(val *int64) {
+	m.versionField = val
 }
 
 // UnmarshalGenericTxSlice unmarshals polymorphic slices of GenericTx
@@ -129,6 +129,13 @@ func unmarshalGenericTx(data []byte, consumer runtime.Consumer) (GenericTx, erro
 
 	case "ChannelDepositTxJSON":
 		var result ChannelDepositTxJSON
+		if err := consumer.Consume(buf2, &result); err != nil {
+			return nil, err
+		}
+		return &result, nil
+
+	case "ChannelForceProgressTxJSON":
+		var result ChannelForceProgressTxJSON
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
@@ -255,7 +262,7 @@ func unmarshalGenericTx(data []byte, consumer runtime.Consumer) (GenericTx, erro
 func (m *genericTx) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateVsn(formats); err != nil {
+	if err := m.validateVersion(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -265,9 +272,9 @@ func (m *genericTx) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *genericTx) validateVsn(formats strfmt.Registry) error {
+func (m *genericTx) validateVersion(formats strfmt.Registry) error {
 
-	if err := validate.Required("vsn", "body", m.Vsn()); err != nil {
+	if err := validate.Required("version", "body", m.Version()); err != nil {
 		return err
 	}
 

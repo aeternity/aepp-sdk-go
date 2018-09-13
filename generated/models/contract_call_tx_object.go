@@ -19,7 +19,7 @@ import (
 // ContractCallTxObject contract call tx object
 // swagger:model ContractCallTxObject
 type ContractCallTxObject struct {
-	vsnField *int64
+	versionField *int64
 
 	ContractCallData
 }
@@ -34,14 +34,14 @@ func (m *ContractCallTxObject) SetType(val string) {
 
 }
 
-// Vsn gets the vsn of this subtype
-func (m *ContractCallTxObject) Vsn() *int64 {
-	return m.vsnField
+// Version gets the version of this subtype
+func (m *ContractCallTxObject) Version() *int64 {
+	return m.versionField
 }
 
-// SetVsn sets the vsn of this subtype
-func (m *ContractCallTxObject) SetVsn(val *int64) {
-	m.vsnField = val
+// SetVersion sets the version of this subtype
+func (m *ContractCallTxObject) SetVersion(val *int64) {
+	m.versionField = val
 }
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
@@ -62,7 +62,7 @@ func (m *ContractCallTxObject) UnmarshalJSON(raw []byte) error {
 
 		Type string `json:"type"`
 
-		Vsn *int64 `json:"vsn"`
+		Version *int64 `json:"version"`
 	}
 	buf = bytes.NewBuffer(raw)
 	dec = json.NewDecoder(buf)
@@ -79,7 +79,7 @@ func (m *ContractCallTxObject) UnmarshalJSON(raw []byte) error {
 		return errors.New(422, "invalid type value: %q", base.Type)
 	}
 
-	result.vsnField = base.Vsn
+	result.versionField = base.Version
 
 	result.ContractCallData = data.ContractCallData
 
@@ -105,12 +105,12 @@ func (m ContractCallTxObject) MarshalJSON() ([]byte, error) {
 	b2, err = json.Marshal(struct {
 		Type string `json:"type"`
 
-		Vsn *int64 `json:"vsn"`
+		Version *int64 `json:"version"`
 	}{
 
 		Type: m.Type(),
 
-		Vsn: m.Vsn(),
+		Version: m.Version(),
 	},
 	)
 	if err != nil {
@@ -124,7 +124,7 @@ func (m ContractCallTxObject) MarshalJSON() ([]byte, error) {
 func (m *ContractCallTxObject) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateVsn(formats); err != nil {
+	if err := m.validateVersion(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -139,9 +139,9 @@ func (m *ContractCallTxObject) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractCallTxObject) validateVsn(formats strfmt.Registry) error {
+func (m *ContractCallTxObject) validateVersion(formats strfmt.Registry) error {
 
-	if err := validate.Required("vsn", "body", m.Vsn()); err != nil {
+	if err := validate.Required("version", "body", m.Version()); err != nil {
 		return err
 	}
 

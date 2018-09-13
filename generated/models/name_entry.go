@@ -18,14 +18,14 @@ import (
 // swagger:model NameEntry
 type NameEntry struct {
 
-	// expires
-	Expires int64 `json:"expires,omitempty"`
-
 	// id
 	ID EncodedHash `json:"id,omitempty"`
 
 	// pointers
 	Pointers []*NamePointer `json:"pointers"`
+
+	// ttl
+	TTL int64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this name entry

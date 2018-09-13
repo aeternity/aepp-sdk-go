@@ -20,27 +20,27 @@ import (
 type Status struct {
 
 	// difficulty
-	Difficulty float64 `json:"difficulty,omitempty"`
+	Difficulty int64 `json:"difficulty,omitempty"`
 
 	// genesis key block hash
-	GenesisKeyBlockHash EncodedHash `json:"genesis-key-block-hash,omitempty"`
+	GenesisKeyBlockHash EncodedHash `json:"genesis_key_block_hash,omitempty"`
 
 	// listening
 	Listening bool `json:"listening,omitempty"`
 
 	// node revision
-	NodeRevision string `json:"node-revision,omitempty"`
+	NodeRevision string `json:"node_revision,omitempty"`
 
 	// node version
-	NodeVersion string `json:"node-version,omitempty"`
+	NodeVersion string `json:"node_version,omitempty"`
 
 	// peer count
 	// Minimum: 0
-	PeerCount *int64 `json:"peer-count,omitempty"`
+	PeerCount *int64 `json:"peer_count,omitempty"`
 
 	// pending transactions count
 	// Minimum: 0
-	PendingTransactionsCount *int64 `json:"pending-transactions-count,omitempty"`
+	PendingTransactionsCount *int64 `json:"pending_transactions_count,omitempty"`
 
 	// protocols
 	Protocols []*Protocol `json:"protocols"`
@@ -91,7 +91,7 @@ func (m *Status) validateGenesisKeyBlockHash(formats strfmt.Registry) error {
 
 	if err := m.GenesisKeyBlockHash.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("genesis-key-block-hash")
+			return ve.ValidateName("genesis_key_block_hash")
 		}
 		return err
 	}
@@ -105,7 +105,7 @@ func (m *Status) validatePeerCount(formats strfmt.Registry) error {
 		return nil
 	}
 
-	if err := validate.MinimumInt("peer-count", "body", int64(*m.PeerCount), 0, false); err != nil {
+	if err := validate.MinimumInt("peer_count", "body", int64(*m.PeerCount), 0, false); err != nil {
 		return err
 	}
 
@@ -118,7 +118,7 @@ func (m *Status) validatePendingTransactionsCount(formats strfmt.Registry) error
 		return nil
 	}
 
-	if err := validate.MinimumInt("pending-transactions-count", "body", int64(*m.PendingTransactionsCount), 0, false); err != nil {
+	if err := validate.MinimumInt("pending_transactions_count", "body", int64(*m.PendingTransactionsCount), 0, false); err != nil {
 		return err
 	}
 

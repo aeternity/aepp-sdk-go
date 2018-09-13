@@ -19,7 +19,7 @@ import (
 // ChannelSLASHTxJSON channel slash tx JSON
 // swagger:model ChannelSlashTxJSON
 type ChannelSLASHTxJSON struct {
-	vsnField *int64
+	versionField *int64
 
 	ChannelSLASHTx
 }
@@ -34,14 +34,14 @@ func (m *ChannelSLASHTxJSON) SetType(val string) {
 
 }
 
-// Vsn gets the vsn of this subtype
-func (m *ChannelSLASHTxJSON) Vsn() *int64 {
-	return m.vsnField
+// Version gets the version of this subtype
+func (m *ChannelSLASHTxJSON) Version() *int64 {
+	return m.versionField
 }
 
-// SetVsn sets the vsn of this subtype
-func (m *ChannelSLASHTxJSON) SetVsn(val *int64) {
-	m.vsnField = val
+// SetVersion sets the version of this subtype
+func (m *ChannelSLASHTxJSON) SetVersion(val *int64) {
+	m.versionField = val
 }
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
@@ -62,7 +62,7 @@ func (m *ChannelSLASHTxJSON) UnmarshalJSON(raw []byte) error {
 
 		Type string `json:"type"`
 
-		Vsn *int64 `json:"vsn"`
+		Version *int64 `json:"version"`
 	}
 	buf = bytes.NewBuffer(raw)
 	dec = json.NewDecoder(buf)
@@ -79,7 +79,7 @@ func (m *ChannelSLASHTxJSON) UnmarshalJSON(raw []byte) error {
 		return errors.New(422, "invalid type value: %q", base.Type)
 	}
 
-	result.vsnField = base.Vsn
+	result.versionField = base.Version
 
 	result.ChannelSLASHTx = data.ChannelSLASHTx
 
@@ -105,12 +105,12 @@ func (m ChannelSLASHTxJSON) MarshalJSON() ([]byte, error) {
 	b2, err = json.Marshal(struct {
 		Type string `json:"type"`
 
-		Vsn *int64 `json:"vsn"`
+		Version *int64 `json:"version"`
 	}{
 
 		Type: m.Type(),
 
-		Vsn: m.Vsn(),
+		Version: m.Version(),
 	},
 	)
 	if err != nil {
@@ -124,7 +124,7 @@ func (m ChannelSLASHTxJSON) MarshalJSON() ([]byte, error) {
 func (m *ChannelSLASHTxJSON) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateVsn(formats); err != nil {
+	if err := m.validateVersion(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -139,9 +139,9 @@ func (m *ChannelSLASHTxJSON) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ChannelSLASHTxJSON) validateVsn(formats strfmt.Registry) error {
+func (m *ChannelSLASHTxJSON) validateVersion(formats strfmt.Registry) error {
 
-	if err := validate.Required("vsn", "body", m.Vsn()); err != nil {
+	if err := validate.Required("version", "body", m.Version()); err != nil {
 		return err
 	}
 

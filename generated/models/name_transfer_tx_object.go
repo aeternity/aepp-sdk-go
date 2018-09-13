@@ -19,7 +19,7 @@ import (
 // NameTransferTxObject name transfer tx object
 // swagger:model NameTransferTxObject
 type NameTransferTxObject struct {
-	vsnField *int64
+	versionField *int64
 
 	NameTransferTx
 }
@@ -34,14 +34,14 @@ func (m *NameTransferTxObject) SetType(val string) {
 
 }
 
-// Vsn gets the vsn of this subtype
-func (m *NameTransferTxObject) Vsn() *int64 {
-	return m.vsnField
+// Version gets the version of this subtype
+func (m *NameTransferTxObject) Version() *int64 {
+	return m.versionField
 }
 
-// SetVsn sets the vsn of this subtype
-func (m *NameTransferTxObject) SetVsn(val *int64) {
-	m.vsnField = val
+// SetVersion sets the version of this subtype
+func (m *NameTransferTxObject) SetVersion(val *int64) {
+	m.versionField = val
 }
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
@@ -62,7 +62,7 @@ func (m *NameTransferTxObject) UnmarshalJSON(raw []byte) error {
 
 		Type string `json:"type"`
 
-		Vsn *int64 `json:"vsn"`
+		Version *int64 `json:"version"`
 	}
 	buf = bytes.NewBuffer(raw)
 	dec = json.NewDecoder(buf)
@@ -79,7 +79,7 @@ func (m *NameTransferTxObject) UnmarshalJSON(raw []byte) error {
 		return errors.New(422, "invalid type value: %q", base.Type)
 	}
 
-	result.vsnField = base.Vsn
+	result.versionField = base.Version
 
 	result.NameTransferTx = data.NameTransferTx
 
@@ -105,12 +105,12 @@ func (m NameTransferTxObject) MarshalJSON() ([]byte, error) {
 	b2, err = json.Marshal(struct {
 		Type string `json:"type"`
 
-		Vsn *int64 `json:"vsn"`
+		Version *int64 `json:"version"`
 	}{
 
 		Type: m.Type(),
 
-		Vsn: m.Vsn(),
+		Version: m.Version(),
 	},
 	)
 	if err != nil {
@@ -124,7 +124,7 @@ func (m NameTransferTxObject) MarshalJSON() ([]byte, error) {
 func (m *NameTransferTxObject) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateVsn(formats); err != nil {
+	if err := m.validateVersion(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -139,9 +139,9 @@ func (m *NameTransferTxObject) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *NameTransferTxObject) validateVsn(formats strfmt.Registry) error {
+func (m *NameTransferTxObject) validateVersion(formats strfmt.Registry) error {
 
-	if err := validate.Required("vsn", "body", m.Vsn()); err != nil {
+	if err := validate.Required("version", "body", m.Version()); err != nil {
 		return err
 	}
 

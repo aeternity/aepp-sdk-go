@@ -16,9 +16,6 @@ import (
 // swagger:model RegisteredOracle
 type RegisteredOracle struct {
 
-	// expires
-	Expires int64 `json:"expires,omitempty"`
-
 	// id
 	ID EncodedHash `json:"id,omitempty"`
 
@@ -30,6 +27,9 @@ type RegisteredOracle struct {
 
 	// response format
 	ResponseFormat string `json:"response_format,omitempty"`
+
+	// ttl
+	TTL int64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this registered oracle

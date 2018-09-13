@@ -1397,6 +1397,34 @@ func (a *Client) PostContractCreateCompute(params *PostContractCreateComputePara
 }
 
 /*
+PostKeyBlock Post a mined key block
+*/
+func (a *Client) PostKeyBlock(params *PostKeyBlockParams) (*PostKeyBlockOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewPostKeyBlockParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "PostKeyBlock",
+		Method:             "POST",
+		PathPattern:        "/key-blocks",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &PostKeyBlockReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*PostKeyBlockOK), nil
+
+}
+
+/*
 PostNameClaim Get a name_claim transaction object
 */
 func (a *Client) PostNameClaim(params *PostNameClaimParams) (*PostNameClaimOK, error) {

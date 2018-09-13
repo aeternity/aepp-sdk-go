@@ -19,6 +19,10 @@ import (
 // swagger:model Channel
 type Channel struct {
 
+	// channel amount
+	// Minimum: 0
+	ChannelAmount *int64 `json:"channel_amount,omitempty"`
+
 	// channel reserve
 	// Minimum: 0
 	ChannelReserve *int64 `json:"channel_reserve,omitempty"`
@@ -28,6 +32,9 @@ type Channel struct {
 
 	// delegate ids
 	DelegateIds []EncodedHash `json:"delegate_ids"`
+
+	// forcing blocked until
+	ForcingBlockedUntil int64 `json:"forcing_blocked_until,omitempty"`
 
 	// id
 	ID EncodedHash `json:"id,omitempty"`
@@ -56,15 +63,15 @@ type Channel struct {
 
 	// state hash
 	StateHash EncodedHash `json:"state_hash,omitempty"`
-
-	// total amount
-	// Minimum: 0
-	TotalAmount *int64 `json:"total_amount,omitempty"`
 }
 
 // Validate validates this channel
 func (m *Channel) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := m.validateChannelAmount(formats); err != nil {
+		res = append(res, err)
+	}
 
 	if err := m.validateChannelReserve(formats); err != nil {
 		res = append(res, err)
@@ -106,13 +113,22 @@ func (m *Channel) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateTotalAmount(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *Channel) validateChannelAmount(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.ChannelAmount) { // not required
+		return nil
+	}
+
+	if err := validate.MinimumInt("channel_amount", "body", int64(*m.ChannelAmount), 0, false); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -259,19 +275,6 @@ func (m *Channel) validateStateHash(formats strfmt.Registry) error {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("state_hash")
 		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *Channel) validateTotalAmount(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.TotalAmount) { // not required
-		return nil
-	}
-
-	if err := validate.MinimumInt("total_amount", "body", int64(*m.TotalAmount), 0, false); err != nil {
 		return err
 	}
 

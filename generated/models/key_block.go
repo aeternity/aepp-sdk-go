@@ -29,13 +29,16 @@ type KeyBlock struct {
 	Miner EncodedHash `json:"miner,omitempty"`
 
 	// nonce
-	Nonce uint64 `json:"nonce,omitempty"`
+	Nonce int64 `json:"nonce,omitempty"`
 
 	// pow
 	Pow Pow `json:"pow"`
 
 	// prev hash
 	PrevHash EncodedHash `json:"prev_hash,omitempty"`
+
+	// prev key hash
+	PrevKeyHash EncodedHash `json:"prev_key_hash,omitempty"`
 
 	// state hash
 	StateHash EncodedHash `json:"state_hash,omitempty"`
@@ -74,6 +77,10 @@ func (m *KeyBlock) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validatePrevHash(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePrevKeyHash(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -164,6 +171,22 @@ func (m *KeyBlock) validatePrevHash(formats strfmt.Registry) error {
 	if err := m.PrevHash.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("prev_hash")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *KeyBlock) validatePrevKeyHash(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.PrevKeyHash) { // not required
+		return nil
+	}
+
+	if err := m.PrevKeyHash.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("prev_key_hash")
 		}
 		return err
 	}

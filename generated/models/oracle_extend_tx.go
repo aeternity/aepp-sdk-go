@@ -29,7 +29,7 @@ type OracleExtendTx struct {
 
 	// oracle ttl
 	// Required: true
-	OracleTTL *TTL `json:"oracle_ttl"`
+	OracleTTL *RelativeTTL `json:"oracle_ttl"`
 
 	// ttl
 	TTL int64 `json:"ttl,omitempty"`

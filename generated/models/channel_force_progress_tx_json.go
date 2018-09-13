@@ -16,38 +16,38 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// ChannelCreateTxJSON channel create tx JSON
-// swagger:model ChannelCreateTxJSON
-type ChannelCreateTxJSON struct {
+// ChannelForceProgressTxJSON channel force progress tx JSON
+// swagger:model ChannelForceProgressTxJSON
+type ChannelForceProgressTxJSON struct {
 	versionField *int64
 
-	ChannelCreateTx
+	ChannelForceProgressTx
 }
 
 // Type gets the type of this subtype
-func (m *ChannelCreateTxJSON) Type() string {
-	return "ChannelCreateTxJSON"
+func (m *ChannelForceProgressTxJSON) Type() string {
+	return "ChannelForceProgressTxJSON"
 }
 
 // SetType sets the type of this subtype
-func (m *ChannelCreateTxJSON) SetType(val string) {
+func (m *ChannelForceProgressTxJSON) SetType(val string) {
 
 }
 
 // Version gets the version of this subtype
-func (m *ChannelCreateTxJSON) Version() *int64 {
+func (m *ChannelForceProgressTxJSON) Version() *int64 {
 	return m.versionField
 }
 
 // SetVersion sets the version of this subtype
-func (m *ChannelCreateTxJSON) SetVersion(val *int64) {
+func (m *ChannelForceProgressTxJSON) SetVersion(val *int64) {
 	m.versionField = val
 }
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
-func (m *ChannelCreateTxJSON) UnmarshalJSON(raw []byte) error {
+func (m *ChannelForceProgressTxJSON) UnmarshalJSON(raw []byte) error {
 	var data struct {
-		ChannelCreateTx
+		ChannelForceProgressTx
 	}
 	buf := bytes.NewBuffer(raw)
 	dec := json.NewDecoder(buf)
@@ -72,7 +72,7 @@ func (m *ChannelCreateTxJSON) UnmarshalJSON(raw []byte) error {
 		return err
 	}
 
-	var result ChannelCreateTxJSON
+	var result ChannelForceProgressTxJSON
 
 	if base.Type != result.Type() {
 		/* Not the type we're looking for. */
@@ -81,7 +81,7 @@ func (m *ChannelCreateTxJSON) UnmarshalJSON(raw []byte) error {
 
 	result.versionField = base.Version
 
-	result.ChannelCreateTx = data.ChannelCreateTx
+	result.ChannelForceProgressTx = data.ChannelForceProgressTx
 
 	*m = result
 
@@ -89,14 +89,14 @@ func (m *ChannelCreateTxJSON) UnmarshalJSON(raw []byte) error {
 }
 
 // MarshalJSON marshals this object with a polymorphic type to a JSON structure
-func (m ChannelCreateTxJSON) MarshalJSON() ([]byte, error) {
+func (m ChannelForceProgressTxJSON) MarshalJSON() ([]byte, error) {
 	var b1, b2, b3 []byte
 	var err error
 	b1, err = json.Marshal(struct {
-		ChannelCreateTx
+		ChannelForceProgressTx
 	}{
 
-		ChannelCreateTx: m.ChannelCreateTx,
+		ChannelForceProgressTx: m.ChannelForceProgressTx,
 	},
 	)
 	if err != nil {
@@ -120,16 +120,16 @@ func (m ChannelCreateTxJSON) MarshalJSON() ([]byte, error) {
 	return swag.ConcatJSON(b1, b2, b3), nil
 }
 
-// Validate validates this channel create tx JSON
-func (m *ChannelCreateTxJSON) Validate(formats strfmt.Registry) error {
+// Validate validates this channel force progress tx JSON
+func (m *ChannelForceProgressTxJSON) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateVersion(formats); err != nil {
 		res = append(res, err)
 	}
 
-	// validation for a type composition with ChannelCreateTx
-	if err := m.ChannelCreateTx.Validate(formats); err != nil {
+	// validation for a type composition with ChannelForceProgressTx
+	if err := m.ChannelForceProgressTx.Validate(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -139,7 +139,7 @@ func (m *ChannelCreateTxJSON) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ChannelCreateTxJSON) validateVersion(formats strfmt.Registry) error {
+func (m *ChannelForceProgressTxJSON) validateVersion(formats strfmt.Registry) error {
 
 	if err := validate.Required("version", "body", m.Version()); err != nil {
 		return err
@@ -149,7 +149,7 @@ func (m *ChannelCreateTxJSON) validateVersion(formats strfmt.Registry) error {
 }
 
 // MarshalBinary interface implementation
-func (m *ChannelCreateTxJSON) MarshalBinary() ([]byte, error) {
+func (m *ChannelForceProgressTxJSON) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -157,8 +157,8 @@ func (m *ChannelCreateTxJSON) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *ChannelCreateTxJSON) UnmarshalBinary(b []byte) error {
-	var res ChannelCreateTxJSON
+func (m *ChannelForceProgressTxJSON) UnmarshalBinary(b []byte) error {
+	var res ChannelForceProgressTxJSON
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

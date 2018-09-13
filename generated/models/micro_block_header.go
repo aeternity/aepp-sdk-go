@@ -25,6 +25,9 @@ type MicroBlockHeader struct {
 	// prev hash
 	PrevHash EncodedHash `json:"prev_hash,omitempty"`
 
+	// prev key hash
+	PrevKeyHash EncodedHash `json:"prev_key_hash,omitempty"`
+
 	// signature
 	Signature EncodedHash `json:"signature,omitempty"`
 
@@ -50,6 +53,10 @@ func (m *MicroBlockHeader) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validatePrevHash(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePrevKeyHash(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -96,6 +103,22 @@ func (m *MicroBlockHeader) validatePrevHash(formats strfmt.Registry) error {
 	if err := m.PrevHash.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("prev_hash")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *MicroBlockHeader) validatePrevKeyHash(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.PrevKeyHash) { // not required
+		return nil
+	}
+
+	if err := m.PrevKeyHash.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("prev_key_hash")
 		}
 		return err
 	}
