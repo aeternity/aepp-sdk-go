@@ -55,7 +55,7 @@ type ContractCreateCompute struct {
 
 	// Contract owner pub_key
 	// Required: true
-	Owner *string `json:"owner"`
+	OwnerID *string `json:"owner_id"`
 
 	// Transaction TTL
 	// Minimum: 0
@@ -100,7 +100,7 @@ func (m *ContractCreateCompute) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateOwner(formats); err != nil {
+	if err := m.validateOwnerID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -201,9 +201,9 @@ func (m *ContractCreateCompute) validateGasPrice(formats strfmt.Registry) error 
 	return nil
 }
 
-func (m *ContractCreateCompute) validateOwner(formats strfmt.Registry) error {
+func (m *ContractCreateCompute) validateOwnerID(formats strfmt.Registry) error {
 
-	if err := validate.Required("owner", "body", m.Owner); err != nil {
+	if err := validate.Required("owner_id", "body", m.OwnerID); err != nil {
 		return err
 	}
 

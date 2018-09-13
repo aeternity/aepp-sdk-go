@@ -21,12 +21,12 @@ type Account struct {
 	// Minimum: 0
 	Balance *int64 `json:"balance,omitempty"`
 
+	// Public key
+	ID EncodedHash `json:"id,omitempty"`
+
 	// Nonce
 	// Minimum: 0
 	Nonce *int64 `json:"nonce,omitempty"`
-
-	// Public key
-	Pubkey string `json:"pubkey,omitempty"`
 }
 
 // Validate validates this account
@@ -34,6 +34,10 @@ func (m *Account) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateBalance(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -54,6 +58,22 @@ func (m *Account) validateBalance(formats strfmt.Registry) error {
 	}
 
 	if err := validate.MinimumInt("balance", "body", int64(*m.Balance), 0, false); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Account) validateID(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.ID) { // not required
+		return nil
+	}
+
+	if err := m.ID.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("id")
+		}
 		return err
 	}
 

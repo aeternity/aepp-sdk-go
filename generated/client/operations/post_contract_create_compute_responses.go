@@ -65,7 +65,7 @@ type PostContractCreateComputeOK struct {
 }
 
 func (o *PostContractCreateComputeOK) Error() string {
-	return fmt.Sprintf("[POST /tx/contract/create/compute][%d] postContractCreateComputeOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /debug/contracts/create/compute][%d] postContractCreateComputeOK  %+v", 200, o.Payload)
 }
 
 func (o *PostContractCreateComputeOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -94,7 +94,7 @@ type PostContractCreateComputeBadRequest struct {
 }
 
 func (o *PostContractCreateComputeBadRequest) Error() string {
-	return fmt.Sprintf("[POST /tx/contract/create/compute][%d] postContractCreateComputeBadRequest  %+v", 400, o.Payload)
+	return fmt.Sprintf("[POST /debug/contracts/create/compute][%d] postContractCreateComputeBadRequest  %+v", 400, o.Payload)
 }
 
 func (o *PostContractCreateComputeBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -123,7 +123,7 @@ type PostContractCreateComputeNotFound struct {
 }
 
 func (o *PostContractCreateComputeNotFound) Error() string {
-	return fmt.Sprintf("[POST /tx/contract/create/compute][%d] postContractCreateComputeNotFound  %+v", 404, o.Payload)
+	return fmt.Sprintf("[POST /debug/contracts/create/compute][%d] postContractCreateComputeNotFound  %+v", 404, o.Payload)
 }
 
 func (o *PostContractCreateComputeNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

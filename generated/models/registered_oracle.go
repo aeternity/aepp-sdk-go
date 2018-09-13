@@ -8,6 +8,7 @@ package models
 import (
 	strfmt "github.com/go-openapi/strfmt"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 )
 
@@ -19,7 +20,7 @@ type RegisteredOracle struct {
 	Expires int64 `json:"expires,omitempty"`
 
 	// id
-	ID string `json:"id,omitempty"`
+	ID EncodedHash `json:"id,omitempty"`
 
 	// query fee
 	QueryFee int64 `json:"query_fee,omitempty"`
@@ -33,6 +34,31 @@ type RegisteredOracle struct {
 
 // Validate validates this registered oracle
 func (m *RegisteredOracle) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateID(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *RegisteredOracle) validateID(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.ID) { // not required
+		return nil
+	}
+
+	if err := m.ID.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("id")
+		}
+		return err
+	}
+
 	return nil
 }
 

@@ -58,7 +58,7 @@ type PostChannelDepositOK struct {
 }
 
 func (o *PostChannelDepositOK) Error() string {
-	return fmt.Sprintf("[POST /tx/channel/deposit][%d] postChannelDepositOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /debug/channels/deposit][%d] postChannelDepositOK  %+v", 200, o.Payload)
 }
 
 func (o *PostChannelDepositOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -87,7 +87,7 @@ type PostChannelDepositBadRequest struct {
 }
 
 func (o *PostChannelDepositBadRequest) Error() string {
-	return fmt.Sprintf("[POST /tx/channel/deposit][%d] postChannelDepositBadRequest  %+v", 400, o.Payload)
+	return fmt.Sprintf("[POST /debug/channels/deposit][%d] postChannelDepositBadRequest  %+v", 400, o.Payload)
 }
 
 func (o *PostChannelDepositBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

@@ -65,7 +65,7 @@ type PostNameTransferOK struct {
 }
 
 func (o *PostNameTransferOK) Error() string {
-	return fmt.Sprintf("[POST /tx/name/transfer][%d] postNameTransferOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /debug/names/transfer][%d] postNameTransferOK  %+v", 200, o.Payload)
 }
 
 func (o *PostNameTransferOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -94,7 +94,7 @@ type PostNameTransferBadRequest struct {
 }
 
 func (o *PostNameTransferBadRequest) Error() string {
-	return fmt.Sprintf("[POST /tx/name/transfer][%d] postNameTransferBadRequest  %+v", 400, o.Payload)
+	return fmt.Sprintf("[POST /debug/names/transfer][%d] postNameTransferBadRequest  %+v", 400, o.Payload)
 }
 
 func (o *PostNameTransferBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -123,7 +123,7 @@ type PostNameTransferNotFound struct {
 }
 
 func (o *PostNameTransferNotFound) Error() string {
-	return fmt.Sprintf("[POST /tx/name/transfer][%d] postNameTransferNotFound  %+v", 404, o.Payload)
+	return fmt.Sprintf("[POST /debug/names/transfer][%d] postNameTransferNotFound  %+v", 404, o.Payload)
 }
 
 func (o *PostNameTransferNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

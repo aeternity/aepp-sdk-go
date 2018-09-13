@@ -62,11 +62,11 @@ for the get contract po i operation typically these are written to a http.Reques
 */
 type GetContractPoIParams struct {
 
-	/*Contract
+	/*Pubkey
 	  Contract pubkey to get proof for
 
 	*/
-	Contract string
+	Pubkey string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -106,15 +106,15 @@ func (o *GetContractPoIParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
-// WithContract adds the contract to the get contract po i params
-func (o *GetContractPoIParams) WithContract(contract string) *GetContractPoIParams {
-	o.SetContract(contract)
+// WithPubkey adds the pubkey to the get contract po i params
+func (o *GetContractPoIParams) WithPubkey(pubkey string) *GetContractPoIParams {
+	o.SetPubkey(pubkey)
 	return o
 }
 
-// SetContract adds the contract to the get contract po i params
-func (o *GetContractPoIParams) SetContract(contract string) {
-	o.Contract = contract
+// SetPubkey adds the pubkey to the get contract po i params
+func (o *GetContractPoIParams) SetPubkey(pubkey string) {
+	o.Pubkey = pubkey
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -125,8 +125,8 @@ func (o *GetContractPoIParams) WriteToRequest(r runtime.ClientRequest, reg strfm
 	}
 	var res []error
 
-	// path param contract
-	if err := r.SetPathParam("contract", o.Contract); err != nil {
+	// path param pubkey
+	if err := r.SetPathParam("pubkey", o.Pubkey); err != nil {
 		return err
 	}
 

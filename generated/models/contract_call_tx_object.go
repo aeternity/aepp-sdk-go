@@ -13,33 +13,34 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // ContractCallTxObject contract call tx object
 // swagger:model ContractCallTxObject
 type ContractCallTxObject struct {
-	vsnField int64
+	vsnField *int64
 
 	ContractCallData
 }
 
-// DataSchema gets the data schema of this subtype
-func (m *ContractCallTxObject) DataSchema() string {
+// Type gets the type of this subtype
+func (m *ContractCallTxObject) Type() string {
 	return "ContractCallTxObject"
 }
 
-// SetDataSchema sets the data schema of this subtype
-func (m *ContractCallTxObject) SetDataSchema(val string) {
+// SetType sets the type of this subtype
+func (m *ContractCallTxObject) SetType(val string) {
 
 }
 
 // Vsn gets the vsn of this subtype
-func (m *ContractCallTxObject) Vsn() int64 {
+func (m *ContractCallTxObject) Vsn() *int64 {
 	return m.vsnField
 }
 
 // SetVsn sets the vsn of this subtype
-func (m *ContractCallTxObject) SetVsn(val int64) {
+func (m *ContractCallTxObject) SetVsn(val *int64) {
 	m.vsnField = val
 }
 
@@ -59,9 +60,9 @@ func (m *ContractCallTxObject) UnmarshalJSON(raw []byte) error {
 	var base struct {
 		/* Just the base type fields. Used for unmashalling polymorphic types.*/
 
-		DataSchema string `json:"data_schema"`
+		Type string `json:"type"`
 
-		Vsn int64 `json:"vsn,omitempty"`
+		Vsn *int64 `json:"vsn"`
 	}
 	buf = bytes.NewBuffer(raw)
 	dec = json.NewDecoder(buf)
@@ -73,9 +74,9 @@ func (m *ContractCallTxObject) UnmarshalJSON(raw []byte) error {
 
 	var result ContractCallTxObject
 
-	if base.DataSchema != result.DataSchema() {
+	if base.Type != result.Type() {
 		/* Not the type we're looking for. */
-		return errors.New(422, "invalid data_schema value: %q", base.DataSchema)
+		return errors.New(422, "invalid type value: %q", base.Type)
 	}
 
 	result.vsnField = base.Vsn
@@ -102,12 +103,12 @@ func (m ContractCallTxObject) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 	b2, err = json.Marshal(struct {
-		DataSchema string `json:"data_schema"`
+		Type string `json:"type"`
 
-		Vsn int64 `json:"vsn,omitempty"`
+		Vsn *int64 `json:"vsn"`
 	}{
 
-		DataSchema: m.DataSchema(),
+		Type: m.Type(),
 
 		Vsn: m.Vsn(),
 	},
@@ -123,6 +124,10 @@ func (m ContractCallTxObject) MarshalJSON() ([]byte, error) {
 func (m *ContractCallTxObject) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateVsn(formats); err != nil {
+		res = append(res, err)
+	}
+
 	// validation for a type composition with ContractCallData
 	if err := m.ContractCallData.Validate(formats); err != nil {
 		res = append(res, err)
@@ -131,6 +136,15 @@ func (m *ContractCallTxObject) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *ContractCallTxObject) validateVsn(formats strfmt.Registry) error {
+
+	if err := validate.Required("vsn", "body", m.Vsn()); err != nil {
+		return err
+	}
+
 	return nil
 }
 

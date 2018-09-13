@@ -36,7 +36,7 @@ func (a *Client) CallContract(params *CallContractParams) (*CallContractOK, erro
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "CallContract",
 		Method:             "POST",
-		PathPattern:        "/contract/call",
+		PathPattern:        "/debug/contracts/code/call",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
@@ -64,7 +64,7 @@ func (a *Client) CompileContract(params *CompileContractParams) (*CompileContrac
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "CompileContract",
 		Method:             "POST",
-		PathPattern:        "/contract/compile",
+		PathPattern:        "/debug/contracts/code/compile",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
@@ -92,7 +92,7 @@ func (a *Client) DecodeData(params *DecodeDataParams) (*DecodeDataOK, error) {
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "DecodeData",
 		Method:             "POST",
-		PathPattern:        "/contract/decode-data",
+		PathPattern:        "/debug/contracts/code/decode-data",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
@@ -120,7 +120,7 @@ func (a *Client) EncodeCalldata(params *EncodeCalldataParams) (*EncodeCalldataOK
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "EncodeCalldata",
 		Method:             "POST",
-		PathPattern:        "/contract/encode-calldata",
+		PathPattern:        "/debug/contracts/code/encode-calldata",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
@@ -133,34 +133,6 @@ func (a *Client) EncodeCalldata(params *EncodeCalldataParams) (*EncodeCalldataOK
 		return nil, err
 	}
 	return result.(*EncodeCalldataOK), nil
-
-}
-
-/*
-GetAccountBalance Get accounts's balance
-*/
-func (a *Client) GetAccountBalance(params *GetAccountBalanceParams) (*GetAccountBalanceOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetAccountBalanceParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetAccountBalance",
-		Method:             "GET",
-		PathPattern:        "/account/{address}/balance",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetAccountBalanceReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetAccountBalanceOK), nil
 
 }
 
@@ -193,286 +165,6 @@ func (a *Client) GetAccountByPubkey(params *GetAccountByPubkeyParams) (*GetAccou
 }
 
 /*
-GetAccountNonce Get accounts's last used nonce on chain
-*/
-func (a *Client) GetAccountNonce(params *GetAccountNonceParams) (*GetAccountNonceOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetAccountNonceParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetAccountNonce",
-		Method:             "GET",
-		PathPattern:        "/account/{account_pubkey}/nonce",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetAccountNonceReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetAccountNonceOK), nil
-
-}
-
-/*
-GetAccountPendingTransactions Get accounts's pending transactions from the mempool
-*/
-func (a *Client) GetAccountPendingTransactions(params *GetAccountPendingTransactionsParams) (*GetAccountPendingTransactionsOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetAccountPendingTransactionsParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetAccountPendingTransactions",
-		Method:             "GET",
-		PathPattern:        "/account/{account_pubkey}/pending_transactions",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetAccountPendingTransactionsReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetAccountPendingTransactionsOK), nil
-
-}
-
-/*
-GetAccountsBalances Get all users' balances
-*/
-func (a *Client) GetAccountsBalances(params *GetAccountsBalancesParams) (*GetAccountsBalancesOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetAccountsBalancesParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetAccountsBalances",
-		Method:             "GET",
-		PathPattern:        "/balances",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetAccountsBalancesReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetAccountsBalancesOK), nil
-
-}
-
-/*
-GetActiveRegisteredOracles Get active registered oracles
-*/
-func (a *Client) GetActiveRegisteredOracles(params *GetActiveRegisteredOraclesParams) (*GetActiveRegisteredOraclesOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetActiveRegisteredOraclesParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetActiveRegisteredOracles",
-		Method:             "GET",
-		PathPattern:        "/oracles",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetActiveRegisteredOraclesReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetActiveRegisteredOraclesOK), nil
-
-}
-
-/*
-GetBlockByHash Get a block by hash
-*/
-func (a *Client) GetBlockByHash(params *GetBlockByHashParams) (*GetBlockByHashOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetBlockByHashParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetBlockByHash",
-		Method:             "GET",
-		PathPattern:        "/block/hash/{hash}",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetBlockByHashReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetBlockByHashOK), nil
-
-}
-
-/*
-GetBlockGenesis Get the genesis block
-*/
-func (a *Client) GetBlockGenesis(params *GetBlockGenesisParams) (*GetBlockGenesisOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetBlockGenesisParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetBlockGenesis",
-		Method:             "GET",
-		PathPattern:        "/block/genesis",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetBlockGenesisReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetBlockGenesisOK), nil
-
-}
-
-/*
-GetBlockLatest Get the top block
-*/
-func (a *Client) GetBlockLatest(params *GetBlockLatestParams) (*GetBlockLatestOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetBlockLatestParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetBlockLatest",
-		Method:             "GET",
-		PathPattern:        "/block/latest",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetBlockLatestReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetBlockLatestOK), nil
-
-}
-
-/*
-GetBlockNumber Get the current block's height
-*/
-func (a *Client) GetBlockNumber(params *GetBlockNumberParams) (*GetBlockNumberOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetBlockNumberParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetBlockNumber",
-		Method:             "GET",
-		PathPattern:        "/block/number",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetBlockNumberReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetBlockNumberOK), nil
-
-}
-
-/*
-GetBlockTxsCountByHash Get a block transactions count by hash
-*/
-func (a *Client) GetBlockTxsCountByHash(params *GetBlockTxsCountByHashParams) (*GetBlockTxsCountByHashOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetBlockTxsCountByHashParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetBlockTxsCountByHash",
-		Method:             "GET",
-		PathPattern:        "/block/txs/count/hash/{hash}",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetBlockTxsCountByHashReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetBlockTxsCountByHashOK), nil
-
-}
-
-/*
-GetBlockTxsCountByHeight Get a block transactions count by height
-*/
-func (a *Client) GetBlockTxsCountByHeight(params *GetBlockTxsCountByHeightParams) (*GetBlockTxsCountByHeightOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetBlockTxsCountByHeightParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetBlockTxsCountByHeight",
-		Method:             "GET",
-		PathPattern:        "/block/txs/count/height/{height}",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetBlockTxsCountByHeightReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetBlockTxsCountByHeightOK), nil
-
-}
-
-/*
 GetChannelByPubkey Get channel by public key
 */
 func (a *Client) GetChannelByPubkey(params *GetChannelByPubkeyParams) (*GetChannelByPubkeyOK, error) {
@@ -501,30 +193,30 @@ func (a *Client) GetChannelByPubkey(params *GetChannelByPubkeyParams) (*GetChann
 }
 
 /*
-GetCommitmentHash Compute commitment hash for a given salt and name. Commitment hash must be computed client side. This endpoint is for verifying client's implementations.
+GetCommitmentID Compute commitment ID for a given salt and name
 */
-func (a *Client) GetCommitmentHash(params *GetCommitmentHashParams) (*GetCommitmentHashOK, error) {
+func (a *Client) GetCommitmentID(params *GetCommitmentIDParams) (*GetCommitmentIDOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewGetCommitmentHashParams()
+		params = NewGetCommitmentIDParams()
 	}
 
 	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetCommitmentHash",
+		ID:                 "GetCommitmentId",
 		Method:             "GET",
-		PathPattern:        "/commitment-hash",
+		PathPattern:        "/debug/names/commitment-id",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{""},
 		Schemes:            []string{"http"},
 		Params:             params,
-		Reader:             &GetCommitmentHashReader{formats: a.formats},
+		Reader:             &GetCommitmentIDReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetCommitmentHashOK), nil
+	return result.(*GetCommitmentIDOK), nil
 
 }
 
@@ -553,34 +245,6 @@ func (a *Client) GetContract(params *GetContractParams) (*GetContractOK, error) 
 		return nil, err
 	}
 	return result.(*GetContractOK), nil
-
-}
-
-/*
-GetContractCallFromTx Get the call result for a contract_create or contract_call transaction
-*/
-func (a *Client) GetContractCallFromTx(params *GetContractCallFromTxParams) (*GetContractCallFromTxOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetContractCallFromTxParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetContractCallFromTx",
-		Method:             "GET",
-		PathPattern:        "/tx/{tx_hash}/contract-call",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetContractCallFromTxReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetContractCallFromTxOK), nil
 
 }
 
@@ -624,7 +288,7 @@ func (a *Client) GetContractPoI(params *GetContractPoIParams) (*GetContractPoIOK
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "GetContractPoI",
 		Method:             "GET",
-		PathPattern:        "/poi/contract/{contract}",
+		PathPattern:        "/contracts/{pubkey}/poi",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{""},
 		Schemes:            []string{"http"},
@@ -837,90 +501,6 @@ func (a *Client) GetGenerationByHeight(params *GetGenerationByHeightParams) (*Ge
 }
 
 /*
-GetGenesisBlockTxsCount Get the genesis block transactions count
-*/
-func (a *Client) GetGenesisBlockTxsCount(params *GetGenesisBlockTxsCountParams) (*GetGenesisBlockTxsCountOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetGenesisBlockTxsCountParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetGenesisBlockTxsCount",
-		Method:             "GET",
-		PathPattern:        "/block/txs/count/genesis",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetGenesisBlockTxsCountReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetGenesisBlockTxsCountOK), nil
-
-}
-
-/*
-GetHeaderByHash Get a header by hash
-*/
-func (a *Client) GetHeaderByHash(params *GetHeaderByHashParams) (*GetHeaderByHashOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetHeaderByHashParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetHeaderByHash",
-		Method:             "GET",
-		PathPattern:        "/header-by-hash",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetHeaderByHashReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetHeaderByHashOK), nil
-
-}
-
-/*
-GetInfo Get node info
-*/
-func (a *Client) GetInfo(params *GetInfoParams) (*GetInfoOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetInfoParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetInfo",
-		Method:             "GET",
-		PathPattern:        "/info",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetInfoReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetInfoOK), nil
-
-}
-
-/*
 GetKeyBlockByHash Get a key block by hash
 */
 func (a *Client) GetKeyBlockByHash(params *GetKeyBlockByHashParams) (*GetKeyBlockByHashOK, error) {
@@ -973,90 +553,6 @@ func (a *Client) GetKeyBlockByHeight(params *GetKeyBlockByHeightParams) (*GetKey
 		return nil, err
 	}
 	return result.(*GetKeyBlockByHeightOK), nil
-
-}
-
-/*
-GetKeyBlockByHeightObsolete Get a key block by height
-*/
-func (a *Client) GetKeyBlockByHeightObsolete(params *GetKeyBlockByHeightObsoleteParams) (*GetKeyBlockByHeightObsoleteOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetKeyBlockByHeightObsoleteParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetKeyBlockByHeightObsolete",
-		Method:             "GET",
-		PathPattern:        "/block/height/{height}",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetKeyBlockByHeightObsoleteReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetKeyBlockByHeightObsoleteOK), nil
-
-}
-
-/*
-GetKeyHeaderByHeight Get a key header by its height in the chain
-*/
-func (a *Client) GetKeyHeaderByHeight(params *GetKeyHeaderByHeightParams) (*GetKeyHeaderByHeightOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetKeyHeaderByHeightParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetKeyHeaderByHeight",
-		Method:             "GET",
-		PathPattern:        "/header-by-height",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetKeyHeaderByHeightReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetKeyHeaderByHeightOK), nil
-
-}
-
-/*
-GetLatestBlockTxsCount Get the latest block transactions count
-*/
-func (a *Client) GetLatestBlockTxsCount(params *GetLatestBlockTxsCountParams) (*GetLatestBlockTxsCountOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetLatestBlockTxsCountParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetLatestBlockTxsCount",
-		Method:             "GET",
-		PathPattern:        "/block/txs/count/latest",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetLatestBlockTxsCountReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetLatestBlockTxsCountOK), nil
 
 }
 
@@ -1173,34 +669,6 @@ func (a *Client) GetMicroBlockTransactionsCountByHash(params *GetMicroBlockTrans
 }
 
 /*
-GetName Get name entry from Naming System
-*/
-func (a *Client) GetName(params *GetNameParams) (*GetNameOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetNameParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetName",
-		Method:             "GET",
-		PathPattern:        "/name",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetNameReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetNameOK), nil
-
-}
-
-/*
 GetNameEntryByName Get name entry from naming system
 */
 func (a *Client) GetNameEntryByName(params *GetNameEntryByNameParams) (*GetNameEntryByNameOK, error) {
@@ -1225,6 +693,34 @@ func (a *Client) GetNameEntryByName(params *GetNameEntryByNameParams) (*GetNameE
 		return nil, err
 	}
 	return result.(*GetNameEntryByNameOK), nil
+
+}
+
+/*
+GetNodePubkey Get node's public key
+*/
+func (a *Client) GetNodePubkey(params *GetNodePubkeyParams) (*GetNodePubkeyOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetNodePubkeyParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "GetNodePubkey",
+		Method:             "GET",
+		PathPattern:        "/debug/accounts/node",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{""},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetNodePubkeyReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetNodePubkeyOK), nil
 
 }
 
@@ -1313,62 +809,6 @@ func (a *Client) GetOracleQueryByPubkeyAndQueryID(params *GetOracleQueryByPubkey
 }
 
 /*
-GetOracleQuestions Get active oracle questions
-*/
-func (a *Client) GetOracleQuestions(params *GetOracleQuestionsParams) (*GetOracleQuestionsOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetOracleQuestionsParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetOracleQuestions",
-		Method:             "GET",
-		PathPattern:        "/oracle-questions",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetOracleQuestionsReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetOracleQuestionsOK), nil
-
-}
-
-/*
-GetPeerKey Get node's public peer key
-*/
-func (a *Client) GetPeerKey(params *GetPeerKeyParams) (*GetPeerKeyOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetPeerKeyParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetPeerKey",
-		Method:             "GET",
-		PathPattern:        "/peer/key",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetPeerKeyReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetPeerKeyOK), nil
-
-}
-
-/*
 GetPeerPubkey Get peer public key
 */
 func (a *Client) GetPeerPubkey(params *GetPeerPubkeyParams) (*GetPeerPubkeyOK, error) {
@@ -1453,34 +893,6 @@ func (a *Client) GetPendingAccountTransactionsByPubkey(params *GetPendingAccount
 }
 
 /*
-GetPendingBlockTxsCount Get the pending block transactions count
-*/
-func (a *Client) GetPendingBlockTxsCount(params *GetPendingBlockTxsCountParams) (*GetPendingBlockTxsCountOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetPendingBlockTxsCountParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetPendingBlockTxsCount",
-		Method:             "GET",
-		PathPattern:        "/block/txs/count/pending",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetPendingBlockTxsCountReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetPendingBlockTxsCountOK), nil
-
-}
-
-/*
 GetPendingKeyBlock Get the pending key block
 */
 func (a *Client) GetPendingKeyBlock(params *GetPendingKeyBlockParams) (*GetPendingKeyBlockOK, error) {
@@ -1509,30 +921,30 @@ func (a *Client) GetPendingKeyBlock(params *GetPendingKeyBlockParams) (*GetPendi
 }
 
 /*
-GetPubKey Get user's public key address
+GetPendingTransactions Get pending transactions
 */
-func (a *Client) GetPubKey(params *GetPubKeyParams) (*GetPubKeyOK, error) {
+func (a *Client) GetPendingTransactions(params *GetPendingTransactionsParams) (*GetPendingTransactionsOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewGetPubKeyParams()
+		params = NewGetPendingTransactionsParams()
 	}
 
 	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetPubKey",
+		ID:                 "GetPendingTransactions",
 		Method:             "GET",
-		PathPattern:        "/account/pub-key",
+		PathPattern:        "/debug/transactions/pending",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{""},
 		Schemes:            []string{"http"},
 		Params:             params,
-		Reader:             &GetPubKeyReader{formats: a.formats},
+		Reader:             &GetPendingTransactionsReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetPubKeyOK), nil
+	return result.(*GetPendingTransactionsOK), nil
 
 }
 
@@ -1561,34 +973,6 @@ func (a *Client) GetStatus(params *GetStatusParams) (*GetStatusOK, error) {
 		return nil, err
 	}
 	return result.(*GetStatusOK), nil
-
-}
-
-/*
-GetTop Get the top block (either key or micro block)
-*/
-func (a *Client) GetTop(params *GetTopParams) (*GetTopOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetTopParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetTop",
-		Method:             "GET",
-		PathPattern:        "/top",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetTopReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetTopOK), nil
 
 }
 
@@ -1649,90 +1033,6 @@ func (a *Client) GetTransactionByHash(params *GetTransactionByHashParams) (*GetT
 }
 
 /*
-GetTransactionFromBlockHash Get a transaction by index in the block by hash
-*/
-func (a *Client) GetTransactionFromBlockHash(params *GetTransactionFromBlockHashParams) (*GetTransactionFromBlockHashOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetTransactionFromBlockHashParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetTransactionFromBlockHash",
-		Method:             "GET",
-		PathPattern:        "/block/tx/hash/{hash}/{tx_index}",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetTransactionFromBlockHashReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetTransactionFromBlockHashOK), nil
-
-}
-
-/*
-GetTransactionFromBlockHeight Get a transaction by index in the block by height
-*/
-func (a *Client) GetTransactionFromBlockHeight(params *GetTransactionFromBlockHeightParams) (*GetTransactionFromBlockHeightOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetTransactionFromBlockHeightParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetTransactionFromBlockHeight",
-		Method:             "GET",
-		PathPattern:        "/block/tx/height/{height}/{tx_index}",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetTransactionFromBlockHeightReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetTransactionFromBlockHeightOK), nil
-
-}
-
-/*
-GetTransactionFromBlockLatest Get a transaction by index in the latest block
-*/
-func (a *Client) GetTransactionFromBlockLatest(params *GetTransactionFromBlockLatestParams) (*GetTransactionFromBlockLatestOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetTransactionFromBlockLatestParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetTransactionFromBlockLatest",
-		Method:             "GET",
-		PathPattern:        "/block/tx/latest/{tx_index}",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetTransactionFromBlockLatestReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetTransactionFromBlockLatestOK), nil
-
-}
-
-/*
 GetTransactionInfoByHash Get a transaction info by hash
 */
 func (a *Client) GetTransactionInfoByHash(params *GetTransactionInfoByHashParams) (*GetTransactionInfoByHashOK, error) {
@@ -1761,90 +1061,6 @@ func (a *Client) GetTransactionInfoByHash(params *GetTransactionInfoByHashParams
 }
 
 /*
-GetTx Get a transaction by hash
-*/
-func (a *Client) GetTx(params *GetTxParams) (*GetTxOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetTxParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetTx",
-		Method:             "GET",
-		PathPattern:        "/tx/{tx_hash}",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetTxReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetTxOK), nil
-
-}
-
-/*
-GetTxs Get transactions in the mempool
-*/
-func (a *Client) GetTxs(params *GetTxsParams) (*GetTxsOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetTxsParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetTxs",
-		Method:             "GET",
-		PathPattern:        "/transactions",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetTxsReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetTxsOK), nil
-
-}
-
-/*
-GetVersion Get node's version
-*/
-func (a *Client) GetVersion(params *GetVersionParams) (*GetVersionOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetVersionParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetVersion",
-		Method:             "GET",
-		PathPattern:        "/version",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetVersionReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetVersionOK), nil
-
-}
-
-/*
 PostChannelCloseMutual Get a channel_close_mutual transaction object
 */
 func (a *Client) PostChannelCloseMutual(params *PostChannelCloseMutualParams) (*PostChannelCloseMutualOK, error) {
@@ -1856,7 +1072,7 @@ func (a *Client) PostChannelCloseMutual(params *PostChannelCloseMutualParams) (*
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PostChannelCloseMutual",
 		Method:             "POST",
-		PathPattern:        "/tx/channel/close/mutual",
+		PathPattern:        "/debug/channels/close/mutual",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{""},
 		Schemes:            []string{"http"},
@@ -1884,7 +1100,7 @@ func (a *Client) PostChannelCloseSolo(params *PostChannelCloseSoloParams) (*Post
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PostChannelCloseSolo",
 		Method:             "POST",
-		PathPattern:        "/tx/channel/close/solo",
+		PathPattern:        "/debug/channels/close/solo",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{""},
 		Schemes:            []string{"http"},
@@ -1912,7 +1128,7 @@ func (a *Client) PostChannelCreate(params *PostChannelCreateParams) (*PostChanne
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PostChannelCreate",
 		Method:             "POST",
-		PathPattern:        "/tx/channel/create",
+		PathPattern:        "/debug/channels/create",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{""},
 		Schemes:            []string{"http"},
@@ -1940,7 +1156,7 @@ func (a *Client) PostChannelDeposit(params *PostChannelDepositParams) (*PostChan
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PostChannelDeposit",
 		Method:             "POST",
-		PathPattern:        "/tx/channel/deposit",
+		PathPattern:        "/debug/channels/deposit",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{""},
 		Schemes:            []string{"http"},
@@ -1968,7 +1184,7 @@ func (a *Client) PostChannelSettle(params *PostChannelSettleParams) (*PostChanne
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PostChannelSettle",
 		Method:             "POST",
-		PathPattern:        "/tx/channel/settle",
+		PathPattern:        "/debug/channels/settle",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{""},
 		Schemes:            []string{"http"},
@@ -1996,7 +1212,7 @@ func (a *Client) PostChannelSLASH(params *PostChannelSLASHParams) (*PostChannelS
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PostChannelSlash",
 		Method:             "POST",
-		PathPattern:        "/tx/channel/slash",
+		PathPattern:        "/debug/channels/slash",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{""},
 		Schemes:            []string{"http"},
@@ -2024,7 +1240,7 @@ func (a *Client) PostChannelSnapshotSolo(params *PostChannelSnapshotSoloParams) 
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PostChannelSnapshotSolo",
 		Method:             "POST",
-		PathPattern:        "/tx/channel/snapshot/solo",
+		PathPattern:        "/debug/channels/snapshot/solo",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{""},
 		Schemes:            []string{"http"},
@@ -2041,30 +1257,30 @@ func (a *Client) PostChannelSnapshotSolo(params *PostChannelSnapshotSoloParams) 
 }
 
 /*
-PostChannelWithdrawal Get a channel_withdrawal transaction object
+PostChannelWithdraw Get a channel_withdrawal transaction object
 */
-func (a *Client) PostChannelWithdrawal(params *PostChannelWithdrawalParams) (*PostChannelWithdrawalOK, error) {
+func (a *Client) PostChannelWithdraw(params *PostChannelWithdrawParams) (*PostChannelWithdrawOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewPostChannelWithdrawalParams()
+		params = NewPostChannelWithdrawParams()
 	}
 
 	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "PostChannelWithdrawal",
+		ID:                 "PostChannelWithdraw",
 		Method:             "POST",
-		PathPattern:        "/tx/channel/withdrawal",
+		PathPattern:        "/debug/channels/withdraw",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{""},
 		Schemes:            []string{"http"},
 		Params:             params,
-		Reader:             &PostChannelWithdrawalReader{formats: a.formats},
+		Reader:             &PostChannelWithdrawReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
 	if err != nil {
 		return nil, err
 	}
-	return result.(*PostChannelWithdrawalOK), nil
+	return result.(*PostChannelWithdrawOK), nil
 
 }
 
@@ -2080,7 +1296,7 @@ func (a *Client) PostContractCall(params *PostContractCallParams) (*PostContract
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PostContractCall",
 		Method:             "POST",
-		PathPattern:        "/tx/contract/call",
+		PathPattern:        "/debug/contracts/call",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
@@ -2108,7 +1324,7 @@ func (a *Client) PostContractCallCompute(params *PostContractCallComputeParams) 
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PostContractCallCompute",
 		Method:             "POST",
-		PathPattern:        "/tx/contract/call/compute",
+		PathPattern:        "/debug/contracts/call/compute",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
@@ -2136,7 +1352,7 @@ func (a *Client) PostContractCreate(params *PostContractCreateParams) (*PostCont
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PostContractCreate",
 		Method:             "POST",
-		PathPattern:        "/tx/contract/create",
+		PathPattern:        "/debug/contracts/create",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
@@ -2164,7 +1380,7 @@ func (a *Client) PostContractCreateCompute(params *PostContractCreateComputePara
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PostContractCreateCompute",
 		Method:             "POST",
-		PathPattern:        "/tx/contract/create/compute",
+		PathPattern:        "/debug/contracts/create/compute",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
@@ -2192,7 +1408,7 @@ func (a *Client) PostNameClaim(params *PostNameClaimParams) (*PostNameClaimOK, e
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PostNameClaim",
 		Method:             "POST",
-		PathPattern:        "/tx/name/claim",
+		PathPattern:        "/debug/names/claim",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{""},
 		Schemes:            []string{"http"},
@@ -2209,34 +1425,6 @@ func (a *Client) PostNameClaim(params *PostNameClaimParams) (*PostNameClaimOK, e
 }
 
 /*
-PostNameClaimTx Create name claim transaction
-*/
-func (a *Client) PostNameClaimTx(params *PostNameClaimTxParams) (*PostNameClaimTxOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewPostNameClaimTxParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "PostNameClaimTx",
-		Method:             "POST",
-		PathPattern:        "/name-claim-tx",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &PostNameClaimTxReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*PostNameClaimTxOK), nil
-
-}
-
-/*
 PostNamePreclaim Get a name_preclaim transaction object
 */
 func (a *Client) PostNamePreclaim(params *PostNamePreclaimParams) (*PostNamePreclaimOK, error) {
@@ -2248,7 +1436,7 @@ func (a *Client) PostNamePreclaim(params *PostNamePreclaimParams) (*PostNamePrec
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PostNamePreclaim",
 		Method:             "POST",
-		PathPattern:        "/tx/name/preclaim",
+		PathPattern:        "/debug/names/preclaim",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{""},
 		Schemes:            []string{"http"},
@@ -2265,34 +1453,6 @@ func (a *Client) PostNamePreclaim(params *PostNamePreclaimParams) (*PostNamePrec
 }
 
 /*
-PostNamePreclaimTx Create name preclaim transaction
-*/
-func (a *Client) PostNamePreclaimTx(params *PostNamePreclaimTxParams) (*PostNamePreclaimTxOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewPostNamePreclaimTxParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "PostNamePreclaimTx",
-		Method:             "POST",
-		PathPattern:        "/name-preclaim-tx",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &PostNamePreclaimTxReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*PostNamePreclaimTxOK), nil
-
-}
-
-/*
 PostNameRevoke Get a name_revoke transaction object
 */
 func (a *Client) PostNameRevoke(params *PostNameRevokeParams) (*PostNameRevokeOK, error) {
@@ -2304,7 +1464,7 @@ func (a *Client) PostNameRevoke(params *PostNameRevokeParams) (*PostNameRevokeOK
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PostNameRevoke",
 		Method:             "POST",
-		PathPattern:        "/tx/name/revoke",
+		PathPattern:        "/debug/names/revoke",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{""},
 		Schemes:            []string{"http"},
@@ -2321,34 +1481,6 @@ func (a *Client) PostNameRevoke(params *PostNameRevokeParams) (*PostNameRevokeOK
 }
 
 /*
-PostNameRevokeTx Create name revoke transaction
-*/
-func (a *Client) PostNameRevokeTx(params *PostNameRevokeTxParams) (*PostNameRevokeTxOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewPostNameRevokeTxParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "PostNameRevokeTx",
-		Method:             "POST",
-		PathPattern:        "/name-revoke-tx",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &PostNameRevokeTxReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*PostNameRevokeTxOK), nil
-
-}
-
-/*
 PostNameTransfer Get a name_transfer transaction object
 */
 func (a *Client) PostNameTransfer(params *PostNameTransferParams) (*PostNameTransferOK, error) {
@@ -2360,7 +1492,7 @@ func (a *Client) PostNameTransfer(params *PostNameTransferParams) (*PostNameTran
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PostNameTransfer",
 		Method:             "POST",
-		PathPattern:        "/tx/name/transfer",
+		PathPattern:        "/debug/names/transfer",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{""},
 		Schemes:            []string{"http"},
@@ -2377,34 +1509,6 @@ func (a *Client) PostNameTransfer(params *PostNameTransferParams) (*PostNameTran
 }
 
 /*
-PostNameTransferTx Create name transfer transaction
-*/
-func (a *Client) PostNameTransferTx(params *PostNameTransferTxParams) (*PostNameTransferTxOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewPostNameTransferTxParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "PostNameTransferTx",
-		Method:             "POST",
-		PathPattern:        "/name-transfer-tx",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &PostNameTransferTxReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*PostNameTransferTxOK), nil
-
-}
-
-/*
 PostNameUpdate Get a name_update transaction object
 */
 func (a *Client) PostNameUpdate(params *PostNameUpdateParams) (*PostNameUpdateOK, error) {
@@ -2416,7 +1520,7 @@ func (a *Client) PostNameUpdate(params *PostNameUpdateParams) (*PostNameUpdateOK
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PostNameUpdate",
 		Method:             "POST",
-		PathPattern:        "/tx/name/update",
+		PathPattern:        "/debug/names/update",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{""},
 		Schemes:            []string{"http"},
@@ -2433,34 +1537,6 @@ func (a *Client) PostNameUpdate(params *PostNameUpdateParams) (*PostNameUpdateOK
 }
 
 /*
-PostNameUpdateTx Create name update transaction
-*/
-func (a *Client) PostNameUpdateTx(params *PostNameUpdateTxParams) (*PostNameUpdateTxOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewPostNameUpdateTxParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "PostNameUpdateTx",
-		Method:             "POST",
-		PathPattern:        "/name-update-tx",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &PostNameUpdateTxReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*PostNameUpdateTxOK), nil
-
-}
-
-/*
 PostOracleExtend Get an oracle_extend transaction object
 */
 func (a *Client) PostOracleExtend(params *PostOracleExtendParams) (*PostOracleExtendOK, error) {
@@ -2472,7 +1548,7 @@ func (a *Client) PostOracleExtend(params *PostOracleExtendParams) (*PostOracleEx
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PostOracleExtend",
 		Method:             "POST",
-		PathPattern:        "/tx/oracle/extend",
+		PathPattern:        "/debug/oracles/extend",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
@@ -2489,34 +1565,6 @@ func (a *Client) PostOracleExtend(params *PostOracleExtendParams) (*PostOracleEx
 }
 
 /*
-PostOracleExtendTx Create oracle extend transaction
-*/
-func (a *Client) PostOracleExtendTx(params *PostOracleExtendTxParams) (*PostOracleExtendTxOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewPostOracleExtendTxParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "PostOracleExtendTx",
-		Method:             "POST",
-		PathPattern:        "/oracle-extend-tx",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &PostOracleExtendTxReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*PostOracleExtendTxOK), nil
-
-}
-
-/*
 PostOracleQuery Get an oracle_query transaction object
 */
 func (a *Client) PostOracleQuery(params *PostOracleQueryParams) (*PostOracleQueryOK, error) {
@@ -2528,7 +1576,7 @@ func (a *Client) PostOracleQuery(params *PostOracleQueryParams) (*PostOracleQuer
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PostOracleQuery",
 		Method:             "POST",
-		PathPattern:        "/tx/oracle/query",
+		PathPattern:        "/debug/oracles/query",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
@@ -2545,34 +1593,6 @@ func (a *Client) PostOracleQuery(params *PostOracleQueryParams) (*PostOracleQuer
 }
 
 /*
-PostOracleQueryTx Create oracle query transaction
-*/
-func (a *Client) PostOracleQueryTx(params *PostOracleQueryTxParams) (*PostOracleQueryTxOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewPostOracleQueryTxParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "PostOracleQueryTx",
-		Method:             "POST",
-		PathPattern:        "/oracle-query-tx",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &PostOracleQueryTxReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*PostOracleQueryTxOK), nil
-
-}
-
-/*
 PostOracleRegister Get a oracle_register transaction object
 */
 func (a *Client) PostOracleRegister(params *PostOracleRegisterParams) (*PostOracleRegisterOK, error) {
@@ -2584,7 +1604,7 @@ func (a *Client) PostOracleRegister(params *PostOracleRegisterParams) (*PostOrac
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PostOracleRegister",
 		Method:             "POST",
-		PathPattern:        "/tx/oracle/register",
+		PathPattern:        "/debug/oracles/register",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
@@ -2601,86 +1621,30 @@ func (a *Client) PostOracleRegister(params *PostOracleRegisterParams) (*PostOrac
 }
 
 /*
-PostOracleRegisterTx Create oracle register transaction
+PostOracleRespond Get an oracle_response transaction object
 */
-func (a *Client) PostOracleRegisterTx(params *PostOracleRegisterTxParams) (*PostOracleRegisterTxOK, error) {
+func (a *Client) PostOracleRespond(params *PostOracleRespondParams) (*PostOracleRespondOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewPostOracleRegisterTxParams()
+		params = NewPostOracleRespondParams()
 	}
 
 	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "PostOracleRegisterTx",
+		ID:                 "PostOracleRespond",
 		Method:             "POST",
-		PathPattern:        "/oracle-register-tx",
+		PathPattern:        "/debug/oracles/respond",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
-		Reader:             &PostOracleRegisterTxReader{formats: a.formats},
+		Reader:             &PostOracleRespondReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
 	if err != nil {
 		return nil, err
 	}
-	return result.(*PostOracleRegisterTxOK), nil
-
-}
-
-/*
-PostOracleResponse Get an oracle_response transaction object
-*/
-func (a *Client) PostOracleResponse(params *PostOracleResponseParams) (*PostOracleResponseOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewPostOracleResponseParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "PostOracleResponse",
-		Method:             "POST",
-		PathPattern:        "/tx/oracle/response",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &PostOracleResponseReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*PostOracleResponseOK), nil
-
-}
-
-/*
-PostOracleResponseTx Create oracle response transaction
-*/
-func (a *Client) PostOracleResponseTx(params *PostOracleResponseTxParams) (*PostOracleResponseTxOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewPostOracleResponseTxParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "PostOracleResponseTx",
-		Method:             "POST",
-		PathPattern:        "/oracle-response-tx",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &PostOracleResponseTxReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*PostOracleResponseTxOK), nil
+	return result.(*PostOracleRespondOK), nil
 
 }
 
@@ -2696,7 +1660,7 @@ func (a *Client) PostSpend(params *PostSpendParams) (*PostSpendOK, error) {
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PostSpend",
 		Method:             "POST",
-		PathPattern:        "/tx/spend",
+		PathPattern:        "/debug/transactions/spend",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
@@ -2713,34 +1677,6 @@ func (a *Client) PostSpend(params *PostSpendParams) (*PostSpendOK, error) {
 }
 
 /*
-PostSpendTx Create spend transaction
-*/
-func (a *Client) PostSpendTx(params *PostSpendTxParams) (*PostSpendTxOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewPostSpendTxParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "PostSpendTx",
-		Method:             "POST",
-		PathPattern:        "/spend-tx",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &PostSpendTxReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*PostSpendTxOK), nil
-
-}
-
-/*
 PostTransaction Post a new transaction
 */
 func (a *Client) PostTransaction(params *PostTransactionParams) (*PostTransactionOK, error) {
@@ -2752,7 +1688,7 @@ func (a *Client) PostTransaction(params *PostTransactionParams) (*PostTransactio
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "PostTransaction",
 		Method:             "POST",
-		PathPattern:        "/ng-transactions",
+		PathPattern:        "/transactions",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
@@ -2765,34 +1701,6 @@ func (a *Client) PostTransaction(params *PostTransactionParams) (*PostTransactio
 		return nil, err
 	}
 	return result.(*PostTransactionOK), nil
-
-}
-
-/*
-PostTx Post a new transaction
-*/
-func (a *Client) PostTx(params *PostTxParams) (*PostTxOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewPostTxParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "PostTx",
-		Method:             "POST",
-		PathPattern:        "/tx",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &PostTxReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*PostTxOK), nil
 
 }
 

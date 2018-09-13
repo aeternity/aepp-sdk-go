@@ -20,7 +20,7 @@ import (
 type Status struct {
 
 	// difficulty
-	Difficulty int64 `json:"difficulty,omitempty"`
+	Difficulty float64 `json:"difficulty,omitempty"`
 
 	// genesis key block hash
 	GenesisKeyBlockHash EncodedHash `json:"genesis-key-block-hash,omitempty"`

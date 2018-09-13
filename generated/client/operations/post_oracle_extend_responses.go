@@ -65,7 +65,7 @@ type PostOracleExtendOK struct {
 }
 
 func (o *PostOracleExtendOK) Error() string {
-	return fmt.Sprintf("[POST /tx/oracle/extend][%d] postOracleExtendOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /debug/oracles/extend][%d] postOracleExtendOK  %+v", 200, o.Payload)
 }
 
 func (o *PostOracleExtendOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -94,7 +94,7 @@ type PostOracleExtendBadRequest struct {
 }
 
 func (o *PostOracleExtendBadRequest) Error() string {
-	return fmt.Sprintf("[POST /tx/oracle/extend][%d] postOracleExtendBadRequest  %+v", 400, o.Payload)
+	return fmt.Sprintf("[POST /debug/oracles/extend][%d] postOracleExtendBadRequest  %+v", 400, o.Payload)
 }
 
 func (o *PostOracleExtendBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -123,7 +123,7 @@ type PostOracleExtendNotFound struct {
 }
 
 func (o *PostOracleExtendNotFound) Error() string {
-	return fmt.Sprintf("[POST /tx/oracle/extend][%d] postOracleExtendNotFound  %+v", 404, o.Payload)
+	return fmt.Sprintf("[POST /debug/oracles/extend][%d] postOracleExtendNotFound  %+v", 404, o.Payload)
 }
 
 func (o *PostOracleExtendNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

@@ -65,7 +65,7 @@ type PostSpendOK struct {
 }
 
 func (o *PostSpendOK) Error() string {
-	return fmt.Sprintf("[POST /tx/spend][%d] postSpendOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /debug/transactions/spend][%d] postSpendOK  %+v", 200, o.Payload)
 }
 
 func (o *PostSpendOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -94,7 +94,7 @@ type PostSpendBadRequest struct {
 }
 
 func (o *PostSpendBadRequest) Error() string {
-	return fmt.Sprintf("[POST /tx/spend][%d] postSpendBadRequest  %+v", 400, o.Payload)
+	return fmt.Sprintf("[POST /debug/transactions/spend][%d] postSpendBadRequest  %+v", 400, o.Payload)
 }
 
 func (o *PostSpendBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -123,7 +123,7 @@ type PostSpendNotFound struct {
 }
 
 func (o *PostSpendNotFound) Error() string {
-	return fmt.Sprintf("[POST /tx/spend][%d] postSpendNotFound  %+v", 404, o.Payload)
+	return fmt.Sprintf("[POST /debug/transactions/spend][%d] postSpendNotFound  %+v", 404, o.Payload)
 }
 
 func (o *PostSpendNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

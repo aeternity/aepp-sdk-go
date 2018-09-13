@@ -58,7 +58,7 @@ type PostChannelSnapshotSoloOK struct {
 }
 
 func (o *PostChannelSnapshotSoloOK) Error() string {
-	return fmt.Sprintf("[POST /tx/channel/snapshot/solo][%d] postChannelSnapshotSoloOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /debug/channels/snapshot/solo][%d] postChannelSnapshotSoloOK  %+v", 200, o.Payload)
 }
 
 func (o *PostChannelSnapshotSoloOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -87,7 +87,7 @@ type PostChannelSnapshotSoloBadRequest struct {
 }
 
 func (o *PostChannelSnapshotSoloBadRequest) Error() string {
-	return fmt.Sprintf("[POST /tx/channel/snapshot/solo][%d] postChannelSnapshotSoloBadRequest  %+v", 400, o.Payload)
+	return fmt.Sprintf("[POST /debug/channels/snapshot/solo][%d] postChannelSnapshotSoloBadRequest  %+v", 400, o.Payload)
 }
 
 func (o *PostChannelSnapshotSoloBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

@@ -17,17 +17,17 @@ import (
 // swagger:model ContractCallObject
 type ContractCallObject struct {
 
-	// caller address
+	// caller id
 	// Required: true
-	CallerAddress EncodedHash `json:"caller_address"`
+	CallerID EncodedHash `json:"caller_id"`
 
 	// caller nonce
 	// Required: true
 	CallerNonce *int64 `json:"caller_nonce"`
 
-	// contract address
+	// contract id
 	// Required: true
-	ContractAddress EncodedHash `json:"contract_address"`
+	ContractID EncodedHash `json:"contract_id"`
 
 	// gas price
 	// Required: true
@@ -54,7 +54,7 @@ type ContractCallObject struct {
 func (m *ContractCallObject) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateCallerAddress(formats); err != nil {
+	if err := m.validateCallerID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -62,7 +62,7 @@ func (m *ContractCallObject) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateContractAddress(formats); err != nil {
+	if err := m.validateContractID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -92,11 +92,11 @@ func (m *ContractCallObject) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractCallObject) validateCallerAddress(formats strfmt.Registry) error {
+func (m *ContractCallObject) validateCallerID(formats strfmt.Registry) error {
 
-	if err := m.CallerAddress.Validate(formats); err != nil {
+	if err := m.CallerID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("caller_address")
+			return ve.ValidateName("caller_id")
 		}
 		return err
 	}
@@ -113,11 +113,11 @@ func (m *ContractCallObject) validateCallerNonce(formats strfmt.Registry) error 
 	return nil
 }
 
-func (m *ContractCallObject) validateContractAddress(formats strfmt.Registry) error {
+func (m *ContractCallObject) validateContractID(formats strfmt.Registry) error {
 
-	if err := m.ContractAddress.Validate(formats); err != nil {
+	if err := m.ContractID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("contract_address")
+			return ve.ValidateName("contract_id")
 		}
 		return err
 	}

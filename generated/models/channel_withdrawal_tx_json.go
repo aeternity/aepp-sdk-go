@@ -13,40 +13,41 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // ChannelWithdrawalTxJSON channel withdrawal tx JSON
 // swagger:model ChannelWithdrawalTxJSON
 type ChannelWithdrawalTxJSON struct {
-	vsnField int64
+	vsnField *int64
 
-	ChannelWithdrawalTx
+	ChannelWithdrawTx
 }
 
-// DataSchema gets the data schema of this subtype
-func (m *ChannelWithdrawalTxJSON) DataSchema() string {
+// Type gets the type of this subtype
+func (m *ChannelWithdrawalTxJSON) Type() string {
 	return "ChannelWithdrawalTxJSON"
 }
 
-// SetDataSchema sets the data schema of this subtype
-func (m *ChannelWithdrawalTxJSON) SetDataSchema(val string) {
+// SetType sets the type of this subtype
+func (m *ChannelWithdrawalTxJSON) SetType(val string) {
 
 }
 
 // Vsn gets the vsn of this subtype
-func (m *ChannelWithdrawalTxJSON) Vsn() int64 {
+func (m *ChannelWithdrawalTxJSON) Vsn() *int64 {
 	return m.vsnField
 }
 
 // SetVsn sets the vsn of this subtype
-func (m *ChannelWithdrawalTxJSON) SetVsn(val int64) {
+func (m *ChannelWithdrawalTxJSON) SetVsn(val *int64) {
 	m.vsnField = val
 }
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
 func (m *ChannelWithdrawalTxJSON) UnmarshalJSON(raw []byte) error {
 	var data struct {
-		ChannelWithdrawalTx
+		ChannelWithdrawTx
 	}
 	buf := bytes.NewBuffer(raw)
 	dec := json.NewDecoder(buf)
@@ -59,9 +60,9 @@ func (m *ChannelWithdrawalTxJSON) UnmarshalJSON(raw []byte) error {
 	var base struct {
 		/* Just the base type fields. Used for unmashalling polymorphic types.*/
 
-		DataSchema string `json:"data_schema"`
+		Type string `json:"type"`
 
-		Vsn int64 `json:"vsn,omitempty"`
+		Vsn *int64 `json:"vsn"`
 	}
 	buf = bytes.NewBuffer(raw)
 	dec = json.NewDecoder(buf)
@@ -73,14 +74,14 @@ func (m *ChannelWithdrawalTxJSON) UnmarshalJSON(raw []byte) error {
 
 	var result ChannelWithdrawalTxJSON
 
-	if base.DataSchema != result.DataSchema() {
+	if base.Type != result.Type() {
 		/* Not the type we're looking for. */
-		return errors.New(422, "invalid data_schema value: %q", base.DataSchema)
+		return errors.New(422, "invalid type value: %q", base.Type)
 	}
 
 	result.vsnField = base.Vsn
 
-	result.ChannelWithdrawalTx = data.ChannelWithdrawalTx
+	result.ChannelWithdrawTx = data.ChannelWithdrawTx
 
 	*m = result
 
@@ -92,22 +93,22 @@ func (m ChannelWithdrawalTxJSON) MarshalJSON() ([]byte, error) {
 	var b1, b2, b3 []byte
 	var err error
 	b1, err = json.Marshal(struct {
-		ChannelWithdrawalTx
+		ChannelWithdrawTx
 	}{
 
-		ChannelWithdrawalTx: m.ChannelWithdrawalTx,
+		ChannelWithdrawTx: m.ChannelWithdrawTx,
 	},
 	)
 	if err != nil {
 		return nil, err
 	}
 	b2, err = json.Marshal(struct {
-		DataSchema string `json:"data_schema"`
+		Type string `json:"type"`
 
-		Vsn int64 `json:"vsn,omitempty"`
+		Vsn *int64 `json:"vsn"`
 	}{
 
-		DataSchema: m.DataSchema(),
+		Type: m.Type(),
 
 		Vsn: m.Vsn(),
 	},
@@ -123,14 +124,27 @@ func (m ChannelWithdrawalTxJSON) MarshalJSON() ([]byte, error) {
 func (m *ChannelWithdrawalTxJSON) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	// validation for a type composition with ChannelWithdrawalTx
-	if err := m.ChannelWithdrawalTx.Validate(formats); err != nil {
+	if err := m.validateVsn(formats); err != nil {
+		res = append(res, err)
+	}
+
+	// validation for a type composition with ChannelWithdrawTx
+	if err := m.ChannelWithdrawTx.Validate(formats); err != nil {
 		res = append(res, err)
 	}
 
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *ChannelWithdrawalTxJSON) validateVsn(formats strfmt.Registry) error {
+
+	if err := validate.Required("vsn", "body", m.Vsn()); err != nil {
+		return err
+	}
+
 	return nil
 }
 

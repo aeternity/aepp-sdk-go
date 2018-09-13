@@ -10,7 +10,6 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 )
 
 // CreateContractUnsignedTx create contract unsigned tx
@@ -20,7 +19,7 @@ type CreateContractUnsignedTx struct {
 
 	// Address of the contract to be created
 	// Required: true
-	ContractAddress *string `json:"contract_address"`
+	ContractID EncodedHash `json:"contract_id"`
 }
 
 // UnmarshalJSON unmarshals this object from a JSON structure
@@ -34,13 +33,13 @@ func (m *CreateContractUnsignedTx) UnmarshalJSON(raw []byte) error {
 
 	// AO1
 	var dataAO1 struct {
-		ContractAddress *string `json:"contract_address"`
+		ContractID EncodedHash `json:"contract_id"`
 	}
 	if err := swag.ReadJSON(raw, &dataAO1); err != nil {
 		return err
 	}
 
-	m.ContractAddress = dataAO1.ContractAddress
+	m.ContractID = dataAO1.ContractID
 
 	return nil
 }
@@ -56,10 +55,10 @@ func (m CreateContractUnsignedTx) MarshalJSON() ([]byte, error) {
 	_parts = append(_parts, aO0)
 
 	var dataAO1 struct {
-		ContractAddress *string `json:"contract_address"`
+		ContractID EncodedHash `json:"contract_id"`
 	}
 
-	dataAO1.ContractAddress = m.ContractAddress
+	dataAO1.ContractID = m.ContractID
 
 	jsonDataAO1, errAO1 := swag.WriteJSON(dataAO1)
 	if errAO1 != nil {
@@ -79,7 +78,7 @@ func (m *CreateContractUnsignedTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateContractAddress(formats); err != nil {
+	if err := m.validateContractID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -89,9 +88,12 @@ func (m *CreateContractUnsignedTx) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *CreateContractUnsignedTx) validateContractAddress(formats strfmt.Registry) error {
+func (m *CreateContractUnsignedTx) validateContractID(formats strfmt.Registry) error {
 
-	if err := validate.Required("contract_address", "body", m.ContractAddress); err != nil {
+	if err := m.ContractID.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("contract_id")
+		}
 		return err
 	}
 

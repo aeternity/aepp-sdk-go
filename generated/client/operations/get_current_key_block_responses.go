@@ -32,6 +32,13 @@ func (o *GetCurrentKeyBlockReader) ReadResponse(response runtime.ClientResponse,
 		}
 		return result, nil
 
+	case 404:
+		result := NewGetCurrentKeyBlockNotFound()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
+
 	default:
 		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
@@ -47,7 +54,7 @@ func NewGetCurrentKeyBlockOK() *GetCurrentKeyBlockOK {
 Successful operation
 */
 type GetCurrentKeyBlockOK struct {
-	Payload *models.GenericBlock
+	Payload *models.KeyBlock
 }
 
 func (o *GetCurrentKeyBlockOK) Error() string {
@@ -56,7 +63,36 @@ func (o *GetCurrentKeyBlockOK) Error() string {
 
 func (o *GetCurrentKeyBlockOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericBlock)
+	o.Payload = new(models.KeyBlock)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
+// NewGetCurrentKeyBlockNotFound creates a GetCurrentKeyBlockNotFound with default headers values
+func NewGetCurrentKeyBlockNotFound() *GetCurrentKeyBlockNotFound {
+	return &GetCurrentKeyBlockNotFound{}
+}
+
+/*GetCurrentKeyBlockNotFound handles this case with default header values.
+
+Block not found
+*/
+type GetCurrentKeyBlockNotFound struct {
+	Payload *models.Error
+}
+
+func (o *GetCurrentKeyBlockNotFound) Error() string {
+	return fmt.Sprintf("[GET /key-blocks/current][%d] getCurrentKeyBlockNotFound  %+v", 404, o.Payload)
+}
+
+func (o *GetCurrentKeyBlockNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(models.Error)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

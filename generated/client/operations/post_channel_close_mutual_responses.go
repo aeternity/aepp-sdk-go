@@ -58,7 +58,7 @@ type PostChannelCloseMutualOK struct {
 }
 
 func (o *PostChannelCloseMutualOK) Error() string {
-	return fmt.Sprintf("[POST /tx/channel/close/mutual][%d] postChannelCloseMutualOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /debug/channels/close/mutual][%d] postChannelCloseMutualOK  %+v", 200, o.Payload)
 }
 
 func (o *PostChannelCloseMutualOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -87,7 +87,7 @@ type PostChannelCloseMutualBadRequest struct {
 }
 
 func (o *PostChannelCloseMutualBadRequest) Error() string {
-	return fmt.Sprintf("[POST /tx/channel/close/mutual][%d] postChannelCloseMutualBadRequest  %+v", 400, o.Payload)
+	return fmt.Sprintf("[POST /debug/channels/close/mutual][%d] postChannelCloseMutualBadRequest  %+v", 400, o.Payload)
 }
 
 func (o *PostChannelCloseMutualBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

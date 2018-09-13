@@ -13,40 +13,41 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // OracleResponseTxJSON oracle response tx JSON
 // swagger:model OracleResponseTxJSON
 type OracleResponseTxJSON struct {
-	vsnField int64
+	vsnField *int64
 
-	OracleResponseTx
+	OracleRespondTx
 }
 
-// DataSchema gets the data schema of this subtype
-func (m *OracleResponseTxJSON) DataSchema() string {
+// Type gets the type of this subtype
+func (m *OracleResponseTxJSON) Type() string {
 	return "OracleResponseTxJSON"
 }
 
-// SetDataSchema sets the data schema of this subtype
-func (m *OracleResponseTxJSON) SetDataSchema(val string) {
+// SetType sets the type of this subtype
+func (m *OracleResponseTxJSON) SetType(val string) {
 
 }
 
 // Vsn gets the vsn of this subtype
-func (m *OracleResponseTxJSON) Vsn() int64 {
+func (m *OracleResponseTxJSON) Vsn() *int64 {
 	return m.vsnField
 }
 
 // SetVsn sets the vsn of this subtype
-func (m *OracleResponseTxJSON) SetVsn(val int64) {
+func (m *OracleResponseTxJSON) SetVsn(val *int64) {
 	m.vsnField = val
 }
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
 func (m *OracleResponseTxJSON) UnmarshalJSON(raw []byte) error {
 	var data struct {
-		OracleResponseTx
+		OracleRespondTx
 	}
 	buf := bytes.NewBuffer(raw)
 	dec := json.NewDecoder(buf)
@@ -59,9 +60,9 @@ func (m *OracleResponseTxJSON) UnmarshalJSON(raw []byte) error {
 	var base struct {
 		/* Just the base type fields. Used for unmashalling polymorphic types.*/
 
-		DataSchema string `json:"data_schema"`
+		Type string `json:"type"`
 
-		Vsn int64 `json:"vsn,omitempty"`
+		Vsn *int64 `json:"vsn"`
 	}
 	buf = bytes.NewBuffer(raw)
 	dec = json.NewDecoder(buf)
@@ -73,14 +74,14 @@ func (m *OracleResponseTxJSON) UnmarshalJSON(raw []byte) error {
 
 	var result OracleResponseTxJSON
 
-	if base.DataSchema != result.DataSchema() {
+	if base.Type != result.Type() {
 		/* Not the type we're looking for. */
-		return errors.New(422, "invalid data_schema value: %q", base.DataSchema)
+		return errors.New(422, "invalid type value: %q", base.Type)
 	}
 
 	result.vsnField = base.Vsn
 
-	result.OracleResponseTx = data.OracleResponseTx
+	result.OracleRespondTx = data.OracleRespondTx
 
 	*m = result
 
@@ -92,22 +93,22 @@ func (m OracleResponseTxJSON) MarshalJSON() ([]byte, error) {
 	var b1, b2, b3 []byte
 	var err error
 	b1, err = json.Marshal(struct {
-		OracleResponseTx
+		OracleRespondTx
 	}{
 
-		OracleResponseTx: m.OracleResponseTx,
+		OracleRespondTx: m.OracleRespondTx,
 	},
 	)
 	if err != nil {
 		return nil, err
 	}
 	b2, err = json.Marshal(struct {
-		DataSchema string `json:"data_schema"`
+		Type string `json:"type"`
 
-		Vsn int64 `json:"vsn,omitempty"`
+		Vsn *int64 `json:"vsn"`
 	}{
 
-		DataSchema: m.DataSchema(),
+		Type: m.Type(),
 
 		Vsn: m.Vsn(),
 	},
@@ -123,14 +124,27 @@ func (m OracleResponseTxJSON) MarshalJSON() ([]byte, error) {
 func (m *OracleResponseTxJSON) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	// validation for a type composition with OracleResponseTx
-	if err := m.OracleResponseTx.Validate(formats); err != nil {
+	if err := m.validateVsn(formats); err != nil {
+		res = append(res, err)
+	}
+
+	// validation for a type composition with OracleRespondTx
+	if err := m.OracleRespondTx.Validate(formats); err != nil {
 		res = append(res, err)
 	}
 
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *OracleResponseTxJSON) validateVsn(formats strfmt.Registry) error {
+
+	if err := validate.Required("vsn", "body", m.Vsn()); err != nil {
+		return err
+	}
+
 	return nil
 }
 

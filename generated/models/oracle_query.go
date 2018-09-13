@@ -24,10 +24,10 @@ type OracleQuery struct {
 	Fee int64 `json:"fee,omitempty"`
 
 	// id
-	ID string `json:"id,omitempty"`
+	ID EncodedHash `json:"id,omitempty"`
 
 	// oracle id
-	OracleID string `json:"oracle_id,omitempty"`
+	OracleID EncodedHash `json:"oracle_id,omitempty"`
 
 	// query
 	Query string `json:"query,omitempty"`
@@ -38,8 +38,8 @@ type OracleQuery struct {
 	// response ttl
 	ResponseTTL *TTL `json:"response_ttl,omitempty"`
 
-	// sender
-	Sender string `json:"sender,omitempty"`
+	// sender id
+	SenderID EncodedHash `json:"sender_id,omitempty"`
 
 	// sender nonce
 	// Minimum: 0
@@ -50,7 +50,19 @@ type OracleQuery struct {
 func (m *OracleQuery) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateID(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateOracleID(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateResponseTTL(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateSenderID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -61,6 +73,38 @@ func (m *OracleQuery) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *OracleQuery) validateID(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.ID) { // not required
+		return nil
+	}
+
+	if err := m.ID.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("id")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *OracleQuery) validateOracleID(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.OracleID) { // not required
+		return nil
+	}
+
+	if err := m.OracleID.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("oracle_id")
+		}
+		return err
+	}
+
 	return nil
 }
 
@@ -77,6 +121,22 @@ func (m *OracleQuery) validateResponseTTL(formats strfmt.Registry) error {
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (m *OracleQuery) validateSenderID(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.SenderID) { // not required
+		return nil
+	}
+
+	if err := m.SenderID.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("sender_id")
+		}
+		return err
 	}
 
 	return nil

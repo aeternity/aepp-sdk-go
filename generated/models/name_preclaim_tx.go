@@ -17,12 +17,12 @@ import (
 // swagger:model NamePreclaimTx
 type NamePreclaimTx struct {
 
-	// account
-	Account EncodedHash `json:"account,omitempty"`
+	// account id
+	AccountID EncodedHash `json:"account_id,omitempty"`
 
-	// commitment
+	// commitment id
 	// Required: true
-	Commitment *string `json:"commitment"`
+	CommitmentID EncodedHash `json:"commitment_id"`
 
 	// fee
 	// Required: true
@@ -39,11 +39,11 @@ type NamePreclaimTx struct {
 func (m *NamePreclaimTx) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateAccount(formats); err != nil {
+	if err := m.validateAccountID(formats); err != nil {
 		res = append(res, err)
 	}
 
-	if err := m.validateCommitment(formats); err != nil {
+	if err := m.validateCommitmentID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -57,15 +57,15 @@ func (m *NamePreclaimTx) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *NamePreclaimTx) validateAccount(formats strfmt.Registry) error {
+func (m *NamePreclaimTx) validateAccountID(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Account) { // not required
+	if swag.IsZero(m.AccountID) { // not required
 		return nil
 	}
 
-	if err := m.Account.Validate(formats); err != nil {
+	if err := m.AccountID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("account")
+			return ve.ValidateName("account_id")
 		}
 		return err
 	}
@@ -73,9 +73,12 @@ func (m *NamePreclaimTx) validateAccount(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *NamePreclaimTx) validateCommitment(formats strfmt.Registry) error {
+func (m *NamePreclaimTx) validateCommitmentID(formats strfmt.Registry) error {
 
-	if err := validate.Required("commitment", "body", m.Commitment); err != nil {
+	if err := m.CommitmentID.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("commitment_id")
+		}
 		return err
 	}
 

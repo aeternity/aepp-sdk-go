@@ -65,7 +65,7 @@ type PostChannelCreateOK struct {
 }
 
 func (o *PostChannelCreateOK) Error() string {
-	return fmt.Sprintf("[POST /tx/channel/create][%d] postChannelCreateOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /debug/channels/create][%d] postChannelCreateOK  %+v", 200, o.Payload)
 }
 
 func (o *PostChannelCreateOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -94,7 +94,7 @@ type PostChannelCreateBadRequest struct {
 }
 
 func (o *PostChannelCreateBadRequest) Error() string {
-	return fmt.Sprintf("[POST /tx/channel/create][%d] postChannelCreateBadRequest  %+v", 400, o.Payload)
+	return fmt.Sprintf("[POST /debug/channels/create][%d] postChannelCreateBadRequest  %+v", 400, o.Payload)
 }
 
 func (o *PostChannelCreateBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -123,7 +123,7 @@ type PostChannelCreateNotFound struct {
 }
 
 func (o *PostChannelCreateNotFound) Error() string {
-	return fmt.Sprintf("[POST /tx/channel/create][%d] postChannelCreateNotFound  %+v", 404, o.Payload)
+	return fmt.Sprintf("[POST /debug/channels/create][%d] postChannelCreateNotFound  %+v", 404, o.Payload)
 }
 
 func (o *PostChannelCreateNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

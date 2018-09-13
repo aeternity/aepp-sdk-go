@@ -27,14 +27,14 @@ type ChannelCreateTx struct {
 	// Minimum: 0
 	Fee *int64 `json:"fee"`
 
-	// initiator
-	// Required: true
-	Initiator EncodedHash `json:"initiator"`
-
 	// initiator amount
 	// Required: true
 	// Minimum: 0
 	InitiatorAmount *int64 `json:"initiator_amount"`
+
+	// initiator id
+	// Required: true
+	InitiatorID EncodedHash `json:"initiator_id"`
 
 	// lock period
 	// Required: true
@@ -50,14 +50,14 @@ type ChannelCreateTx struct {
 	// Minimum: 0
 	PushAmount *int64 `json:"push_amount"`
 
-	// responder
-	// Required: true
-	Responder EncodedHash `json:"responder"`
-
 	// responder amount
 	// Required: true
 	// Minimum: 0
 	ResponderAmount *int64 `json:"responder_amount"`
+
+	// responder id
+	// Required: true
+	ResponderID EncodedHash `json:"responder_id"`
 
 	// Root hash of the channel's internal state tree
 	// Required: true
@@ -80,11 +80,11 @@ func (m *ChannelCreateTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateInitiator(formats); err != nil {
+	if err := m.validateInitiatorAmount(formats); err != nil {
 		res = append(res, err)
 	}
 
-	if err := m.validateInitiatorAmount(formats); err != nil {
+	if err := m.validateInitiatorID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -100,11 +100,11 @@ func (m *ChannelCreateTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateResponder(formats); err != nil {
+	if err := m.validateResponderAmount(formats); err != nil {
 		res = append(res, err)
 	}
 
-	if err := m.validateResponderAmount(formats); err != nil {
+	if err := m.validateResponderID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -148,18 +148,6 @@ func (m *ChannelCreateTx) validateFee(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ChannelCreateTx) validateInitiator(formats strfmt.Registry) error {
-
-	if err := m.Initiator.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("initiator")
-		}
-		return err
-	}
-
-	return nil
-}
-
 func (m *ChannelCreateTx) validateInitiatorAmount(formats strfmt.Registry) error {
 
 	if err := validate.Required("initiator_amount", "body", m.InitiatorAmount); err != nil {
@@ -167,6 +155,18 @@ func (m *ChannelCreateTx) validateInitiatorAmount(formats strfmt.Registry) error
 	}
 
 	if err := validate.MinimumInt("initiator_amount", "body", int64(*m.InitiatorAmount), 0, false); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *ChannelCreateTx) validateInitiatorID(formats strfmt.Registry) error {
+
+	if err := m.InitiatorID.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("initiator_id")
+		}
 		return err
 	}
 
@@ -212,18 +212,6 @@ func (m *ChannelCreateTx) validatePushAmount(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ChannelCreateTx) validateResponder(formats strfmt.Registry) error {
-
-	if err := m.Responder.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("responder")
-		}
-		return err
-	}
-
-	return nil
-}
-
 func (m *ChannelCreateTx) validateResponderAmount(formats strfmt.Registry) error {
 
 	if err := validate.Required("responder_amount", "body", m.ResponderAmount); err != nil {
@@ -231,6 +219,18 @@ func (m *ChannelCreateTx) validateResponderAmount(formats strfmt.Registry) error
 	}
 
 	if err := validate.MinimumInt("responder_amount", "body", int64(*m.ResponderAmount), 0, false); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *ChannelCreateTx) validateResponderID(formats strfmt.Registry) error {
+
+	if err := m.ResponderID.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("responder_id")
+		}
 		return err
 	}
 

@@ -65,7 +65,7 @@ type PostOracleQueryOK struct {
 }
 
 func (o *PostOracleQueryOK) Error() string {
-	return fmt.Sprintf("[POST /tx/oracle/query][%d] postOracleQueryOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /debug/oracles/query][%d] postOracleQueryOK  %+v", 200, o.Payload)
 }
 
 func (o *PostOracleQueryOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -94,7 +94,7 @@ type PostOracleQueryBadRequest struct {
 }
 
 func (o *PostOracleQueryBadRequest) Error() string {
-	return fmt.Sprintf("[POST /tx/oracle/query][%d] postOracleQueryBadRequest  %+v", 400, o.Payload)
+	return fmt.Sprintf("[POST /debug/oracles/query][%d] postOracleQueryBadRequest  %+v", 400, o.Payload)
 }
 
 func (o *PostOracleQueryBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -123,7 +123,7 @@ type PostOracleQueryNotFound struct {
 }
 
 func (o *PostOracleQueryNotFound) Error() string {
-	return fmt.Sprintf("[POST /tx/oracle/query][%d] postOracleQueryNotFound  %+v", 404, o.Payload)
+	return fmt.Sprintf("[POST /debug/oracles/query][%d] postOracleQueryNotFound  %+v", 404, o.Payload)
 }
 
 func (o *PostOracleQueryNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

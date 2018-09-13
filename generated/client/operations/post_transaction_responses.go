@@ -58,7 +58,7 @@ type PostTransactionOK struct {
 }
 
 func (o *PostTransactionOK) Error() string {
-	return fmt.Sprintf("[POST /ng-transactions][%d] postTransactionOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /transactions][%d] postTransactionOK  %+v", 200, o.Payload)
 }
 
 func (o *PostTransactionOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -87,7 +87,7 @@ type PostTransactionBadRequest struct {
 }
 
 func (o *PostTransactionBadRequest) Error() string {
-	return fmt.Sprintf("[POST /ng-transactions][%d] postTransactionBadRequest  %+v", 400, o.Payload)
+	return fmt.Sprintf("[POST /transactions][%d] postTransactionBadRequest  %+v", 400, o.Payload)
 }
 
 func (o *PostTransactionBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

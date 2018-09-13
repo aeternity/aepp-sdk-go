@@ -61,7 +61,7 @@ func NewGetMicroBlockTransactionByHashAndIndexOK() *GetMicroBlockTransactionByHa
 Successful operation
 */
 type GetMicroBlockTransactionByHashAndIndexOK struct {
-	Payload *models.SignedTxJSON
+	Payload *models.GenericSignedTx
 }
 
 func (o *GetMicroBlockTransactionByHashAndIndexOK) Error() string {
@@ -70,7 +70,7 @@ func (o *GetMicroBlockTransactionByHashAndIndexOK) Error() string {
 
 func (o *GetMicroBlockTransactionByHashAndIndexOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.SignedTxJSON)
+	o.Payload = new(models.GenericSignedTx)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

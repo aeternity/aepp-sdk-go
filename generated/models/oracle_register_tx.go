@@ -17,8 +17,8 @@ import (
 // swagger:model OracleRegisterTx
 type OracleRegisterTx struct {
 
-	// account
-	Account EncodedHash `json:"account,omitempty"`
+	// account id
+	AccountID EncodedHash `json:"account_id,omitempty"`
 
 	// fee
 	// Required: true
@@ -51,7 +51,7 @@ type OracleRegisterTx struct {
 func (m *OracleRegisterTx) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateAccount(formats); err != nil {
+	if err := m.validateAccountID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -81,15 +81,15 @@ func (m *OracleRegisterTx) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *OracleRegisterTx) validateAccount(formats strfmt.Registry) error {
+func (m *OracleRegisterTx) validateAccountID(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Account) { // not required
+	if swag.IsZero(m.AccountID) { // not required
 		return nil
 	}
 
-	if err := m.Account.Validate(formats); err != nil {
+	if err := m.AccountID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("account")
+			return ve.ValidateName("account_id")
 		}
 		return err
 	}

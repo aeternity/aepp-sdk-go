@@ -31,11 +31,11 @@ type ContractObject struct {
 	// log
 	Log string `json:"log,omitempty"`
 
-	// owner
-	Owner EncodedHash `json:"owner,omitempty"`
+	// owner id
+	OwnerID EncodedHash `json:"owner_id,omitempty"`
 
-	// referers
-	Referers []EncodedHash `json:"referers"`
+	// referrer ids
+	ReferrerIds []EncodedHash `json:"referrer_ids"`
 
 	// vm version
 	// Maximum: 255
@@ -51,11 +51,11 @@ func (m *ContractObject) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateOwner(formats); err != nil {
+	if err := m.validateOwnerID(formats); err != nil {
 		res = append(res, err)
 	}
 
-	if err := m.validateReferers(formats); err != nil {
+	if err := m.validateReferrerIds(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -85,15 +85,15 @@ func (m *ContractObject) validateID(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractObject) validateOwner(formats strfmt.Registry) error {
+func (m *ContractObject) validateOwnerID(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Owner) { // not required
+	if swag.IsZero(m.OwnerID) { // not required
 		return nil
 	}
 
-	if err := m.Owner.Validate(formats); err != nil {
+	if err := m.OwnerID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("owner")
+			return ve.ValidateName("owner_id")
 		}
 		return err
 	}
@@ -101,17 +101,17 @@ func (m *ContractObject) validateOwner(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractObject) validateReferers(formats strfmt.Registry) error {
+func (m *ContractObject) validateReferrerIds(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Referers) { // not required
+	if swag.IsZero(m.ReferrerIds) { // not required
 		return nil
 	}
 
-	for i := 0; i < len(m.Referers); i++ {
+	for i := 0; i < len(m.ReferrerIds); i++ {
 
-		if err := m.Referers[i].Validate(formats); err != nil {
+		if err := m.ReferrerIds[i].Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("referers" + "." + strconv.Itoa(i))
+				return ve.ValidateName("referrer_ids" + "." + strconv.Itoa(i))
 			}
 			return err
 		}

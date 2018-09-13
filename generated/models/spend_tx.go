@@ -33,12 +33,12 @@ type SpendTx struct {
 	// Required: true
 	Payload *string `json:"payload"`
 
-	// recipient pubkey
+	// recipient id
 	// Required: true
-	RecipientPubkey EncodedHash `json:"recipient_pubkey"`
+	RecipientID EncodedHash `json:"recipient_id"`
 
-	// sender
-	Sender EncodedHash `json:"sender,omitempty"`
+	// sender id
+	SenderID EncodedHash `json:"sender_id,omitempty"`
 
 	// ttl
 	TTL int64 `json:"ttl,omitempty"`
@@ -60,11 +60,11 @@ func (m *SpendTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateRecipientPubkey(formats); err != nil {
+	if err := m.validateRecipientID(formats); err != nil {
 		res = append(res, err)
 	}
 
-	if err := m.validateSender(formats); err != nil {
+	if err := m.validateSenderID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -105,11 +105,11 @@ func (m *SpendTx) validatePayload(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *SpendTx) validateRecipientPubkey(formats strfmt.Registry) error {
+func (m *SpendTx) validateRecipientID(formats strfmt.Registry) error {
 
-	if err := m.RecipientPubkey.Validate(formats); err != nil {
+	if err := m.RecipientID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("recipient_pubkey")
+			return ve.ValidateName("recipient_id")
 		}
 		return err
 	}
@@ -117,15 +117,15 @@ func (m *SpendTx) validateRecipientPubkey(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *SpendTx) validateSender(formats strfmt.Registry) error {
+func (m *SpendTx) validateSenderID(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Sender) { // not required
+	if swag.IsZero(m.SenderID) { // not required
 		return nil
 	}
 
-	if err := m.Sender.Validate(formats); err != nil {
+	if err := m.SenderID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("sender")
+			return ve.ValidateName("sender_id")
 		}
 		return err
 	}

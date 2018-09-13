@@ -58,7 +58,7 @@ type PostChannelSettleOK struct {
 }
 
 func (o *PostChannelSettleOK) Error() string {
-	return fmt.Sprintf("[POST /tx/channel/settle][%d] postChannelSettleOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /debug/channels/settle][%d] postChannelSettleOK  %+v", 200, o.Payload)
 }
 
 func (o *PostChannelSettleOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -87,7 +87,7 @@ type PostChannelSettleBadRequest struct {
 }
 
 func (o *PostChannelSettleBadRequest) Error() string {
-	return fmt.Sprintf("[POST /tx/channel/settle][%d] postChannelSettleBadRequest  %+v", 400, o.Payload)
+	return fmt.Sprintf("[POST /debug/channels/settle][%d] postChannelSettleBadRequest  %+v", 400, o.Payload)
 }
 
 func (o *PostChannelSettleBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

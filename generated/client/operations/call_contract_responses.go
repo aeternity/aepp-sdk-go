@@ -58,7 +58,7 @@ type CallContractOK struct {
 }
 
 func (o *CallContractOK) Error() string {
-	return fmt.Sprintf("[POST /contract/call][%d] callContractOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /debug/contracts/code/call][%d] callContractOK  %+v", 200, o.Payload)
 }
 
 func (o *CallContractOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -87,7 +87,7 @@ type CallContractForbidden struct {
 }
 
 func (o *CallContractForbidden) Error() string {
-	return fmt.Sprintf("[POST /contract/call][%d] callContractForbidden  %+v", 403, o.Payload)
+	return fmt.Sprintf("[POST /debug/contracts/code/call][%d] callContractForbidden  %+v", 403, o.Payload)
 }
 
 func (o *CallContractForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

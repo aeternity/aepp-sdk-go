@@ -65,7 +65,7 @@ type GetContractPoIOK struct {
 }
 
 func (o *GetContractPoIOK) Error() string {
-	return fmt.Sprintf("[GET /poi/contract/{contract}][%d] getContractPoIOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[GET /contracts/{pubkey}/poi][%d] getContractPoIOK  %+v", 200, o.Payload)
 }
 
 func (o *GetContractPoIOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -94,7 +94,7 @@ type GetContractPoIBadRequest struct {
 }
 
 func (o *GetContractPoIBadRequest) Error() string {
-	return fmt.Sprintf("[GET /poi/contract/{contract}][%d] getContractPoIBadRequest  %+v", 400, o.Payload)
+	return fmt.Sprintf("[GET /contracts/{pubkey}/poi][%d] getContractPoIBadRequest  %+v", 400, o.Payload)
 }
 
 func (o *GetContractPoIBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -123,7 +123,7 @@ type GetContractPoINotFound struct {
 }
 
 func (o *GetContractPoINotFound) Error() string {
-	return fmt.Sprintf("[GET /poi/contract/{contract}][%d] getContractPoINotFound  %+v", 404, o.Payload)
+	return fmt.Sprintf("[GET /contracts/{pubkey}/poi][%d] getContractPoINotFound  %+v", 404, o.Payload)
 }
 
 func (o *GetContractPoINotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

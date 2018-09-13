@@ -65,7 +65,7 @@ type PostNamePreclaimOK struct {
 }
 
 func (o *PostNamePreclaimOK) Error() string {
-	return fmt.Sprintf("[POST /tx/name/preclaim][%d] postNamePreclaimOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /debug/names/preclaim][%d] postNamePreclaimOK  %+v", 200, o.Payload)
 }
 
 func (o *PostNamePreclaimOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -94,7 +94,7 @@ type PostNamePreclaimBadRequest struct {
 }
 
 func (o *PostNamePreclaimBadRequest) Error() string {
-	return fmt.Sprintf("[POST /tx/name/preclaim][%d] postNamePreclaimBadRequest  %+v", 400, o.Payload)
+	return fmt.Sprintf("[POST /debug/names/preclaim][%d] postNamePreclaimBadRequest  %+v", 400, o.Payload)
 }
 
 func (o *PostNamePreclaimBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -123,7 +123,7 @@ type PostNamePreclaimNotFound struct {
 }
 
 func (o *PostNamePreclaimNotFound) Error() string {
-	return fmt.Sprintf("[POST /tx/name/preclaim][%d] postNamePreclaimNotFound  %+v", 404, o.Payload)
+	return fmt.Sprintf("[POST /debug/names/preclaim][%d] postNamePreclaimNotFound  %+v", 404, o.Payload)
 }
 
 func (o *PostNamePreclaimNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

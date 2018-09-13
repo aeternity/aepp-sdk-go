@@ -54,7 +54,7 @@ func NewGetPendingKeyBlockOK() *GetPendingKeyBlockOK {
 Successful operation
 */
 type GetPendingKeyBlockOK struct {
-	Payload *models.GenericBlock
+	Payload *models.KeyBlock
 }
 
 func (o *GetPendingKeyBlockOK) Error() string {
@@ -63,7 +63,7 @@ func (o *GetPendingKeyBlockOK) Error() string {
 
 func (o *GetPendingKeyBlockOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericBlock)
+	o.Payload = new(models.KeyBlock)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -80,7 +80,7 @@ func NewGetPendingKeyBlockNotFound() *GetPendingKeyBlockNotFound {
 
 /*GetPendingKeyBlockNotFound handles this case with default header values.
 
-No pending block (node not mining)
+Block not found
 */
 type GetPendingKeyBlockNotFound struct {
 	Payload *models.Error

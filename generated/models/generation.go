@@ -19,7 +19,7 @@ import (
 type Generation struct {
 
 	// key block
-	KeyBlock *GenericBlock `json:"key_block,omitempty"`
+	KeyBlock *KeyBlock `json:"key_block,omitempty"`
 
 	// micro blocks
 	MicroBlocks []EncodedHash `json:"micro_blocks"`

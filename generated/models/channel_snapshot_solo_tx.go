@@ -26,9 +26,8 @@ type ChannelSnapshotSoloTx struct {
 	// Minimum: 0
 	Fee *int64 `json:"fee"`
 
-	// from
-	// Required: true
-	From EncodedHash `json:"from"`
+	// from id
+	FromID EncodedHash `json:"from_id,omitempty"`
 
 	// nonce
 	// Minimum: 0
@@ -55,7 +54,7 @@ func (m *ChannelSnapshotSoloTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateFrom(formats); err != nil {
+	if err := m.validateFromID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -102,11 +101,15 @@ func (m *ChannelSnapshotSoloTx) validateFee(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ChannelSnapshotSoloTx) validateFrom(formats strfmt.Registry) error {
+func (m *ChannelSnapshotSoloTx) validateFromID(formats strfmt.Registry) error {
 
-	if err := m.From.Validate(formats); err != nil {
+	if swag.IsZero(m.FromID) { // not required
+		return nil
+	}
+
+	if err := m.FromID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("from")
+			return ve.ValidateName("from_id")
 		}
 		return err
 	}

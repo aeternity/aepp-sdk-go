@@ -65,7 +65,7 @@ type PostNameClaimOK struct {
 }
 
 func (o *PostNameClaimOK) Error() string {
-	return fmt.Sprintf("[POST /tx/name/claim][%d] postNameClaimOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /debug/names/claim][%d] postNameClaimOK  %+v", 200, o.Payload)
 }
 
 func (o *PostNameClaimOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -94,7 +94,7 @@ type PostNameClaimBadRequest struct {
 }
 
 func (o *PostNameClaimBadRequest) Error() string {
-	return fmt.Sprintf("[POST /tx/name/claim][%d] postNameClaimBadRequest  %+v", 400, o.Payload)
+	return fmt.Sprintf("[POST /debug/names/claim][%d] postNameClaimBadRequest  %+v", 400, o.Payload)
 }
 
 func (o *PostNameClaimBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -123,7 +123,7 @@ type PostNameClaimNotFound struct {
 }
 
 func (o *PostNameClaimNotFound) Error() string {
-	return fmt.Sprintf("[POST /tx/name/claim][%d] postNameClaimNotFound  %+v", 404, o.Payload)
+	return fmt.Sprintf("[POST /debug/names/claim][%d] postNameClaimNotFound  %+v", 404, o.Payload)
 }
 
 func (o *PostNameClaimNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

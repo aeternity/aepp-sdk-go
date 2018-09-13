@@ -61,7 +61,7 @@ func NewGetKeyBlockByHashOK() *GetKeyBlockByHashOK {
 Successful operation
 */
 type GetKeyBlockByHashOK struct {
-	Payload *models.GenericBlock
+	Payload *models.KeyBlock
 }
 
 func (o *GetKeyBlockByHashOK) Error() string {
@@ -70,7 +70,7 @@ func (o *GetKeyBlockByHashOK) Error() string {
 
 func (o *GetKeyBlockByHashOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericBlock)
+	o.Payload = new(models.KeyBlock)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

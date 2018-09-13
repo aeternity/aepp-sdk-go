@@ -58,7 +58,7 @@ type PostChannelCloseSoloOK struct {
 }
 
 func (o *PostChannelCloseSoloOK) Error() string {
-	return fmt.Sprintf("[POST /tx/channel/close/solo][%d] postChannelCloseSoloOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /debug/channels/close/solo][%d] postChannelCloseSoloOK  %+v", 200, o.Payload)
 }
 
 func (o *PostChannelCloseSoloOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -87,7 +87,7 @@ type PostChannelCloseSoloBadRequest struct {
 }
 
 func (o *PostChannelCloseSoloBadRequest) Error() string {
-	return fmt.Sprintf("[POST /tx/channel/close/solo][%d] postChannelCloseSoloBadRequest  %+v", 400, o.Payload)
+	return fmt.Sprintf("[POST /debug/channels/close/solo][%d] postChannelCloseSoloBadRequest  %+v", 400, o.Payload)
 }
 
 func (o *PostChannelCloseSoloBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

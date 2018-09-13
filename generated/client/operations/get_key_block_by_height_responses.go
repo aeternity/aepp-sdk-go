@@ -54,7 +54,7 @@ func NewGetKeyBlockByHeightOK() *GetKeyBlockByHeightOK {
 Successful operation
 */
 type GetKeyBlockByHeightOK struct {
-	Payload *models.GenericBlock
+	Payload *models.KeyBlock
 }
 
 func (o *GetKeyBlockByHeightOK) Error() string {
@@ -63,7 +63,7 @@ func (o *GetKeyBlockByHeightOK) Error() string {
 
 func (o *GetKeyBlockByHeightOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericBlock)
+	o.Payload = new(models.KeyBlock)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

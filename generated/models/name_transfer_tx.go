@@ -17,23 +17,23 @@ import (
 // swagger:model NameTransferTx
 type NameTransferTx struct {
 
-	// account
-	Account EncodedHash `json:"account,omitempty"`
+	// account id
+	AccountID EncodedHash `json:"account_id,omitempty"`
 
 	// fee
 	// Required: true
 	Fee *int64 `json:"fee"`
 
-	// name hash
+	// name id
 	// Required: true
-	NameHash *string `json:"name_hash"`
+	NameID EncodedHash `json:"name_id"`
 
 	// nonce
 	Nonce int64 `json:"nonce,omitempty"`
 
-	// recipient pubkey
+	// recipient id
 	// Required: true
-	RecipientPubkey *string `json:"recipient_pubkey"`
+	RecipientID EncodedHash `json:"recipient_id"`
 
 	// ttl
 	TTL int64 `json:"ttl,omitempty"`
@@ -43,7 +43,7 @@ type NameTransferTx struct {
 func (m *NameTransferTx) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateAccount(formats); err != nil {
+	if err := m.validateAccountID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -51,11 +51,11 @@ func (m *NameTransferTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateNameHash(formats); err != nil {
+	if err := m.validateNameID(formats); err != nil {
 		res = append(res, err)
 	}
 
-	if err := m.validateRecipientPubkey(formats); err != nil {
+	if err := m.validateRecipientID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -65,15 +65,15 @@ func (m *NameTransferTx) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *NameTransferTx) validateAccount(formats strfmt.Registry) error {
+func (m *NameTransferTx) validateAccountID(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Account) { // not required
+	if swag.IsZero(m.AccountID) { // not required
 		return nil
 	}
 
-	if err := m.Account.Validate(formats); err != nil {
+	if err := m.AccountID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("account")
+			return ve.ValidateName("account_id")
 		}
 		return err
 	}
@@ -90,18 +90,24 @@ func (m *NameTransferTx) validateFee(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *NameTransferTx) validateNameHash(formats strfmt.Registry) error {
+func (m *NameTransferTx) validateNameID(formats strfmt.Registry) error {
 
-	if err := validate.Required("name_hash", "body", m.NameHash); err != nil {
+	if err := m.NameID.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("name_id")
+		}
 		return err
 	}
 
 	return nil
 }
 
-func (m *NameTransferTx) validateRecipientPubkey(formats strfmt.Registry) error {
+func (m *NameTransferTx) validateRecipientID(formats strfmt.Registry) error {
 
-	if err := validate.Required("recipient_pubkey", "body", m.RecipientPubkey); err != nil {
+	if err := m.RecipientID.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("recipient_id")
+		}
 		return err
 	}
 

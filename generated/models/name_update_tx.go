@@ -6,6 +6,8 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"strconv"
+
 	strfmt "github.com/go-openapi/strfmt"
 
 	"github.com/go-openapi/errors"
@@ -17,8 +19,8 @@ import (
 // swagger:model NameUpdateTx
 type NameUpdateTx struct {
 
-	// account
-	Account EncodedHash `json:"account,omitempty"`
+	// account id
+	AccountID EncodedHash `json:"account_id,omitempty"`
 
 	// client ttl
 	// Required: true
@@ -28,9 +30,9 @@ type NameUpdateTx struct {
 	// Required: true
 	Fee *int64 `json:"fee"`
 
-	// name hash
+	// name id
 	// Required: true
-	NameHash *string `json:"name_hash"`
+	NameID EncodedHash `json:"name_id"`
 
 	// name ttl
 	// Required: true
@@ -41,7 +43,7 @@ type NameUpdateTx struct {
 
 	// pointers
 	// Required: true
-	Pointers *string `json:"pointers"`
+	Pointers []*NamePointer `json:"pointers"`
 
 	// ttl
 	TTL int64 `json:"ttl,omitempty"`
@@ -51,7 +53,7 @@ type NameUpdateTx struct {
 func (m *NameUpdateTx) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateAccount(formats); err != nil {
+	if err := m.validateAccountID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -63,7 +65,7 @@ func (m *NameUpdateTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateNameHash(formats); err != nil {
+	if err := m.validateNameID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -81,15 +83,15 @@ func (m *NameUpdateTx) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *NameUpdateTx) validateAccount(formats strfmt.Registry) error {
+func (m *NameUpdateTx) validateAccountID(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Account) { // not required
+	if swag.IsZero(m.AccountID) { // not required
 		return nil
 	}
 
-	if err := m.Account.Validate(formats); err != nil {
+	if err := m.AccountID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("account")
+			return ve.ValidateName("account_id")
 		}
 		return err
 	}
@@ -115,9 +117,12 @@ func (m *NameUpdateTx) validateFee(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *NameUpdateTx) validateNameHash(formats strfmt.Registry) error {
+func (m *NameUpdateTx) validateNameID(formats strfmt.Registry) error {
 
-	if err := validate.Required("name_hash", "body", m.NameHash); err != nil {
+	if err := m.NameID.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("name_id")
+		}
 		return err
 	}
 
@@ -137,6 +142,22 @@ func (m *NameUpdateTx) validatePointers(formats strfmt.Registry) error {
 
 	if err := validate.Required("pointers", "body", m.Pointers); err != nil {
 		return err
+	}
+
+	for i := 0; i < len(m.Pointers); i++ {
+		if swag.IsZero(m.Pointers[i]) { // not required
+			continue
+		}
+
+		if m.Pointers[i] != nil {
+			if err := m.Pointers[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("pointers" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil

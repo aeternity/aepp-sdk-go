@@ -65,7 +65,7 @@ type PostNameUpdateOK struct {
 }
 
 func (o *PostNameUpdateOK) Error() string {
-	return fmt.Sprintf("[POST /tx/name/update][%d] postNameUpdateOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /debug/names/update][%d] postNameUpdateOK  %+v", 200, o.Payload)
 }
 
 func (o *PostNameUpdateOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -94,7 +94,7 @@ type PostNameUpdateBadRequest struct {
 }
 
 func (o *PostNameUpdateBadRequest) Error() string {
-	return fmt.Sprintf("[POST /tx/name/update][%d] postNameUpdateBadRequest  %+v", 400, o.Payload)
+	return fmt.Sprintf("[POST /debug/names/update][%d] postNameUpdateBadRequest  %+v", 400, o.Payload)
 }
 
 func (o *PostNameUpdateBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -123,7 +123,7 @@ type PostNameUpdateNotFound struct {
 }
 
 func (o *PostNameUpdateNotFound) Error() string {
-	return fmt.Sprintf("[POST /tx/name/update][%d] postNameUpdateNotFound  %+v", 404, o.Payload)
+	return fmt.Sprintf("[POST /debug/names/update][%d] postNameUpdateNotFound  %+v", 404, o.Payload)
 }
 
 func (o *PostNameUpdateNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

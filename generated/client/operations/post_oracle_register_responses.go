@@ -65,7 +65,7 @@ type PostOracleRegisterOK struct {
 }
 
 func (o *PostOracleRegisterOK) Error() string {
-	return fmt.Sprintf("[POST /tx/oracle/register][%d] postOracleRegisterOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /debug/oracles/register][%d] postOracleRegisterOK  %+v", 200, o.Payload)
 }
 
 func (o *PostOracleRegisterOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -94,7 +94,7 @@ type PostOracleRegisterBadRequest struct {
 }
 
 func (o *PostOracleRegisterBadRequest) Error() string {
-	return fmt.Sprintf("[POST /tx/oracle/register][%d] postOracleRegisterBadRequest  %+v", 400, o.Payload)
+	return fmt.Sprintf("[POST /debug/oracles/register][%d] postOracleRegisterBadRequest  %+v", 400, o.Payload)
 }
 
 func (o *PostOracleRegisterBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -123,7 +123,7 @@ type PostOracleRegisterNotFound struct {
 }
 
 func (o *PostOracleRegisterNotFound) Error() string {
-	return fmt.Sprintf("[POST /tx/oracle/register][%d] postOracleRegisterNotFound  %+v", 404, o.Payload)
+	return fmt.Sprintf("[POST /debug/oracles/register][%d] postOracleRegisterNotFound  %+v", 404, o.Payload)
 }
 
 func (o *PostOracleRegisterNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

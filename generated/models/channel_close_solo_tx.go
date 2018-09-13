@@ -26,9 +26,9 @@ type ChannelCloseSoloTx struct {
 	// Minimum: 0
 	Fee *int64 `json:"fee"`
 
-	// from
+	// from id
 	// Required: true
-	From EncodedHash `json:"from"`
+	FromID EncodedHash `json:"from_id"`
 
 	// nonce
 	// Minimum: 0
@@ -59,7 +59,7 @@ func (m *ChannelCloseSoloTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateFrom(formats); err != nil {
+	if err := m.validateFromID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -110,11 +110,11 @@ func (m *ChannelCloseSoloTx) validateFee(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ChannelCloseSoloTx) validateFrom(formats strfmt.Registry) error {
+func (m *ChannelCloseSoloTx) validateFromID(formats strfmt.Registry) error {
 
-	if err := m.From.Validate(formats); err != nil {
+	if err := m.FromID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("from")
+			return ve.ValidateName("from_id")
 		}
 		return err
 	}

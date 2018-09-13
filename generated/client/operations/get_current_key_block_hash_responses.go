@@ -32,6 +32,13 @@ func (o *GetCurrentKeyBlockHashReader) ReadResponse(response runtime.ClientRespo
 		}
 		return result, nil
 
+	case 404:
+		result := NewGetCurrentKeyBlockHashNotFound()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
+
 	default:
 		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
@@ -57,6 +64,35 @@ func (o *GetCurrentKeyBlockHashOK) Error() string {
 func (o *GetCurrentKeyBlockHashOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.InlineResponse200)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
+// NewGetCurrentKeyBlockHashNotFound creates a GetCurrentKeyBlockHashNotFound with default headers values
+func NewGetCurrentKeyBlockHashNotFound() *GetCurrentKeyBlockHashNotFound {
+	return &GetCurrentKeyBlockHashNotFound{}
+}
+
+/*GetCurrentKeyBlockHashNotFound handles this case with default header values.
+
+Block not found
+*/
+type GetCurrentKeyBlockHashNotFound struct {
+	Payload *models.Error
+}
+
+func (o *GetCurrentKeyBlockHashNotFound) Error() string {
+	return fmt.Sprintf("[GET /key-blocks/current/hash][%d] getCurrentKeyBlockHashNotFound  %+v", 404, o.Payload)
+}
+
+func (o *GetCurrentKeyBlockHashNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(models.Error)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

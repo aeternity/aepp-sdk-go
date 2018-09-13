@@ -8,6 +8,7 @@ package models
 import (
 	strfmt "github.com/go-openapi/strfmt"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 )
 
@@ -15,12 +16,37 @@ import (
 // swagger:model NameHash
 type NameHash struct {
 
-	// name hash
-	NameHash string `json:"name_hash,omitempty"`
+	// name id
+	NameID EncodedHash `json:"name_id,omitempty"`
 }
 
 // Validate validates this name hash
 func (m *NameHash) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateNameID(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *NameHash) validateNameID(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.NameID) { // not required
+		return nil
+	}
+
+	if err := m.NameID.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("name_id")
+		}
+		return err
+	}
+
 	return nil
 }
 

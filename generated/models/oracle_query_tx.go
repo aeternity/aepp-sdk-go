@@ -24,9 +24,9 @@ type OracleQueryTx struct {
 	// Sender nonce
 	Nonce int64 `json:"nonce,omitempty"`
 
-	// oracle pubkey
+	// oracle id
 	// Required: true
-	OraclePubkey *string `json:"oracle_pubkey"`
+	OracleID EncodedHash `json:"oracle_id"`
 
 	// query
 	// Required: true
@@ -44,8 +44,8 @@ type OracleQueryTx struct {
 	// Required: true
 	ResponseTTL *RelativeTTL `json:"response_ttl"`
 
-	// sender
-	Sender EncodedHash `json:"sender,omitempty"`
+	// sender id
+	SenderID EncodedHash `json:"sender_id,omitempty"`
 
 	// ttl
 	TTL int64 `json:"ttl,omitempty"`
@@ -59,7 +59,7 @@ func (m *OracleQueryTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateOraclePubkey(formats); err != nil {
+	if err := m.validateOracleID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -79,7 +79,7 @@ func (m *OracleQueryTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateSender(formats); err != nil {
+	if err := m.validateSenderID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -98,9 +98,12 @@ func (m *OracleQueryTx) validateFee(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *OracleQueryTx) validateOraclePubkey(formats strfmt.Registry) error {
+func (m *OracleQueryTx) validateOracleID(formats strfmt.Registry) error {
 
-	if err := validate.Required("oracle_pubkey", "body", m.OraclePubkey); err != nil {
+	if err := m.OracleID.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("oracle_id")
+		}
 		return err
 	}
 
@@ -161,15 +164,15 @@ func (m *OracleQueryTx) validateResponseTTL(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *OracleQueryTx) validateSender(formats strfmt.Registry) error {
+func (m *OracleQueryTx) validateSenderID(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Sender) { // not required
+	if swag.IsZero(m.SenderID) { // not required
 		return nil
 	}
 
-	if err := m.Sender.Validate(formats); err != nil {
+	if err := m.SenderID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("sender")
+			return ve.ValidateName("sender_id")
 		}
 		return err
 	}

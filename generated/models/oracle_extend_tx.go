@@ -24,8 +24,8 @@ type OracleExtendTx struct {
 	// nonce
 	Nonce int64 `json:"nonce,omitempty"`
 
-	// oracle
-	Oracle EncodedHash `json:"oracle,omitempty"`
+	// oracle id
+	OracleID EncodedHash `json:"oracle_id,omitempty"`
 
 	// oracle ttl
 	// Required: true
@@ -43,7 +43,7 @@ func (m *OracleExtendTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateOracle(formats); err != nil {
+	if err := m.validateOracleID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -66,15 +66,15 @@ func (m *OracleExtendTx) validateFee(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *OracleExtendTx) validateOracle(formats strfmt.Registry) error {
+func (m *OracleExtendTx) validateOracleID(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Oracle) { // not required
+	if swag.IsZero(m.OracleID) { // not required
 		return nil
 	}
 
-	if err := m.Oracle.Validate(formats); err != nil {
+	if err := m.OracleID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("oracle")
+			return ve.ValidateName("oracle_id")
 		}
 		return err
 	}

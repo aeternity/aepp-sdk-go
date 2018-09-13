@@ -58,7 +58,7 @@ type CompileContractOK struct {
 }
 
 func (o *CompileContractOK) Error() string {
-	return fmt.Sprintf("[POST /contract/compile][%d] compileContractOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /debug/contracts/code/compile][%d] compileContractOK  %+v", 200, o.Payload)
 }
 
 func (o *CompileContractOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -87,7 +87,7 @@ type CompileContractForbidden struct {
 }
 
 func (o *CompileContractForbidden) Error() string {
-	return fmt.Sprintf("[POST /contract/compile][%d] compileContractForbidden  %+v", 403, o.Payload)
+	return fmt.Sprintf("[POST /debug/contracts/code/compile][%d] compileContractForbidden  %+v", 403, o.Payload)
 }
 
 func (o *CompileContractForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

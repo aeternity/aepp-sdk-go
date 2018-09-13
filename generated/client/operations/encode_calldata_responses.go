@@ -58,7 +58,7 @@ type EncodeCalldataOK struct {
 }
 
 func (o *EncodeCalldataOK) Error() string {
-	return fmt.Sprintf("[POST /contract/encode-calldata][%d] encodeCalldataOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /debug/contracts/code/encode-calldata][%d] encodeCalldataOK  %+v", 200, o.Payload)
 }
 
 func (o *EncodeCalldataOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -87,7 +87,7 @@ type EncodeCalldataForbidden struct {
 }
 
 func (o *EncodeCalldataForbidden) Error() string {
-	return fmt.Sprintf("[POST /contract/encode-calldata][%d] encodeCalldataForbidden  %+v", 403, o.Payload)
+	return fmt.Sprintf("[POST /debug/contracts/code/encode-calldata][%d] encodeCalldataForbidden  %+v", 403, o.Payload)
 }
 
 func (o *EncodeCalldataForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

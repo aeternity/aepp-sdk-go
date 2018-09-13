@@ -28,11 +28,11 @@ type ContractCallCompute struct {
 
 	// Contract caller pub_key
 	// Required: true
-	Caller *string `json:"caller"`
+	CallerID EncodedHash `json:"caller_id"`
 
 	// Contract's pub_key
 	// Required: true
-	Contract *string `json:"contract"`
+	ContractID EncodedHash `json:"contract_id"`
 
 	// Transaction fee
 	// Required: true
@@ -79,11 +79,11 @@ func (m *ContractCallCompute) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateCaller(formats); err != nil {
+	if err := m.validateCallerID(formats); err != nil {
 		res = append(res, err)
 	}
 
-	if err := m.validateContract(formats); err != nil {
+	if err := m.validateContractID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -139,18 +139,24 @@ func (m *ContractCallCompute) validateArguments(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractCallCompute) validateCaller(formats strfmt.Registry) error {
+func (m *ContractCallCompute) validateCallerID(formats strfmt.Registry) error {
 
-	if err := validate.Required("caller", "body", m.Caller); err != nil {
+	if err := m.CallerID.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("caller_id")
+		}
 		return err
 	}
 
 	return nil
 }
 
-func (m *ContractCallCompute) validateContract(formats strfmt.Registry) error {
+func (m *ContractCallCompute) validateContractID(formats strfmt.Registry) error {
 
-	if err := validate.Required("contract", "body", m.Contract); err != nil {
+	if err := m.ContractID.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("contract_id")
+		}
 		return err
 	}
 

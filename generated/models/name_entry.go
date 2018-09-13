@@ -6,8 +6,11 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"strconv"
+
 	strfmt "github.com/go-openapi/strfmt"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 )
 
@@ -15,21 +18,72 @@ import (
 // swagger:model NameEntry
 type NameEntry struct {
 
-	// name
-	Name string `json:"name,omitempty"`
+	// expires
+	Expires int64 `json:"expires,omitempty"`
 
-	// name hash
-	NameHash string `json:"name_hash,omitempty"`
-
-	// name ttl
-	NameTTL int64 `json:"name_ttl,omitempty"`
+	// id
+	ID EncodedHash `json:"id,omitempty"`
 
 	// pointers
-	Pointers string `json:"pointers,omitempty"`
+	Pointers []*NamePointer `json:"pointers"`
 }
 
 // Validate validates this name entry
 func (m *NameEntry) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateID(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePointers(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *NameEntry) validateID(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.ID) { // not required
+		return nil
+	}
+
+	if err := m.ID.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("id")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *NameEntry) validatePointers(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Pointers) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.Pointers); i++ {
+		if swag.IsZero(m.Pointers[i]) { // not required
+			continue
+		}
+
+		if m.Pointers[i] != nil {
+			if err := m.Pointers[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("pointers" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
 	return nil
 }
 

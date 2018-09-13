@@ -65,7 +65,7 @@ type PostNameRevokeOK struct {
 }
 
 func (o *PostNameRevokeOK) Error() string {
-	return fmt.Sprintf("[POST /tx/name/revoke][%d] postNameRevokeOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /debug/names/revoke][%d] postNameRevokeOK  %+v", 200, o.Payload)
 }
 
 func (o *PostNameRevokeOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -94,7 +94,7 @@ type PostNameRevokeBadRequest struct {
 }
 
 func (o *PostNameRevokeBadRequest) Error() string {
-	return fmt.Sprintf("[POST /tx/name/revoke][%d] postNameRevokeBadRequest  %+v", 400, o.Payload)
+	return fmt.Sprintf("[POST /debug/names/revoke][%d] postNameRevokeBadRequest  %+v", 400, o.Payload)
 }
 
 func (o *PostNameRevokeBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -123,7 +123,7 @@ type PostNameRevokeNotFound struct {
 }
 
 func (o *PostNameRevokeNotFound) Error() string {
-	return fmt.Sprintf("[POST /tx/name/revoke][%d] postNameRevokeNotFound  %+v", 404, o.Payload)
+	return fmt.Sprintf("[POST /debug/names/revoke][%d] postNameRevokeNotFound  %+v", 404, o.Payload)
 }
 
 func (o *PostNameRevokeNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

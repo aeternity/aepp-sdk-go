@@ -58,7 +58,7 @@ type DecodeDataOK struct {
 }
 
 func (o *DecodeDataOK) Error() string {
-	return fmt.Sprintf("[POST /contract/decode-data][%d] decodeDataOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /debug/contracts/code/decode-data][%d] decodeDataOK  %+v", 200, o.Payload)
 }
 
 func (o *DecodeDataOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -87,7 +87,7 @@ type DecodeDataBadRequest struct {
 }
 
 func (o *DecodeDataBadRequest) Error() string {
-	return fmt.Sprintf("[POST /contract/decode-data][%d] decodeDataBadRequest  %+v", 400, o.Payload)
+	return fmt.Sprintf("[POST /debug/contracts/code/decode-data][%d] decodeDataBadRequest  %+v", 400, o.Payload)
 }
 
 func (o *DecodeDataBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

@@ -61,7 +61,7 @@ func NewGetMicroBlockTransactionsByHashOK() *GetMicroBlockTransactionsByHashOK {
 Successful operation
 */
 type GetMicroBlockTransactionsByHashOK struct {
-	Payload *models.JSONTxs
+	Payload *models.GenericTxs
 }
 
 func (o *GetMicroBlockTransactionsByHashOK) Error() string {
@@ -70,7 +70,7 @@ func (o *GetMicroBlockTransactionsByHashOK) Error() string {
 
 func (o *GetMicroBlockTransactionsByHashOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONTxs)
+	o.Payload = new(models.GenericTxs)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

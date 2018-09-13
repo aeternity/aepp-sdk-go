@@ -58,7 +58,7 @@ type PostChannelSLASHOK struct {
 }
 
 func (o *PostChannelSLASHOK) Error() string {
-	return fmt.Sprintf("[POST /tx/channel/slash][%d] postChannelSlashOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[POST /debug/channels/slash][%d] postChannelSlashOK  %+v", 200, o.Payload)
 }
 
 func (o *PostChannelSLASHOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -87,7 +87,7 @@ type PostChannelSLASHBadRequest struct {
 }
 
 func (o *PostChannelSLASHBadRequest) Error() string {
-	return fmt.Sprintf("[POST /tx/channel/slash][%d] postChannelSlashBadRequest  %+v", 400, o.Payload)
+	return fmt.Sprintf("[POST /debug/channels/slash][%d] postChannelSlashBadRequest  %+v", 400, o.Payload)
 }
 
 func (o *PostChannelSLASHBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
