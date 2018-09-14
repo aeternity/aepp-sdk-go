@@ -11,7 +11,7 @@ import (
 
 	strfmt "github.com/go-openapi/strfmt"
 
-	"github.com/aeternity/aepp-sdk-go/generated/client/operations"
+	"github.com/aeternity/aepp-sdk-go/generated/client/external"
 )
 
 // Default epoch HTTP client.
@@ -57,7 +57,7 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Epoch {
 	cli := new(Epoch)
 	cli.Transport = transport
 
-	cli.Operations = operations.New(transport, formats)
+	cli.External = external.New(transport, formats)
 
 	return cli
 }
@@ -103,7 +103,7 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 
 // Epoch is a client for epoch
 type Epoch struct {
-	Operations *operations.Client
+	External *external.Client
 
 	Transport runtime.ClientTransport
 }
@@ -112,6 +112,6 @@ type Epoch struct {
 func (c *Epoch) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
 
-	c.Operations.SetTransport(transport)
+	c.External.SetTransport(transport)
 
 }
