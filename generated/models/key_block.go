@@ -29,7 +29,7 @@ type KeyBlock struct {
 	Miner EncodedHash `json:"miner,omitempty"`
 
 	// nonce
-	Nonce int64 `json:"nonce,omitempty"`
+	Nonce uint64 `json:"nonce,omitempty"`
 
 	// pow
 	Pow Pow `json:"pow"`
