@@ -56,7 +56,7 @@ func encodeP(prefix HashPrefix, data []byte) string {
 
 // decode decode a string encoded with base58 + checksum to a byte array
 func decode(in string) (out []byte, err error) {
-	if len(in) >= 3 && string(in[2]) == "$" {
+	if len(in) >= 3 && string(in[2]) == PrefixSeparator {
 		in = in[3:]
 	}
 	raw := base58.Decode(in)
