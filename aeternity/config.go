@@ -52,9 +52,9 @@ type ClientConfig struct {
 
 // TuningConfig fine tuning of parameters of the client
 type TuningConfig struct {
-	ChainPollInteval float32 `yaml:"chain_poll_interval" mapstructure:"chain_poll_interval"`
-	TxPayload        string  `yaml:"tx_payload" mapstructure:"tx_payload"`
-	ResponseEncoding string  `yaml:"msg_encoding" mapstructure:"msg_encoding"`
+	ChainPollInteval int64  `yaml:"chain_poll_interval" mapstructure:"chain_poll_interval"`
+	ChainTimeout     int64  `yaml:"chain_timeout" mapstructure:"chain_timeout"`
+	ResponseEncoding string `yaml:"msg_encoding" mapstructure:"msg_encoding"`
 }
 
 // ProfileConfig a configuration profile
@@ -98,8 +98,9 @@ func (c *ProfileConfig) Defaults() *ProfileConfig {
 	utils.DefaultIfEmptyInt64(&c.Client.Contracts.Gas, 40000000)
 	utils.DefaultIfEmptyInt64(&c.Client.Contracts.GasPrice, 1)
 	// for tuning
-	utils.DefaultIfEmptyStr(&c.Tuning.TxPayload, "payload")
 	utils.DefaultIfEmptyStr(&c.Tuning.ResponseEncoding, "json")
+	utils.DefaultIfEmptyInt64(&c.Tuning.ChainPollInteval, 1000)
+	utils.DefaultIfEmptyInt64(&c.Tuning.ChainTimeout, 5000)
 	return c
 }
 
