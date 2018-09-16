@@ -4,11 +4,11 @@ import (
 	"encoding/binary"
 	"fmt"
 	"strings"
+	"time"
 
 	apiclient "github.com/aeternity/aepp-sdk-go/generated/client"
-	"github.com/aeternity/aepp-sdk-go/generated/client/operations"
+	"github.com/aeternity/aepp-sdk-go/generated/client/external"
 	"github.com/aeternity/aepp-sdk-go/generated/models"
-	"github.com/aeternity/aepp-sdk-go/rlp"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 )
@@ -74,63 +74,177 @@ func urlComponents(url string) (host string, schemas []string) {
 	return
 }
 
-// GetAbsoluteHeight return the chain height adding the offset
-func GetAbsoluteHeight(epochCli *apiclient.Epoch, offset int64) (height int64) {
-	if r, err := epochCli.Operations.GetTop(nil); err == nil {
-		height = r.Payload.Height + offset
+// getTopBlock get the top block of the chain
+// wraps the generated code to avoid too much changes
+// in case of the swagger api call changes
+func getTopBlock(epochCli *apiclient.Epoch) (kb *models.KeyBlock, err error) {
+	r, err := epochCli.External.GetTopBlock(nil)
+	if err != nil {
+		return
+	}
+	kb = r.Payload
+	return
+}
+
+// return the current key block
+func getCurrentKeyBlock(epochCli *apiclient.Epoch) (kb *models.KeyBlock, err error) {
+	r, err := epochCli.External.GetCurrentKeyBlock(nil)
+	if err != nil {
+		return
+	}
+	kb = r.Payload
+	return
+}
+
+// getAbsoluteHeight return the chain height adding the offset
+func getAbsoluteHeight(epochCli *apiclient.Epoch, offset int64) (height int64, err error) {
+	kb, err := getTopBlock(epochCli)
+	if err != nil {
+		return
+	}
+	height = kb.Height + offset
+	return
+}
+
+// getAccount retrieve an account by its address (public key)
+// it is particularly useful to obtain the nonce for spending transactions
+func getAccount(epochCli *apiclient.Epoch, address string) (account *models.Account, err error) {
+	p := external.NewGetAccountByPubkeyParams().WithPubkey(address)
+	r, err := epochCli.External.GetAccountByPubkey(p)
+	if err != nil {
+		return
+	}
+	account = r.Payload
+	return
+}
+
+// getNextNonce retrieve the next nonce for an account
+// it has to query the chain to do so
+func getNextNonce(epochCli *apiclient.Epoch, acccount *KeyPair) (nextNonce uint64, err error) {
+	a, err := getAccount(epochCli, acccount.Address)
+	if err != nil {
+		return
+	}
+	nextNonce = *a.Nonce + 1
+	return
+}
+
+// getTransaction retrieve a transaction by it's hash
+func getTransaction(epochCli *apiclient.Epoch, txHash string) (tx *models.GenericSignedTx, err error) {
+	p := external.NewGetTransactionByHashParams().WithHash(txHash)
+	r, err := epochCli.External.GetTransactionByHash(p)
+	if err != nil {
+		return
+	}
+	tx = r.Payload
+	return
+}
+
+// waitForTransaction to appear on the chain
+func waitForTransaction(epochCli *apiclient.Epoch, txHash string) (blockHeight int64, blockHash string, err error) {
+	// caclulate the date for the timeout
+	ctm := Config.P.Tuning.ChainTimeout
+	tm := time.Now().Add(time.Millisecond * time.Duration(ctm))
+	// start querying the transaction
+	for {
+		if time.Now().After(tm) {
+			// TODO: should use the chain height instead of a timeout
+			err = fmt.Errorf("Timeout waiting for the transaction to appear")
+			break // timeout execed
+		}
+		tx, err := getTransaction(epochCli, txHash)
+		if err != nil {
+			break
+		}
+		if len(tx.BlockHash) > 0 {
+			blockHeight = tx.BlockHeight
+			blockHash = fmt.Sprint(tx.BlockHash)
+			break
+		}
+		time.Sleep(time.Millisecond * time.Duration(Config.P.Tuning.ChainPollInteval))
 	}
 	return
 }
 
-// PostTransaction post a transaction to the chain
-func PostTransaction(epochCli *apiclient.Epoch, signedEncodedTx, signedEncodedTxHash string) (err error) {
-	p := operations.NewPostTransactionParams().WithBody(&models.Tx{
+// waitForTransactionUntillHeight waits for a transaction until heightLimit (inclusive) is reached
+func waitForTransactionUntillHeight(epochCli *apiclient.Epoch, height int64, txHash string) (blockHeight int64, blockHash, microBlockHash string, tx *models.GenericSignedTx, err error) {
+
+	kb, err := getCurrentKeyBlock(epochCli)
+	if err != nil {
+		return
+	}
+	// current height
+	targetHeight := kb.Height
+	nextHeight := kb.Height
+	// hold the generation
+	var g *models.Generation
+
+Main:
+	for {
+		// check the top height
+		if targetHeight > height {
+			err = fmt.Errorf("Transaction %s not found, height %d", txHash, height)
+			break
+		}
+		// get the generation of the targetHeight
+		fmt.Println("Try with block ", targetHeight)
+		p := external.NewGetGenerationByHeightParams().WithHeight(targetHeight)
+		r, err := epochCli.External.GetGenerationByHeight(p)
+		if err != nil {
+			break
+		}
+		g = r.Payload
+		// search for transaction in the microblocks
+		for _, mbh := range g.MicroBlocks {
+			// get the microblok
+			mbhs := fmt.Sprint(mbh)
+			p := external.NewGetMicroBlockTransactionsByHashParams().WithHash(mbhs)
+			r, mErr := epochCli.External.GetMicroBlockTransactionsByHash(p)
+			if mErr != nil {
+				err = mErr
+				break Main
+			}
+			// go through all the hashes
+			for _, btx := range r.Payload.Transactions {
+				if fmt.Sprint(btx.Hash) == txHash {
+					// transaction found !!
+					blockHash = fmt.Sprint(g.KeyBlock.Hash)
+					blockHeight = g.KeyBlock.Height
+					microBlockHash = mbhs
+					tx = btx
+					break Main
+				}
+			}
+		}
+		// here we want to query one more time the current generation
+		// before switching to the next one in case microblocks have been added meanwhile
+		// update targetHeight
+		if nextHeight > targetHeight {
+			targetHeight = nextHeight
+		}
+		// update nextHeight
+		kb, err = getCurrentKeyBlock(epochCli)
+		if err != nil {
+			break
+		}
+		nextHeight = kb.Height
+	}
+
+	return
+}
+
+// postTransaction post a transaction to the chain
+func postTransaction(epochCli *apiclient.Epoch, signedEncodedTx, signedEncodedTxHash string) (err error) {
+	p := external.NewPostTransactionParams().WithBody(&models.Tx{
 		Tx: signedEncodedTx,
 	})
-	r, err := epochCli.Operations.PostTransaction(p)
+	r, err := epochCli.External.PostTransaction(p)
 	if err != nil {
 		return
 	}
 	if r.Payload.TxHash != models.EncodedHash(signedEncodedTxHash) {
 		err = fmt.Errorf("Transaction hash mismatch, expected %s got %s", signedEncodedTxHash, r.Payload.TxHash)
 	}
-	return
-}
-
-// SignEncodeTx sign and encode a transaction
-func SignEncodeTx(kp *KeyPair, tx models.EncodedHash) (signedEncodedTx, signedEncodedTxHash, signature string, err error) {
-	txStr := fmt.Sprint(tx)
-	// decode the transaction string
-	txRaw, err := decode(txStr)
-	if err != nil {
-		return
-	}
-	// sign the transaction
-	sigRaw := kp.Sign(txRaw)
-	if err != nil {
-		return
-	}
-	// create a message of the transaction and signature
-	data := struct {
-		Tag        uint
-		Vsn        uint
-		Signatures [][]byte
-		TxRaw      []byte
-	}{
-		11,
-		1,
-		[][]byte{sigRaw},
-		txRaw,
-	}
-	// encode the message using rlp
-	rlpTxRaw, err := rlp.EncodeToBytes(data)
-	// encode the rlp message with the prefix
-	signedEncodedTx = encodeP(PrefixTx, rlpTxRaw)
-	// compute the hash
-	rlpTxHashRaw, err := hash(rlpTxRaw)
-	signedEncodedTxHash = encodeP(PrefixTxHash, rlpTxHashRaw)
-	// encode the signature
-	signature = encodeP(PrefixSignature, sigRaw)
 	return
 }
 
