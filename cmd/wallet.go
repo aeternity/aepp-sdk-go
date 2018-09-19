@@ -17,12 +17,21 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
 	"github.com/aeternity/aepp-sdk-go/utils"
 
 	"github.com/spf13/cobra"
+)
+
+var (
+	waitForTx       bool
+	payload         string
+	printPrivateKey bool
+	walletFileName  string
 )
 
 // walletCmd represents the wallet command
@@ -42,72 +51,185 @@ var walletCmd = &cobra.Command{
 
 // addressCmd represents the address subcommand
 var addressCmd = &cobra.Command{
-	Use:   "address",
+	Use:   "address WALLET_PATH",
 	Short: "Print the aeternity wallet address",
 	Long:  ``,
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		// ask for th keystore password
+		p, err := utils.AskPassword("Enter the password to unlock the keystore: ")
+		if err != nil {
+			fmt.Println("Error reading the password: ", err)
+			os.Exit(1)
+		}
+		// load the account
+		account, err := aeternity.LoadAccountToKeyStoreFile(args[0], p)
+		if err != nil {
+			fmt.Println("Error unlocking the keystore: ", err)
+			os.Exit(1)
+		}
+		aeternity.Pp("Account address", account.Address)
+		if printPrivateKey {
+			aeternity.Pp("Account private key", account.SigningKeyToHexString())
+		}
+	},
+}
 
-		// TODO: Work your own magic here
-		fmt.Printf("%#v", args)
+// createCmd represents the generate subcommand
+var createCmd = &cobra.Command{
+	Use:   "create",
+	Short: "Create a new account",
+	Long:  ``,
+	Run: func(cmd *cobra.Command, args []string) {
+		account, _ := aeternity.NewAccount()
+		// ask for password
+		p, err := utils.AskPassword("Enter a password for your keystore: ")
+		if err != nil {
+			fmt.Println("Error reading the password: ", err)
+			return
+		}
+		// check if a name was given
+		f, err := aeternity.StoreAccountToKeyStoreFile(account, p, walletFileName)
+		if err != nil {
+			fmt.Println("Error saving the keystore file: ", err)
+			return
+		}
+		aeternity.Pp(
+			"Wallet path", f,
+			"Account address", account.Address,
+		)
+	},
+}
+
+// balanceCmd represents the generate subcommand
+var balanceCmd = &cobra.Command{
+	Use:   "balance WALLET_PATH",
+	Short: "Get the balance of an account",
+	Long:  ``,
+	Args:  cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		// ask for th keystore password
+		p, err := utils.AskPassword("Enter the password to unlock the keystore: ")
+		if err != nil {
+			fmt.Println("Error reading the password: ", err)
+			os.Exit(1)
+		}
+		// load the account
+		account, err := aeternity.LoadAccountToKeyStoreFile(args[0], p)
+		if err != nil {
+			fmt.Println("Error unlocking the keystore: ", err)
+			os.Exit(1)
+		}
+		a, err := aeCli.APIGetAccount(account.Address)
+		if err != nil {
+			fmt.Println("Error retrieving the account: ", err)
+			os.Exit(1)
+		}
+		aeternity.PrintObject(a)
+	},
+}
+
+// saveCmd represents the generate subcommand
+var saveCmd = &cobra.Command{
+	Use:   "save ACCOUNT_HEX_STRING",
+	Short: "Save an account from a hex string to a keystore file",
+	Long:  ``,
+	Args:  cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		account, err := aeternity.AccountFromHexString(args[0])
+		if err != nil {
+			fmt.Println("Error parsing the private key hex string:", err)
+			return
+		}
+		p, err := utils.AskPassword("Enter a password for your keystore: ")
+		if err != nil {
+			fmt.Println("Error reading the password: ", err)
+			return
+		}
+
+		f, err := aeternity.StoreAccountToKeyStoreFile(account, p, walletFileName)
+		if err != nil {
+			fmt.Println("Error saving the keystore file: ", err)
+			return
+		}
+		aeternity.Pp("Keystore path ", f)
 	},
 }
 
 // spendCmd represents the spend subcommand
 var spendCmd = &cobra.Command{
-	Use:   "spend",
+	Use:   "spend WALLET_PATH RECIPIENT_ADDRESS AMOUNT",
 	Short: "Print the aeternity wallet spend",
 	Long:  ``,
 	Args:  cobra.ExactArgs(3),
 	Run: func(cmd *cobra.Command, args []string) {
 
-		pkPath := ""
-		amount := int64(-1)
-		recipient := ""
-		var err error = nil
-		// find arguments
+		var (
+			keystorePath string
+			recipient    string
+			amount       int64
+		)
+
+		// load variables
 		for _, a := range args {
-			if strings.HasPrefix(a, aeternity.PrefixAccount) {
+			if strings.HasPrefix(a, string(aeternity.PrefixAccount)) {
 				recipient = a
-			} else if ok, v := utils.IsPositiveInt64(a); ok {
-				amount = v
-			} else {
-				pkPath = a
+				continue
+			}
+			if m, _ := regexp.MatchString(`^\d+$`, a); m {
+				amount, _ = strconv.ParseInt(a, 10, 64)
+			}
+			if p, err := aeternity.GetWalletPath(a); err == nil {
+				keystorePath = p
 			}
 		}
-		if len(pkPath) == 0 {
-			err = fmt.Errorf("Missing key path")
-		}
+
+		// validate variables
 		if len(recipient) == 0 {
-			err = fmt.Errorf("Missing recipient")
+			fmt.Println("Error, missing or invalid recipient address")
+			os.Exit(1)
+		}
+		if len(keystorePath) == 0 {
+			fmt.Println("Error, missing or invalid keystore path")
+			os.Exit(1)
 		}
 		if amount <= 0 {
-			err = fmt.Errorf("Amount must be a strictly positve int")
-		}
-
-		if err != nil {
-			fmt.Println(err)
+			fmt.Println("Error, missing or invalid amount")
 			os.Exit(1)
 		}
-
-		// load the private key
-		kp, err := aeternity.Load(pkPath)
+		// ask for th keystore password
+		p, err := utils.AskPassword("Enter the password to unlock the keystore: ")
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("Error reading the password: ", err)
 			os.Exit(1)
 		}
+		// load the account
+		account, err := aeternity.LoadAccountToKeyStoreFile(keystorePath, p)
+		if err != nil {
+			fmt.Println("Error unlocking the keystore: ", err)
+			os.Exit(1)
+		}
+		// run the transaction
+		_, txHash, _, ttl, _, err := aeCli.WithAccount(account).Spend(recipient, amount, payload)
 
-		txHash, signature, err := aeternity.Spend(epochCli, kp, recipient, amount)
 		// TODO: print also the ttl
-		utils.Pp(
-			"Sender Address", kp.Address,
+		aeternity.Pp(
+			"Sender Address", account.Address,
 			"Recipient Address", recipient,
 			"Amount", amount,
-			"Transaction hash", txHash,
-			"Signature", signature,
+			"TransactionHash", txHash,
 		)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
+		}
+		if waitForTx {
+			_, _, _, tx, err := aeCli.WaitForTransactionUntillHeight(ttl, txHash)
+			aeternity.PrintObjectT("Transaction", tx)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
 		}
 	},
 }
@@ -116,14 +238,17 @@ func init() {
 	RootCmd.AddCommand(walletCmd)
 	walletCmd.AddCommand(addressCmd)
 	walletCmd.AddCommand(spendCmd)
-	// Here you will define your flags and configuration settings.
+	walletCmd.AddCommand(createCmd)
+	walletCmd.AddCommand(saveCmd)
+	walletCmd.AddCommand(balanceCmd)
 
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// walletCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// walletCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-
+	// create flags
+	createCmd.Flags().StringVar(&walletFileName, "name", "", "Override the default name of a wallaet")
+	// save flags
+	saveCmd.Flags().StringVar(&walletFileName, "name", "", "Override the default name of a wallaet")
+	// address flags
+	addressCmd.Flags().BoolVar(&printPrivateKey, "private-key", false, "Print the private key as hex string")
+	// spend command flags
+	spendCmd.Flags().BoolVarP(&waitForTx, "wait", "w", false, "Wait for the transaction to be mined before exiting")
+	spendCmd.Flags().StringVarP(&payload, "message", "m", "", "Payload to add to the spend transaction")
 }

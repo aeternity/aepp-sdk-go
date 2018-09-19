@@ -6,13 +6,15 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"syscall"
 
 	gonanoid "github.com/matoous/go-nanoid"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 const (
 	// DefaultAlphabet default alphabet for string generation
-	DefaultAlphabet = "asdfghjklqwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890#!-"
+	DefaultAlphabet = "asdfghjklqwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890"
 )
 
 // IsEqStr tells if two strings a and b are equals after trimming spaces and lowercasing
@@ -59,6 +61,13 @@ func RandomString(alphabet string, length int) (s string, err error) {
 	return gonanoid.Generate(alphabet, length)
 }
 
+// RandomStringL generate a string that can be used as secrete api key
+func RandomStringL(l int) string {
+	secret, _ := RandomString(DefaultAlphabet, l)
+	return secret
+}
+
+// IsInt64 check if a string is a int64
 func IsInt64(str string) (isInt bool, val int64) {
 	if v, err := strconv.Atoi(str); err == nil {
 		val = int64(v)
@@ -67,17 +76,11 @@ func IsInt64(str string) (isInt bool, val int64) {
 	return
 }
 
+// IsPositiveInt64 check if a string is a positive integer
 func IsPositiveInt64(str string) (isInt bool, val int64) {
 	isInt, val = IsInt64(str)
 	isInt = val > 0
 	return
-}
-
-// GenerateSecret generate a string that can be used as secrete api key
-func GenerateSecret() string {
-	l := 50
-	secret, _ := RandomString(DefaultAlphabet, l)
-	return secret
 }
 
 // AskYes prompt a yes/no question to the prompt
@@ -94,5 +97,16 @@ func AskYes(question string, defaultYes bool) (isYes bool) {
 	if IsEqStr(reply, "yes") {
 		return true
 	}
+	return
+}
+
+// AskPassword ask a password
+func AskPassword(question string) (password string, err error) {
+	fmt.Println(question)
+	bytePassword, err := terminal.ReadPassword(int(syscall.Stdin))
+	if err != nil {
+		return
+	}
+	password = string(bytePassword)
 	return
 }

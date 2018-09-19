@@ -17,10 +17,12 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
-	apiclient "github.com/aeternity/aepp-sdk-go/client"
+	"github.com/aeternity/aepp-sdk-go/utils"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
+	"github.com/shibukawa/configdir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -28,21 +30,16 @@ import (
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "aecli",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "The command line client for the Aeternity blockchain",
+	Long:  ``,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	//	Run: func(cmd *cobra.Command, args []string) { },
 }
 
 var cfgFile string
-var debug bool
-var epochCli *apiclient.Epoch
+var debug, outputFormatJSON bool
+var aeCli *aeternity.Ae
 
 // Execute adds all child commands to the root command sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
@@ -58,41 +55,48 @@ func init() {
 	// Here you will define your flags and configuration settings.
 	// Cobra supports Persistent Flags, which, if defined here,
 	// will be global for your application.
-	RootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file (default is /etc/distill/settings.yaml)")
+	RootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file to load (defaults to $HOME/.aeternity/config.yaml")
 	RootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "enable debug")
+	RootCmd.PersistentFlags().BoolVar(&outputFormatJSON, "json", false, "print output in json format")
 
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
+	// retrieve the directory (os dependent) where the config file exists
+	configDirs := configdir.New("aeternity", "aecli")
+	globalCfg := configDirs.QueryFolders(configdir.Global)[0]
 	// set configuration paramteres
 	viper.SetConfigName(aeternity.ConfigFilename) // name of config file (without extension)
-	viper.AddConfigPath("$HOME/.aeternity")       // adding home directory as first search path
-	viper.AddConfigPath("./config")
-	viper.AddConfigPath(".")
-	viper.AutomaticEnv() // read in environment variables that match
+	viper.AddConfigPath(globalCfg.Path)           // adding home directory as first search path
+	//viper.AutomaticEnv()                          // read in environment variables that match
 	// if there is the config file read it
 	if len(cfgFile) > 0 { // enable ability to specify config file via flag
 		viper.SetConfigFile(cfgFile)
 	}
-
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		viper.Unmarshal(&aeternity.Config)
 		aeternity.Config.Defaults()
 		aeternity.Config.Validate()
+		aeternity.Config.ConfigPath = viper.ConfigFileUsed()
+		aeternity.Config.KeysFolder = filepath.Join(globalCfg.Path, "keys")
 	} else {
-		// switch err.(type) {
-		// case viper.ConfigFileNotFoundError:
-		// 	if do := utils.AskYes("A configuration file was not found, would you like to generate one?", true); do {
-		// 		aeternity.GenerateDefaultConfig("config/"+aeternity.ConfigFilename+".yaml", RootCmd.Version)
-		// 		fmt.Println("Configuration created")
-		// 	}
-		// }
-		// fmt.Println("Configuration file not found!!")
-		// os.Exit(1)
-		aeternity.Config = aeternity.ConfigSchema{}
-		aeternity.Config.Defaults()
+		switch err.(type) {
+		case viper.ConfigFileNotFoundError:
+			if do := utils.AskYes("A configuration file was not found, would you like to generate one?", true); do {
+				configFilePath := filepath.Join(globalCfg.Path, aeternity.ConfigFilename+".yml")
+				aeternity.GenerateDefaultConfig(configFilePath, RootCmd.Version)
+				aeternity.Config.Save()
+			} else {
+				fmt.Println("Configuration file not found!!")
+				os.Exit(1)
+			}
+		}
+
 	}
-	epochCli = aeternity.NewCli(aeternity.Config.Epoch.URL, debug)
+
+	aeternity.Config.P.Tuning.OutputFormatJSON = outputFormatJSON
+	aeCli = aeternity.NewCli(aeternity.Config.P.Epoch.URL, debug)
+
 }

@@ -15,8 +15,9 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/aeternity/aepp-sdk-go/aeternity"
-	"github.com/aeternity/aepp-sdk-go/utils"
 
 	"github.com/spf13/cobra"
 )
@@ -27,16 +28,77 @@ var configCmd = &cobra.Command{
 	Short: "Print the configuration of the client",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		utils.Pp(
-			"Epoch URL", aeternity.Config.Epoch.URL,
-			"Epoch Internal URL", aeternity.Config.Epoch.InternalURL,
-			"Epoch Websocket URL", aeternity.Config.Epoch.WebsocketURL,
+		aeternity.PrintObjectT("Configuration", aeternity.Config.P)
+		// aeternity.Pp(
+		// 	"Epoch URL", aeternity.Config.P.Epoch.URL,
+		// 	"Epoch Internal URL", aeternity.Config.P.Epoch.InternalURL,
+		// 	"Epoch Websocket URL", aeternity.Config.P.Epoch.WebsocketURL,
+		// )
+	},
+}
+
+var profileCmd = &cobra.Command{
+	Use:   "profile",
+	Short: "Print the current profile",
+	Long:  ``,
+	Run: func(cmd *cobra.Command, args []string) {
+		aeternity.Pp(
+			"Active profile", aeternity.Config.P.Name,
 		)
+	},
+}
+
+var profileListCmd = &cobra.Command{
+	Use:   "list",
+	Short: "List the available profiles",
+	Long:  ``,
+	Run: func(cmd *cobra.Command, args []string) {
+		for _, p := range aeternity.Config.Profiles {
+			prefix := ""
+			if p.Name == aeternity.Config.P.Name {
+				prefix = "  *  "
+			}
+			aeternity.Pp(
+				prefix, p.Name,
+			)
+		}
+	},
+}
+
+var profileActivateCmd = &cobra.Command{
+	Use:   "activate PROFILE_NAME",
+	Short: "Activate the profile PROFILE_NAME",
+	Long:  ``,
+	Args:  cobra.RangeArgs(1, 1),
+	Run: func(cmd *cobra.Command, args []string) {
+		err := aeternity.Config.ActivateProfile(args[0])
+		if err != nil {
+			fmt.Println(err)
+		}
+		aeternity.Config.Save()
+		fmt.Println("Profile", args[0], "activated")
+	},
+}
+
+var profileCreateCmd = &cobra.Command{
+	Use:   "create PROFILE_NAME",
+	Short: "Create the profile PROFILE_NAME",
+	Args:  cobra.RangeArgs(1, 1),
+	Long:  ``,
+	Run: func(cmd *cobra.Command, args []string) {
+		aeternity.Config.NewProfile(args[0])
+		aeternity.Config.ActivateProfile(args[0])
+		aeternity.Config.Save()
+		fmt.Println("Profile", args[0], "created")
 	},
 }
 
 func init() {
 	RootCmd.AddCommand(configCmd)
+	configCmd.AddCommand(profileCmd)
+	profileCmd.AddCommand(profileListCmd)
+	profileCmd.AddCommand(profileCreateCmd)
+	profileCmd.AddCommand(profileActivateCmd)
 
 	// Here you will define your flags and configuration settings.
 

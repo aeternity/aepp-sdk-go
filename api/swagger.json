@@ -1,0 +1,4443 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "description" : "This is the [Aeternity](https://www.aeternity.com/) Epoch API.",
+    "version" : "0.22.0",
+    "title" : "Aeternity Epoch",
+    "termsOfService" : "https://www.aeternity.com/terms/",
+    "contact" : {
+      "email" : "apiteam@aeternity.com"
+    }
+  },
+  "basePath" : "/v2",
+  "tags" : [ {
+    "name" : "external",
+    "description" : "External API"
+  }, {
+    "name" : "internal",
+    "description" : "Internal API"
+  }, {
+    "name" : "chain",
+    "description" : "Chain related endpoints"
+  }, {
+    "name" : "transaction",
+    "description" : "Transaction related endpoints"
+  }, {
+    "name" : "account",
+    "description" : "Account related endpoints"
+  }, {
+    "name" : "contract",
+    "description" : "Contract related endpoints"
+  }, {
+    "name" : "oracle",
+    "description" : "Oracle related endpoints"
+  }, {
+    "name" : "name_service",
+    "description" : "Name service related endpoints"
+  }, {
+    "name" : "channel",
+    "description" : "State channel related endpoints"
+  }, {
+    "name" : "node_info",
+    "description" : "Node information related endpoints"
+  }, {
+    "name" : "debug",
+    "description" : "Debug endpoints"
+  }, {
+    "name" : "obsolete",
+    "description" : "Old endpoints that will be removed"
+  } ],
+  "schemes" : [ "http" ],
+  "paths" : {
+    "/blocks/top" : {
+      "get" : {
+        "tags" : [ "external", "chain" ],
+        "description" : "Get the top block (either key or micro block)",
+        "operationId" : "GetTopBlock",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/KeyBlock"
+            }
+          },
+          "404" : {
+            "description" : "Block not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/key-blocks/current" : {
+      "get" : {
+        "tags" : [ "external", "chain" ],
+        "description" : "Get the current key block",
+        "operationId" : "GetCurrentKeyBlock",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/KeyBlock"
+            }
+          },
+          "404" : {
+            "description" : "Block not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/key-blocks/current/hash" : {
+      "get" : {
+        "tags" : [ "external", "chain" ],
+        "description" : "Get the hash of the current key block",
+        "operationId" : "GetCurrentKeyBlockHash",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/inline_response_200"
+            }
+          },
+          "404" : {
+            "description" : "Block not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/key-blocks/current/height" : {
+      "get" : {
+        "tags" : [ "external", "chain" ],
+        "description" : "Get the height of the current key block",
+        "operationId" : "GetCurrentKeyBlockHeight",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/inline_response_200_1"
+            }
+          },
+          "404" : {
+            "description" : "Block not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/key-blocks/pending" : {
+      "get" : {
+        "tags" : [ "external", "chain" ],
+        "description" : "Get the pending key block",
+        "operationId" : "GetPendingKeyBlock",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/KeyBlock"
+            }
+          },
+          "404" : {
+            "description" : "Block not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/key-blocks/hash/{hash}" : {
+      "get" : {
+        "tags" : [ "external", "chain" ],
+        "description" : "Get a key block by hash",
+        "operationId" : "GetKeyBlockByHash",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "hash",
+          "in" : "path",
+          "description" : "The hash of the block",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/KeyBlock"
+            }
+          },
+          "400" : {
+            "description" : "Invalid hash",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Block not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/key-blocks/height/{height}" : {
+      "get" : {
+        "tags" : [ "external", "chain" ],
+        "description" : "Get a key block by height",
+        "operationId" : "GetKeyBlockByHeight",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "height",
+          "in" : "path",
+          "description" : "The height of the block",
+          "required" : true,
+          "type" : "integer"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/KeyBlock"
+            }
+          },
+          "404" : {
+            "description" : "Block not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/key-blocks" : {
+      "post" : {
+        "tags" : [ "internal", "chain" ],
+        "description" : "Post a mined key block",
+        "operationId" : "PostKeyBlock",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "description" : "Mined key block",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/KeyBlock"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation"
+          },
+          "400" : {
+            "description" : "Invalid block",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/micro-blocks/hash/{hash}/header" : {
+      "get" : {
+        "tags" : [ "external", "chain" ],
+        "description" : "Get a micro block header by hash",
+        "operationId" : "GetMicroBlockHeaderByHash",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "hash",
+          "in" : "path",
+          "description" : "The hash of the block",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/MicroBlockHeader"
+            }
+          },
+          "400" : {
+            "description" : "Invalid hash",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Block not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/micro-blocks/hash/{hash}/transactions" : {
+      "get" : {
+        "tags" : [ "external", "chain" ],
+        "description" : "Get micro block transactions by hash",
+        "operationId" : "GetMicroBlockTransactionsByHash",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "hash",
+          "in" : "path",
+          "description" : "The hash of the block",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/GenericTxs"
+            }
+          },
+          "400" : {
+            "description" : "Invalid hash",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Block not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/micro-blocks/hash/{hash}/transactions/index/{index}" : {
+      "get" : {
+        "tags" : [ "external", "chain" ],
+        "description" : "Get a micro block transaction by hash and index",
+        "operationId" : "GetMicroBlockTransactionByHashAndIndex",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "hash",
+          "in" : "path",
+          "description" : "The hash of the block",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "index",
+          "in" : "path",
+          "description" : "The index of the transaction in a block",
+          "required" : true,
+          "type" : "integer",
+          "minimum" : 1
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/GenericSignedTx"
+            }
+          },
+          "400" : {
+            "description" : "Invalid hash or index",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Block not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/micro-blocks/hash/{hash}/transactions/count" : {
+      "get" : {
+        "tags" : [ "external", "chain" ],
+        "description" : "Get micro block transaction count by hash",
+        "operationId" : "GetMicroBlockTransactionsCountByHash",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "hash",
+          "in" : "path",
+          "description" : "The hash of the block",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/inline_response_200_2"
+            }
+          },
+          "400" : {
+            "description" : "Invalid hash",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Block not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/generations/current" : {
+      "get" : {
+        "tags" : [ "external", "chain" ],
+        "description" : "Get the current generation",
+        "operationId" : "GetCurrentGeneration",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/Generation"
+            }
+          },
+          "404" : {
+            "description" : "Generation not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/generations/hash/{hash}" : {
+      "get" : {
+        "tags" : [ "external", "chain" ],
+        "description" : "Get a generation by hash",
+        "operationId" : "GetGenerationByHash",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "hash",
+          "in" : "path",
+          "description" : "The hash of the generation",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/Generation"
+            }
+          },
+          "400" : {
+            "description" : "Invalid hash",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Generation not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/generations/height/{height}" : {
+      "get" : {
+        "tags" : [ "external", "chain" ],
+        "description" : "Get a generation by height",
+        "operationId" : "GetGenerationByHeight",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "height",
+          "in" : "path",
+          "description" : "The height of the generation",
+          "required" : true,
+          "type" : "integer"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/Generation"
+            }
+          },
+          "404" : {
+            "description" : "Generation not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/accounts/{pubkey}" : {
+      "get" : {
+        "tags" : [ "external", "account" ],
+        "description" : "Get an account by public key",
+        "operationId" : "GetAccountByPubkey",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "pubkey",
+          "in" : "path",
+          "description" : "The public key of the account",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/Account"
+            }
+          },
+          "400" : {
+            "description" : "Invalid public key",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Account not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/accounts/{pubkey}/transactions/pending" : {
+      "get" : {
+        "tags" : [ "external", "account" ],
+        "description" : "Get pending account transactions by public key",
+        "operationId" : "GetPendingAccountTransactionsByPubkey",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "pubkey",
+          "in" : "path",
+          "description" : "The public key of the account",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/GenericTxs"
+            }
+          },
+          "400" : {
+            "description" : "Invalid public key",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Account not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/transactions/{hash}" : {
+      "get" : {
+        "tags" : [ "external", "transaction" ],
+        "description" : "Get a transaction by hash",
+        "operationId" : "GetTransactionByHash",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "hash",
+          "in" : "path",
+          "description" : "The hash of the transaction",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/GenericSignedTx"
+            }
+          },
+          "400" : {
+            "description" : "Invalid hash",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Transaction not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/transactions/{hash}/info" : {
+      "get" : {
+        "tags" : [ "external", "transaction" ],
+        "description" : "Get a transaction info by hash",
+        "operationId" : "GetTransactionInfoByHash",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "hash",
+          "in" : "path",
+          "description" : "The hash of the transaction",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/ContractCallObject"
+            }
+          },
+          "400" : {
+            "description" : "Invalid hash",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Transaction not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/transactions" : {
+      "post" : {
+        "tags" : [ "external", "transaction" ],
+        "description" : "Post a new transaction",
+        "operationId" : "PostTransaction",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "description" : "The new transaction",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/Tx"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/PostTxResponse"
+            }
+          },
+          "400" : {
+            "description" : "Invalid transaction",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/contracts/{pubkey}" : {
+      "get" : {
+        "tags" : [ "external", "contract" ],
+        "description" : "Get a contract by pubkey",
+        "operationId" : "GetContract",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "pubkey",
+          "in" : "path",
+          "description" : "The pubkey of the contract",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/ContractObject"
+            }
+          },
+          "400" : {
+            "description" : "Invalid pubkey",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Contract not found"
+          }
+        }
+      }
+    },
+    "/contracts/{pubkey}/code" : {
+      "get" : {
+        "tags" : [ "external", "contract" ],
+        "description" : "Get contract code by pubkey",
+        "operationId" : "GetContractCode",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "pubkey",
+          "in" : "path",
+          "description" : "The pubkey of the contract",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Contract code",
+            "schema" : {
+              "$ref" : "#/definitions/ByteCode"
+            }
+          },
+          "400" : {
+            "description" : "Invalid pubkey",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Contract not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/contracts/{pubkey}/store" : {
+      "get" : {
+        "tags" : [ "external", "contract" ],
+        "description" : "Get contract store by pubkey",
+        "operationId" : "GetContractStore",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "pubkey",
+          "in" : "path",
+          "description" : "The pubkey of the contract",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Contract Store",
+            "schema" : {
+              "$ref" : "#/definitions/ContractStore"
+            }
+          },
+          "400" : {
+            "description" : "Invalid pubkey",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Contract not found"
+          }
+        }
+      }
+    },
+    "/contracts/{pubkey}/poi" : {
+      "get" : {
+        "tags" : [ "external", "contract" ],
+        "description" : "Get a proof of inclusion for a contract",
+        "operationId" : "GetContractPoI",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "pubkey",
+          "in" : "path",
+          "description" : "Contract pubkey to get proof for",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/PoI"
+            }
+          },
+          "400" : {
+            "description" : "Invalid contract key",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Contract not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/oracles/{pubkey}" : {
+      "get" : {
+        "tags" : [ "external", "oracle" ],
+        "description" : "Get an oracle by public key",
+        "operationId" : "GetOracleByPubkey",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "pubkey",
+          "in" : "path",
+          "description" : "The public key of the oracle",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/RegisteredOracle"
+            }
+          },
+          "400" : {
+            "description" : "Invalid public key",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Oracle not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/oracles/{pubkey}/queries" : {
+      "get" : {
+        "tags" : [ "external", "oracle" ],
+        "description" : "Get oracle queries by public key",
+        "operationId" : "GetOracleQueriesByPubkey",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "pubkey",
+          "in" : "path",
+          "description" : "The public key of the oracle",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "from",
+          "in" : "query",
+          "description" : "Last query id in previous page",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Max number of oracle queries",
+          "required" : false,
+          "type" : "integer",
+          "maximum" : 1000,
+          "minimum" : 1
+        }, {
+          "name" : "type",
+          "in" : "query",
+          "description" : "The type of a query: open, closed or all",
+          "required" : false,
+          "type" : "string",
+          "enum" : [ "open", "closed", "all" ]
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/OracleQueries"
+            }
+          },
+          "400" : {
+            "description" : "Invalid public key",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Oracle not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/oracles/{pubkey}/queries/{query-id}" : {
+      "get" : {
+        "tags" : [ "external", "oracle" ],
+        "description" : "Get an oracle query by public key and query ID",
+        "operationId" : "GetOracleQueryByPubkeyAndQueryId",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "pubkey",
+          "in" : "path",
+          "description" : "The public key of the oracle",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "query-id",
+          "in" : "path",
+          "description" : "The ID of the query",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/OracleQuery"
+            }
+          },
+          "400" : {
+            "description" : "Invalid public key or query ID",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Oracle query not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/names/{name}" : {
+      "get" : {
+        "tags" : [ "external", "name_service" ],
+        "description" : "Get name entry from naming system",
+        "operationId" : "GetNameEntryByName",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "name",
+          "in" : "path",
+          "description" : "The name key of the name entry",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/NameEntry"
+            }
+          },
+          "400" : {
+            "description" : "Invalid name",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Name not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/channels/{pubkey}" : {
+      "get" : {
+        "tags" : [ "external", "channel" ],
+        "description" : "Get channel by public key",
+        "operationId" : "GetChannelByPubkey",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "pubkey",
+          "in" : "path",
+          "description" : "The pubkey of the channel",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/Channel"
+            }
+          },
+          "400" : {
+            "description" : "Invalid public key",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Channel not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/peers/pubkey" : {
+      "get" : {
+        "tags" : [ "external", "node_info" ],
+        "description" : "Get peer public key",
+        "operationId" : "GetPeerPubkey",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/inline_response_200_3"
+            }
+          }
+        }
+      }
+    },
+    "/status" : {
+      "get" : {
+        "tags" : [ "external", "node_info" ],
+        "description" : "Get the status of a node",
+        "operationId" : "GetStatus",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/Status"
+            }
+          }
+        }
+      }
+    },
+    "/debug/contracts/create" : {
+      "post" : {
+        "tags" : [ "internal", "contract", "debug" ],
+        "description" : "Get a contract_create transaction object",
+        "operationId" : "PostContractCreate",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/ContractCreateData"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/CreateContractUnsignedTx"
+            }
+          },
+          "400" : {
+            "description" : "Invalid transaction",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Owner account not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/debug/contracts/create/compute" : {
+      "post" : {
+        "tags" : [ "internal", "contract", "debug" ],
+        "description" : "Compute the call_data for SOPHIA and get a contract_create transaction object",
+        "operationId" : "PostContractCreateCompute",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/ContractCreateCompute"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/CreateContractUnsignedTx"
+            }
+          },
+          "400" : {
+            "description" : "Invalid transaction",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Owner account not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/debug/contracts/call" : {
+      "post" : {
+        "tags" : [ "internal", "contract", "debug" ],
+        "description" : "Get a contract_call transaction object",
+        "operationId" : "PostContractCall",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/ContractCallData"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/UnsignedTx"
+            }
+          },
+          "400" : {
+            "description" : "Invalid transaction",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Caller account or contract not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/debug/contracts/call/compute" : {
+      "post" : {
+        "tags" : [ "internal", "contract", "debug" ],
+        "description" : "Compute the call_data for SOPHIA and get contract_call transaction object",
+        "operationId" : "PostContractCallCompute",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/ContractCallCompute"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/UnsignedTx"
+            }
+          },
+          "400" : {
+            "description" : "Invalid transaction",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Caller account or contract not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/debug/oracles/register" : {
+      "post" : {
+        "tags" : [ "internal", "oracle", "debug" ],
+        "description" : "Get a oracle_register transaction object",
+        "operationId" : "PostOracleRegister",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/OracleRegisterTx"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/UnsignedTx"
+            }
+          },
+          "400" : {
+            "description" : "Invalid transaction",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Account not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/debug/oracles/extend" : {
+      "post" : {
+        "tags" : [ "internal", "oracle", "debug" ],
+        "description" : "Get an oracle_extend transaction object",
+        "operationId" : "PostOracleExtend",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/OracleExtendTx"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/UnsignedTx"
+            }
+          },
+          "400" : {
+            "description" : "Invalid transaction",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Account not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/debug/oracles/query" : {
+      "post" : {
+        "tags" : [ "internal", "oracle", "debug" ],
+        "description" : "Get an oracle_query transaction object",
+        "operationId" : "PostOracleQuery",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/OracleQueryTx"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/UnsignedTx"
+            }
+          },
+          "400" : {
+            "description" : "Invalid transaction",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Account or oracle not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/debug/oracles/respond" : {
+      "post" : {
+        "tags" : [ "internal", "oracle", "debug" ],
+        "description" : "Get an oracle_response transaction object",
+        "operationId" : "PostOracleRespond",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/OracleRespondTx"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/UnsignedTx"
+            }
+          },
+          "400" : {
+            "description" : "Invalid transaction",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Oracle or query not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/debug/names/preclaim" : {
+      "post" : {
+        "tags" : [ "internal", "name_service", "debug" ],
+        "description" : "Get a name_preclaim transaction object",
+        "operationId" : "PostNamePreclaim",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/NamePreclaimTx"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/UnsignedTx"
+            }
+          },
+          "400" : {
+            "description" : "Invalid transaction",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Account not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/debug/names/claim" : {
+      "post" : {
+        "tags" : [ "internal", "name_service", "debug" ],
+        "description" : "Get a name_claim transaction object",
+        "operationId" : "PostNameClaim",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/NameClaimTx"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/UnsignedTx"
+            }
+          },
+          "400" : {
+            "description" : "Invalid transaction",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Account or name not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/debug/names/update" : {
+      "post" : {
+        "tags" : [ "internal", "name_service", "debug" ],
+        "description" : "Get a name_update transaction object",
+        "operationId" : "PostNameUpdate",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/NameUpdateTx"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/UnsignedTx"
+            }
+          },
+          "400" : {
+            "description" : "Invalid transaction",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Account or oracle not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/debug/names/transfer" : {
+      "post" : {
+        "tags" : [ "internal", "name_service", "debug" ],
+        "description" : "Get a name_transfer transaction object",
+        "operationId" : "PostNameTransfer",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/NameTransferTx"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/UnsignedTx"
+            }
+          },
+          "400" : {
+            "description" : "Invalid transaction",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Account or name not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/debug/names/revoke" : {
+      "post" : {
+        "tags" : [ "internal", "name_service", "debug" ],
+        "description" : "Get a name_revoke transaction object",
+        "operationId" : "PostNameRevoke",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/NameRevokeTx"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/UnsignedTx"
+            }
+          },
+          "400" : {
+            "description" : "Invalid transaction",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Account or name not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/debug/transactions/spend" : {
+      "post" : {
+        "tags" : [ "internal", "transaction", "debug" ],
+        "description" : "Get a spend transaction object",
+        "operationId" : "PostSpend",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "description" : "A spend transaction",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/SpendTx"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/UnsignedTx"
+            }
+          },
+          "400" : {
+            "description" : "Invalid transaction",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Sender account not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/debug/channels/create" : {
+      "post" : {
+        "tags" : [ "internal", "channel", "debug" ],
+        "description" : "Get a channel_create transaction object",
+        "operationId" : "PostChannelCreate",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/ChannelCreateTx"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/UnsignedTx"
+            }
+          },
+          "400" : {
+            "description" : "Invalid transaction",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          },
+          "404" : {
+            "description" : "Initiator not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/debug/channels/deposit" : {
+      "post" : {
+        "tags" : [ "internal", "channel", "debug" ],
+        "description" : "Get a channel_deposit transaction object",
+        "operationId" : "PostChannelDeposit",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/ChannelDepositTx"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/UnsignedTx"
+            }
+          },
+          "400" : {
+            "description" : "Invalid transaction",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/debug/channels/withdraw" : {
+      "post" : {
+        "tags" : [ "internal", "channel", "debug" ],
+        "description" : "Get a channel_withdrawal transaction object",
+        "operationId" : "PostChannelWithdraw",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/ChannelWithdrawTx"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/UnsignedTx"
+            }
+          },
+          "400" : {
+            "description" : "Invalid transaction",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/debug/channels/snapshot/solo" : {
+      "post" : {
+        "tags" : [ "internal", "channel", "debug" ],
+        "description" : "Get a channel_snapshot_solo transaction object",
+        "operationId" : "PostChannelSnapshotSolo",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/ChannelSnapshotSoloTx"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/UnsignedTx"
+            }
+          },
+          "400" : {
+            "description" : "Invalid transaction",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/debug/channels/close/mutual" : {
+      "post" : {
+        "tags" : [ "internal", "channel", "debug" ],
+        "description" : "Get a channel_close_mutual transaction object",
+        "operationId" : "PostChannelCloseMutual",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/ChannelCloseMutualTx"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/UnsignedTx"
+            }
+          },
+          "400" : {
+            "description" : "Invalid transaction",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/debug/channels/close/solo" : {
+      "post" : {
+        "tags" : [ "internal", "channel", "debug" ],
+        "description" : "Get a channel_close_solo transaction object",
+        "operationId" : "PostChannelCloseSolo",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/ChannelCloseSoloTx"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/UnsignedTx"
+            }
+          },
+          "400" : {
+            "description" : "Invalid transaction",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/debug/channels/slash" : {
+      "post" : {
+        "tags" : [ "internal", "channel", "debug" ],
+        "description" : "Get a channel_slash transaction object",
+        "operationId" : "PostChannelSlash",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/ChannelSlashTx"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/UnsignedTx"
+            }
+          },
+          "400" : {
+            "description" : "Invalid transaction",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/debug/channels/settle" : {
+      "post" : {
+        "tags" : [ "internal", "channel", "debug" ],
+        "description" : "Get a channel_settle transaction object",
+        "operationId" : "PostChannelSettle",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/ChannelSettleTx"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/UnsignedTx"
+            }
+          },
+          "400" : {
+            "description" : "Invalid transaction",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/debug/transactions/pending" : {
+      "get" : {
+        "tags" : [ "internal", "transaction", "debug" ],
+        "description" : "Get pending transactions",
+        "operationId" : "GetPendingTransactions",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/GenericTxs"
+            }
+          }
+        }
+      }
+    },
+    "/debug/names/commitment-id" : {
+      "get" : {
+        "tags" : [ "internal", "name_service", "debug" ],
+        "description" : "Compute commitment ID for a given salt and name",
+        "operationId" : "GetCommitmentId",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "name",
+          "in" : "query",
+          "description" : "Name",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "salt",
+          "in" : "query",
+          "description" : "Salt",
+          "required" : true,
+          "type" : "integer"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/CommitmentId"
+            }
+          },
+          "400" : {
+            "description" : "Invalid name",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/debug/accounts/node" : {
+      "get" : {
+        "tags" : [ "internal", "node_info", "debug" ],
+        "description" : "Get node's public key",
+        "operationId" : "GetNodePubkey",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/PubKey"
+            }
+          },
+          "404" : {
+            "description" : "Public key not found",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/debug/peers" : {
+      "get" : {
+        "tags" : [ "internal", "node_info", "debug" ],
+        "description" : "Get node Peers",
+        "operationId" : "GetPeers",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/Peers"
+            }
+          },
+          "403" : {
+            "description" : "Info not enabled",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/debug/contracts/code/compile" : {
+      "post" : {
+        "tags" : [ "internal", "contract", "debug" ],
+        "description" : "Compile a sophia contract from source and return byte code",
+        "operationId" : "CompileContract",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "description" : "contract code",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/Contract"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Byte code response",
+            "schema" : {
+              "$ref" : "#/definitions/ByteCode"
+            }
+          },
+          "403" : {
+            "description" : "Invalid contract",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/debug/contracts/code/call" : {
+      "post" : {
+        "tags" : [ "internal", "contract", "debug" ],
+        "description" : "Call a sophia function with a given name and argument in the given bytecode off chain.",
+        "operationId" : "CallContract",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "description" : "contract call",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/ContractCallInput"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Resulting state map",
+            "schema" : {
+              "$ref" : "#/definitions/CallResult"
+            }
+          },
+          "403" : {
+            "description" : "Invalid contract",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/debug/contracts/code/decode-data" : {
+      "post" : {
+        "tags" : [ "internal", "contract", "debug" ],
+        "description" : "Decode Sophia return data encoded according to Sophia ABI.",
+        "operationId" : "DecodeData",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "description" : "Binary data in Sophia ABI format",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/SophiaBinaryData"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Json encoded data",
+            "schema" : {
+              "$ref" : "#/definitions/SophiaJsonData"
+            }
+          },
+          "400" : {
+            "description" : "Invalid data",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/debug/contracts/code/encode-calldata" : {
+      "post" : {
+        "tags" : [ "internal", "contract", "debug" ],
+        "description" : "Encode sophia data and function name according to sophia ABI.",
+        "operationId" : "EncodeCalldata",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "description" : "Arguments in sophia",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/ContractCallInput"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Binary ecoded calldata",
+            "schema" : {
+              "$ref" : "#/definitions/Calldata"
+            }
+          },
+          "403" : {
+            "description" : "Invalid contract",
+            "schema" : {
+              "$ref" : "#/definitions/Error"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions" : {
+    "EncodedHash" : {
+      "type" : "string"
+    },
+    "Pow" : {
+      "type" : "array",
+      "items" : {
+        "type" : "integer",
+        "format" : "int32"
+      }
+    },
+    "Uri" : {
+      "type" : "string"
+    },
+    "KeyBlock" : {
+      "type" : "object",
+      "properties" : {
+        "hash" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "height" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "prev_hash" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "prev_key_hash" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "state_hash" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "txs_hash" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "target" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "nonce" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "time" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "version" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "pow" : {
+          "$ref" : "#/definitions/Pow"
+        },
+        "miner" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "beneficiary" : {
+          "$ref" : "#/definitions/EncodedHash"
+        }
+      },
+      "example" : {
+        "txs_hash" : null,
+        "prev_hash" : null,
+        "nonce" : 1,
+        "version" : 5,
+        "miner" : null,
+        "target" : 6,
+        "beneficiary" : null,
+        "state_hash" : null,
+        "pow" : "",
+        "prev_key_hash" : null,
+        "time" : 5,
+        "hash" : { },
+        "height" : 0
+      }
+    },
+    "MicroBlockHeader" : {
+      "type" : "object",
+      "properties" : {
+        "hash" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "height" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "prev_hash" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "prev_key_hash" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "state_hash" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "txs_hash" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "signature" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "time" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "version" : {
+          "type" : "integer",
+          "format" : "int64"
+        }
+      },
+      "example" : {
+        "txs_hash" : null,
+        "state_hash" : null,
+        "signature" : null,
+        "prev_hash" : null,
+        "prev_key_hash" : null,
+        "time" : 6,
+        "version" : 1,
+        "hash" : { },
+        "height" : 0
+      }
+    },
+    "GenericTxs" : {
+      "type" : "object",
+      "properties" : {
+        "transactions" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/GenericSignedTx"
+          }
+        }
+      },
+      "example" : {
+        "transactions" : [ {
+          "tx" : {
+            "type" : "type",
+            "version" : 0
+          },
+          "block_hash" : { },
+          "block_height" : 6,
+          "hash" : null,
+          "signatures" : [ "signatures", "signatures" ]
+        }, {
+          "tx" : {
+            "type" : "type",
+            "version" : 0
+          },
+          "block_hash" : { },
+          "block_height" : 6,
+          "hash" : null,
+          "signatures" : [ "signatures", "signatures" ]
+        } ]
+      }
+    },
+    "Account" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "description" : "Public key",
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "balance" : {
+          "type" : "integer",
+          "format" : "int64",
+          "description" : "Balance",
+          "minimum" : 0
+        },
+        "nonce" : {
+          "type" : "integer",
+          "format" : "int64",
+          "description" : "Nonce",
+          "minimum" : 0
+        }
+      },
+      "example" : {
+        "balance" : 0,
+        "id" : { },
+        "nonce" : 0
+      }
+    },
+    "Tx" : {
+      "type" : "object",
+      "properties" : {
+        "tx" : {
+          "type" : "string"
+        }
+      },
+      "example" : {
+        "tx" : "tx"
+      }
+    },
+    "RegisteredOracle" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "query_format" : {
+          "type" : "string"
+        },
+        "response_format" : {
+          "type" : "string"
+        },
+        "query_fee" : {
+          "type" : "integer"
+        },
+        "ttl" : {
+          "type" : "integer",
+          "format" : "int64"
+        }
+      },
+      "example" : {
+        "response_format" : "response_format",
+        "id" : { },
+        "query_fee" : 0,
+        "ttl" : 6,
+        "query_format" : "query_format"
+      }
+    },
+    "OracleQuery" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "sender_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "sender_nonce" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "oracle_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "query" : {
+          "type" : "string"
+        },
+        "response" : {
+          "type" : "string"
+        },
+        "ttl" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "response_ttl" : {
+          "$ref" : "#/definitions/TTL"
+        },
+        "fee" : {
+          "type" : "integer",
+          "format" : "int64"
+        }
+      },
+      "example" : {
+        "oracle_id" : null,
+        "response_ttl" : {
+          "type" : "delta",
+          "value" : 1
+        },
+        "response" : "response",
+        "query" : "query",
+        "fee" : 5,
+        "sender_nonce" : 0,
+        "id" : { },
+        "ttl" : 6,
+        "sender_id" : null
+      }
+    },
+    "OracleQueries" : {
+      "type" : "object",
+      "properties" : {
+        "oracle_queries" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/OracleQuery"
+          }
+        }
+      },
+      "example" : {
+        "oracle_queries" : [ {
+          "oracle_id" : null,
+          "response_ttl" : {
+            "type" : "delta",
+            "value" : 1
+          },
+          "response" : "response",
+          "query" : "query",
+          "fee" : 5,
+          "sender_nonce" : 0,
+          "id" : { },
+          "ttl" : 6,
+          "sender_id" : null
+        }, {
+          "oracle_id" : null,
+          "response_ttl" : {
+            "type" : "delta",
+            "value" : 1
+          },
+          "response" : "response",
+          "query" : "query",
+          "fee" : 5,
+          "sender_nonce" : 0,
+          "id" : { },
+          "ttl" : 6,
+          "sender_id" : null
+        } ]
+      }
+    },
+    "SpendTx" : {
+      "type" : "object",
+      "required" : [ "amount", "fee", "payload", "recipient_id" ],
+      "properties" : {
+        "recipient_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "amount" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "fee" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "ttl" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "sender_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "nonce" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "payload" : {
+          "type" : "string"
+        }
+      },
+      "example" : {
+        "amount" : 0,
+        "payload" : "payload",
+        "fee" : 6,
+        "ttl" : 1,
+        "nonce" : 5,
+        "sender_id" : null,
+        "recipient_id" : { }
+      }
+    },
+    "OracleRegisterTx" : {
+      "type" : "object",
+      "required" : [ "fee", "oracle_ttl", "query_fee", "query_format", "response_format" ],
+      "properties" : {
+        "query_format" : {
+          "type" : "string"
+        },
+        "response_format" : {
+          "type" : "string"
+        },
+        "query_fee" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "oracle_ttl" : {
+          "$ref" : "#/definitions/TTL"
+        },
+        "account_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "nonce" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "fee" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "ttl" : {
+          "type" : "integer",
+          "format" : "int64"
+        }
+      },
+      "example" : {
+        "response_format" : "response_format",
+        "account_id" : { },
+        "fee" : 1,
+        "oracle_ttl" : {
+          "type" : "delta",
+          "value" : 1
+        },
+        "query_fee" : 0,
+        "nonce" : 6,
+        "ttl" : 5,
+        "query_format" : "query_format"
+      }
+    },
+    "OracleExtendTx" : {
+      "type" : "object",
+      "required" : [ "fee", "oracle_ttl" ],
+      "properties" : {
+        "fee" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "oracle_ttl" : {
+          "$ref" : "#/definitions/RelativeTTL"
+        },
+        "oracle_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "nonce" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "ttl" : {
+          "type" : "integer",
+          "format" : "int64"
+        }
+      },
+      "example" : {
+        "oracle_id" : { },
+        "fee" : 0,
+        "oracle_ttl" : {
+          "type" : "delta",
+          "value" : 1
+        },
+        "nonce" : 1,
+        "ttl" : 5
+      }
+    },
+    "OracleQueryTx" : {
+      "type" : "object",
+      "required" : [ "fee", "oracle_id", "query", "query_fee", "query_ttl", "response_ttl" ],
+      "properties" : {
+        "oracle_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "query" : {
+          "type" : "string"
+        },
+        "query_fee" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "query_ttl" : {
+          "$ref" : "#/definitions/TTL"
+        },
+        "response_ttl" : {
+          "$ref" : "#/definitions/RelativeTTL"
+        },
+        "fee" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "ttl" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "sender_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "nonce" : {
+          "type" : "integer",
+          "format" : "int64",
+          "description" : "Sender nonce"
+        }
+      },
+      "example" : {
+        "oracle_id" : { },
+        "response_ttl" : {
+          "type" : "delta",
+          "value" : 1
+        },
+        "query" : "query",
+        "query_ttl" : {
+          "type" : "delta",
+          "value" : 1
+        },
+        "fee" : 6,
+        "query_fee" : 0,
+        "ttl" : 1,
+        "nonce" : 5,
+        "sender_id" : null
+      }
+    },
+    "OracleRespondTx" : {
+      "type" : "object",
+      "required" : [ "fee", "query_id", "response" ],
+      "properties" : {
+        "query_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "response" : {
+          "type" : "string"
+        },
+        "fee" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "ttl" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "oracle_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "nonce" : {
+          "type" : "integer",
+          "format" : "int64",
+          "description" : "Oracle nonce"
+        }
+      },
+      "example" : {
+        "oracle_id" : null,
+        "query_id" : { },
+        "response" : "response",
+        "fee" : 0,
+        "ttl" : 6,
+        "nonce" : 1
+      }
+    },
+    "TTL" : {
+      "type" : "object",
+      "properties" : {
+        "type" : {
+          "type" : "string",
+          "enum" : [ "delta", "block" ]
+        },
+        "value" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 1
+        }
+      },
+      "example" : {
+        "type" : "delta",
+        "value" : 1
+      }
+    },
+    "RelativeTTL" : {
+      "type" : "object",
+      "properties" : {
+        "type" : {
+          "type" : "string",
+          "enum" : [ "delta" ]
+        },
+        "value" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 1
+        }
+      },
+      "example" : {
+        "type" : "delta",
+        "value" : 1
+      }
+    },
+    "NameEntry" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "ttl" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "pointers" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/NamePointer"
+          }
+        }
+      },
+      "example" : {
+        "id" : { },
+        "ttl" : 0,
+        "pointers" : [ {
+          "id" : null,
+          "key" : "key"
+        }, {
+          "id" : null,
+          "key" : "key"
+        } ]
+      }
+    },
+    "NamePreclaimTx" : {
+      "type" : "object",
+      "required" : [ "commitment_id", "fee" ],
+      "properties" : {
+        "commitment_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "fee" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "ttl" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "account_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "nonce" : {
+          "type" : "integer",
+          "format" : "int64"
+        }
+      },
+      "example" : {
+        "commitment_id" : { },
+        "account_id" : null,
+        "fee" : 0,
+        "ttl" : 6,
+        "nonce" : 1
+      }
+    },
+    "NameClaimTx" : {
+      "type" : "object",
+      "required" : [ "fee", "name", "name_salt" ],
+      "properties" : {
+        "name" : {
+          "type" : "string"
+        },
+        "name_salt" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "fee" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "ttl" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "account_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "nonce" : {
+          "type" : "integer",
+          "format" : "int64"
+        }
+      },
+      "example" : {
+        "name_salt" : 0,
+        "account_id" : { },
+        "fee" : 6,
+        "name" : "name",
+        "ttl" : 1,
+        "nonce" : 5
+      }
+    },
+    "NameUpdateTx" : {
+      "type" : "object",
+      "required" : [ "client_ttl", "fee", "name_id", "name_ttl", "pointers" ],
+      "properties" : {
+        "name_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "name_ttl" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "pointers" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/NamePointer"
+          }
+        },
+        "client_ttl" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "fee" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "ttl" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "account_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "nonce" : {
+          "type" : "integer",
+          "format" : "int64"
+        }
+      },
+      "example" : {
+        "name_ttl" : 0,
+        "client_ttl" : 6,
+        "account_id" : null,
+        "fee" : 1,
+        "name_id" : { },
+        "ttl" : 5,
+        "nonce" : 5,
+        "pointers" : [ {
+          "id" : null,
+          "key" : "key"
+        }, {
+          "id" : null,
+          "key" : "key"
+        } ]
+      }
+    },
+    "NameTransferTx" : {
+      "type" : "object",
+      "required" : [ "fee", "name_id", "recipient_id" ],
+      "properties" : {
+        "name_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "recipient_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "fee" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "ttl" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "account_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "nonce" : {
+          "type" : "integer",
+          "format" : "int64"
+        }
+      },
+      "example" : {
+        "account_id" : null,
+        "fee" : 0,
+        "name_id" : { },
+        "ttl" : 6,
+        "nonce" : 1,
+        "recipient_id" : null
+      }
+    },
+    "NameRevokeTx" : {
+      "type" : "object",
+      "required" : [ "fee", "name_id" ],
+      "properties" : {
+        "name_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "fee" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "ttl" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "account_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "nonce" : {
+          "type" : "integer",
+          "format" : "int64"
+        }
+      },
+      "example" : {
+        "account_id" : null,
+        "fee" : 0,
+        "name_id" : { },
+        "ttl" : 6,
+        "nonce" : 1
+      }
+    },
+    "CommitmentId" : {
+      "type" : "object",
+      "properties" : {
+        "commitment_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        }
+      },
+      "example" : {
+        "commitment_id" : { }
+      }
+    },
+    "NameHash" : {
+      "type" : "object",
+      "properties" : {
+        "name_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        }
+      }
+    },
+    "NamePointer" : {
+      "type" : "object",
+      "properties" : {
+        "key" : {
+          "type" : "string"
+        },
+        "id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        }
+      },
+      "example" : {
+        "id" : null,
+        "key" : "key"
+      }
+    },
+    "Channel" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "initiator_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "responder_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "channel_amount" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "initiator_amount" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "responder_amount" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "channel_reserve" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "delegate_ids" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/EncodedHash"
+          }
+        },
+        "state_hash" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "round" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "lock_period" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "forcing_blocked_until" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "closes_at" : {
+          "type" : "integer",
+          "format" : "int64"
+        }
+      },
+      "example" : {
+        "delegate_ids" : [ null, null ],
+        "responder_id" : null,
+        "lock_period" : 0,
+        "responder_amount" : 0,
+        "initiator_amount" : 0,
+        "round" : 0,
+        "initiator_id" : null,
+        "state_hash" : null,
+        "forcing_blocked_until" : 7,
+        "id" : { },
+        "closes_at" : 9,
+        "channel_amount" : 0,
+        "channel_reserve" : 0
+      }
+    },
+    "ChannelCreateTx" : {
+      "type" : "object",
+      "required" : [ "channel_reserve", "fee", "initiator_amount", "initiator_id", "lock_period", "push_amount", "responder_amount", "responder_id", "state_hash" ],
+      "properties" : {
+        "initiator_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "initiator_amount" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "responder_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "responder_amount" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "push_amount" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "channel_reserve" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "lock_period" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "ttl" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "fee" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "nonce" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "state_hash" : {
+          "description" : "Root hash of the channel's internal state tree",
+          "$ref" : "#/definitions/EncodedHash"
+        }
+      },
+      "example" : {
+        "responder_amount" : 0,
+        "initiator_amount" : 0,
+        "initiator_id" : { },
+        "responder_id" : null,
+        "state_hash" : null,
+        "fee" : 0,
+        "push_amount" : 0,
+        "ttl" : 0,
+        "nonce" : 0,
+        "lock_period" : 0,
+        "channel_reserve" : 0
+      }
+    },
+    "ChannelDepositTx" : {
+      "type" : "object",
+      "required" : [ "amount", "channel_id", "fee", "from_id", "nonce", "round", "state_hash" ],
+      "properties" : {
+        "channel_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "from_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "amount" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "ttl" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "fee" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "nonce" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "state_hash" : {
+          "description" : "Root hash of the channel's internal state tree after the deposit had been applied to it",
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "round" : {
+          "type" : "integer",
+          "format" : "int64",
+          "description" : "Channel's next round",
+          "minimum" : 0
+        }
+      },
+      "example" : {
+        "amount" : 0,
+        "from_id" : null,
+        "round" : 0,
+        "state_hash" : null,
+        "fee" : 0,
+        "channel_id" : { },
+        "ttl" : 0,
+        "nonce" : 0
+      }
+    },
+    "ChannelWithdrawTx" : {
+      "type" : "object",
+      "required" : [ "amount", "channel_id", "fee", "nonce", "round", "state_hash", "to_id" ],
+      "properties" : {
+        "channel_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "to_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "amount" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "ttl" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "fee" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "nonce" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "state_hash" : {
+          "description" : "Root hash of the channel's internal state tree after the withdraw had been applied to it",
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "round" : {
+          "type" : "integer",
+          "format" : "int64",
+          "description" : "Channel's next round",
+          "minimum" : 0
+        }
+      },
+      "example" : {
+        "amount" : 0,
+        "round" : 0,
+        "state_hash" : null,
+        "fee" : 0,
+        "to_id" : null,
+        "channel_id" : { },
+        "ttl" : 0,
+        "nonce" : 0
+      }
+    },
+    "ChannelForceProgressTx" : {
+      "type" : "object",
+      "required" : [ "addresses", "channel_id", "fee", "from_id", "payload", "poi", "round", "state_hash", "update" ],
+      "properties" : {
+        "channel_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "from_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "payload" : {
+          "type" : "string"
+        },
+        "round" : {
+          "type" : "integer",
+          "format" : "int64",
+          "description" : "Channel's next round",
+          "minimum" : 0
+        },
+        "update" : {
+          "description" : "Update to be applied. Must be a OffChainCallContract",
+          "$ref" : "#/definitions/OffChainUpdate"
+        },
+        "state_hash" : {
+          "description" : "Channel's next state_hash",
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "addresses" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/EncodedHash"
+          },
+          "minItems" : 1
+        },
+        "poi" : {
+          "type" : "string",
+          "description" : "Proof of inclusion containing information for closing the channel"
+        },
+        "ttl" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "fee" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "nonce" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        }
+      }
+    },
+    "ChannelCloseMutualTx" : {
+      "type" : "object",
+      "required" : [ "channel_id", "fee", "initiator_amount_final", "nonce", "responder_amount_final" ],
+      "properties" : {
+        "channel_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "initiator_amount_final" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "responder_amount_final" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "ttl" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "fee" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "nonce" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        }
+      },
+      "example" : {
+        "responder_amount_final" : 0,
+        "fee" : 0,
+        "initiator_amount_final" : 0,
+        "channel_id" : { },
+        "ttl" : 0,
+        "nonce" : 0
+      }
+    },
+    "ChannelCloseSoloTx" : {
+      "type" : "object",
+      "required" : [ "channel_id", "fee", "from_id", "payload", "poi" ],
+      "properties" : {
+        "channel_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "from_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "payload" : {
+          "type" : "string"
+        },
+        "ttl" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "fee" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "nonce" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "poi" : {
+          "type" : "string",
+          "description" : "Proof of inclusion containing information for closing the channel"
+        }
+      },
+      "example" : {
+        "from_id" : null,
+        "payload" : "payload",
+        "fee" : 0,
+        "poi" : "poi",
+        "channel_id" : { },
+        "ttl" : 0,
+        "nonce" : 0
+      }
+    },
+    "ChannelSlashTx" : {
+      "type" : "object",
+      "required" : [ "channel_id", "fee", "from_id", "payload", "poi" ],
+      "properties" : {
+        "channel_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "from_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "payload" : {
+          "type" : "string"
+        },
+        "ttl" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "fee" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "nonce" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "poi" : {
+          "type" : "string",
+          "description" : "Proof of inclusion containing information for closing the channel"
+        }
+      },
+      "example" : {
+        "from_id" : null,
+        "payload" : "payload",
+        "fee" : 0,
+        "poi" : "poi",
+        "channel_id" : { },
+        "ttl" : 0,
+        "nonce" : 0
+      }
+    },
+    "ChannelSettleTx" : {
+      "type" : "object",
+      "required" : [ "channel_id", "fee", "from_id", "initiator_amount_final", "nonce", "responder_amount_final" ],
+      "properties" : {
+        "channel_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "from_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "initiator_amount_final" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "responder_amount_final" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "ttl" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "fee" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "nonce" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        }
+      },
+      "example" : {
+        "from_id" : null,
+        "responder_amount_final" : 0,
+        "fee" : 0,
+        "initiator_amount_final" : 0,
+        "channel_id" : { },
+        "ttl" : 0,
+        "nonce" : 0
+      }
+    },
+    "ChannelSnapshotSoloTx" : {
+      "type" : "object",
+      "required" : [ "channel_id", "fee", "payload" ],
+      "properties" : {
+        "channel_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "from_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "payload" : {
+          "type" : "string"
+        },
+        "ttl" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "fee" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "nonce" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        }
+      },
+      "example" : {
+        "from_id" : null,
+        "payload" : "payload",
+        "fee" : 0,
+        "channel_id" : { },
+        "ttl" : 0,
+        "nonce" : 0
+      }
+    },
+    "PubKey" : {
+      "type" : "object",
+      "properties" : {
+        "pub_key" : {
+          "type" : "string"
+        }
+      },
+      "example" : {
+        "pub_key" : "pub_key"
+      }
+    },
+    "Status" : {
+      "type" : "object",
+      "properties" : {
+        "genesis_key_block_hash" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "solutions" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "difficulty" : {
+          "type" : "number",
+          "format" : "int64"
+        },
+        "syncing" : {
+          "type" : "boolean"
+        },
+        "listening" : {
+          "type" : "boolean"
+        },
+        "protocols" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/Protocol"
+          }
+        },
+        "node_version" : {
+          "type" : "string"
+        },
+        "node_revision" : {
+          "type" : "string"
+        },
+        "peer_count" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
+        "pending_transactions_count" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        }
+      },
+      "example" : {
+        "difficulty" : 6.02745618307040320615897144307382404804229736328125,
+        "listening" : true,
+        "peer_count" : 0,
+        "pending_transactions_count" : 0,
+        "genesis_key_block_hash" : { },
+        "syncing" : true,
+        "node_revision" : "node_revision",
+        "solutions" : 0,
+        "node_version" : "node_version",
+        "protocols" : [ {
+          "protocol_version" : 1,
+          "effective_at_height" : 0
+        }, {
+          "protocol_version" : 1,
+          "effective_at_height" : 0
+        } ]
+      }
+    },
+    "Protocol" : {
+      "type" : "object",
+      "properties" : {
+        "protocol_version" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 1
+        },
+        "effective_at_height" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        }
+      },
+      "example" : {
+        "protocol_version" : 1,
+        "effective_at_height" : 0
+      }
+    },
+    "GenericSignedTx" : {
+      "type" : "object",
+      "properties" : {
+        "tx" : {
+          "$ref" : "#/definitions/GenericTx"
+        },
+        "block_height" : {
+          "type" : "integer"
+        },
+        "block_hash" : {
+          "description" : "Value \"none\" means no block in the chain includes the transaction",
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "hash" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "signatures" : {
+          "type" : "array",
+          "items" : {
+            "type" : "string"
+          },
+          "minItems" : 1
+        }
+      },
+      "example" : {
+        "tx" : {
+          "type" : "type",
+          "version" : 0
+        },
+        "block_hash" : { },
+        "block_height" : 6,
+        "hash" : null,
+        "signatures" : [ "signatures", "signatures" ]
+      }
+    },
+    "GenericTx" : {
+      "type" : "object",
+      "required" : [ "type", "version" ],
+      "discriminator" : "type",
+      "properties" : {
+        "version" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "type" : {
+          "type" : "string"
+        }
+      },
+      "example" : {
+        "type" : "type",
+        "version" : 0
+      }
+    },
+    "ChannelCreateTxJSON" : {
+      "allOf" : [ {
+        "$ref" : "#/definitions/GenericTx"
+      }, {
+        "$ref" : "#/definitions/ChannelCreateTx"
+      } ]
+    },
+    "ChannelDepositTxJSON" : {
+      "allOf" : [ {
+        "$ref" : "#/definitions/GenericTx"
+      }, {
+        "$ref" : "#/definitions/ChannelDepositTx"
+      } ]
+    },
+    "ChannelWithdrawalTxJSON" : {
+      "allOf" : [ {
+        "$ref" : "#/definitions/GenericTx"
+      }, {
+        "$ref" : "#/definitions/ChannelWithdrawTx"
+      } ]
+    },
+    "ChannelForceProgressTxJSON" : {
+      "allOf" : [ {
+        "$ref" : "#/definitions/GenericTx"
+      }, {
+        "$ref" : "#/definitions/ChannelForceProgressTx"
+      } ]
+    },
+    "ChannelCloseMutualTxJSON" : {
+      "allOf" : [ {
+        "$ref" : "#/definitions/GenericTx"
+      }, {
+        "$ref" : "#/definitions/ChannelCloseMutualTx"
+      } ]
+    },
+    "ChannelCloseSoloTxJSON" : {
+      "allOf" : [ {
+        "$ref" : "#/definitions/GenericTx"
+      }, {
+        "$ref" : "#/definitions/ChannelCloseSoloTx"
+      } ]
+    },
+    "ChannelSlashTxJSON" : {
+      "allOf" : [ {
+        "$ref" : "#/definitions/GenericTx"
+      }, {
+        "$ref" : "#/definitions/ChannelSlashTx"
+      } ]
+    },
+    "ChannelSettleTxJSON" : {
+      "allOf" : [ {
+        "$ref" : "#/definitions/GenericTx"
+      }, {
+        "$ref" : "#/definitions/ChannelSettleTx"
+      } ]
+    },
+    "SpendTxJSON" : {
+      "allOf" : [ {
+        "$ref" : "#/definitions/GenericTx"
+      }, {
+        "$ref" : "#/definitions/SpendTx"
+      } ]
+    },
+    "OracleRegisterTxJSON" : {
+      "allOf" : [ {
+        "$ref" : "#/definitions/GenericTx"
+      }, {
+        "$ref" : "#/definitions/OracleRegisterTx"
+      } ]
+    },
+    "OracleExtendTxJSON" : {
+      "allOf" : [ {
+        "$ref" : "#/definitions/GenericTx"
+      }, {
+        "$ref" : "#/definitions/OracleExtendTx"
+      } ]
+    },
+    "OracleQueryTxJSON" : {
+      "allOf" : [ {
+        "$ref" : "#/definitions/GenericTx"
+      }, {
+        "$ref" : "#/definitions/OracleQueryTx"
+      } ]
+    },
+    "OracleResponseTxJSON" : {
+      "allOf" : [ {
+        "$ref" : "#/definitions/GenericTx"
+      }, {
+        "$ref" : "#/definitions/OracleRespondTx"
+      } ]
+    },
+    "NamePreclaimTxObject" : {
+      "allOf" : [ {
+        "$ref" : "#/definitions/GenericTx"
+      }, {
+        "$ref" : "#/definitions/NamePreclaimTx"
+      } ]
+    },
+    "NameClaimTxObject" : {
+      "allOf" : [ {
+        "$ref" : "#/definitions/GenericTx"
+      }, {
+        "$ref" : "#/definitions/NameClaimTx"
+      } ]
+    },
+    "NameUpdateTxObject" : {
+      "allOf" : [ {
+        "$ref" : "#/definitions/GenericTx"
+      }, {
+        "$ref" : "#/definitions/NameUpdateTx"
+      } ]
+    },
+    "NameTransferTxObject" : {
+      "allOf" : [ {
+        "$ref" : "#/definitions/GenericTx"
+      }, {
+        "$ref" : "#/definitions/NameTransferTx"
+      } ]
+    },
+    "NameRevokeTxObject" : {
+      "allOf" : [ {
+        "$ref" : "#/definitions/GenericTx"
+      }, {
+        "$ref" : "#/definitions/NameRevokeTx"
+      } ]
+    },
+    "ContractCreateTxObject" : {
+      "allOf" : [ {
+        "$ref" : "#/definitions/GenericTx"
+      }, {
+        "$ref" : "#/definitions/ContractCreateData"
+      } ]
+    },
+    "ContractCallTxObject" : {
+      "allOf" : [ {
+        "$ref" : "#/definitions/GenericTx"
+      }, {
+        "$ref" : "#/definitions/ContractCallData"
+      } ]
+    },
+    "ContractCallObject" : {
+      "type" : "object",
+      "required" : [ "caller_id", "caller_nonce", "contract_id", "gas_price", "gas_used", "height", "return_type", "return_value" ],
+      "properties" : {
+        "caller_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "caller_nonce" : {
+          "type" : "integer"
+        },
+        "height" : {
+          "type" : "integer"
+        },
+        "contract_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "gas_price" : {
+          "type" : "integer"
+        },
+        "gas_used" : {
+          "type" : "integer"
+        },
+        "return_value" : {
+          "type" : "string",
+          "description" : "Hex encoded return value of the call"
+        },
+        "return_type" : {
+          "type" : "string",
+          "description" : "The status of the call 'ok | error | revert'."
+        }
+      },
+      "example" : {
+        "gas_price" : 1,
+        "return_type" : "return_type",
+        "return_value" : "return_value",
+        "caller_id" : { },
+        "contract_id" : null,
+        "gas_used" : 5,
+        "caller_nonce" : 0,
+        "height" : 6
+      }
+    },
+    "Error" : {
+      "type" : "object",
+      "properties" : {
+        "reason" : {
+          "type" : "string"
+        }
+      }
+    },
+    "ContractObject" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "owner_id" : {
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "vm_version" : {
+          "type" : "integer",
+          "minimum" : 0,
+          "maximum" : 255
+        },
+        "log" : {
+          "type" : "string"
+        },
+        "active" : {
+          "type" : "boolean"
+        },
+        "referrer_ids" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/EncodedHash"
+          }
+        },
+        "deposit" : {
+          "type" : "integer"
+        }
+      },
+      "example" : {
+        "vm_version" : 20,
+        "log" : "log",
+        "owner_id" : null,
+        "active" : true,
+        "deposit" : 6,
+        "referrer_ids" : [ null, null ],
+        "id" : { }
+      }
+    },
+    "ContractStore" : {
+      "type" : "object",
+      "properties" : {
+        "store" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/ContractStore_store"
+          }
+        }
+      },
+      "example" : {
+        "store" : [ {
+          "value" : "value",
+          "key" : "key"
+        }, {
+          "value" : "value",
+          "key" : "key"
+        } ]
+      }
+    },
+    "Contract" : {
+      "type" : "object",
+      "properties" : {
+        "code" : {
+          "type" : "string"
+        },
+        "options" : {
+          "type" : "string"
+        }
+      },
+      "example" : {
+        "code" : "code",
+        "options" : "options"
+      }
+    },
+    "ByteCode" : {
+      "type" : "object",
+      "properties" : {
+        "bytecode" : {
+          "type" : "string"
+        }
+      },
+      "example" : {
+        "bytecode" : "bytecode"
+      }
+    },
+    "ContractCallInput" : {
+      "type" : "object",
+      "properties" : {
+        "abi" : {
+          "type" : "string"
+        },
+        "code" : {
+          "type" : "string"
+        },
+        "function" : {
+          "type" : "string"
+        },
+        "arg" : {
+          "type" : "string"
+        }
+      },
+      "example" : {
+        "code" : "code",
+        "function" : "function",
+        "arg" : "arg",
+        "abi" : "abi"
+      }
+    },
+    "CallResult" : {
+      "type" : "object",
+      "properties" : {
+        "out" : {
+          "type" : "string"
+        }
+      },
+      "example" : {
+        "out" : "out"
+      }
+    },
+    "Calldata" : {
+      "type" : "object",
+      "properties" : {
+        "calldata" : {
+          "type" : "string"
+        }
+      },
+      "example" : {
+        "calldata" : "calldata"
+      }
+    },
+    "SophiaBinaryData" : {
+      "type" : "object",
+      "required" : [ "data", "sophia-type" ],
+      "properties" : {
+        "sophia-type" : {
+          "type" : "string"
+        },
+        "data" : {
+          "type" : "string"
+        }
+      },
+      "example" : {
+        "data" : "data",
+        "sophia-type" : "sophia-type"
+      }
+    },
+    "SophiaJsonData" : {
+      "type" : "object",
+      "required" : [ "data" ],
+      "properties" : {
+        "data" : {
+          "type" : "object",
+          "properties" : { }
+        }
+      },
+      "example" : {
+        "data" : "{}"
+      }
+    },
+    "Peer" : {
+      "type" : "string",
+      "description" : "Aeternity node"
+    },
+    "Peers" : {
+      "type" : "object",
+      "properties" : {
+        "peers" : {
+          "type" : "array",
+          "description" : "All discovered peers",
+          "items" : {
+            "$ref" : "#/definitions/Peer"
+          }
+        },
+        "blocked" : {
+          "type" : "array",
+          "description" : "All blocked peers",
+          "items" : {
+            "$ref" : "#/definitions/Peer"
+          }
+        }
+      },
+      "example" : {
+        "blocked" : [ null, null ],
+        "peers" : [ { }, { } ]
+      }
+    },
+    "ContractCreateData" : {
+      "type" : "object",
+      "required" : [ "amount", "call_data", "code", "deposit", "fee", "gas", "gas_price", "owner_id", "vm_version" ],
+      "properties" : {
+        "owner_id" : {
+          "description" : "Contract owner pub_key",
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "nonce" : {
+          "type" : "integer",
+          "description" : "Owner's nonce"
+        },
+        "code" : {
+          "type" : "string",
+          "description" : "Contract's code"
+        },
+        "vm_version" : {
+          "type" : "integer",
+          "description" : "Virtual machine's version",
+          "minimum" : 0,
+          "maximum" : 255
+        },
+        "deposit" : {
+          "type" : "integer",
+          "description" : "Deposit",
+          "minimum" : 0
+        },
+        "amount" : {
+          "type" : "integer",
+          "description" : "Amount",
+          "minimum" : 0
+        },
+        "gas" : {
+          "type" : "integer",
+          "description" : "Contract gas",
+          "minimum" : 0
+        },
+        "gas_price" : {
+          "type" : "integer",
+          "description" : "Gas price",
+          "minimum" : 0
+        },
+        "fee" : {
+          "type" : "integer",
+          "description" : "Transaction fee",
+          "minimum" : 0
+        },
+        "ttl" : {
+          "type" : "integer",
+          "description" : "Transaction TTL",
+          "minimum" : 0
+        },
+        "call_data" : {
+          "type" : "string",
+          "description" : "Contract call data"
+        }
+      },
+      "example" : {
+        "gas_price" : 0,
+        "vm_version" : 153,
+        "amount" : 0,
+        "code" : "code",
+        "call_data" : "call_data",
+        "owner_id" : { },
+        "fee" : 0,
+        "gas" : 0,
+        "deposit" : 0,
+        "nonce" : 0,
+        "ttl" : 0
+      }
+    },
+    "ContractCreateCompute" : {
+      "type" : "object",
+      "required" : [ "amount", "arguments", "code", "deposit", "fee", "gas", "gas_price", "owner_id", "vm_version" ],
+      "properties" : {
+        "owner_id" : {
+          "type" : "string",
+          "description" : "Contract owner pub_key"
+        },
+        "nonce" : {
+          "type" : "integer",
+          "description" : "Owner's nonce"
+        },
+        "code" : {
+          "type" : "string",
+          "description" : "Contract's code"
+        },
+        "vm_version" : {
+          "type" : "integer",
+          "description" : "Virtual machine's version",
+          "minimum" : 0,
+          "maximum" : 255
+        },
+        "deposit" : {
+          "type" : "integer",
+          "description" : "Deposit",
+          "minimum" : 0
+        },
+        "amount" : {
+          "type" : "integer",
+          "description" : "Amount",
+          "minimum" : 0
+        },
+        "gas" : {
+          "type" : "integer",
+          "description" : "Contract gas",
+          "minimum" : 0
+        },
+        "gas_price" : {
+          "type" : "integer",
+          "description" : "Gas price",
+          "minimum" : 0
+        },
+        "fee" : {
+          "type" : "integer",
+          "description" : "Transaction fee",
+          "minimum" : 0
+        },
+        "ttl" : {
+          "type" : "integer",
+          "description" : "Transaction TTL",
+          "minimum" : 0
+        },
+        "arguments" : {
+          "type" : "string",
+          "description" : "Contract call data init function arguments"
+        }
+      },
+      "example" : {
+        "gas_price" : 0,
+        "vm_version" : 153,
+        "amount" : 0,
+        "code" : "code",
+        "owner_id" : "owner_id",
+        "fee" : 0,
+        "gas" : 0,
+        "deposit" : 0,
+        "arguments" : "arguments",
+        "nonce" : 0,
+        "ttl" : 0
+      }
+    },
+    "ContractCallData" : {
+      "type" : "object",
+      "required" : [ "amount", "call_data", "caller_id", "contract_id", "fee", "gas", "gas_price", "vm_version" ],
+      "properties" : {
+        "caller_id" : {
+          "description" : "Contract caller pub_key",
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "nonce" : {
+          "type" : "integer",
+          "description" : "Caller's nonce"
+        },
+        "contract_id" : {
+          "description" : "Contract's pub_key",
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "vm_version" : {
+          "type" : "integer",
+          "description" : "Virtual machine's version",
+          "minimum" : 0,
+          "maximum" : 255
+        },
+        "fee" : {
+          "type" : "integer",
+          "description" : "Transaction fee",
+          "minimum" : 0
+        },
+        "ttl" : {
+          "type" : "integer",
+          "description" : "Transaction TTL",
+          "minimum" : 0
+        },
+        "amount" : {
+          "type" : "integer",
+          "description" : "Amount",
+          "minimum" : 0
+        },
+        "gas" : {
+          "type" : "integer",
+          "description" : "Contract gas",
+          "minimum" : 0
+        },
+        "gas_price" : {
+          "type" : "integer",
+          "description" : "Gas price",
+          "minimum" : 0
+        },
+        "call_data" : {
+          "type" : "string",
+          "description" : "Contract call data"
+        }
+      },
+      "example" : {
+        "gas_price" : 0,
+        "vm_version" : 153,
+        "amount" : 0,
+        "call_data" : "call_data",
+        "caller_id" : { },
+        "contract_id" : null,
+        "fee" : 0,
+        "gas" : 0,
+        "nonce" : 0,
+        "ttl" : 0
+      }
+    },
+    "ContractCallCompute" : {
+      "type" : "object",
+      "required" : [ "amount", "arguments", "caller_id", "contract_id", "fee", "function", "gas", "gas_price", "vm_version" ],
+      "properties" : {
+        "caller_id" : {
+          "description" : "Contract caller pub_key",
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "nonce" : {
+          "type" : "integer",
+          "description" : "Caller's nonce"
+        },
+        "contract_id" : {
+          "description" : "Contract's pub_key",
+          "$ref" : "#/definitions/EncodedHash"
+        },
+        "vm_version" : {
+          "type" : "integer",
+          "description" : "Virtual machine's version",
+          "minimum" : 0,
+          "maximum" : 255
+        },
+        "fee" : {
+          "type" : "integer",
+          "description" : "Transaction fee",
+          "minimum" : 0
+        },
+        "ttl" : {
+          "type" : "integer",
+          "description" : "Transaction TTL",
+          "minimum" : 0
+        },
+        "amount" : {
+          "type" : "integer",
+          "description" : "Amount",
+          "minimum" : 0
+        },
+        "gas" : {
+          "type" : "integer",
+          "description" : "Contract gas",
+          "minimum" : 0
+        },
+        "gas_price" : {
+          "type" : "integer",
+          "description" : "Gas price",
+          "minimum" : 0
+        },
+        "function" : {
+          "type" : "string",
+          "description" : "Contract call data function"
+        },
+        "arguments" : {
+          "type" : "string",
+          "description" : "Contract call data function arguments"
+        }
+      },
+      "example" : {
+        "gas_price" : 0,
+        "vm_version" : 153,
+        "amount" : 0,
+        "caller_id" : { },
+        "contract_id" : null,
+        "fee" : 0,
+        "function" : "function",
+        "gas" : 0,
+        "arguments" : "arguments",
+        "nonce" : 0,
+        "ttl" : 0
+      }
+    },
+    "UnsignedTx" : {
+      "type" : "object",
+      "required" : [ "tx" ],
+      "properties" : {
+        "tx" : {
+          "description" : "Unsigned transaction object",
+          "$ref" : "#/definitions/EncodedHash"
+        }
+      },
+      "example" : {
+        "tx" : { }
+      }
+    },
+    "PostTxResponse" : {
+      "type" : "object",
+      "required" : [ "tx_hash" ],
+      "properties" : {
+        "tx_hash" : {
+          "description" : "Hash of a signed transaction",
+          "$ref" : "#/definitions/EncodedHash"
+        }
+      },
+      "example" : {
+        "tx_hash" : { }
+      }
+    },
+    "CreateContractUnsignedTx" : {
+      "allOf" : [ {
+        "$ref" : "#/definitions/UnsignedTx"
+      }, {
+        "type" : "object",
+        "required" : [ "contract_id" ],
+        "properties" : {
+          "contract_id" : {
+            "description" : "Address of the contract to be created",
+            "$ref" : "#/definitions/EncodedHash"
+          }
+        }
+      } ]
+    },
+    "PoI" : {
+      "type" : "object",
+      "required" : [ "poi" ],
+      "properties" : {
+        "poi" : {
+          "type" : "string",
+          "description" : "Proof of inclusion"
+        }
+      },
+      "example" : {
+        "poi" : "poi"
+      }
+    },
+    "Generation" : {
+      "type" : "object",
+      "properties" : {
+        "key_block" : {
+          "$ref" : "#/definitions/KeyBlock"
+        },
+        "micro_blocks" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/EncodedHash"
+          }
+        }
+      },
+      "example" : {
+        "micro_blocks" : [ { }, { } ],
+        "key_block" : {
+          "txs_hash" : null,
+          "prev_hash" : null,
+          "nonce" : 1,
+          "version" : 5,
+          "miner" : null,
+          "target" : 6,
+          "beneficiary" : null,
+          "state_hash" : null,
+          "pow" : "",
+          "prev_key_hash" : null,
+          "time" : 5,
+          "hash" : { },
+          "height" : 0
+        }
+      }
+    },
+    "OffChainUpdate" : {
+      "type" : "object",
+      "required" : [ "op" ],
+      "discriminator" : "op",
+      "properties" : {
+        "op" : {
+          "type" : "string"
+        }
+      }
+    },
+    "OffChainTransfer" : {
+      "allOf" : [ {
+        "$ref" : "#/definitions/OffChainUpdate"
+      }, {
+        "type" : "object",
+        "required" : [ "am", "from", "to" ],
+        "properties" : {
+          "from" : {
+            "description" : "Sender of tokens",
+            "$ref" : "#/definitions/EncodedHash"
+          },
+          "to" : {
+            "description" : "Receiver of tokens",
+            "$ref" : "#/definitions/EncodedHash"
+          },
+          "am" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "Amount of tokens to transfer"
+          }
+        }
+      } ]
+    },
+    "OffChainWithdrawal" : {
+      "allOf" : [ {
+        "$ref" : "#/definitions/OffChainUpdate"
+      }, {
+        "type" : "object",
+        "required" : [ "am", "to" ],
+        "properties" : {
+          "to" : {
+            "description" : "Withdrawer of tokens",
+            "$ref" : "#/definitions/EncodedHash"
+          },
+          "am" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "Amount of tokens to withdraw"
+          }
+        }
+      } ]
+    },
+    "OffChainDeposit" : {
+      "allOf" : [ {
+        "$ref" : "#/definitions/OffChainUpdate"
+      }, {
+        "type" : "object",
+        "required" : [ "am", "from" ],
+        "properties" : {
+          "from" : {
+            "description" : "Depositor of tokens",
+            "$ref" : "#/definitions/EncodedHash"
+          },
+          "am" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "Amount of tokens to deposit"
+          }
+        }
+      } ]
+    },
+    "OffChainNewContract" : {
+      "allOf" : [ {
+        "$ref" : "#/definitions/OffChainUpdate"
+      }, {
+        "type" : "object",
+        "required" : [ "call_data", "code", "deposit", "owner", "vm_version" ],
+        "properties" : {
+          "owner" : {
+            "description" : "Contract owner",
+            "$ref" : "#/definitions/EncodedHash"
+          },
+          "vm_version" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "VM version of the contract"
+          },
+          "code" : {
+            "$ref" : "#/definitions/ByteCode"
+          },
+          "deposit" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "Amount of tokens to deposit to the new contract"
+          },
+          "call_data" : {
+            "type" : "string",
+            "description" : "Contract call data"
+          }
+        }
+      } ]
+    },
+    "OffChainCallContract" : {
+      "allOf" : [ {
+        "$ref" : "#/definitions/OffChainUpdate"
+      }, {
+        "type" : "object",
+        "required" : [ "amount", "call_data", "caller", "contract", "gas", "gas_price", "vm_version" ],
+        "properties" : {
+          "caller" : {
+            "description" : "Contract caller",
+            "$ref" : "#/definitions/EncodedHash"
+          },
+          "contract" : {
+            "description" : "Contract address",
+            "$ref" : "#/definitions/EncodedHash"
+          },
+          "vm_version" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "VM version of the contract"
+          },
+          "amount" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "Amount of tokens to transfer to the contract"
+          },
+          "gas" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "Gas limit for the contract call"
+          },
+          "gas_price" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "Gas price for the contract call"
+          },
+          "call_data" : {
+            "type" : "string",
+            "description" : "Contract call data"
+          }
+        }
+      } ]
+    },
+    "inline_response_200" : {
+      "properties" : {
+        "hash" : {
+          "type" : "string",
+          "description" : "Hash"
+        }
+      },
+      "example" : {
+        "hash" : "hash"
+      }
+    },
+    "inline_response_200_1" : {
+      "properties" : {
+        "height" : {
+          "type" : "integer",
+          "format" : "int64",
+          "description" : "Height"
+        }
+      },
+      "example" : {
+        "height" : 0
+      }
+    },
+    "inline_response_200_2" : {
+      "properties" : {
+        "count" : {
+          "type" : "integer",
+          "format" : "int64",
+          "description" : "Count",
+          "minimum" : 1
+        }
+      },
+      "example" : {
+        "count" : 1
+      }
+    },
+    "inline_response_200_3" : {
+      "properties" : {
+        "pubkey" : {
+          "type" : "string"
+        }
+      },
+      "example" : {
+        "pubkey" : "pubkey"
+      }
+    },
+    "ContractStore_store" : {
+      "properties" : {
+        "key" : {
+          "type" : "string"
+        },
+        "value" : {
+          "type" : "string"
+        }
+      },
+      "example" : {
+        "value" : "value",
+        "key" : "key"
+      }
+    }
+  },
+  "externalDocs" : {
+    "description" : "Find out more about Aeternity",
+    "url" : "http://www.aeternity.com"
+  }
+}
