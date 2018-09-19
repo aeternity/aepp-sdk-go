@@ -18,8 +18,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/aeternity/aepp-sdk-go/generated/client/operations"
-	"github.com/aeternity/aepp-sdk-go/utils"
+	"github.com/aeternity/aepp-sdk-go/aeternity"
 	"github.com/spf13/cobra"
 )
 
@@ -35,53 +34,63 @@ var topCmd = &cobra.Command{
 	Short: "Query the top block of the chain",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		if r, err := aeCli.Operations.GetTop(nil); err == nil {
-			utils.PrintObject(r.Payload)
-		} else {
-			utils.Pp("Error:", err)
+		v, err := aeCli.APIGetTopBlock()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
 		}
+		aeternity.PrintObject(v)
 	},
 }
 
 var versionCmd = &cobra.Command{
 	Use:   "version",
-	Short: "Query the version of the node running the chain",
+	Short: "Get the status and version of the node running the chain",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		if r, err := aeCli.Operations.GetVersion(nil); err == nil {
-			utils.PrintObject(r.Payload)
-		} else {
-			utils.Pp("Error:", err)
+		v, err := aeCli.APIGetStatus()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
 		}
+		aeternity.PrintObject(v)
 	},
 }
 
+var limit, startFromHeight int64
 var playCmd = &cobra.Command{
 	Use:   "play",
 	Short: "Query the blocks of the chain one after the other",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		var prevHash string
-		if r, err := aeCli.Operations.GetTopBlock(nil); err == nil {
-			utils.PrintObject(r.Payload)
-			prevHash = fmt.Sprint(r.Payload.PrevHash)
-		} else {
-			utils.Pp("Error:", err)
+		top, err := aeCli.APIGetTopBlock()
+		if err != nil {
+			fmt.Println(err)
 			os.Exit(1)
 		}
 
-		for {
-			p := operations.NewGetBlockByHashParams().WithHash(prevHash)
-			if r, err := aeCli.Operations.GetBlockByHash(p); err == nil {
-				utils.PrintObjectT(" <<>> <<>> <<>> ", r.Payload)
-			} else {
-				switch err.(type) {
-				case *operations.GetBlockByHashBadRequest:
-					utils.PrintError("Bad request:", err.(*operations.GetBlockByHashBadRequest).Payload)
-				case *operations.GetBlockByHashNotFound:
-					utils.PrintError("Block not found:", err.(*operations.GetBlockByHashNotFound).Payload)
-				}
+		blockHeight := top.Height
+		// deal with the height parameter
+		if startFromHeight > blockHeight {
+			fmt.Printf("Height (%d) is greater that the top block (%d)", startFromHeight, blockHeight)
+			os.Exit(1)
+		}
+
+		if startFromHeight > 0 {
+			blockHeight = startFromHeight
+		}
+		// deal with the limit parameter
+		targetHeight := int64(-1)
+		if limit > 0 {
+			th := blockHeight - limit
+			if th > targetHeight {
+				targetHeight = th
 			}
+		}
+		// run the play
+		for ; blockHeight > targetHeight; blockHeight-- {
+			aeCli.PrintGenerationByHeight(blockHeight)
+			fmt.Println("")
 		}
 	},
 }
@@ -91,6 +100,9 @@ func init() {
 	chainCmd.AddCommand(topCmd)
 	chainCmd.AddCommand(versionCmd)
 	chainCmd.AddCommand(playCmd)
+
+	playCmd.Flags().Int64Var(&limit, "limit", 0, "Print at max 'limit' generations")
+	playCmd.Flags().Int64Var(&startFromHeight, "height", 0, "Start playing the chain at 'height'")
 
 	// Here you will define your flags and configuration settings.
 

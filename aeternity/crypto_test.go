@@ -2,6 +2,7 @@ package aeternity
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -16,10 +17,10 @@ func TestLoad(t *testing.T) {
 		wantErr  bool
 		keyMatch bool
 	}{
-		{"genesis", args{"9aaf28231d6c1f4a57bfdd834ee4080c7702106b9e117905fced7958216f5e48655c06e189b996dfb5bad32db5c24b7a283eec8e96453acbe493b15a01872f26", "ak$me6L5SSXL4NLWv5EkQ7a16xaA145Br7oV4sz9JphZgsTsYwGC"}, false, true},
-		{"genesis", args{"9aaf28231d6c1f4a57bfdd834ee4080c7702106b9e117905fced7958216f5e48655c06e189b996dfb5bad32db5c24b7a283eec8e96453acbe493b15a01872f26", "ak$me6L5SSXL4NLWv5EkQ7a16xaA145Br7oV4sz9JphZgsTs"}, false, false},
-		{"genesis", args{"e", "ak$2a1j2Mk9YSmC1gioUq4PWRm3bsv88RVwyv4KaUGoR1eiKi"}, true, false},
-		{"genesis", args{"9aaf28231d6c1f4a57bfdd834ee4080c7702106b9e117905fc", "ak$me6L5SSXL4NLWv5EkQ7a16xaA145Br7oV4sz9JphZgsTsYwGC"}, true, false},
+		{"account", args{"9aaf28231d6c1f4a57bfdd834ee4080c7702106b9e117905fced7958216f5e48655c06e189b996dfb5bad32db5c24b7a283eec8e96453acbe493b15a01872f26", "ak_me6L5SSXL4NLWv5EkQ7a16xaA145Br7oV4sz9JphZgsTsYwGC"}, false, true},
+		{"account", args{"9aaf28231d6c1f4a57bfdd834ee4080c7702106b9e117905fced7958216f5e48655c06e189b996dfb5bad32db5c24b7a283eec8e96453acbe493b15a01872f26", "ak_me6L5SSXL4NLWv5EkQ7a16xaA145Br7oV4sz9JphZgsTs"}, false, false},
+		{"account", args{"e", "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv88RVwyv4KaUGoR1eiKi"}, true, false},
+		{"account", args{"9aaf28231d6c1f4a57bfdd834ee4080c7702106b9e117905fc", "ak_me6L5SSXL4NLWv5EkQ7a16xaA145Br7oV4sz9JphZgsTsYwGC"}, true, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -37,7 +38,7 @@ func TestLoad(t *testing.T) {
 func TestKeyPair_Sign(t *testing.T) {
 
 	priv := "4d881dd1917036cc231f9881a0db978c8899dd76a817252418606b02bf6ab9d22378f892b7cc82c2d2739e994ec9953aa36461f1eb5a4a49a5b0de17b3d23ae8"
-	pub := "ak$Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm"
+	pub := "ak_Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm"
 	kp, _ := Load(priv)
 
 	if kp.Address != pub {
@@ -79,12 +80,12 @@ func Test_decode(t *testing.T) {
 	}{
 		{"invalid", args{"c"}, []byte{}, true},
 		{"invalid", args{"cd"}, []byte{}, true},
-		{"invalid", args{"ak$"}, []byte{}, true},
-		{"invalid", args{"ak$aasda"}, []byte{}, true},
+		{"invalid", args{"ak_"}, []byte{}, true},
+		{"invalid", args{"ak_aasda"}, []byte{}, true},
 		{"invalid", args{"000000"}, []byte{}, true},
 		{"invalid", args{"0"}, []byte{}, true},
-		{"invalid", args{"ak$0"}, []byte{}, true},
-		{"valid", args{"ak$Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm"}, []byte{35, 120, 248, 146, 183, 204, 130, 194, 210, 115, 158, 153, 78, 201, 149, 58, 163, 100, 97, 241, 235, 90, 74, 73, 165, 176, 222, 23, 179, 210, 58, 232}, false},
+		{"invalid", args{"ak_0"}, []byte{}, true},
+		{"valid", args{"ak_Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm"}, []byte{35, 120, 248, 146, 183, 204, 130, 194, 210, 115, 158, 153, 78, 201, 149, 58, 163, 100, 97, 241, 235, 90, 74, 73, 165, 176, 222, 23, 179, 210, 58, 232}, false},
 	}
 
 	for _, tt := range tests {
@@ -102,7 +103,7 @@ func Test_decode(t *testing.T) {
 }
 
 func Test_namehash(t *testing.T) {
-	// ('welghmolql.aet') == 'nm$2KrC4asc6fdv82uhXDwfiqB1TY2htjhnzwzJJKLxidyMymJRUQ'
+	// ('welghmolql.aet') == 'nm_2KrC4asc6fdv82uhXDwfiqB1TY2htjhnzwzJJKLxidyMymJRUQ'
 	type args struct {
 		name string
 	}
@@ -111,15 +112,68 @@ func Test_namehash(t *testing.T) {
 		args args
 		want string
 	}{
-		{"ok", args{"welghmolql.aet"}, "nm$2KrC4asc6fdv82uhXDwfiqB1TY2htjhnzwzJJKLxidyMymJRUQ"},
-		{"ok", args{"welghmolql"}, "nm$2nLRBu1FyukEvJuMANjFzx8mubMFeyG2mJ2QpQoYKymYe1d2sr"},
-		{"ok", args{""}, "nm$2q1DrgEuxRNCWRp5nTs6FyA7moSEzrPVUSTEpkpFsM4hRL4Dkb"},
+		{"ok", args{"welghmolql.aet"}, "nm_2KrC4asc6fdv82uhXDwfiqB1TY2htjhnzwzJJKLxidyMymJRUQ"},
+		{"ok", args{"welghmolql"}, "nm_2nLRBu1FyukEvJuMANjFzx8mubMFeyG2mJ2QpQoYKymYe1d2sr"},
+		{"ok", args{""}, "nm_2q1DrgEuxRNCWRp5nTs6FyA7moSEzrPVUSTEpkpFsM4hRL4Dkb"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := encodeP(PrefixNameHash, namehash(tt.args.name))
 			if got != tt.want {
 				t.Errorf("namehash() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestLoadFromFile(t *testing.T) {
+	// 7d7d43238efe877a76371a23886f7c9924d8ba35dc6845d9db50b7a906a44c5311f23e7f2b4f46a4cca4d6a7ff7b5770adacf4460dab5d24dac35fcfc8b776e3
+	// ak_8uQyHDwrW9CzWSptWrLDzJho7NwdSA76B4rpuwEuWtFj8nn4R
+	fixtureKP, _ := Load("7d7d43238efe877a76371a23886f7c9924d8ba35dc6845d9db50b7a906a44c5311f23e7f2b4f46a4cca4d6a7ff7b5770adacf4460dab5d24dac35fcfc8b776e3")
+
+	type args struct {
+		path     string
+		password string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantKp  *KeyPair
+		wantErr bool
+	}{
+		{"ok", args{"testdata/wallet.key", ""}, fixtureKP, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotKp, err := LoadFromFile(tt.args.path, tt.args.password)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("LoadFromFile() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if gotKp.Address != tt.wantKp.Address {
+				t.Errorf("LoadFromFile() = %v, want %v", gotKp.Address, tt.wantKp.Address)
+			}
+		})
+	}
+}
+
+func TestGenerate(t *testing.T) {
+	tests := []struct {
+		name    string
+		wantErr bool
+	}{
+		{"ok", false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotKp, err := Generate()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Generate() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !strings.HasPrefix(gotKp.Address, "ak_") {
+				t.Errorf("Generate() error = %v", gotKp.Address)
+				return
 			}
 		})
 	}

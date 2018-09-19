@@ -28,20 +28,15 @@ import (
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "aecli",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "The command line client for the Aeternity blockchain",
+	Long: ``,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	//	Run: func(cmd *cobra.Command, args []string) { },
 }
 
 var cfgFile string
-var debug bool
+var debug, outputFormatJSON bool
 var aeCli *aeternity.Ae
 
 // Execute adds all child commands to the root command sets flags appropriately.
@@ -60,6 +55,7 @@ func init() {
 	// will be global for your application.
 	RootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file (default is /etc/distill/settings.yaml)")
 	RootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "enable debug")
+	RootCmd.PersistentFlags().BoolVar(&outputFormatJSON, "json", false, "print output in json format")
 
 }
 
@@ -96,5 +92,7 @@ func initConfig() {
 
 	}
 
+	aeternity.Config.P.Tuning.OutputFormatJSON = outputFormatJSON
 	aeCli = aeternity.NewCli(aeternity.Config.P.Epoch.URL, debug)
+
 }

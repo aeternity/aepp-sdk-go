@@ -7,7 +7,7 @@ import (
 )
 
 // SignEncodeTx sign and encode a transaction
-func SignEncodeTx(kp *KeyPair, txRaw []byte) (signedEncodedTx, signedEncodedTxHash, signature string, err error) {
+func SignEncodeTx(kp *Account, txRaw []byte) (signedEncodedTx, signedEncodedTxHash, signature string, err error) {
 	// sign the transaction
 	sigRaw := kp.Sign(txRaw)
 	if err != nil {
@@ -110,7 +110,7 @@ func namePreclaimTx(accountID, commitmentID string, fee, ttl int64, nonce uint64
 	return
 }
 
-func namePreclaimTxSigned(account *KeyPair, commitmentID string, fee, ttl int64, nonce uint64) (signedEncodedTx, signedEncodedTxHash, signature string, err error) {
+func namePreclaimTxSigned(account *Account, commitmentID string, fee, ttl int64, nonce uint64) (signedEncodedTx, signedEncodedTxHash, signature string, err error) {
 	// this is the transaction to sign
 	rawTx, err := namePreclaimTx(account.Address, commitmentID, fee, ttl, nonce)
 	if err != nil {
@@ -147,7 +147,7 @@ func nameClaimTx(accountID, name string, nameSalt, fee, ttl int64, nonce uint64)
 	return
 }
 
-func nameClaimTxSigned(account *KeyPair, name string, nameSalt, fee, ttl int64, nonce uint64) (signedEncodedTx, signedEncodedTxHash, signature string, err error) {
+func nameClaimTxSigned(account *Account, name string, nameSalt, fee, ttl int64, nonce uint64) (signedEncodedTx, signedEncodedTxHash, signature string, err error) {
 	// this is the transaction to sign
 	rawTx, err := nameClaimTx(account.Address, name, nameSalt, fee, ttl, nonce)
 	if err != nil {
@@ -216,7 +216,7 @@ func nameUpdateTx(accountID, nameID string, pointers []string, nameTTL, clientTT
 	return
 }
 
-func nameUpdateTxSigned(account *KeyPair, nameID string, pointers []string, nameTTL, clientTTL, fee, ttl int64, nonce uint64) (signedEncodedTx, signedEncodedTxHash, signature string, err error) {
+func nameUpdateTxSigned(account *Account, nameID string, pointers []string, nameTTL, clientTTL, fee, ttl int64, nonce uint64) (signedEncodedTx, signedEncodedTxHash, signature string, err error) {
 	// this is the transaction to sign
 	rawTx, err := nameUpdateTx(account.Address, nameID, pointers, nameTTL, clientTTL, fee, ttl, nonce)
 	if err != nil {
@@ -224,5 +224,25 @@ func nameUpdateTxSigned(account *KeyPair, nameID string, pointers []string, name
 	}
 	// sign the above transaction with the private key
 	signedEncodedTx, signedEncodedTxHash, signature, err = SignEncodeTx(account, rawTx)
+	return
+}
+
+// txOracleRegister
+// see https://github.com/aeternity/protocol/blob/master/serializations.md#oracles
+func txOracleRegister(accountID, queryFormat, responseFormat string, queryFee, expires int64) (rlpRawMsg []byte, err error) {
+	// build id for the account
+	aID, err := buildIDTag(IDTagAccount, accountID)
+	if err != nil {
+		return
+	}
+	// create the transaction
+	rlpRawMsg, err = buildRLPMessage(
+		ObjectTagOracle,
+		rlpMessageVersion,
+		aID,
+		[]byte(queryFormat),
+		[]byte(responseFormat),
+		uint64(queryFee),
+		uint64(expires))
 	return
 }

@@ -18,7 +18,6 @@ import (
 	"fmt"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
-	"github.com/aeternity/aepp-sdk-go/utils"
 
 	"github.com/spf13/cobra"
 )
@@ -29,11 +28,12 @@ var configCmd = &cobra.Command{
 	Short: "Print the configuration of the client",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		utils.Pp(
-			"Epoch URL", aeternity.Config.P.Epoch.URL,
-			"Epoch Internal URL", aeternity.Config.P.Epoch.InternalURL,
-			"Epoch Websocket URL", aeternity.Config.P.Epoch.WebsocketURL,
-		)
+		aeternity.PrintObjectT("Configuration", aeternity.Config.P)
+		// aeternity.Pp(
+		// 	"Epoch URL", aeternity.Config.P.Epoch.URL,
+		// 	"Epoch Internal URL", aeternity.Config.P.Epoch.InternalURL,
+		// 	"Epoch Websocket URL", aeternity.Config.P.Epoch.WebsocketURL,
+		// )
 	},
 }
 
@@ -42,7 +42,7 @@ var profileCmd = &cobra.Command{
 	Short: "Print the current profile",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		utils.Pp(
+		aeternity.Pp(
 			"Active profile", aeternity.Config.P.Name,
 		)
 	},
@@ -58,7 +58,7 @@ var profileListCmd = &cobra.Command{
 			if p.Name == aeternity.Config.P.Name {
 				prefix = "  *  "
 			}
-			utils.Pp(
+			aeternity.Pp(
 				prefix, p.Name,
 			)
 		}

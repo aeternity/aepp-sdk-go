@@ -16,11 +16,12 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
-	"github.com/aeternity/aepp-sdk-go/generated/client/operations"
-	"github.com/aeternity/aepp-sdk-go/utils"
 
 	"github.com/spf13/cobra"
 )
@@ -51,96 +52,58 @@ func init() {
 
 }
 
+func printResult(v interface{}, err error) {
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	aeternity.PrintObject(v)
+}
+
 func inspect(cmd *cobra.Command, args []string) {
 	for _, object := range args {
-
+		// height
+		if matched, _ := regexp.MatchString(`^\d+$`, object); matched {
+			height, _ := strconv.ParseInt(object, 10, 64)
+			aeCli.PrintGenerationByHeight(height)
+			continue
+		}
 		// name
 		if strings.HasSuffix(object, ".aet") {
-			p := operations.NewGetNameParams().WithName(object)
-			if r, err := aeCli.Operations.GetName(p); err == nil {
-				utils.PrintObjectT("Name", r.Payload)
-			} else {
-				switch err.(type) {
-				case *operations.GetNameBadRequest:
-					utils.PrintError("Bad request:", err.(*operations.GetNameBadRequest).Payload)
-				case *operations.GetNameNotFound:
-					utils.PrintError("Name not found:", err.(*operations.GetNameNotFound).Payload)
-				default:
-					utils.Pp("Unknown error:", err)
-				}
-			}
+			v, err := aeCli.APIGetNameEntryByName(object)
+			printResult(v, err)
 			continue
 		}
 
-		switch aeternity.HashPrefix(object[0:3]) {
+		switch aeternity.GetHashPrefix(object) {
 		case aeternity.PrefixAccount:
 			// account balance
-			p := operations.NewGetAccountBalanceParams().WithAddress(object)
-			if r, err := aeCli.Operations.GetAccountBalance(p); err == nil {
-				utils.Pp("Balance", r.Payload.Balance)
-			} else {
-				switch err.(type) {
-				case *operations.GetAccountBalanceBadRequest:
-					utils.PrintError("Bad request:", err.(*operations.GetAccountBalanceBadRequest).Payload)
-				case *operations.GetAccountBalanceNotFound:
-					utils.PrintError("Account not found:", err.(*operations.GetAccountBalanceNotFound).Payload)
-				default:
-					utils.Pp("Unknown error:", err)
-				}
-			}
+			v, err := aeCli.APIGetAccount(object)
+			printResult(v, err)
 
-		case aeternity.PrefixBlockHash:
+		case aeternity.PrefixMicroBlockHash:
+			v, err := aeCli.APIGetMicroBlockHeaderByHash(object)
+			printResult(v, err)
+			v1, err := aeCli.APIGetMicroBlockTransactionsByHash(object)
+			printResult(v1, err)
+
+		case aeternity.PrefixKeyBlockHash:
 			// block
-			p := operations.NewGetBlockByHashParams().WithHash(object)
-			if r, err := aeCli.Operations.GetBlockByHash(p); err == nil {
-				utils.PrintObject(r.Payload)
-			} else {
-				switch err.(type) {
-				case *operations.GetBlockByHashBadRequest:
-					utils.PrintError("Bad request:", err.(*operations.GetBlockByHashBadRequest).Payload)
-				case *operations.GetBlockByHashNotFound:
-					utils.PrintError("Block not found:", err.(*operations.GetBlockByHashNotFound).Payload)
-				default:
-					utils.Pp("Unknown error:", err)
-				}
-			}
+			v, err := aeCli.APIGetKeyBlockByHash(object)
+			printResult(v, err)
+
 		case aeternity.PrefixTxHash:
 			// transaction
-			p := operations.NewGetTxParams().
-				WithTxHash(object).
-				WithTxEncoding(&aeternity.Config.P.Tuning.ResponseEncoding)
+			v, err := aeCli.APIGetTransactionByHash(object)
+			printResult(v, err)
 
-			if r, err := aeCli.Operations.GetTx(p); err == nil {
-				utils.PrintObject(r.Payload)
-			} else {
-				switch err.(type) {
-				case *operations.GetTxBadRequest:
-					utils.PrintError("Bad request:", err.(*operations.GetTxBadRequest).Payload)
-				case *operations.GetTxNotFound:
-					utils.PrintError("Tx not found:", err.(*operations.GetTxBadRequest).Payload)
-				default:
-					utils.Pp("Unknown error:", err)
-				}
-			}
+		case aeternity.PrefixOracle:
+			// oracle
+			v, err := aeCli.APIGetOracleByPubkey(object)
+			printResult(v, err)
 
-		case aeternity.PrefixBlockTxHash:
-			// block transaction
-			p := operations.NewGetTransactionFromBlockHashParams().
-				WithHash(object)
-			if r, err := aeCli.Operations.GetTransactionFromBlockHash(p); err == nil {
-				utils.PrintObject(r.Payload)
-			} else {
-				switch err.(type) {
-				case *operations.GetTransactionFromBlockHashNotFound:
-					utils.PrintError("Tx not found:", err.(*operations.GetTransactionFromBlockHashNotFound).Payload)
-				default:
-					utils.Pp("Unknown error:", err)
-				}
-			}
-			//utils.PrintObject(r.Payload, err)
 		default:
 			fmt.Println("Object", object, "not yet supported")
 		}
-
 	}
 }

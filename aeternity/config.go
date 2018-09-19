@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -52,9 +53,9 @@ type ClientConfig struct {
 
 // TuningConfig fine tuning of parameters of the client
 type TuningConfig struct {
-	ChainPollInteval int64  `yaml:"chain_poll_interval" mapstructure:"chain_poll_interval"`
-	ChainTimeout     int64  `yaml:"chain_timeout" mapstructure:"chain_timeout"`
-	ResponseEncoding string `yaml:"msg_encoding" mapstructure:"msg_encoding"`
+	ChainPollInteval int64 `yaml:"chain_poll_interval" mapstructure:"chain_poll_interval"`
+	ChainTimeout     int64 `yaml:"chain_timeout" mapstructure:"chain_timeout"`
+	OutputFormatJSON bool  `yaml:"-" mapstructure:"-"`
 }
 
 // ProfileConfig a configuration profile
@@ -98,7 +99,6 @@ func (c *ProfileConfig) Defaults() *ProfileConfig {
 	utils.DefaultIfEmptyInt64(&c.Client.Contracts.Gas, 40000000)
 	utils.DefaultIfEmptyInt64(&c.Client.Contracts.GasPrice, 1)
 	// for tuning
-	utils.DefaultIfEmptyStr(&c.Tuning.ResponseEncoding, "json")
 	utils.DefaultIfEmptyInt64(&c.Tuning.ChainPollInteval, 1000)
 	utils.DefaultIfEmptyInt64(&c.Tuning.ChainTimeout, 5000)
 	return c
@@ -138,7 +138,7 @@ var Config ConfigSchema
 
 // GenerateDefaultConfig generate a default configuration
 func GenerateDefaultConfig(outFile, version string) {
-	Config := ConfigSchema{
+	Config = ConfigSchema{
 		DefaultKeysPath: "keys",
 		ConfigPath:      outFile,
 	}
@@ -156,10 +156,14 @@ func (c *ConfigSchema) Save() {
 		fmt.Sprintf("%s", b),
 		"#\n# Config end\n#",
 	}, "\n")
+	if err := os.MkdirAll(filepath.Dir(c.ConfigPath), os.ModePerm); err != nil {
+		fmt.Println("Cannot create config file path", err)
+		os.Exit(1)
+	}
 	err := ioutil.WriteFile(c.ConfigPath, []byte(data), 0600)
 	if err != nil {
-		fmt.Println(err)
-		return
+		fmt.Println("Cannot create config file ", err)
+		os.Exit(1)
 	}
 	fmt.Println("config file written to", c.ConfigPath)
 }
