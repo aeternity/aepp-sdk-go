@@ -29,6 +29,18 @@ build-dist: $(GOFILES)
 	cp -r README.md LICENSE $(OUTPUTFOLDER)
 	@echo done
 
+build-relase:
+	@echo build binary to $(OUTPUTFOLDER)
+	$(eval OS=darwin)
+	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build -ldflags "-X main.Version=$(GIT_DESCR)" -o $(OUTPUTFOLDER)/$(OS)/$(APP) .
+	$(eval OS=windows)
+	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build -ldflags "-X main.Version=$(GIT_DESCR)" -o $(OUTPUTFOLDER)/$(OS)/$(APP).exe .
+	$(eval OS=linux)
+	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build -ldflags "-X main.Version=$(GIT_DESCR)" -o $(OUTPUTFOLDER)/$(OS)/$(APP) .
+	@echo copy resources
+	cp -r README.md LICENSE CHANGELOG.md $(OUTPUTFOLDER)
+	@echo done
+
 test: test-all
 
 test-all:
