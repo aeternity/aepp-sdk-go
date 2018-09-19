@@ -30,10 +30,10 @@ type NameClaimTx struct {
 
 	// name salt
 	// Required: true
-	NameSalt *int64 `json:"name_salt"`
+	NameSalt *uint64 `json:"name_salt"`
 
 	// nonce
-	Nonce int64 `json:"nonce,omitempty"`
+	Nonce uint64 `json:"nonce,omitempty"`
 
 	// ttl
 	TTL int64 `json:"ttl,omitempty"`

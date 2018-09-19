@@ -43,7 +43,7 @@ type ChannelCreateTx struct {
 
 	// nonce
 	// Minimum: 0
-	Nonce *int64 `json:"nonce,omitempty"`
+	Nonce *uint64 `json:"nonce,omitempty"`
 
 	// push amount
 	// Required: true

@@ -32,7 +32,7 @@ type ChannelSLASHTx struct {
 
 	// nonce
 	// Minimum: 0
-	Nonce *int64 `json:"nonce,omitempty"`
+	Nonce *uint64 `json:"nonce,omitempty"`
 
 	// payload
 	// Required: true

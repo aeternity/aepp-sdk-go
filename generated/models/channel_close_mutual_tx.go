@@ -34,7 +34,7 @@ type ChannelCloseMutualTx struct {
 	// nonce
 	// Required: true
 	// Minimum: 0
-	Nonce *int64 `json:"nonce"`
+	Nonce *uint64 `json:"nonce"`
 
 	// responder amount final
 	// Required: true

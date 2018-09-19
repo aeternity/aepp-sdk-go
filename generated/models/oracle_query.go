@@ -40,7 +40,7 @@ type OracleQuery struct {
 
 	// sender nonce
 	// Minimum: 0
-	SenderNonce *int64 `json:"sender_nonce,omitempty"`
+	SenderNonce *uint64 `json:"sender_nonce,omitempty"`
 
 	// ttl
 	TTL int64 `json:"ttl,omitempty"`

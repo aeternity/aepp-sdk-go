@@ -23,7 +23,7 @@ type ContractCallObject struct {
 
 	// caller nonce
 	// Required: true
-	CallerNonce *int64 `json:"caller_nonce"`
+	CallerNonce *uint64 `json:"caller_nonce"`
 
 	// contract id
 	// Required: true

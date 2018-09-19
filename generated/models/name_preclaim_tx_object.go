@@ -26,7 +26,8 @@ type NamePreclaimTxObject struct {
 
 // Type gets the type of this subtype
 func (m *NamePreclaimTxObject) Type() string {
-	return "NamePreclaimTxObject"
+	//return "NamePreclaimTxObject"
+	return "name_preclaim_tx"
 }
 
 // SetType sets the type of this subtype

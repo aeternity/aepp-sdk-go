@@ -38,7 +38,7 @@ type ChannelDepositTx struct {
 	// nonce
 	// Required: true
 	// Minimum: 0
-	Nonce *int64 `json:"nonce"`
+	Nonce *uint64 `json:"nonce"`
 
 	// Channel's next round
 	// Required: true

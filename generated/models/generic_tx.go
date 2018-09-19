@@ -183,35 +183,35 @@ func unmarshalGenericTx(data []byte, consumer runtime.Consumer) (GenericTx, erro
 		}
 		return &result, nil
 
-	case "NameClaimTxObject":
+	case "NameClaimTxObject", "name_claim_tx":
 		var result NameClaimTxObject
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
 
-	case "NamePreclaimTxObject":
+	case "NamePreclaimTxObject", "name_preclaim_tx":
 		var result NamePreclaimTxObject
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
 
-	case "NameRevokeTxObject":
+	case "NameRevokeTxObject", "name_revoke_tx":
 		var result NameRevokeTxObject
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
 
-	case "NameTransferTxObject":
+	case "NameTransferTxObject", "name_transfer_tx":
 		var result NameTransferTxObject
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
 
-	case "NameUpdateTxObject":
+	case "NameUpdateTxObject", "name_update_tx":
 		var result NameUpdateTxObject
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
@@ -246,7 +246,7 @@ func unmarshalGenericTx(data []byte, consumer runtime.Consumer) (GenericTx, erro
 		}
 		return &result, nil
 
-	case "SpendTxJSON":
+	case "SpendTxJSON", "spend_tx":
 		var result SpendTxJSON
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
