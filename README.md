@@ -1,6 +1,10 @@
 # aepp-sdk-go
 
-golang sdk for aeternity blockchain
+Golang SDK to interact with the Æternity blockchain
+
+Documentation available on [godoc](https://godoc.org/github.com/aeternity/aepp-sdk-go) 
+
+
 
 
 ## Development
