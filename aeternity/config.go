@@ -20,9 +20,7 @@ const (
 
 // EpochConfig configuration for the epoch node
 type EpochConfig struct {
-	URL          string `yaml:"url" mapstructure:"url"`
-	InternalURL  string `yaml:"internal_url" mapstructure:"internal_url"`
-	WebsocketURL string `yaml:"websocket_url" mapstructure:"websocket_url"`
+	URL string `yaml:"url" mapstructure:"url"`
 }
 
 // AensConfig configurations for Aens
@@ -83,8 +81,6 @@ func (c *ProfileConfig) Defaults() *ProfileConfig {
 	}
 	// for server
 	utils.DefaultIfEmptyStr(&c.Epoch.URL, "https://sdk-testnet.aepps.com")
-	utils.DefaultIfEmptyStr(&c.Epoch.InternalURL, "http://127.0.0.1:3113")
-	utils.DefaultIfEmptyStr(&c.Epoch.WebsocketURL, "ws://127.0.0.1:3013")
 	// for client
 	utils.DefaultIfEmptyStr(&c.Client.DefaultKey, "wallet.key")
 	utils.DefaultIfEmptyInt64(&c.Client.TxTTL, 500)
