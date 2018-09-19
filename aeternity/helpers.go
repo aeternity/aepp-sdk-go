@@ -328,7 +328,12 @@ func StoreAccountToKeyStoreFile(account *Account, password, walletName string) (
 }
 
 // LoadAccountToKeyStoreFile load file from the keystore
-func LoadAccountToKeyStoreFile(filePath, password string) (account *Account, err error) {
+func LoadAccountToKeyStoreFile(keyFile, password string) (account *Account, err error) {
+	// find out the real path of the wallet
+	filePath, err := GetWalletPath(keyFile)
+	if err != nil {
+		return
+	}
 	// load the json file
 	jks, err := ioutil.ReadFile(filePath)
 	if err != nil {
@@ -351,7 +356,7 @@ func GetWalletPath(path string) (walletPath string, err error) {
 		return
 	}
 	// check by name in the default location
-	path = filepath.Join(filepath.Dir(Config.ConfigPath), "keys", path)
+	path = filepath.Join(Config.KeysFolder, path)
 	if _, err = os.Stat(path); !os.IsNotExist(err) {
 		walletPath = path
 	}

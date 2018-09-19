@@ -14,11 +14,17 @@
 
 package main
 
-import "github.com/aeternity/aepp-sdk-go/cmd"
+import (
+	"github.com/aeternity/aepp-sdk-go/cmd"
+)
 
 // Version hold the version of the program
 var Version = "0.0.0"
 
 func main() {
+	// err := doc.GenMarkdownTree(cmd.RootCmd, "./doc/cli")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 	cmd.Execute(Version)
 }

@@ -17,10 +17,12 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/aeternity/aepp-sdk-go/utils"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
+	"github.com/shibukawa/configdir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -29,7 +31,7 @@ import (
 var RootCmd = &cobra.Command{
 	Use:   "aecli",
 	Short: "The command line client for the Aeternity blockchain",
-	Long: ``,
+	Long:  ``,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	//	Run: func(cmd *cobra.Command, args []string) { },
@@ -53,7 +55,7 @@ func init() {
 	// Here you will define your flags and configuration settings.
 	// Cobra supports Persistent Flags, which, if defined here,
 	// will be global for your application.
-	RootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file (default is /etc/distill/settings.yaml)")
+	RootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file to load (defaults to $HOME/.aeternity/config.yaml")
 	RootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "enable debug")
 	RootCmd.PersistentFlags().BoolVar(&outputFormatJSON, "json", false, "print output in json format")
 
@@ -61,12 +63,13 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
+	// retrieve the directory (os dependent) where the config file exists
+	configDirs := configdir.New("aeternity", "aecli")
+	globalCfg := configDirs.QueryFolders(configdir.Global)[0]
 	// set configuration paramteres
 	viper.SetConfigName(aeternity.ConfigFilename) // name of config file (without extension)
-	viper.AddConfigPath("$HOME/.aeternity")       // adding home directory as first search path
-	viper.AddConfigPath("./config")
-	viper.AddConfigPath(".")
-	viper.AutomaticEnv() // read in environment variables that match
+	viper.AddConfigPath(globalCfg.Path)           // adding home directory as first search path
+	//viper.AutomaticEnv()                          // read in environment variables that match
 	// if there is the config file read it
 	if len(cfgFile) > 0 { // enable ability to specify config file via flag
 		viper.SetConfigFile(cfgFile)
@@ -77,13 +80,14 @@ func initConfig() {
 		aeternity.Config.Defaults()
 		aeternity.Config.Validate()
 		aeternity.Config.ConfigPath = viper.ConfigFileUsed()
+		aeternity.Config.KeysFolder = filepath.Join(globalCfg.Path, "keys")
 	} else {
 		switch err.(type) {
 		case viper.ConfigFileNotFoundError:
 			if do := utils.AskYes("A configuration file was not found, would you like to generate one?", true); do {
-				aeternity.GenerateDefaultConfig("config/"+aeternity.ConfigFilename+".yaml", RootCmd.Version)
+				configFilePath := filepath.Join(globalCfg.Path, aeternity.ConfigFilename+".yml")
+				aeternity.GenerateDefaultConfig(configFilePath, RootCmd.Version)
 				aeternity.Config.Save()
-				fmt.Println("Configuration created")
 			} else {
 				fmt.Println("Configuration file not found!!")
 				os.Exit(1)

@@ -15,7 +15,7 @@ import (
 
 const (
 	// ConfigFilename default configuration file name
-	ConfigFilename = "aecli.config"
+	ConfigFilename = "config"
 )
 
 // EpochConfig configuration for the epoch node
@@ -66,11 +66,11 @@ type ProfileConfig struct {
 
 // ConfigSchema define the configuration object
 type ConfigSchema struct {
-	ActiveProfile   string           `yaml:"active_profile" mapstructure:"active_profile"`
-	DefaultKeysPath string           `yaml:"keys_path" mapstructure:"keys_path"`
-	Profiles        []*ProfileConfig `yaml:"profiles" mapstructure:"profiles"`
-	P               *ProfileConfig   `yaml:"-" mapstructure:"-"` // holds the active profile
-	ConfigPath      string           `yaml:"-" mapstructure:"-"` // the path of the configuration file
+	ActiveProfile string           `yaml:"active_profile" mapstructure:"active_profile"`
+	Profiles      []*ProfileConfig `yaml:"profiles" mapstructure:"profiles"`
+	P             *ProfileConfig   `yaml:"-" mapstructure:"-"` // holds the active profile
+	ConfigPath    string           `yaml:"-" mapstructure:"-"` // the path of the configuration file
+	KeysFolder    string           `yaml:"-" mapstructure:"-"`
 }
 
 //Defaults generate configuration defaults
@@ -135,8 +135,8 @@ var Config ConfigSchema
 // GenerateDefaultConfig generate a default configuration
 func GenerateDefaultConfig(outFile, version string) {
 	Config = ConfigSchema{
-		DefaultKeysPath: "keys",
-		ConfigPath:      outFile,
+		KeysFolder: filepath.Join(filepath.Dir(outFile), "keys"),
+		ConfigPath: outFile,
 	}
 	Config.NewProfile("default")
 	Config.ActivateProfile("default")
