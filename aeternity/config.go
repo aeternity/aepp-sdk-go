@@ -80,7 +80,7 @@ func (c *ProfileConfig) Defaults() *ProfileConfig {
 		Names:     AensConfig{},
 	}
 	// for server
-	utils.DefaultIfEmptyStr(&c.Epoch.URL, "https://sdk-testnet.aepps.com")
+	utils.DefaultIfEmptyStr(&c.Epoch.URL, "https://sdk-edgenet.aepps.com")
 	// for client
 	utils.DefaultIfEmptyStr(&c.Client.DefaultKey, "wallet.key")
 	utils.DefaultIfEmptyInt64(&c.Client.TxTTL, 500)
