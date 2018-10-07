@@ -31,20 +31,20 @@ var (
   waitForTx       bool
   payload         string
   printPrivateKey bool
-  walletFileName  string
+  accountFileName string
 )
 
-// walletCmd represents the wallet command
-var walletCmd = &cobra.Command{
-  Use:   "wallet PRIVATE_KEY_PATH",
-  Short: "Interact with a wallet",
+// accountCmd represents the account command
+var accountCmd = &cobra.Command{
+  Use:   "account PRIVATE_KEY_PATH",
+  Short: "Interact with a account",
   Long:  ``,
 }
 
 // addressCmd represents the address subcommand
 var addressCmd = &cobra.Command{
-  Use:   "address WALLET_PATH",
-  Short: "Print the aeternity wallet address",
+  Use:   "address ACCOUNT_KEYSTORE",
+  Short: "Print the aeternity account address",
   Long:  ``,
   Args:  cobra.ExactArgs(1),
   Run: func(cmd *cobra.Command, args []string) {
@@ -81,7 +81,7 @@ var createCmd = &cobra.Command{
       return
     }
     // check if a name was given
-    f, err := aeternity.StoreAccountToKeyStoreFile(account, p, walletFileName)
+    f, err := aeternity.StoreAccountToKeyStoreFile(account, p, accountFileName)
     if err != nil {
       fmt.Println("Error saving the keystore file: ", err)
       return
@@ -95,7 +95,7 @@ var createCmd = &cobra.Command{
 
 // balanceCmd represents the generate subcommand
 var balanceCmd = &cobra.Command{
-  Use:   "balance WALLET_PATH",
+  Use:   "balance ACCOUNT_KEYSTORE",
   Short: "Get the balance of an account",
   Long:  ``,
   Args:  cobra.ExactArgs(1),
@@ -124,7 +124,7 @@ var balanceCmd = &cobra.Command{
 // listCmd represents the generate subcommand
 var listCmd = &cobra.Command{
   Use:   "list",
-  Short: "List the wallet in the default keys path",
+  Short: "List the account in the default keys path",
   Long:  ``,
   Run: func(cmd *cobra.Command, args []string) {
     fmt.Println(aeternity.ListWallets())
@@ -149,7 +149,7 @@ var saveCmd = &cobra.Command{
       return
     }
 
-    f, err := aeternity.StoreAccountToKeyStoreFile(account, p, walletFileName)
+    f, err := aeternity.StoreAccountToKeyStoreFile(account, p, accountFileName)
     if err != nil {
       fmt.Println("Error saving the keystore file: ", err)
       return
@@ -160,8 +160,8 @@ var saveCmd = &cobra.Command{
 
 // spendCmd represents the spend subcommand
 var spendCmd = &cobra.Command{
-  Use:   "spend WALLET_PATH RECIPIENT_ADDRESS AMOUNT",
-  Short: "Print the aeternity wallet spend",
+  Use:   "spend ACCOUNT_KEYSTORE RECIPIENT_ADDRESS AMOUNT",
+  Short: "Print the aeternity account spend",
   Long:  ``,
   Args:  cobra.ExactArgs(3),
   Run: func(cmd *cobra.Command, args []string) {
@@ -237,18 +237,18 @@ var spendCmd = &cobra.Command{
 }
 
 func init() {
-  RootCmd.AddCommand(walletCmd)
-  walletCmd.AddCommand(addressCmd)
-  walletCmd.AddCommand(spendCmd)
-  walletCmd.AddCommand(createCmd)
-  walletCmd.AddCommand(saveCmd)
-  walletCmd.AddCommand(balanceCmd)
-  walletCmd.AddCommand(listCmd)
+  RootCmd.AddCommand(accountCmd)
+  accountCmd.AddCommand(addressCmd)
+  accountCmd.AddCommand(spendCmd)
+  accountCmd.AddCommand(createCmd)
+  accountCmd.AddCommand(saveCmd)
+  accountCmd.AddCommand(balanceCmd)
+  accountCmd.AddCommand(listCmd)
 
   // create flags
-  createCmd.Flags().StringVar(&walletFileName, "name", "", "Override the default name of a wallaet")
+  createCmd.Flags().StringVar(&accountFileName, "name", "", "Override the default name of a wallaet")
   // save flags
-  saveCmd.Flags().StringVar(&walletFileName, "name", "", "Override the default name of a wallaet")
+  saveCmd.Flags().StringVar(&accountFileName, "name", "", "Override the default name of a wallaet")
   // address flags
   addressCmd.Flags().BoolVar(&printPrivateKey, "private-key", false, "Print the private key as hex string")
   // spend command flags
