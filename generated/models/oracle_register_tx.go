@@ -18,7 +18,8 @@ import (
 type OracleRegisterTx struct {
 
 	// account id
-	AccountID EncodedHash `json:"account_id,omitempty"`
+	// Required: true
+	AccountID EncodedHash `json:"account_id"`
 
 	// fee
 	// Required: true
@@ -82,10 +83,6 @@ func (m *OracleRegisterTx) Validate(formats strfmt.Registry) error {
 }
 
 func (m *OracleRegisterTx) validateAccountID(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.AccountID) { // not required
-		return nil
-	}
 
 	if err := m.AccountID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {

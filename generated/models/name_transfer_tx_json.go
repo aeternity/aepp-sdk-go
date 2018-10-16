@@ -16,38 +16,38 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// SpendTxJSON spend tx JSON
-// swagger:model SpendTxJSON
-type SpendTxJSON struct {
+// NameTransferTxJSON name transfer tx JSON
+// swagger:model NameTransferTxJSON
+type NameTransferTxJSON struct {
 	versionField *int64
 
-	SpendTx
+	NameTransferTx
 }
 
 // Type gets the type of this subtype
-func (m *SpendTxJSON) Type() string {
-	return "SpendTxJSON"
+func (m *NameTransferTxJSON) Type() string {
+	return "NameTransferTxJSON"
 }
 
 // SetType sets the type of this subtype
-func (m *SpendTxJSON) SetType(val string) {
+func (m *NameTransferTxJSON) SetType(val string) {
 
 }
 
 // Version gets the version of this subtype
-func (m *SpendTxJSON) Version() *int64 {
+func (m *NameTransferTxJSON) Version() *int64 {
 	return m.versionField
 }
 
 // SetVersion sets the version of this subtype
-func (m *SpendTxJSON) SetVersion(val *int64) {
+func (m *NameTransferTxJSON) SetVersion(val *int64) {
 	m.versionField = val
 }
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
-func (m *SpendTxJSON) UnmarshalJSON(raw []byte) error {
+func (m *NameTransferTxJSON) UnmarshalJSON(raw []byte) error {
 	var data struct {
-		SpendTx
+		NameTransferTx
 	}
 	buf := bytes.NewBuffer(raw)
 	dec := json.NewDecoder(buf)
@@ -72,7 +72,7 @@ func (m *SpendTxJSON) UnmarshalJSON(raw []byte) error {
 		return err
 	}
 
-	var result SpendTxJSON
+	var result NameTransferTxJSON
 
 	if base.Type != result.Type() {
 		/* Not the type we're looking for. */
@@ -81,7 +81,7 @@ func (m *SpendTxJSON) UnmarshalJSON(raw []byte) error {
 
 	result.versionField = base.Version
 
-	result.SpendTx = data.SpendTx
+	result.NameTransferTx = data.NameTransferTx
 
 	*m = result
 
@@ -89,14 +89,14 @@ func (m *SpendTxJSON) UnmarshalJSON(raw []byte) error {
 }
 
 // MarshalJSON marshals this object with a polymorphic type to a JSON structure
-func (m SpendTxJSON) MarshalJSON() ([]byte, error) {
+func (m NameTransferTxJSON) MarshalJSON() ([]byte, error) {
 	var b1, b2, b3 []byte
 	var err error
 	b1, err = json.Marshal(struct {
-		SpendTx
+		NameTransferTx
 	}{
 
-		SpendTx: m.SpendTx,
+		NameTransferTx: m.NameTransferTx,
 	},
 	)
 	if err != nil {
@@ -120,16 +120,16 @@ func (m SpendTxJSON) MarshalJSON() ([]byte, error) {
 	return swag.ConcatJSON(b1, b2, b3), nil
 }
 
-// Validate validates this spend tx JSON
-func (m *SpendTxJSON) Validate(formats strfmt.Registry) error {
+// Validate validates this name transfer tx JSON
+func (m *NameTransferTxJSON) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateVersion(formats); err != nil {
 		res = append(res, err)
 	}
 
-	// validation for a type composition with SpendTx
-	if err := m.SpendTx.Validate(formats); err != nil {
+	// validation for a type composition with NameTransferTx
+	if err := m.NameTransferTx.Validate(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -139,7 +139,7 @@ func (m *SpendTxJSON) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *SpendTxJSON) validateVersion(formats strfmt.Registry) error {
+func (m *NameTransferTxJSON) validateVersion(formats strfmt.Registry) error {
 
 	if err := validate.Required("version", "body", m.Version()); err != nil {
 		return err
@@ -149,7 +149,7 @@ func (m *SpendTxJSON) validateVersion(formats strfmt.Registry) error {
 }
 
 // MarshalBinary interface implementation
-func (m *SpendTxJSON) MarshalBinary() ([]byte, error) {
+func (m *NameTransferTxJSON) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -157,8 +157,8 @@ func (m *SpendTxJSON) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *SpendTxJSON) UnmarshalBinary(b []byte) error {
-	var res SpendTxJSON
+func (m *NameTransferTxJSON) UnmarshalBinary(b []byte) error {
+	var res NameTransferTxJSON
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

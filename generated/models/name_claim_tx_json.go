@@ -16,39 +16,38 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// NamePreclaimTxObject name preclaim tx object
-// swagger:model NamePreclaimTxObject
-type NamePreclaimTxObject struct {
+// NameClaimTxJSON name claim tx JSON
+// swagger:model NameClaimTxJSON
+type NameClaimTxJSON struct {
 	versionField *int64
 
-	NamePreclaimTx
+	NameClaimTx
 }
 
 // Type gets the type of this subtype
-func (m *NamePreclaimTxObject) Type() string {
-	//return "NamePreclaimTxObject"
-	return "name_preclaim_tx"
+func (m *NameClaimTxJSON) Type() string {
+	return "NameClaimTxJSON"
 }
 
 // SetType sets the type of this subtype
-func (m *NamePreclaimTxObject) SetType(val string) {
+func (m *NameClaimTxJSON) SetType(val string) {
 
 }
 
 // Version gets the version of this subtype
-func (m *NamePreclaimTxObject) Version() *int64 {
+func (m *NameClaimTxJSON) Version() *int64 {
 	return m.versionField
 }
 
 // SetVersion sets the version of this subtype
-func (m *NamePreclaimTxObject) SetVersion(val *int64) {
+func (m *NameClaimTxJSON) SetVersion(val *int64) {
 	m.versionField = val
 }
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
-func (m *NamePreclaimTxObject) UnmarshalJSON(raw []byte) error {
+func (m *NameClaimTxJSON) UnmarshalJSON(raw []byte) error {
 	var data struct {
-		NamePreclaimTx
+		NameClaimTx
 	}
 	buf := bytes.NewBuffer(raw)
 	dec := json.NewDecoder(buf)
@@ -73,7 +72,7 @@ func (m *NamePreclaimTxObject) UnmarshalJSON(raw []byte) error {
 		return err
 	}
 
-	var result NamePreclaimTxObject
+	var result NameClaimTxJSON
 
 	if base.Type != result.Type() {
 		/* Not the type we're looking for. */
@@ -82,7 +81,7 @@ func (m *NamePreclaimTxObject) UnmarshalJSON(raw []byte) error {
 
 	result.versionField = base.Version
 
-	result.NamePreclaimTx = data.NamePreclaimTx
+	result.NameClaimTx = data.NameClaimTx
 
 	*m = result
 
@@ -90,14 +89,14 @@ func (m *NamePreclaimTxObject) UnmarshalJSON(raw []byte) error {
 }
 
 // MarshalJSON marshals this object with a polymorphic type to a JSON structure
-func (m NamePreclaimTxObject) MarshalJSON() ([]byte, error) {
+func (m NameClaimTxJSON) MarshalJSON() ([]byte, error) {
 	var b1, b2, b3 []byte
 	var err error
 	b1, err = json.Marshal(struct {
-		NamePreclaimTx
+		NameClaimTx
 	}{
 
-		NamePreclaimTx: m.NamePreclaimTx,
+		NameClaimTx: m.NameClaimTx,
 	},
 	)
 	if err != nil {
@@ -121,16 +120,16 @@ func (m NamePreclaimTxObject) MarshalJSON() ([]byte, error) {
 	return swag.ConcatJSON(b1, b2, b3), nil
 }
 
-// Validate validates this name preclaim tx object
-func (m *NamePreclaimTxObject) Validate(formats strfmt.Registry) error {
+// Validate validates this name claim tx JSON
+func (m *NameClaimTxJSON) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateVersion(formats); err != nil {
 		res = append(res, err)
 	}
 
-	// validation for a type composition with NamePreclaimTx
-	if err := m.NamePreclaimTx.Validate(formats); err != nil {
+	// validation for a type composition with NameClaimTx
+	if err := m.NameClaimTx.Validate(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -140,7 +139,7 @@ func (m *NamePreclaimTxObject) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *NamePreclaimTxObject) validateVersion(formats strfmt.Registry) error {
+func (m *NameClaimTxJSON) validateVersion(formats strfmt.Registry) error {
 
 	if err := validate.Required("version", "body", m.Version()); err != nil {
 		return err
@@ -150,7 +149,7 @@ func (m *NamePreclaimTxObject) validateVersion(formats strfmt.Registry) error {
 }
 
 // MarshalBinary interface implementation
-func (m *NamePreclaimTxObject) MarshalBinary() ([]byte, error) {
+func (m *NameClaimTxJSON) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -158,8 +157,8 @@ func (m *NamePreclaimTxObject) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *NamePreclaimTxObject) UnmarshalBinary(b []byte) error {
-	var res NamePreclaimTxObject
+func (m *NameClaimTxJSON) UnmarshalBinary(b []byte) error {
+	var res NameClaimTxJSON
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

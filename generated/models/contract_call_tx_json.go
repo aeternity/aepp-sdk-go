@@ -16,38 +16,38 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// ContractCallTxObject contract call tx object
-// swagger:model ContractCallTxObject
-type ContractCallTxObject struct {
+// ContractCallTxJSON contract call tx JSON
+// swagger:model ContractCallTxJSON
+type ContractCallTxJSON struct {
 	versionField *int64
 
-	ContractCallData
+	ContractCallTx
 }
 
 // Type gets the type of this subtype
-func (m *ContractCallTxObject) Type() string {
-	return "ContractCallTxObject"
+func (m *ContractCallTxJSON) Type() string {
+	return "ContractCallTxJSON"
 }
 
 // SetType sets the type of this subtype
-func (m *ContractCallTxObject) SetType(val string) {
+func (m *ContractCallTxJSON) SetType(val string) {
 
 }
 
 // Version gets the version of this subtype
-func (m *ContractCallTxObject) Version() *int64 {
+func (m *ContractCallTxJSON) Version() *int64 {
 	return m.versionField
 }
 
 // SetVersion sets the version of this subtype
-func (m *ContractCallTxObject) SetVersion(val *int64) {
+func (m *ContractCallTxJSON) SetVersion(val *int64) {
 	m.versionField = val
 }
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
-func (m *ContractCallTxObject) UnmarshalJSON(raw []byte) error {
+func (m *ContractCallTxJSON) UnmarshalJSON(raw []byte) error {
 	var data struct {
-		ContractCallData
+		ContractCallTx
 	}
 	buf := bytes.NewBuffer(raw)
 	dec := json.NewDecoder(buf)
@@ -72,7 +72,7 @@ func (m *ContractCallTxObject) UnmarshalJSON(raw []byte) error {
 		return err
 	}
 
-	var result ContractCallTxObject
+	var result ContractCallTxJSON
 
 	if base.Type != result.Type() {
 		/* Not the type we're looking for. */
@@ -81,7 +81,7 @@ func (m *ContractCallTxObject) UnmarshalJSON(raw []byte) error {
 
 	result.versionField = base.Version
 
-	result.ContractCallData = data.ContractCallData
+	result.ContractCallTx = data.ContractCallTx
 
 	*m = result
 
@@ -89,14 +89,14 @@ func (m *ContractCallTxObject) UnmarshalJSON(raw []byte) error {
 }
 
 // MarshalJSON marshals this object with a polymorphic type to a JSON structure
-func (m ContractCallTxObject) MarshalJSON() ([]byte, error) {
+func (m ContractCallTxJSON) MarshalJSON() ([]byte, error) {
 	var b1, b2, b3 []byte
 	var err error
 	b1, err = json.Marshal(struct {
-		ContractCallData
+		ContractCallTx
 	}{
 
-		ContractCallData: m.ContractCallData,
+		ContractCallTx: m.ContractCallTx,
 	},
 	)
 	if err != nil {
@@ -120,16 +120,16 @@ func (m ContractCallTxObject) MarshalJSON() ([]byte, error) {
 	return swag.ConcatJSON(b1, b2, b3), nil
 }
 
-// Validate validates this contract call tx object
-func (m *ContractCallTxObject) Validate(formats strfmt.Registry) error {
+// Validate validates this contract call tx JSON
+func (m *ContractCallTxJSON) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateVersion(formats); err != nil {
 		res = append(res, err)
 	}
 
-	// validation for a type composition with ContractCallData
-	if err := m.ContractCallData.Validate(formats); err != nil {
+	// validation for a type composition with ContractCallTx
+	if err := m.ContractCallTx.Validate(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -139,7 +139,7 @@ func (m *ContractCallTxObject) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractCallTxObject) validateVersion(formats strfmt.Registry) error {
+func (m *ContractCallTxJSON) validateVersion(formats strfmt.Registry) error {
 
 	if err := validate.Required("version", "body", m.Version()); err != nil {
 		return err
@@ -149,7 +149,7 @@ func (m *ContractCallTxObject) validateVersion(formats strfmt.Registry) error {
 }
 
 // MarshalBinary interface implementation
-func (m *ContractCallTxObject) MarshalBinary() ([]byte, error) {
+func (m *ContractCallTxJSON) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -157,8 +157,8 @@ func (m *ContractCallTxObject) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *ContractCallTxObject) UnmarshalBinary(b []byte) error {
-	var res ContractCallTxObject
+func (m *ContractCallTxJSON) UnmarshalBinary(b []byte) error {
+	var res ContractCallTxJSON
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

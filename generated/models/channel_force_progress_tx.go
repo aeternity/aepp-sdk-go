@@ -43,7 +43,7 @@ type ChannelForceProgressTx struct {
 
 	// nonce
 	// Minimum: 0
-	Nonce *uint64 `json:"nonce,omitempty"`
+	Nonce *int64 `json:"nonce,omitempty"`
 
 	// payload
 	// Required: true
@@ -90,7 +90,7 @@ func (m *ChannelForceProgressTx) UnmarshalJSON(raw []byte) error {
 
 		FromID EncodedHash `json:"from_id"`
 
-		Nonce *uint64 `json:"nonce,omitempty"`
+		Nonce *int64 `json:"nonce,omitempty"`
 
 		Payload *string `json:"payload"`
 
@@ -170,7 +170,7 @@ func (m ChannelForceProgressTx) MarshalJSON() ([]byte, error) {
 
 		FromID EncodedHash `json:"from_id"`
 
-		Nonce *uint64 `json:"nonce,omitempty"`
+		Nonce *int64 `json:"nonce,omitempty"`
 
 		Payload *string `json:"payload"`
 

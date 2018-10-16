@@ -32,7 +32,7 @@ type ChannelCloseSoloTx struct {
 
 	// nonce
 	// Minimum: 0
-	Nonce *uint64 `json:"nonce,omitempty"`
+	Nonce *int64 `json:"nonce,omitempty"`
 
 	// payload
 	// Required: true

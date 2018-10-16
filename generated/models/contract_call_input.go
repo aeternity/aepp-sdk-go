@@ -8,7 +8,9 @@ package models
 import (
 	strfmt "github.com/go-openapi/strfmt"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // ContractCallInput contract call input
@@ -16,20 +18,81 @@ import (
 type ContractCallInput struct {
 
 	// abi
-	Abi string `json:"abi,omitempty"`
+	// Required: true
+	Abi *string `json:"abi"`
 
 	// arg
-	Arg string `json:"arg,omitempty"`
+	// Required: true
+	Arg *string `json:"arg"`
 
 	// code
-	Code string `json:"code,omitempty"`
+	// Required: true
+	Code *string `json:"code"`
 
 	// function
-	Function string `json:"function,omitempty"`
+	// Required: true
+	Function *string `json:"function"`
 }
 
 // Validate validates this contract call input
 func (m *ContractCallInput) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateAbi(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateArg(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateCode(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateFunction(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *ContractCallInput) validateAbi(formats strfmt.Registry) error {
+
+	if err := validate.Required("abi", "body", m.Abi); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *ContractCallInput) validateArg(formats strfmt.Registry) error {
+
+	if err := validate.Required("arg", "body", m.Arg); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *ContractCallInput) validateCode(formats strfmt.Registry) error {
+
+	if err := validate.Required("code", "body", m.Code); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *ContractCallInput) validateFunction(formats strfmt.Registry) error {
+
+	if err := validate.Required("function", "body", m.Function); err != nil {
+		return err
+	}
+
 	return nil
 }
 

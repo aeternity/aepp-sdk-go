@@ -8,6 +8,7 @@ package models
 import (
 	strfmt "github.com/go-openapi/strfmt"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 )
 
@@ -19,11 +20,36 @@ type ContractStoreStore struct {
 	Key string `json:"key,omitempty"`
 
 	// value
-	Value string `json:"value,omitempty"`
+	Value EncodedByteArray `json:"value,omitempty"`
 }
 
 // Validate validates this contract store store
 func (m *ContractStoreStore) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateValue(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *ContractStoreStore) validateValue(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Value) { // not required
+		return nil
+	}
+
+	if err := m.Value.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("value")
+		}
+		return err
+	}
+
 	return nil
 }
 

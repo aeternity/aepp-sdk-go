@@ -22,7 +22,7 @@ type OffChainNewContract struct {
 
 	// Contract call data
 	// Required: true
-	CallData *string `json:"call_data"`
+	CallData EncodedByteArray `json:"call_data"`
 
 	// code
 	// Required: true
@@ -67,7 +67,7 @@ func (m *OffChainNewContract) UnmarshalJSON(raw []byte) error {
 
 		// Contract call data
 		// Required: true
-		CallData *string `json:"call_data"`
+		CallData EncodedByteArray `json:"call_data"`
 
 		// code
 		// Required: true
@@ -136,7 +136,7 @@ func (m OffChainNewContract) MarshalJSON() ([]byte, error) {
 
 		// Contract call data
 		// Required: true
-		CallData *string `json:"call_data"`
+		CallData EncodedByteArray `json:"call_data"`
 
 		// code
 		// Required: true
@@ -215,7 +215,10 @@ func (m *OffChainNewContract) Validate(formats strfmt.Registry) error {
 
 func (m *OffChainNewContract) validateCallData(formats strfmt.Registry) error {
 
-	if err := validate.Required("call_data", "body", m.CallData); err != nil {
+	if err := m.CallData.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("call_data")
+		}
 		return err
 	}
 

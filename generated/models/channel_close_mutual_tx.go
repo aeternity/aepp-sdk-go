@@ -26,6 +26,10 @@ type ChannelCloseMutualTx struct {
 	// Minimum: 0
 	Fee *int64 `json:"fee"`
 
+	// from id
+	// Required: true
+	FromID EncodedHash `json:"from_id"`
+
 	// initiator amount final
 	// Required: true
 	// Minimum: 0
@@ -34,7 +38,7 @@ type ChannelCloseMutualTx struct {
 	// nonce
 	// Required: true
 	// Minimum: 0
-	Nonce *uint64 `json:"nonce"`
+	Nonce *int64 `json:"nonce"`
 
 	// responder amount final
 	// Required: true
@@ -55,6 +59,10 @@ func (m *ChannelCloseMutualTx) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateFee(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateFromID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -99,6 +107,18 @@ func (m *ChannelCloseMutualTx) validateFee(formats strfmt.Registry) error {
 	}
 
 	if err := validate.MinimumInt("fee", "body", int64(*m.Fee), 0, false); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *ChannelCloseMutualTx) validateFromID(formats strfmt.Registry) error {
+
+	if err := m.FromID.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("from_id")
+		}
 		return err
 	}
 

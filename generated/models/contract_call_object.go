@@ -23,7 +23,7 @@ type ContractCallObject struct {
 
 	// caller nonce
 	// Required: true
-	CallerNonce *uint64 `json:"caller_nonce"`
+	CallerNonce *int64 `json:"caller_nonce"`
 
 	// contract id
 	// Required: true
@@ -45,9 +45,9 @@ type ContractCallObject struct {
 	// Required: true
 	ReturnType *string `json:"return_type"`
 
-	// Hex encoded return value of the call
+	// return value
 	// Required: true
-	ReturnValue *string `json:"return_value"`
+	ReturnValue EncodedByteArray `json:"return_value"`
 }
 
 // Validate validates this contract call object
@@ -163,7 +163,10 @@ func (m *ContractCallObject) validateReturnType(formats strfmt.Registry) error {
 
 func (m *ContractCallObject) validateReturnValue(formats strfmt.Registry) error {
 
-	if err := validate.Required("return_value", "body", m.ReturnValue); err != nil {
+	if err := m.ReturnValue.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("return_value")
+		}
 		return err
 	}
 

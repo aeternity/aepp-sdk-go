@@ -38,7 +38,8 @@ type SpendTx struct {
 	RecipientID EncodedHash `json:"recipient_id"`
 
 	// sender id
-	SenderID EncodedHash `json:"sender_id,omitempty"`
+	// Required: true
+	SenderID EncodedHash `json:"sender_id"`
 
 	// ttl
 	TTL int64 `json:"ttl,omitempty"`
@@ -118,10 +119,6 @@ func (m *SpendTx) validateRecipientID(formats strfmt.Registry) error {
 }
 
 func (m *SpendTx) validateSenderID(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.SenderID) { // not required
-		return nil
-	}
 
 	if err := m.SenderID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {

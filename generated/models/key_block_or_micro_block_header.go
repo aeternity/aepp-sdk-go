@@ -6,37 +6,32 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"strconv"
-
 	strfmt "github.com/go-openapi/strfmt"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 )
 
-// Generation generation
-// swagger:model Generation
-type Generation struct {
+// KeyBlockOrMicroBlockHeader key block or micro block header
+// swagger:model KeyBlockOrMicroBlockHeader
+type KeyBlockOrMicroBlockHeader struct {
 
 	// key block
-	// Required: true
-	KeyBlock *KeyBlock `json:"key_block"`
+	KeyBlock *KeyBlock `json:"key_block,omitempty"`
 
-	// micro blocks
-	// Required: true
-	MicroBlocks []EncodedHash `json:"micro_blocks"`
+	// micro block
+	MicroBlock *MicroBlockHeader `json:"micro_block,omitempty"`
 }
 
-// Validate validates this generation
-func (m *Generation) Validate(formats strfmt.Registry) error {
+// Validate validates this key block or micro block header
+func (m *KeyBlockOrMicroBlockHeader) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateKeyBlock(formats); err != nil {
 		res = append(res, err)
 	}
 
-	if err := m.validateMicroBlocks(formats); err != nil {
+	if err := m.validateMicroBlock(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -46,10 +41,10 @@ func (m *Generation) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Generation) validateKeyBlock(formats strfmt.Registry) error {
+func (m *KeyBlockOrMicroBlockHeader) validateKeyBlock(formats strfmt.Registry) error {
 
-	if err := validate.Required("key_block", "body", m.KeyBlock); err != nil {
-		return err
+	if swag.IsZero(m.KeyBlock) { // not required
+		return nil
 	}
 
 	if m.KeyBlock != nil {
@@ -64,28 +59,26 @@ func (m *Generation) validateKeyBlock(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Generation) validateMicroBlocks(formats strfmt.Registry) error {
+func (m *KeyBlockOrMicroBlockHeader) validateMicroBlock(formats strfmt.Registry) error {
 
-	if err := validate.Required("micro_blocks", "body", m.MicroBlocks); err != nil {
-		return err
+	if swag.IsZero(m.MicroBlock) { // not required
+		return nil
 	}
 
-	for i := 0; i < len(m.MicroBlocks); i++ {
-
-		if err := m.MicroBlocks[i].Validate(formats); err != nil {
+	if m.MicroBlock != nil {
+		if err := m.MicroBlock.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("micro_blocks" + "." + strconv.Itoa(i))
+				return ve.ValidateName("micro_block")
 			}
 			return err
 		}
-
 	}
 
 	return nil
 }
 
 // MarshalBinary interface implementation
-func (m *Generation) MarshalBinary() ([]byte, error) {
+func (m *KeyBlockOrMicroBlockHeader) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -93,8 +86,8 @@ func (m *Generation) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *Generation) UnmarshalBinary(b []byte) error {
-	var res Generation
+func (m *KeyBlockOrMicroBlockHeader) UnmarshalBinary(b []byte) error {
+	var res KeyBlockOrMicroBlockHeader
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

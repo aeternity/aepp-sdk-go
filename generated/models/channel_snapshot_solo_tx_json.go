@@ -16,38 +16,38 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// NameRevokeTxObject name revoke tx object
-// swagger:model NameRevokeTxObject
-type NameRevokeTxObject struct {
+// ChannelSnapshotSoloTxJSON channel snapshot solo tx JSON
+// swagger:model ChannelSnapshotSoloTxJSON
+type ChannelSnapshotSoloTxJSON struct {
 	versionField *int64
 
-	NameRevokeTx
+	ChannelSnapshotSoloTx
 }
 
 // Type gets the type of this subtype
-func (m *NameRevokeTxObject) Type() string {
-	return "NameRevokeTxObject"
+func (m *ChannelSnapshotSoloTxJSON) Type() string {
+	return "ChannelSnapshotSoloTxJSON"
 }
 
 // SetType sets the type of this subtype
-func (m *NameRevokeTxObject) SetType(val string) {
+func (m *ChannelSnapshotSoloTxJSON) SetType(val string) {
 
 }
 
 // Version gets the version of this subtype
-func (m *NameRevokeTxObject) Version() *int64 {
+func (m *ChannelSnapshotSoloTxJSON) Version() *int64 {
 	return m.versionField
 }
 
 // SetVersion sets the version of this subtype
-func (m *NameRevokeTxObject) SetVersion(val *int64) {
+func (m *ChannelSnapshotSoloTxJSON) SetVersion(val *int64) {
 	m.versionField = val
 }
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
-func (m *NameRevokeTxObject) UnmarshalJSON(raw []byte) error {
+func (m *ChannelSnapshotSoloTxJSON) UnmarshalJSON(raw []byte) error {
 	var data struct {
-		NameRevokeTx
+		ChannelSnapshotSoloTx
 	}
 	buf := bytes.NewBuffer(raw)
 	dec := json.NewDecoder(buf)
@@ -72,7 +72,7 @@ func (m *NameRevokeTxObject) UnmarshalJSON(raw []byte) error {
 		return err
 	}
 
-	var result NameRevokeTxObject
+	var result ChannelSnapshotSoloTxJSON
 
 	if base.Type != result.Type() {
 		/* Not the type we're looking for. */
@@ -81,7 +81,7 @@ func (m *NameRevokeTxObject) UnmarshalJSON(raw []byte) error {
 
 	result.versionField = base.Version
 
-	result.NameRevokeTx = data.NameRevokeTx
+	result.ChannelSnapshotSoloTx = data.ChannelSnapshotSoloTx
 
 	*m = result
 
@@ -89,14 +89,14 @@ func (m *NameRevokeTxObject) UnmarshalJSON(raw []byte) error {
 }
 
 // MarshalJSON marshals this object with a polymorphic type to a JSON structure
-func (m NameRevokeTxObject) MarshalJSON() ([]byte, error) {
+func (m ChannelSnapshotSoloTxJSON) MarshalJSON() ([]byte, error) {
 	var b1, b2, b3 []byte
 	var err error
 	b1, err = json.Marshal(struct {
-		NameRevokeTx
+		ChannelSnapshotSoloTx
 	}{
 
-		NameRevokeTx: m.NameRevokeTx,
+		ChannelSnapshotSoloTx: m.ChannelSnapshotSoloTx,
 	},
 	)
 	if err != nil {
@@ -120,16 +120,16 @@ func (m NameRevokeTxObject) MarshalJSON() ([]byte, error) {
 	return swag.ConcatJSON(b1, b2, b3), nil
 }
 
-// Validate validates this name revoke tx object
-func (m *NameRevokeTxObject) Validate(formats strfmt.Registry) error {
+// Validate validates this channel snapshot solo tx JSON
+func (m *ChannelSnapshotSoloTxJSON) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateVersion(formats); err != nil {
 		res = append(res, err)
 	}
 
-	// validation for a type composition with NameRevokeTx
-	if err := m.NameRevokeTx.Validate(formats); err != nil {
+	// validation for a type composition with ChannelSnapshotSoloTx
+	if err := m.ChannelSnapshotSoloTx.Validate(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -139,7 +139,7 @@ func (m *NameRevokeTxObject) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *NameRevokeTxObject) validateVersion(formats strfmt.Registry) error {
+func (m *ChannelSnapshotSoloTxJSON) validateVersion(formats strfmt.Registry) error {
 
 	if err := validate.Required("version", "body", m.Version()); err != nil {
 		return err
@@ -149,7 +149,7 @@ func (m *NameRevokeTxObject) validateVersion(formats strfmt.Registry) error {
 }
 
 // MarshalBinary interface implementation
-func (m *NameRevokeTxObject) MarshalBinary() ([]byte, error) {
+func (m *ChannelSnapshotSoloTxJSON) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -157,8 +157,8 @@ func (m *NameRevokeTxObject) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *NameRevokeTxObject) UnmarshalBinary(b []byte) error {
-	var res NameRevokeTxObject
+func (m *ChannelSnapshotSoloTxJSON) UnmarshalBinary(b []byte) error {
+	var res ChannelSnapshotSoloTxJSON
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

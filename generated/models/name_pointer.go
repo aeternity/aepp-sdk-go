@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // NamePointer name pointer
@@ -17,10 +18,12 @@ import (
 type NamePointer struct {
 
 	// id
-	ID EncodedHash `json:"id,omitempty"`
+	// Required: true
+	ID EncodedHash `json:"id"`
 
 	// key
-	Key string `json:"key,omitempty"`
+	// Required: true
+	Key *string `json:"key"`
 }
 
 // Validate validates this name pointer
@@ -28,6 +31,10 @@ func (m *NamePointer) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateID(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateKey(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -39,14 +46,19 @@ func (m *NamePointer) Validate(formats strfmt.Registry) error {
 
 func (m *NamePointer) validateID(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.ID) { // not required
-		return nil
-	}
-
 	if err := m.ID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("id")
 		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *NamePointer) validateKey(formats strfmt.Registry) error {
+
+	if err := validate.Required("key", "body", m.Key); err != nil {
 		return err
 	}
 

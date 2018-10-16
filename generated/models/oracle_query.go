@@ -18,43 +18,64 @@ import (
 type OracleQuery struct {
 
 	// fee
-	Fee int64 `json:"fee,omitempty"`
+	// Required: true
+	Fee *int64 `json:"fee"`
 
 	// id
-	ID EncodedHash `json:"id,omitempty"`
+	// Required: true
+	ID EncodedHash `json:"id"`
 
 	// oracle id
-	OracleID EncodedHash `json:"oracle_id,omitempty"`
+	// Required: true
+	OracleID EncodedHash `json:"oracle_id"`
 
 	// query
-	Query string `json:"query,omitempty"`
+	// Required: true
+	Query *string `json:"query"`
 
 	// response
-	Response string `json:"response,omitempty"`
+	// Required: true
+	Response *string `json:"response"`
 
 	// response ttl
-	ResponseTTL *TTL `json:"response_ttl,omitempty"`
+	// Required: true
+	ResponseTTL *TTL `json:"response_ttl"`
 
 	// sender id
-	SenderID EncodedHash `json:"sender_id,omitempty"`
+	// Required: true
+	SenderID EncodedHash `json:"sender_id"`
 
 	// sender nonce
+	// Required: true
 	// Minimum: 0
-	SenderNonce *uint64 `json:"sender_nonce,omitempty"`
+	SenderNonce *int64 `json:"sender_nonce"`
 
 	// ttl
-	TTL int64 `json:"ttl,omitempty"`
+	// Required: true
+	TTL *int64 `json:"ttl"`
 }
 
 // Validate validates this oracle query
 func (m *OracleQuery) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateFee(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateID(formats); err != nil {
 		res = append(res, err)
 	}
 
 	if err := m.validateOracleID(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateQuery(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateResponse(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -70,17 +91,26 @@ func (m *OracleQuery) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateTTL(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
 	return nil
 }
 
-func (m *OracleQuery) validateID(formats strfmt.Registry) error {
+func (m *OracleQuery) validateFee(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.ID) { // not required
-		return nil
+	if err := validate.Required("fee", "body", m.Fee); err != nil {
+		return err
 	}
+
+	return nil
+}
+
+func (m *OracleQuery) validateID(formats strfmt.Registry) error {
 
 	if err := m.ID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
@@ -94,10 +124,6 @@ func (m *OracleQuery) validateID(formats strfmt.Registry) error {
 
 func (m *OracleQuery) validateOracleID(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.OracleID) { // not required
-		return nil
-	}
-
 	if err := m.OracleID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("oracle_id")
@@ -108,10 +134,28 @@ func (m *OracleQuery) validateOracleID(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *OracleQuery) validateQuery(formats strfmt.Registry) error {
+
+	if err := validate.Required("query", "body", m.Query); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *OracleQuery) validateResponse(formats strfmt.Registry) error {
+
+	if err := validate.Required("response", "body", m.Response); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (m *OracleQuery) validateResponseTTL(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.ResponseTTL) { // not required
-		return nil
+	if err := validate.Required("response_ttl", "body", m.ResponseTTL); err != nil {
+		return err
 	}
 
 	if m.ResponseTTL != nil {
@@ -128,10 +172,6 @@ func (m *OracleQuery) validateResponseTTL(formats strfmt.Registry) error {
 
 func (m *OracleQuery) validateSenderID(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.SenderID) { // not required
-		return nil
-	}
-
 	if err := m.SenderID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("sender_id")
@@ -144,11 +184,20 @@ func (m *OracleQuery) validateSenderID(formats strfmt.Registry) error {
 
 func (m *OracleQuery) validateSenderNonce(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.SenderNonce) { // not required
-		return nil
+	if err := validate.Required("sender_nonce", "body", m.SenderNonce); err != nil {
+		return err
 	}
 
 	if err := validate.MinimumInt("sender_nonce", "body", int64(*m.SenderNonce), 0, false); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *OracleQuery) validateTTL(formats strfmt.Registry) error {
+
+	if err := validate.Required("ttl", "body", m.TTL); err != nil {
 		return err
 	}
 

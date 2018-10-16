@@ -20,12 +20,14 @@ import (
 type RelativeTTL struct {
 
 	// type
+	// Required: true
 	// Enum: [delta]
-	Type string `json:"type,omitempty"`
+	Type *string `json:"type"`
 
 	// value
+	// Required: true
 	// Minimum: 1
-	Value int64 `json:"value,omitempty"`
+	Value *int64 `json:"value"`
 }
 
 // Validate validates this relative TTL
@@ -74,12 +76,12 @@ func (m *RelativeTTL) validateTypeEnum(path, location string, value string) erro
 
 func (m *RelativeTTL) validateType(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Type) { // not required
-		return nil
+	if err := validate.Required("type", "body", m.Type); err != nil {
+		return err
 	}
 
 	// value enum
-	if err := m.validateTypeEnum("type", "body", m.Type); err != nil {
+	if err := m.validateTypeEnum("type", "body", *m.Type); err != nil {
 		return err
 	}
 
@@ -88,11 +90,11 @@ func (m *RelativeTTL) validateType(formats strfmt.Registry) error {
 
 func (m *RelativeTTL) validateValue(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Value) { // not required
-		return nil
+	if err := validate.Required("value", "body", m.Value); err != nil {
+		return err
 	}
 
-	if err := validate.MinimumInt("value", "body", int64(m.Value), 1, false); err != nil {
+	if err := validate.MinimumInt("value", "body", int64(*m.Value), 1, false); err != nil {
 		return err
 	}
 

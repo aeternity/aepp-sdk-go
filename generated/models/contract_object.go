@@ -20,34 +20,53 @@ import (
 type ContractObject struct {
 
 	// active
-	Active bool `json:"active,omitempty"`
+	// Required: true
+	Active *bool `json:"active"`
 
 	// deposit
-	Deposit int64 `json:"deposit,omitempty"`
+	// Required: true
+	Deposit *int64 `json:"deposit"`
 
 	// id
-	ID EncodedHash `json:"id,omitempty"`
+	// Required: true
+	ID EncodedHash `json:"id"`
 
 	// log
-	Log string `json:"log,omitempty"`
+	// Required: true
+	Log *string `json:"log"`
 
 	// owner id
-	OwnerID EncodedHash `json:"owner_id,omitempty"`
+	// Required: true
+	OwnerID EncodedHash `json:"owner_id"`
 
 	// referrer ids
+	// Required: true
 	ReferrerIds []EncodedHash `json:"referrer_ids"`
 
 	// vm version
+	// Required: true
 	// Maximum: 255
 	// Minimum: 0
-	VMVersion *int64 `json:"vm_version,omitempty"`
+	VMVersion *int64 `json:"vm_version"`
 }
 
 // Validate validates this contract object
 func (m *ContractObject) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateActive(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateDeposit(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateID(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateLog(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -69,11 +88,25 @@ func (m *ContractObject) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractObject) validateID(formats strfmt.Registry) error {
+func (m *ContractObject) validateActive(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.ID) { // not required
-		return nil
+	if err := validate.Required("active", "body", m.Active); err != nil {
+		return err
 	}
+
+	return nil
+}
+
+func (m *ContractObject) validateDeposit(formats strfmt.Registry) error {
+
+	if err := validate.Required("deposit", "body", m.Deposit); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *ContractObject) validateID(formats strfmt.Registry) error {
 
 	if err := m.ID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
@@ -85,11 +118,16 @@ func (m *ContractObject) validateID(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractObject) validateOwnerID(formats strfmt.Registry) error {
+func (m *ContractObject) validateLog(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.OwnerID) { // not required
-		return nil
+	if err := validate.Required("log", "body", m.Log); err != nil {
+		return err
 	}
+
+	return nil
+}
+
+func (m *ContractObject) validateOwnerID(formats strfmt.Registry) error {
 
 	if err := m.OwnerID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
@@ -103,8 +141,8 @@ func (m *ContractObject) validateOwnerID(formats strfmt.Registry) error {
 
 func (m *ContractObject) validateReferrerIds(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.ReferrerIds) { // not required
-		return nil
+	if err := validate.Required("referrer_ids", "body", m.ReferrerIds); err != nil {
+		return err
 	}
 
 	for i := 0; i < len(m.ReferrerIds); i++ {
@@ -123,8 +161,8 @@ func (m *ContractObject) validateReferrerIds(formats strfmt.Registry) error {
 
 func (m *ContractObject) validateVMVersion(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.VMVersion) { // not required
-		return nil
+	if err := validate.Required("vm_version", "body", m.VMVersion); err != nil {
+		return err
 	}
 
 	if err := validate.MinimumInt("vm_version", "body", int64(*m.VMVersion), 0, false); err != nil {

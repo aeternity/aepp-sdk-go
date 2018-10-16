@@ -12,6 +12,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // NameEntry name entry
@@ -19,13 +20,16 @@ import (
 type NameEntry struct {
 
 	// id
-	ID EncodedHash `json:"id,omitempty"`
+	// Required: true
+	ID EncodedHash `json:"id"`
 
 	// pointers
+	// Required: true
 	Pointers []*NamePointer `json:"pointers"`
 
 	// ttl
-	TTL int64 `json:"ttl,omitempty"`
+	// Required: true
+	TTL *int64 `json:"ttl"`
 }
 
 // Validate validates this name entry
@@ -40,6 +44,10 @@ func (m *NameEntry) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateTTL(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -47,10 +55,6 @@ func (m *NameEntry) Validate(formats strfmt.Registry) error {
 }
 
 func (m *NameEntry) validateID(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.ID) { // not required
-		return nil
-	}
 
 	if err := m.ID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
@@ -64,8 +68,8 @@ func (m *NameEntry) validateID(formats strfmt.Registry) error {
 
 func (m *NameEntry) validatePointers(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Pointers) { // not required
-		return nil
+	if err := validate.Required("pointers", "body", m.Pointers); err != nil {
+		return err
 	}
 
 	for i := 0; i < len(m.Pointers); i++ {
@@ -82,6 +86,15 @@ func (m *NameEntry) validatePointers(formats strfmt.Registry) error {
 			}
 		}
 
+	}
+
+	return nil
+}
+
+func (m *NameEntry) validateTTL(formats strfmt.Registry) error {
+
+	if err := validate.Required("ttl", "body", m.TTL); err != nil {
+		return err
 	}
 
 	return nil

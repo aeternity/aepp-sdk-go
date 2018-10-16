@@ -16,38 +16,38 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// NameTransferTxObject name transfer tx object
-// swagger:model NameTransferTxObject
-type NameTransferTxObject struct {
+// NamePreclaimTxJSON name preclaim tx JSON
+// swagger:model NamePreclaimTxJSON
+type NamePreclaimTxJSON struct {
 	versionField *int64
 
-	NameTransferTx
+	NamePreclaimTx
 }
 
 // Type gets the type of this subtype
-func (m *NameTransferTxObject) Type() string {
-	return "NameTransferTxObject"
+func (m *NamePreclaimTxJSON) Type() string {
+	return "NamePreclaimTxJSON"
 }
 
 // SetType sets the type of this subtype
-func (m *NameTransferTxObject) SetType(val string) {
+func (m *NamePreclaimTxJSON) SetType(val string) {
 
 }
 
 // Version gets the version of this subtype
-func (m *NameTransferTxObject) Version() *int64 {
+func (m *NamePreclaimTxJSON) Version() *int64 {
 	return m.versionField
 }
 
 // SetVersion sets the version of this subtype
-func (m *NameTransferTxObject) SetVersion(val *int64) {
+func (m *NamePreclaimTxJSON) SetVersion(val *int64) {
 	m.versionField = val
 }
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
-func (m *NameTransferTxObject) UnmarshalJSON(raw []byte) error {
+func (m *NamePreclaimTxJSON) UnmarshalJSON(raw []byte) error {
 	var data struct {
-		NameTransferTx
+		NamePreclaimTx
 	}
 	buf := bytes.NewBuffer(raw)
 	dec := json.NewDecoder(buf)
@@ -72,7 +72,7 @@ func (m *NameTransferTxObject) UnmarshalJSON(raw []byte) error {
 		return err
 	}
 
-	var result NameTransferTxObject
+	var result NamePreclaimTxJSON
 
 	if base.Type != result.Type() {
 		/* Not the type we're looking for. */
@@ -81,7 +81,7 @@ func (m *NameTransferTxObject) UnmarshalJSON(raw []byte) error {
 
 	result.versionField = base.Version
 
-	result.NameTransferTx = data.NameTransferTx
+	result.NamePreclaimTx = data.NamePreclaimTx
 
 	*m = result
 
@@ -89,14 +89,14 @@ func (m *NameTransferTxObject) UnmarshalJSON(raw []byte) error {
 }
 
 // MarshalJSON marshals this object with a polymorphic type to a JSON structure
-func (m NameTransferTxObject) MarshalJSON() ([]byte, error) {
+func (m NamePreclaimTxJSON) MarshalJSON() ([]byte, error) {
 	var b1, b2, b3 []byte
 	var err error
 	b1, err = json.Marshal(struct {
-		NameTransferTx
+		NamePreclaimTx
 	}{
 
-		NameTransferTx: m.NameTransferTx,
+		NamePreclaimTx: m.NamePreclaimTx,
 	},
 	)
 	if err != nil {
@@ -120,16 +120,16 @@ func (m NameTransferTxObject) MarshalJSON() ([]byte, error) {
 	return swag.ConcatJSON(b1, b2, b3), nil
 }
 
-// Validate validates this name transfer tx object
-func (m *NameTransferTxObject) Validate(formats strfmt.Registry) error {
+// Validate validates this name preclaim tx JSON
+func (m *NamePreclaimTxJSON) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateVersion(formats); err != nil {
 		res = append(res, err)
 	}
 
-	// validation for a type composition with NameTransferTx
-	if err := m.NameTransferTx.Validate(formats); err != nil {
+	// validation for a type composition with NamePreclaimTx
+	if err := m.NamePreclaimTx.Validate(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -139,7 +139,7 @@ func (m *NameTransferTxObject) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *NameTransferTxObject) validateVersion(formats strfmt.Registry) error {
+func (m *NamePreclaimTxJSON) validateVersion(formats strfmt.Registry) error {
 
 	if err := validate.Required("version", "body", m.Version()); err != nil {
 		return err
@@ -149,7 +149,7 @@ func (m *NameTransferTxObject) validateVersion(formats strfmt.Registry) error {
 }
 
 // MarshalBinary interface implementation
-func (m *NameTransferTxObject) MarshalBinary() ([]byte, error) {
+func (m *NamePreclaimTxJSON) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -157,8 +157,8 @@ func (m *NameTransferTxObject) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *NameTransferTxObject) UnmarshalBinary(b []byte) error {
-	var res NameTransferTxObject
+func (m *NamePreclaimTxJSON) UnmarshalBinary(b []byte) error {
+	var res NamePreclaimTxJSON
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

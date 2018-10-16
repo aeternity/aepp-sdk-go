@@ -8,7 +8,9 @@ package models
 import (
 	strfmt "github.com/go-openapi/strfmt"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // Error error
@@ -16,11 +18,30 @@ import (
 type Error struct {
 
 	// reason
-	Reason string `json:"reason,omitempty"`
+	// Required: true
+	Reason *string `json:"reason"`
 }
 
 // Validate validates this error
 func (m *Error) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateReason(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *Error) validateReason(formats strfmt.Registry) error {
+
+	if err := validate.Required("reason", "body", m.Reason); err != nil {
+		return err
+	}
+
 	return nil
 }
 

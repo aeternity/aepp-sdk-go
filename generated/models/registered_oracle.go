@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // RegisteredOracle registered oracle
@@ -17,19 +18,24 @@ import (
 type RegisteredOracle struct {
 
 	// id
-	ID EncodedHash `json:"id,omitempty"`
+	// Required: true
+	ID EncodedHash `json:"id"`
 
 	// query fee
-	QueryFee int64 `json:"query_fee,omitempty"`
+	// Required: true
+	QueryFee *int64 `json:"query_fee"`
 
 	// query format
-	QueryFormat string `json:"query_format,omitempty"`
+	// Required: true
+	QueryFormat *string `json:"query_format"`
 
 	// response format
-	ResponseFormat string `json:"response_format,omitempty"`
+	// Required: true
+	ResponseFormat *string `json:"response_format"`
 
 	// ttl
-	TTL int64 `json:"ttl,omitempty"`
+	// Required: true
+	TTL *int64 `json:"ttl"`
 }
 
 // Validate validates this registered oracle
@@ -37,6 +43,22 @@ func (m *RegisteredOracle) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateID(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateQueryFee(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateQueryFormat(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateResponseFormat(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateTTL(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -48,14 +70,46 @@ func (m *RegisteredOracle) Validate(formats strfmt.Registry) error {
 
 func (m *RegisteredOracle) validateID(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.ID) { // not required
-		return nil
-	}
-
 	if err := m.ID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("id")
 		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *RegisteredOracle) validateQueryFee(formats strfmt.Registry) error {
+
+	if err := validate.Required("query_fee", "body", m.QueryFee); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *RegisteredOracle) validateQueryFormat(formats strfmt.Registry) error {
+
+	if err := validate.Required("query_format", "body", m.QueryFormat); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *RegisteredOracle) validateResponseFormat(formats strfmt.Registry) error {
+
+	if err := validate.Required("response_format", "body", m.ResponseFormat); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *RegisteredOracle) validateTTL(formats strfmt.Registry) error {
+
+	if err := validate.Required("ttl", "body", m.TTL); err != nil {
 		return err
 	}
 

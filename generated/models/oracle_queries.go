@@ -12,6 +12,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // OracleQueries oracle queries
@@ -19,6 +20,7 @@ import (
 type OracleQueries struct {
 
 	// oracle queries
+	// Required: true
 	OracleQueries []*OracleQuery `json:"oracle_queries"`
 }
 
@@ -38,8 +40,8 @@ func (m *OracleQueries) Validate(formats strfmt.Registry) error {
 
 func (m *OracleQueries) validateOracleQueries(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.OracleQueries) { // not required
-		return nil
+	if err := validate.Required("oracle_queries", "body", m.OracleQueries); err != nil {
+		return err
 	}
 
 	for i := 0; i < len(m.OracleQueries); i++ {

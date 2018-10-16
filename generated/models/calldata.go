@@ -8,6 +8,7 @@ package models
 import (
 	strfmt "github.com/go-openapi/strfmt"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 )
 
@@ -16,11 +17,33 @@ import (
 type Calldata struct {
 
 	// calldata
-	Calldata string `json:"calldata,omitempty"`
+	// Required: true
+	Calldata EncodedByteArray `json:"calldata"`
 }
 
 // Validate validates this calldata
 func (m *Calldata) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateCalldata(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *Calldata) validateCalldata(formats strfmt.Registry) error {
+
+	if err := m.Calldata.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("calldata")
+		}
+		return err
+	}
+
 	return nil
 }
 

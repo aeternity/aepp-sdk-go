@@ -25,7 +25,8 @@ type OracleExtendTx struct {
 	Nonce int64 `json:"nonce,omitempty"`
 
 	// oracle id
-	OracleID EncodedHash `json:"oracle_id,omitempty"`
+	// Required: true
+	OracleID EncodedHash `json:"oracle_id"`
 
 	// oracle ttl
 	// Required: true
@@ -67,10 +68,6 @@ func (m *OracleExtendTx) validateFee(formats strfmt.Registry) error {
 }
 
 func (m *OracleExtendTx) validateOracleID(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.OracleID) { // not required
-		return nil
-	}
 
 	if err := m.OracleID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {

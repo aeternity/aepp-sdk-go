@@ -16,38 +16,38 @@ import (
   "github.com/go-openapi/validate"
 )
 
-// ContractCreateTxObject contract create tx object
-// swagger:model ContractCreateTxObject
-type ContractCreateTxObject struct {
+// NameUpdateTxJSON name update tx JSON
+// swagger:model NameUpdateTxJSON
+type NameUpdateTxJSON struct {
   versionField *int64
 
-  ContractCreateData
+  NameUpdateTx
 }
 
 // Type gets the type of this subtype
-func (m *ContractCreateTxObject) Type() string {
-  return "contract_create_tx"
+func (m *NameUpdateTxJSON) Type() string {
+  return "NameUpdateTxJSON"
 }
 
 // SetType sets the type of this subtype
-func (m *ContractCreateTxObject) SetType(val string) {
+func (m *NameUpdateTxJSON) SetType(val string) {
 
 }
 
 // Version gets the version of this subtype
-func (m *ContractCreateTxObject) Version() *int64 {
+func (m *NameUpdateTxJSON) Version() *int64 {
   return m.versionField
 }
 
 // SetVersion sets the version of this subtype
-func (m *ContractCreateTxObject) SetVersion(val *int64) {
+func (m *NameUpdateTxJSON) SetVersion(val *int64) {
   m.versionField = val
 }
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
-func (m *ContractCreateTxObject) UnmarshalJSON(raw []byte) error {
+func (m *NameUpdateTxJSON) UnmarshalJSON(raw []byte) error {
   var data struct {
-    ContractCreateData
+    NameUpdateTx
   }
   buf := bytes.NewBuffer(raw)
   dec := json.NewDecoder(buf)
@@ -72,7 +72,7 @@ func (m *ContractCreateTxObject) UnmarshalJSON(raw []byte) error {
     return err
   }
 
-  var result ContractCreateTxObject
+  var result NameUpdateTxJSON
 
   if base.Type != result.Type() {
     /* Not the type we're looking for. */
@@ -81,7 +81,7 @@ func (m *ContractCreateTxObject) UnmarshalJSON(raw []byte) error {
 
   result.versionField = base.Version
 
-  result.ContractCreateData = data.ContractCreateData
+  result.NameUpdateTx = data.NameUpdateTx
 
   *m = result
 
@@ -89,14 +89,14 @@ func (m *ContractCreateTxObject) UnmarshalJSON(raw []byte) error {
 }
 
 // MarshalJSON marshals this object with a polymorphic type to a JSON structure
-func (m ContractCreateTxObject) MarshalJSON() ([]byte, error) {
+func (m NameUpdateTxJSON) MarshalJSON() ([]byte, error) {
   var b1, b2, b3 []byte
   var err error
   b1, err = json.Marshal(struct {
-    ContractCreateData
+    NameUpdateTx
   }{
 
-    ContractCreateData: m.ContractCreateData,
+    NameUpdateTx: m.NameUpdateTx,
   },
   )
   if err != nil {
@@ -120,16 +120,16 @@ func (m ContractCreateTxObject) MarshalJSON() ([]byte, error) {
   return swag.ConcatJSON(b1, b2, b3), nil
 }
 
-// Validate validates this contract create tx object
-func (m *ContractCreateTxObject) Validate(formats strfmt.Registry) error {
+// Validate validates this name update tx JSON
+func (m *NameUpdateTxJSON) Validate(formats strfmt.Registry) error {
   var res []error
 
   if err := m.validateVersion(formats); err != nil {
     res = append(res, err)
   }
 
-  // validation for a type composition with ContractCreateData
-  if err := m.ContractCreateData.Validate(formats); err != nil {
+  // validation for a type composition with NameUpdateTx
+  if err := m.NameUpdateTx.Validate(formats); err != nil {
     res = append(res, err)
   }
 
@@ -139,7 +139,7 @@ func (m *ContractCreateTxObject) Validate(formats strfmt.Registry) error {
   return nil
 }
 
-func (m *ContractCreateTxObject) validateVersion(formats strfmt.Registry) error {
+func (m *NameUpdateTxJSON) validateVersion(formats strfmt.Registry) error {
 
   if err := validate.Required("version", "body", m.Version()); err != nil {
     return err
@@ -149,7 +149,7 @@ func (m *ContractCreateTxObject) validateVersion(formats strfmt.Registry) error 
 }
 
 // MarshalBinary interface implementation
-func (m *ContractCreateTxObject) MarshalBinary() ([]byte, error) {
+func (m *NameUpdateTxJSON) MarshalBinary() ([]byte, error) {
   if m == nil {
     return nil, nil
   }
@@ -157,8 +157,8 @@ func (m *ContractCreateTxObject) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *ContractCreateTxObject) UnmarshalBinary(b []byte) error {
-  var res ContractCreateTxObject
+func (m *NameUpdateTxJSON) UnmarshalBinary(b []byte) error {
+  var res NameUpdateTxJSON
   if err := swag.ReadJSON(b, &res); err != nil {
     return err
   }

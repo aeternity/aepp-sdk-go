@@ -13,9 +13,9 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// ContractCreateData contract create data
-// swagger:model ContractCreateData
-type ContractCreateData struct {
+// ContractCallTx contract call tx
+// swagger:model ContractCallTx
+type ContractCallTx struct {
 
 	// Amount
 	// Required: true
@@ -24,16 +24,15 @@ type ContractCreateData struct {
 
 	// Contract call data
 	// Required: true
-	CallData *string `json:"call_data"`
+	CallData EncodedByteArray `json:"call_data"`
 
-	// Contract's code
+	// Contract caller pub_key
 	// Required: true
-	Code *string `json:"code"`
+	CallerID EncodedHash `json:"caller_id"`
 
-	// Deposit
+	// Contract's pub_key
 	// Required: true
-	// Minimum: 0
-	Deposit *int64 `json:"deposit"`
+	ContractID EncodedHash `json:"contract_id"`
 
 	// Transaction fee
 	// Required: true
@@ -50,12 +49,8 @@ type ContractCreateData struct {
 	// Minimum: 0
 	GasPrice *int64 `json:"gas_price"`
 
-	// Owner's nonce
+	// Caller's nonce
 	Nonce int64 `json:"nonce,omitempty"`
-
-	// Contract owner pub_key
-	// Required: true
-	OwnerID EncodedHash `json:"owner_id"`
 
 	// Transaction TTL
 	// Minimum: 0
@@ -68,8 +63,8 @@ type ContractCreateData struct {
 	VMVersion *int64 `json:"vm_version"`
 }
 
-// Validate validates this contract create data
-func (m *ContractCreateData) Validate(formats strfmt.Registry) error {
+// Validate validates this contract call tx
+func (m *ContractCallTx) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateAmount(formats); err != nil {
@@ -80,11 +75,11 @@ func (m *ContractCreateData) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateCode(formats); err != nil {
+	if err := m.validateCallerID(formats); err != nil {
 		res = append(res, err)
 	}
 
-	if err := m.validateDeposit(formats); err != nil {
+	if err := m.validateContractID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -97,10 +92,6 @@ func (m *ContractCreateData) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateGasPrice(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateOwnerID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -118,7 +109,7 @@ func (m *ContractCreateData) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractCreateData) validateAmount(formats strfmt.Registry) error {
+func (m *ContractCallTx) validateAmount(formats strfmt.Registry) error {
 
 	if err := validate.Required("amount", "body", m.Amount); err != nil {
 		return err
@@ -131,38 +122,43 @@ func (m *ContractCreateData) validateAmount(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractCreateData) validateCallData(formats strfmt.Registry) error {
+func (m *ContractCallTx) validateCallData(formats strfmt.Registry) error {
 
-	if err := validate.Required("call_data", "body", m.CallData); err != nil {
+	if err := m.CallData.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("call_data")
+		}
 		return err
 	}
 
 	return nil
 }
 
-func (m *ContractCreateData) validateCode(formats strfmt.Registry) error {
+func (m *ContractCallTx) validateCallerID(formats strfmt.Registry) error {
 
-	if err := validate.Required("code", "body", m.Code); err != nil {
+	if err := m.CallerID.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("caller_id")
+		}
 		return err
 	}
 
 	return nil
 }
 
-func (m *ContractCreateData) validateDeposit(formats strfmt.Registry) error {
+func (m *ContractCallTx) validateContractID(formats strfmt.Registry) error {
 
-	if err := validate.Required("deposit", "body", m.Deposit); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("deposit", "body", int64(*m.Deposit), 0, false); err != nil {
+	if err := m.ContractID.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("contract_id")
+		}
 		return err
 	}
 
 	return nil
 }
 
-func (m *ContractCreateData) validateFee(formats strfmt.Registry) error {
+func (m *ContractCallTx) validateFee(formats strfmt.Registry) error {
 
 	if err := validate.Required("fee", "body", m.Fee); err != nil {
 		return err
@@ -175,7 +171,7 @@ func (m *ContractCreateData) validateFee(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractCreateData) validateGas(formats strfmt.Registry) error {
+func (m *ContractCallTx) validateGas(formats strfmt.Registry) error {
 
 	if err := validate.Required("gas", "body", m.Gas); err != nil {
 		return err
@@ -188,7 +184,7 @@ func (m *ContractCreateData) validateGas(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractCreateData) validateGasPrice(formats strfmt.Registry) error {
+func (m *ContractCallTx) validateGasPrice(formats strfmt.Registry) error {
 
 	if err := validate.Required("gas_price", "body", m.GasPrice); err != nil {
 		return err
@@ -201,19 +197,7 @@ func (m *ContractCreateData) validateGasPrice(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractCreateData) validateOwnerID(formats strfmt.Registry) error {
-
-	if err := m.OwnerID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("owner_id")
-		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *ContractCreateData) validateTTL(formats strfmt.Registry) error {
+func (m *ContractCallTx) validateTTL(formats strfmt.Registry) error {
 
 	if swag.IsZero(m.TTL) { // not required
 		return nil
@@ -226,7 +210,7 @@ func (m *ContractCreateData) validateTTL(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractCreateData) validateVMVersion(formats strfmt.Registry) error {
+func (m *ContractCallTx) validateVMVersion(formats strfmt.Registry) error {
 
 	if err := validate.Required("vm_version", "body", m.VMVersion); err != nil {
 		return err
@@ -244,7 +228,7 @@ func (m *ContractCreateData) validateVMVersion(formats strfmt.Registry) error {
 }
 
 // MarshalBinary interface implementation
-func (m *ContractCreateData) MarshalBinary() ([]byte, error) {
+func (m *ContractCallTx) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -252,8 +236,8 @@ func (m *ContractCreateData) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *ContractCreateData) UnmarshalBinary(b []byte) error {
-	var res ContractCreateData
+func (m *ContractCallTx) UnmarshalBinary(b []byte) error {
+	var res ContractCallTx
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

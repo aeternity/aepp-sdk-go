@@ -18,7 +18,8 @@ import (
 type NameClaimTx struct {
 
 	// account id
-	AccountID EncodedHash `json:"account_id,omitempty"`
+	// Required: true
+	AccountID EncodedHash `json:"account_id"`
 
 	// fee
 	// Required: true
@@ -30,10 +31,10 @@ type NameClaimTx struct {
 
 	// name salt
 	// Required: true
-	NameSalt *uint64 `json:"name_salt"`
+	NameSalt *int64 `json:"name_salt"`
 
 	// nonce
-	Nonce uint64 `json:"nonce,omitempty"`
+	Nonce int64 `json:"nonce,omitempty"`
 
 	// ttl
 	TTL int64 `json:"ttl,omitempty"`
@@ -66,10 +67,6 @@ func (m *NameClaimTx) Validate(formats strfmt.Registry) error {
 }
 
 func (m *NameClaimTx) validateAccountID(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.AccountID) { // not required
-		return nil
-	}
 
 	if err := m.AccountID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {

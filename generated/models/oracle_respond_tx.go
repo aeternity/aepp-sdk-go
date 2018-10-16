@@ -25,7 +25,8 @@ type OracleRespondTx struct {
 	Nonce int64 `json:"nonce,omitempty"`
 
 	// oracle id
-	OracleID EncodedHash `json:"oracle_id,omitempty"`
+	// Required: true
+	OracleID EncodedHash `json:"oracle_id"`
 
 	// query id
 	// Required: true
@@ -75,10 +76,6 @@ func (m *OracleRespondTx) validateFee(formats strfmt.Registry) error {
 }
 
 func (m *OracleRespondTx) validateOracleID(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.OracleID) { // not required
-		return nil
-	}
 
 	if err := m.OracleID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {

@@ -12,6 +12,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // Peers peers
@@ -19,9 +20,11 @@ import (
 type Peers struct {
 
 	// All blocked peers
+	// Required: true
 	Blocked []Peer `json:"blocked"`
 
 	// All discovered peers
+	// Required: true
 	Peers []Peer `json:"peers"`
 }
 
@@ -45,8 +48,8 @@ func (m *Peers) Validate(formats strfmt.Registry) error {
 
 func (m *Peers) validateBlocked(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Blocked) { // not required
-		return nil
+	if err := validate.Required("blocked", "body", m.Blocked); err != nil {
+		return err
 	}
 
 	for i := 0; i < len(m.Blocked); i++ {
@@ -65,8 +68,8 @@ func (m *Peers) validateBlocked(formats strfmt.Registry) error {
 
 func (m *Peers) validatePeers(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Peers) { // not required
-		return nil
+	if err := validate.Required("peers", "body", m.Peers); err != nil {
+		return err
 	}
 
 	for i := 0; i < len(m.Peers); i++ {

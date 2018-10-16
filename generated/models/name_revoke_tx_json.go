@@ -16,38 +16,38 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// NameUpdateTxObject name update tx object
-// swagger:model NameUpdateTxObject
-type NameUpdateTxObject struct {
+// NameRevokeTxJSON name revoke tx JSON
+// swagger:model NameRevokeTxJSON
+type NameRevokeTxJSON struct {
 	versionField *int64
 
-	NameUpdateTx
+	NameRevokeTx
 }
 
 // Type gets the type of this subtype
-func (m *NameUpdateTxObject) Type() string {
-	return "NameUpdateTxObject"
+func (m *NameRevokeTxJSON) Type() string {
+	return "NameRevokeTxJSON"
 }
 
 // SetType sets the type of this subtype
-func (m *NameUpdateTxObject) SetType(val string) {
+func (m *NameRevokeTxJSON) SetType(val string) {
 
 }
 
 // Version gets the version of this subtype
-func (m *NameUpdateTxObject) Version() *int64 {
+func (m *NameRevokeTxJSON) Version() *int64 {
 	return m.versionField
 }
 
 // SetVersion sets the version of this subtype
-func (m *NameUpdateTxObject) SetVersion(val *int64) {
+func (m *NameRevokeTxJSON) SetVersion(val *int64) {
 	m.versionField = val
 }
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
-func (m *NameUpdateTxObject) UnmarshalJSON(raw []byte) error {
+func (m *NameRevokeTxJSON) UnmarshalJSON(raw []byte) error {
 	var data struct {
-		NameUpdateTx
+		NameRevokeTx
 	}
 	buf := bytes.NewBuffer(raw)
 	dec := json.NewDecoder(buf)
@@ -72,7 +72,7 @@ func (m *NameUpdateTxObject) UnmarshalJSON(raw []byte) error {
 		return err
 	}
 
-	var result NameUpdateTxObject
+	var result NameRevokeTxJSON
 
 	if base.Type != result.Type() {
 		/* Not the type we're looking for. */
@@ -81,7 +81,7 @@ func (m *NameUpdateTxObject) UnmarshalJSON(raw []byte) error {
 
 	result.versionField = base.Version
 
-	result.NameUpdateTx = data.NameUpdateTx
+	result.NameRevokeTx = data.NameRevokeTx
 
 	*m = result
 
@@ -89,14 +89,14 @@ func (m *NameUpdateTxObject) UnmarshalJSON(raw []byte) error {
 }
 
 // MarshalJSON marshals this object with a polymorphic type to a JSON structure
-func (m NameUpdateTxObject) MarshalJSON() ([]byte, error) {
+func (m NameRevokeTxJSON) MarshalJSON() ([]byte, error) {
 	var b1, b2, b3 []byte
 	var err error
 	b1, err = json.Marshal(struct {
-		NameUpdateTx
+		NameRevokeTx
 	}{
 
-		NameUpdateTx: m.NameUpdateTx,
+		NameRevokeTx: m.NameRevokeTx,
 	},
 	)
 	if err != nil {
@@ -120,16 +120,16 @@ func (m NameUpdateTxObject) MarshalJSON() ([]byte, error) {
 	return swag.ConcatJSON(b1, b2, b3), nil
 }
 
-// Validate validates this name update tx object
-func (m *NameUpdateTxObject) Validate(formats strfmt.Registry) error {
+// Validate validates this name revoke tx JSON
+func (m *NameRevokeTxJSON) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateVersion(formats); err != nil {
 		res = append(res, err)
 	}
 
-	// validation for a type composition with NameUpdateTx
-	if err := m.NameUpdateTx.Validate(formats); err != nil {
+	// validation for a type composition with NameRevokeTx
+	if err := m.NameRevokeTx.Validate(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -139,7 +139,7 @@ func (m *NameUpdateTxObject) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *NameUpdateTxObject) validateVersion(formats strfmt.Registry) error {
+func (m *NameRevokeTxJSON) validateVersion(formats strfmt.Registry) error {
 
 	if err := validate.Required("version", "body", m.Version()); err != nil {
 		return err
@@ -149,7 +149,7 @@ func (m *NameUpdateTxObject) validateVersion(formats strfmt.Registry) error {
 }
 
 // MarshalBinary interface implementation
-func (m *NameUpdateTxObject) MarshalBinary() ([]byte, error) {
+func (m *NameRevokeTxJSON) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -157,8 +157,8 @@ func (m *NameUpdateTxObject) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *NameUpdateTxObject) UnmarshalBinary(b []byte) error {
-	var res NameUpdateTxObject
+func (m *NameRevokeTxJSON) UnmarshalBinary(b []byte) error {
+	var res NameRevokeTxJSON
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}
