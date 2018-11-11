@@ -106,77 +106,77 @@ func unmarshalGenericTx(data []byte, consumer runtime.Consumer) (GenericTx, erro
 
   // The value of type is used to determine which type to create and unmarshal the data into
   switch getType.Type {
-  case "ChannelCloseMutualTxJSON":
+  case "ChannelCloseMutualTx":
     var result ChannelCloseMutualTxJSON
     if err := consumer.Consume(buf2, &result); err != nil {
       return nil, err
     }
     return &result, nil
 
-  case "ChannelCloseSoloTxJSON":
+  case "ChannelCloseSoloTx":
     var result ChannelCloseSoloTxJSON
     if err := consumer.Consume(buf2, &result); err != nil {
       return nil, err
     }
     return &result, nil
 
-  case "ChannelCreateTxJSON":
+  case "ChannelCreateTx":
     var result ChannelCreateTxJSON
     if err := consumer.Consume(buf2, &result); err != nil {
       return nil, err
     }
     return &result, nil
 
-  case "ChannelDepositTxJSON":
+  case "ChannelDepositTx":
     var result ChannelDepositTxJSON
     if err := consumer.Consume(buf2, &result); err != nil {
       return nil, err
     }
     return &result, nil
 
-  case "ChannelForceProgressTxJSON":
+  case "ChannelForceProgressTx":
     var result ChannelForceProgressTxJSON
     if err := consumer.Consume(buf2, &result); err != nil {
       return nil, err
     }
     return &result, nil
 
-  case "ChannelSettleTxJSON":
+  case "ChannelSettleTx":
     var result ChannelSettleTxJSON
     if err := consumer.Consume(buf2, &result); err != nil {
       return nil, err
     }
     return &result, nil
 
-  case "ChannelSlashTxJSON":
+  case "ChannelSlashTx":
     var result ChannelSLASHTxJSON
     if err := consumer.Consume(buf2, &result); err != nil {
       return nil, err
     }
     return &result, nil
 
-  case "ChannelSnapshotSoloTxJSON":
+  case "ChannelSnapshotSoloTx":
     var result ChannelSnapshotSoloTxJSON
     if err := consumer.Consume(buf2, &result); err != nil {
       return nil, err
     }
     return &result, nil
 
-  case "ChannelWithdrawalTxJSON":
+  case "ChannelWithdrawalTx":
     var result ChannelWithdrawalTxJSON
     if err := consumer.Consume(buf2, &result); err != nil {
       return nil, err
     }
     return &result, nil
 
-  case "ContractCallTxJSON":
+  case "ContractCallTx":
     var result ContractCallTxJSON
     if err := consumer.Consume(buf2, &result); err != nil {
       return nil, err
     }
     return &result, nil
 
-  case "ContractCreateTxJSON":
+  case "ContractCreateTx":
     var result ContractCreateTxJSON
     if err := consumer.Consume(buf2, &result); err != nil {
       return nil, err
@@ -190,70 +190,70 @@ func unmarshalGenericTx(data []byte, consumer runtime.Consumer) (GenericTx, erro
     }
     return &result, nil
 
-  case "NameClaimTxJSON":
+  case "NameClaimTx":
     var result NameClaimTxJSON
     if err := consumer.Consume(buf2, &result); err != nil {
       return nil, err
     }
     return &result, nil
 
-  case "NamePreclaimTxJSON":
+  case "NamePreclaimTx":
     var result NamePreclaimTxJSON
     if err := consumer.Consume(buf2, &result); err != nil {
       return nil, err
     }
     return &result, nil
 
-  case "NameRevokeTxJSON":
+  case "NameRevokeTx":
     var result NameRevokeTxJSON
     if err := consumer.Consume(buf2, &result); err != nil {
       return nil, err
     }
     return &result, nil
 
-  case "NameTransferTxJSON":
+  case "NameTransferTx":
     var result NameTransferTxJSON
     if err := consumer.Consume(buf2, &result); err != nil {
       return nil, err
     }
     return &result, nil
 
-  case "NameUpdateTxJSON":
+  case "NameUpdateTx":
     var result NameUpdateTxJSON
     if err := consumer.Consume(buf2, &result); err != nil {
       return nil, err
     }
     return &result, nil
 
-  case "OracleExtendTxJSON":
+  case "OracleExtendTx":
     var result OracleExtendTxJSON
     if err := consumer.Consume(buf2, &result); err != nil {
       return nil, err
     }
     return &result, nil
 
-  case "OracleQueryTxJSON":
+  case "OracleQueryTx":
     var result OracleQueryTxJSON
     if err := consumer.Consume(buf2, &result); err != nil {
       return nil, err
     }
     return &result, nil
 
-  case "OracleRegisterTxJSON":
+  case "OracleRegisterTx":
     var result OracleRegisterTxJSON
     if err := consumer.Consume(buf2, &result); err != nil {
       return nil, err
     }
     return &result, nil
 
-  case "OracleResponseTxJSON":
+  case "OracleResponseTx":
     var result OracleResponseTxJSON
     if err := consumer.Consume(buf2, &result); err != nil {
       return nil, err
     }
     return &result, nil
 
-  case "SpendTxJSON":
+  case "SpendTx":
     var result SpendTxJSON
     if err := consumer.Consume(buf2, &result); err != nil {
       return nil, err
