@@ -20,7 +20,8 @@ const (
 
 // EpochConfig configuration for the epoch node
 type EpochConfig struct {
-  URL string `yaml:"url" mapstructure:"url"`
+  URL       string `yaml:"url" mapstructure:"url"`
+  NetworkID string `yaml:"url" mapstructure:"network_id"`
 }
 
 // AensConfig configurations for Aens
@@ -81,6 +82,7 @@ func (c *ProfileConfig) Defaults() *ProfileConfig {
   }
   // for server
   utils.DefaultIfEmptyStr(&c.Epoch.URL, "https://sdk-edgenet.aepps.com")
+  utils.DefaultIfEmptyStr(&c.Epoch.NetworkID, "ae_mainnet")
   // for client
   utils.DefaultIfEmptyStr(&c.Client.DefaultKey, "wallet.key")
   utils.DefaultIfEmptyUint64(&c.Client.TxTTL, 500)

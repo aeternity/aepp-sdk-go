@@ -8,8 +8,10 @@ import (
 
 // SignEncodeTx sign and encode a transaction
 func SignEncodeTx(kp *Account, txRaw []byte) (signedEncodedTx, signedEncodedTxHash, signature string, err error) {
+  // add the network_id to the transaction
+  msg := append([]byte(Config.P.Epoch.NetworkID), txRaw...)
   // sign the transaction
-  sigRaw := kp.Sign(txRaw)
+  sigRaw := kp.Sign(msg)
   if err != nil {
     return
   }
