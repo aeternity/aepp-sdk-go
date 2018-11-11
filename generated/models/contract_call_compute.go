@@ -22,9 +22,11 @@ type ContractCallCompute struct {
 	// Minimum: 0
 	Amount *int64 `json:"amount"`
 
-	// Contract call data function arguments
-	// Required: true
-	Arguments *string `json:"arguments"`
+	// Contract call data function arguments (deprecated, use call)
+	Arguments string `json:"arguments,omitempty"`
+
+	// Source code for a contract with a function __call() = f(args), if calling a function f
+	Call string `json:"call,omitempty"`
 
 	// Contract caller pub_key
 	// Required: true
@@ -39,9 +41,8 @@ type ContractCallCompute struct {
 	// Minimum: 0
 	Fee *int64 `json:"fee"`
 
-	// Contract call data function
-	// Required: true
-	Function *string `json:"function"`
+	// Contract call data function (deprecated, use call)
+	Function string `json:"function,omitempty"`
 
 	// Contract gas
 	// Required: true
@@ -75,10 +76,6 @@ func (m *ContractCallCompute) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateArguments(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.validateCallerID(formats); err != nil {
 		res = append(res, err)
 	}
@@ -88,10 +85,6 @@ func (m *ContractCallCompute) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateFee(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateFunction(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -130,15 +123,6 @@ func (m *ContractCallCompute) validateAmount(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractCallCompute) validateArguments(formats strfmt.Registry) error {
-
-	if err := validate.Required("arguments", "body", m.Arguments); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (m *ContractCallCompute) validateCallerID(formats strfmt.Registry) error {
 
 	if err := m.CallerID.Validate(formats); err != nil {
@@ -170,15 +154,6 @@ func (m *ContractCallCompute) validateFee(formats strfmt.Registry) error {
 	}
 
 	if err := validate.MinimumInt("fee", "body", int64(*m.Fee), 0, false); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *ContractCallCompute) validateFunction(formats strfmt.Registry) error {
-
-	if err := validate.Required("function", "body", m.Function); err != nil {
 		return err
 	}
 

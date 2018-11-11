@@ -22,16 +22,17 @@ type ContractCallInput struct {
 	Abi *string `json:"abi"`
 
 	// arg
-	// Required: true
-	Arg *string `json:"arg"`
+	Arg string `json:"arg,omitempty"`
+
+	// Source code for a contract with a function __call() = f(args), if calling a function f
+	Call string `json:"call,omitempty"`
 
 	// code
 	// Required: true
 	Code *string `json:"code"`
 
 	// function
-	// Required: true
-	Function *string `json:"function"`
+	Function string `json:"function,omitempty"`
 }
 
 // Validate validates this contract call input
@@ -42,15 +43,7 @@ func (m *ContractCallInput) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateArg(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.validateCode(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateFunction(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -69,27 +62,9 @@ func (m *ContractCallInput) validateAbi(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractCallInput) validateArg(formats strfmt.Registry) error {
-
-	if err := validate.Required("arg", "body", m.Arg); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (m *ContractCallInput) validateCode(formats strfmt.Registry) error {
 
 	if err := validate.Required("code", "body", m.Code); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *ContractCallInput) validateFunction(formats strfmt.Registry) error {
-
-	if err := validate.Required("function", "body", m.Function); err != nil {
 		return err
 	}
 

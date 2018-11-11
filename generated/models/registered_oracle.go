@@ -36,6 +36,11 @@ type RegisteredOracle struct {
 	// ttl
 	// Required: true
 	TTL *int64 `json:"ttl"`
+
+	// vm version
+	// Required: true
+	// Minimum: 0
+	VMVersion *int64 `json:"vm_version"`
 }
 
 // Validate validates this registered oracle
@@ -59,6 +64,10 @@ func (m *RegisteredOracle) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateTTL(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateVMVersion(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -110,6 +119,19 @@ func (m *RegisteredOracle) validateResponseFormat(formats strfmt.Registry) error
 func (m *RegisteredOracle) validateTTL(formats strfmt.Registry) error {
 
 	if err := validate.Required("ttl", "body", m.TTL); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *RegisteredOracle) validateVMVersion(formats strfmt.Registry) error {
+
+	if err := validate.Required("vm_version", "body", m.VMVersion); err != nil {
+		return err
+	}
+
+	if err := validate.MinimumInt("vm_version", "body", int64(*m.VMVersion), 0, false); err != nil {
 		return err
 	}
 

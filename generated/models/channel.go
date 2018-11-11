@@ -29,17 +29,9 @@ type Channel struct {
 	// Minimum: 0
 	ChannelReserve *int64 `json:"channel_reserve"`
 
-	// closes at
-	// Required: true
-	ClosesAt *int64 `json:"closes_at"`
-
 	// delegate ids
 	// Required: true
 	DelegateIds []EncodedHash `json:"delegate_ids"`
-
-	// forcing blocked until
-	// Required: true
-	ForcingBlockedUntil *int64 `json:"forcing_blocked_until"`
 
 	// id
 	// Required: true
@@ -59,6 +51,10 @@ type Channel struct {
 	// Minimum: 0
 	LockPeriod *int64 `json:"lock_period"`
 
+	// locked until
+	// Required: true
+	LockedUntil *int64 `json:"locked_until"`
+
 	// responder amount
 	// Required: true
 	// Minimum: 0
@@ -72,6 +68,11 @@ type Channel struct {
 	// Required: true
 	// Minimum: 0
 	Round *int64 `json:"round"`
+
+	// solo round
+	// Required: true
+	// Minimum: 0
+	SoloRound *int64 `json:"solo_round"`
 
 	// state hash
 	// Required: true
@@ -90,15 +91,7 @@ func (m *Channel) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateClosesAt(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.validateDelegateIds(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateForcingBlockedUntil(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -118,6 +111,10 @@ func (m *Channel) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateLockedUntil(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateResponderAmount(formats); err != nil {
 		res = append(res, err)
 	}
@@ -127,6 +124,10 @@ func (m *Channel) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateRound(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateSoloRound(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -166,15 +167,6 @@ func (m *Channel) validateChannelReserve(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Channel) validateClosesAt(formats strfmt.Registry) error {
-
-	if err := validate.Required("closes_at", "body", m.ClosesAt); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (m *Channel) validateDelegateIds(formats strfmt.Registry) error {
 
 	if err := validate.Required("delegate_ids", "body", m.DelegateIds); err != nil {
@@ -190,15 +182,6 @@ func (m *Channel) validateDelegateIds(formats strfmt.Registry) error {
 			return err
 		}
 
-	}
-
-	return nil
-}
-
-func (m *Channel) validateForcingBlockedUntil(formats strfmt.Registry) error {
-
-	if err := validate.Required("forcing_blocked_until", "body", m.ForcingBlockedUntil); err != nil {
-		return err
 	}
 
 	return nil
@@ -254,6 +237,15 @@ func (m *Channel) validateLockPeriod(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *Channel) validateLockedUntil(formats strfmt.Registry) error {
+
+	if err := validate.Required("locked_until", "body", m.LockedUntil); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (m *Channel) validateResponderAmount(formats strfmt.Registry) error {
 
 	if err := validate.Required("responder_amount", "body", m.ResponderAmount); err != nil {
@@ -286,6 +278,19 @@ func (m *Channel) validateRound(formats strfmt.Registry) error {
 	}
 
 	if err := validate.MinimumInt("round", "body", int64(*m.Round), 0, false); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Channel) validateSoloRound(formats strfmt.Registry) error {
+
+	if err := validate.Required("solo_round", "body", m.SoloRound); err != nil {
+		return err
+	}
+
+	if err := validate.MinimumInt("solo_round", "body", int64(*m.SoloRound), 0, false); err != nil {
 		return err
 	}
 

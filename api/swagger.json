@@ -2,7 +2,7 @@
   "swagger" : "2.0",
   "info" : {
     "description" : "This is the [Aeternity](https://www.aeternity.com/) Epoch API.",
-    "version" : "0.24.0",
+    "version" : "0.25.0",
     "title" : "Aeternity Epoch",
     "termsOfService" : "https://www.aeternity.com/terms/",
     "contact" : {
@@ -210,7 +210,8 @@
           "in" : "path",
           "description" : "The height of the block",
           "required" : true,
-          "type" : "integer"
+          "type" : "integer",
+          "minimum" : 0
         } ],
         "responses" : {
           "200" : {
@@ -473,7 +474,8 @@
           "in" : "path",
           "description" : "The height of the generation",
           "required" : true,
-          "type" : "integer"
+          "type" : "integer",
+          "minimum" : 0
         } ],
         "responses" : {
           "200" : {
@@ -1845,6 +1847,23 @@
         }
       }
     },
+    "/debug/accounts/beneficiary" : {
+      "get" : {
+        "tags" : [ "internal", "node_info", "debug" ],
+        "description" : "Get node's beneficiary public key",
+        "operationId" : "GetNodeBeneficiary",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/PubKey"
+            }
+          }
+        }
+      }
+    },
     "/debug/accounts/node" : {
       "get" : {
         "tags" : [ "internal", "node_info", "debug" ],
@@ -2260,7 +2279,7 @@
     },
     "RegisteredOracle" : {
       "type" : "object",
-      "required" : [ "id", "query_fee", "query_format", "response_format", "ttl" ],
+      "required" : [ "id", "query_fee", "query_format", "response_format", "ttl", "vm_version" ],
       "properties" : {
         "id" : {
           "$ref" : "#/definitions/EncodedHash"
@@ -2277,9 +2296,15 @@
         "ttl" : {
           "type" : "integer",
           "format" : "int64"
+        },
+        "vm_version" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
         }
       },
       "example" : {
+        "vm_version" : 0,
         "response_format" : "response_format",
         "id" : { },
         "query_fee" : 0,
@@ -2451,9 +2476,15 @@
         "ttl" : {
           "type" : "integer",
           "format" : "int64"
+        },
+        "vm_version" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
         }
       },
       "example" : {
+        "vm_version" : 0,
         "response_format" : "response_format",
         "account_id" : { },
         "fee" : 1,
@@ -2558,13 +2589,16 @@
     },
     "OracleRespondTx" : {
       "type" : "object",
-      "required" : [ "fee", "oracle_id", "query_id", "response" ],
+      "required" : [ "fee", "oracle_id", "query_id", "response", "response_ttl" ],
       "properties" : {
         "query_id" : {
           "$ref" : "#/definitions/EncodedHash"
         },
         "response" : {
           "type" : "string"
+        },
+        "response_ttl" : {
+          "$ref" : "#/definitions/RelativeTTL"
         },
         "fee" : {
           "type" : "integer",
@@ -2584,6 +2618,10 @@
         }
       },
       "example" : {
+        "response_ttl" : {
+          "type" : "delta",
+          "value" : 1
+        },
         "oracle_id" : null,
         "query_id" : { },
         "response" : "response",
@@ -2886,7 +2924,7 @@
     },
     "Channel" : {
       "type" : "object",
-      "required" : [ "channel_amount", "channel_reserve", "closes_at", "delegate_ids", "forcing_blocked_until", "id", "initiator_amount", "initiator_id", "lock_period", "responder_amount", "responder_id", "round", "state_hash" ],
+      "required" : [ "channel_amount", "channel_reserve", "delegate_ids", "id", "initiator_amount", "initiator_id", "lock_period", "locked_until", "responder_amount", "responder_id", "round", "solo_round", "state_hash" ],
       "properties" : {
         "id" : {
           "$ref" : "#/definitions/EncodedHash"
@@ -2931,16 +2969,17 @@
           "format" : "int64",
           "minimum" : 0
         },
+        "solo_round" : {
+          "type" : "integer",
+          "format" : "int64",
+          "minimum" : 0
+        },
         "lock_period" : {
           "type" : "integer",
           "format" : "int64",
           "minimum" : 0
         },
-        "forcing_blocked_until" : {
-          "type" : "integer",
-          "format" : "int64"
-        },
-        "closes_at" : {
+        "locked_until" : {
           "type" : "integer",
           "format" : "int64"
         }
@@ -2948,15 +2987,15 @@
       "example" : {
         "delegate_ids" : [ null, null ],
         "responder_id" : null,
+        "locked_until" : 9,
         "lock_period" : 0,
         "responder_amount" : 0,
         "initiator_amount" : 0,
         "round" : 0,
         "initiator_id" : null,
         "state_hash" : null,
-        "forcing_blocked_until" : 7,
         "id" : { },
-        "closes_at" : 9,
+        "solo_round" : 0,
         "channel_amount" : 0,
         "channel_reserve" : 0
       }
@@ -3136,7 +3175,7 @@
     },
     "ChannelForceProgressTx" : {
       "type" : "object",
-      "required" : [ "addresses", "channel_id", "fee", "from_id", "payload", "poi", "round", "state_hash", "update" ],
+      "required" : [ "channel_id", "fee", "from_id", "payload", "round", "state_hash", "update" ],
       "properties" : {
         "channel_id" : {
           "$ref" : "#/definitions/EncodedHash"
@@ -3161,13 +3200,6 @@
           "description" : "Channel's next state_hash",
           "$ref" : "#/definitions/EncodedHash"
         },
-        "addresses" : {
-          "type" : "array",
-          "items" : {
-            "$ref" : "#/definitions/EncodedHash"
-          },
-          "minItems" : 1
-        },
         "ttl" : {
           "type" : "integer",
           "format" : "int64",
@@ -3183,9 +3215,9 @@
           "format" : "int64",
           "minimum" : 0
         },
-        "poi" : {
-          "type" : "string",
-          "description" : "Proof of inclusion containing information for closing the channel"
+        "offchain_trees" : {
+          "description" : "The whole set of off-chain state trees",
+          "$ref" : "#/definitions/EncodedHash"
         }
       }
     },
@@ -3844,7 +3876,7 @@
     },
     "ContractCallInput" : {
       "type" : "object",
-      "required" : [ "abi", "arg", "code", "function" ],
+      "required" : [ "abi", "code" ],
       "properties" : {
         "abi" : {
           "type" : "string"
@@ -3857,9 +3889,14 @@
         },
         "arg" : {
           "type" : "string"
+        },
+        "call" : {
+          "type" : "string",
+          "description" : "Source code for a contract with a function __call() = f(args), if calling a function f"
         }
       },
       "example" : {
+        "call" : "call",
         "code" : "code",
         "function" : "function",
         "arg" : "arg",
@@ -4023,7 +4060,7 @@
     },
     "ContractCreateCompute" : {
       "type" : "object",
-      "required" : [ "amount", "arguments", "code", "deposit", "fee", "gas", "gas_price", "owner_id", "vm_version" ],
+      "required" : [ "amount", "code", "deposit", "fee", "gas", "gas_price", "owner_id", "vm_version" ],
       "properties" : {
         "owner_id" : {
           "type" : "string",
@@ -4075,11 +4112,16 @@
         },
         "arguments" : {
           "type" : "string",
-          "description" : "Contract call data init function arguments"
+          "description" : "Contract call data init function arguments (deprecated, use call)"
+        },
+        "call" : {
+          "type" : "string",
+          "description" : "Source code for a contract with a function __call() = init(args)"
         }
       },
       "example" : {
         "gas_price" : 0,
+        "call" : "call",
         "vm_version" : 153,
         "amount" : 0,
         "code" : "code",
@@ -4159,7 +4201,7 @@
     },
     "ContractCallCompute" : {
       "type" : "object",
-      "required" : [ "amount", "arguments", "caller_id", "contract_id", "fee", "function", "gas", "gas_price", "vm_version" ],
+      "required" : [ "amount", "caller_id", "contract_id", "fee", "gas", "gas_price", "vm_version" ],
       "properties" : {
         "caller_id" : {
           "description" : "Contract caller pub_key",
@@ -4206,15 +4248,20 @@
         },
         "function" : {
           "type" : "string",
-          "description" : "Contract call data function"
+          "description" : "Contract call data function (deprecated, use call)"
         },
         "arguments" : {
           "type" : "string",
-          "description" : "Contract call data function arguments"
+          "description" : "Contract call data function arguments (deprecated, use call)"
+        },
+        "call" : {
+          "type" : "string",
+          "description" : "Source code for a contract with a function __call() = f(args), if calling a function f"
         }
       },
       "example" : {
         "gas_price" : 0,
+        "call" : "call",
         "vm_version" : 153,
         "amount" : 0,
         "caller_id" : { },

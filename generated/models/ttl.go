@@ -6,118 +6,118 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-  "encoding/json"
+	"encoding/json"
 
-  strfmt "github.com/go-openapi/strfmt"
+	strfmt "github.com/go-openapi/strfmt"
 
-  "github.com/go-openapi/errors"
-  "github.com/go-openapi/swag"
-  "github.com/go-openapi/validate"
+	"github.com/go-openapi/errors"
+	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // TTL TTL
 // swagger:model TTL
 type TTL struct {
 
-  // type
-  // Required: true
-  // Enum: [delta block]
-  Type *string `json:"type"`
+	// type
+	// Required: true
+	// Enum: [delta block]
+	Type *string `json:"type"`
 
-  // value
-  // Required: true
-  // Minimum: 1
-  Value *uint64 `json:"value"`
+	// value
+	// Required: true
+	// Minimum: 1
+	Value *int64 `json:"value"`
 }
 
 // Validate validates this TTL
 func (m *TTL) Validate(formats strfmt.Registry) error {
-  var res []error
+	var res []error
 
-  if err := m.validateType(formats); err != nil {
-    res = append(res, err)
-  }
+	if err := m.validateType(formats); err != nil {
+		res = append(res, err)
+	}
 
-  if err := m.validateValue(formats); err != nil {
-    res = append(res, err)
-  }
+	if err := m.validateValue(formats); err != nil {
+		res = append(res, err)
+	}
 
-  if len(res) > 0 {
-    return errors.CompositeValidationError(res...)
-  }
-  return nil
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
 }
 
 var ttlTypeTypePropEnum []interface{}
 
 func init() {
-  var res []string
-  if err := json.Unmarshal([]byte(`["delta","block"]`), &res); err != nil {
-    panic(err)
-  }
-  for _, v := range res {
-    ttlTypeTypePropEnum = append(ttlTypeTypePropEnum, v)
-  }
+	var res []string
+	if err := json.Unmarshal([]byte(`["delta","block"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		ttlTypeTypePropEnum = append(ttlTypeTypePropEnum, v)
+	}
 }
 
 const (
 
-  // TTLTypeDelta captures enum value "delta"
-  TTLTypeDelta string = "delta"
+	// TTLTypeDelta captures enum value "delta"
+	TTLTypeDelta string = "delta"
 
-  // TTLTypeBlock captures enum value "block"
-  TTLTypeBlock string = "block"
+	// TTLTypeBlock captures enum value "block"
+	TTLTypeBlock string = "block"
 )
 
 // prop value enum
 func (m *TTL) validateTypeEnum(path, location string, value string) error {
-  if err := validate.Enum(path, location, value, ttlTypeTypePropEnum); err != nil {
-    return err
-  }
-  return nil
+	if err := validate.Enum(path, location, value, ttlTypeTypePropEnum); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (m *TTL) validateType(formats strfmt.Registry) error {
 
-  if err := validate.Required("type", "body", m.Type); err != nil {
-    return err
-  }
+	if err := validate.Required("type", "body", m.Type); err != nil {
+		return err
+	}
 
-  // value enum
-  if err := m.validateTypeEnum("type", "body", *m.Type); err != nil {
-    return err
-  }
+	// value enum
+	if err := m.validateTypeEnum("type", "body", *m.Type); err != nil {
+		return err
+	}
 
-  return nil
+	return nil
 }
 
 func (m *TTL) validateValue(formats strfmt.Registry) error {
 
-  if err := validate.Required("value", "body", m.Value); err != nil {
-    return err
-  }
+	if err := validate.Required("value", "body", m.Value); err != nil {
+		return err
+	}
 
-  if err := validate.MinimumInt("value", "body", int64(*m.Value), 1, false); err != nil {
-    return err
-  }
+	if err := validate.MinimumInt("value", "body", int64(*m.Value), 1, false); err != nil {
+		return err
+	}
 
-  return nil
+	return nil
 }
 
 // MarshalBinary interface implementation
 func (m *TTL) MarshalBinary() ([]byte, error) {
-  if m == nil {
-    return nil, nil
-  }
-  return swag.WriteJSON(m)
+	if m == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(m)
 }
 
 // UnmarshalBinary interface implementation
 func (m *TTL) UnmarshalBinary(b []byte) error {
-  var res TTL
-  if err := swag.ReadJSON(b, &res); err != nil {
-    return err
-  }
-  *m = res
-  return nil
+	var res TTL
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*m = res
+	return nil
 }

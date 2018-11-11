@@ -36,6 +36,10 @@ type OracleRespondTx struct {
 	// Required: true
 	Response *string `json:"response"`
 
+	// response ttl
+	// Required: true
+	ResponseTTL *RelativeTTL `json:"response_ttl"`
+
 	// ttl
 	TTL int64 `json:"ttl,omitempty"`
 }
@@ -57,6 +61,10 @@ func (m *OracleRespondTx) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateResponse(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateResponseTTL(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -103,6 +111,24 @@ func (m *OracleRespondTx) validateResponse(formats strfmt.Registry) error {
 
 	if err := validate.Required("response", "body", m.Response); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (m *OracleRespondTx) validateResponseTTL(formats strfmt.Registry) error {
+
+	if err := validate.Required("response_ttl", "body", m.ResponseTTL); err != nil {
+		return err
+	}
+
+	if m.ResponseTTL != nil {
+		if err := m.ResponseTTL.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("response_ttl")
+			}
+			return err
+		}
 	}
 
 	return nil

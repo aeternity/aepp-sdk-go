@@ -22,9 +22,11 @@ type ContractCreateCompute struct {
 	// Minimum: 0
 	Amount *int64 `json:"amount"`
 
-	// Contract call data init function arguments
-	// Required: true
-	Arguments *string `json:"arguments"`
+	// Contract call data init function arguments (deprecated, use call)
+	Arguments string `json:"arguments,omitempty"`
+
+	// Source code for a contract with a function __call() = init(args)
+	Call string `json:"call,omitempty"`
 
 	// Contract's code
 	// Required: true
@@ -76,10 +78,6 @@ func (m *ContractCreateCompute) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateArguments(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.validateCode(formats); err != nil {
 		res = append(res, err)
 	}
@@ -125,15 +123,6 @@ func (m *ContractCreateCompute) validateAmount(formats strfmt.Registry) error {
 	}
 
 	if err := validate.MinimumInt("amount", "body", int64(*m.Amount), 0, false); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *ContractCreateCompute) validateArguments(formats strfmt.Registry) error {
-
-	if err := validate.Required("arguments", "body", m.Arguments); err != nil {
 		return err
 	}
 
