@@ -18,6 +18,7 @@ require (
 	github.com/go-openapi/strfmt v0.0.0-20180703152050-913ee058e387
 	github.com/go-openapi/swag v0.0.0-20180703152219-2b0bd4f193d0
 	github.com/go-openapi/validate v0.0.0-20180703152151-9a6e517cddf1
+	github.com/go-swagger/go-swagger v0.17.0 // indirect
 	github.com/hashicorp/hcl v0.0.0-20180404174102-ef8a98b0bbce // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/magiconair/properties v1.8.0 // indirect

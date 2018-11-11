@@ -32,6 +32,8 @@ github.com/go-openapi/swag v0.0.0-20180703152219-2b0bd4f193d0 h1:KOHIkUyLtY/OapQ
 github.com/go-openapi/swag v0.0.0-20180703152219-2b0bd4f193d0/go.mod h1:DXUve3Dpr1UfpPtxFw+EFuQ41HhCWZfha5jSVRG7C7I=
 github.com/go-openapi/validate v0.0.0-20180703152151-9a6e517cddf1 h1:T8Ce9y3KSeFTHh6COKvtnrl0aTvpR6dqXApeQmhF7Zw=
 github.com/go-openapi/validate v0.0.0-20180703152151-9a6e517cddf1/go.mod h1:ve8xoSHgqBUifiKgaVbxLmOE0ckvH0oXfsJcnm6SIz0=
+github.com/go-swagger/go-swagger v0.17.0 h1:VXtAcbBmNFxyDYIKp1udAscwbr9Y+/ZP+woNivlsHEY=
+github.com/go-swagger/go-swagger v0.17.0/go.mod h1:fOcXeMI1KPNv3uk4u7cR4VSyq0NyrYx4SS1/ajuTWDg=
 github.com/hashicorp/hcl v0.0.0-20180404174102-ef8a98b0bbce h1:xdsDDbiBDQTKASoGEZ+pEmF1OnWuu8AQ9I8iNbHNeno=
 github.com/hashicorp/hcl v0.0.0-20180404174102-ef8a98b0bbce/go.mod h1:oZtUIOe8dh44I2q6ScRibXws4Ajl+d+nod3AaR9vL5w=
 github.com/inconshreveable/mousetrap v1.0.0 h1:Z8tu5sraLXCXIcARxBp/8cbvlwVa7Z1NHg9XEKhtSvM=
