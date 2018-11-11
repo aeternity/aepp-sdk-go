@@ -4,11 +4,10 @@ import (
   "crypto/rand"
   "crypto/sha256"
   "fmt"
-  "strings"
-
   "github.com/btcsuite/btcutil/base58"
+  "github.com/satori/go.uuid"
   "golang.org/x/crypto/blake2b"
-  "golang.org/x/crypto/sha3"
+  "strings"
 )
 
 func hashSha256(data []byte) []byte {
@@ -81,11 +80,7 @@ func randomBytes(n int) ([]byte, error) {
   return b, nil
 }
 
-// Keccak256 calculates and returns the Keccak256 hash of the input data.
-func Keccak256(data ...[]byte) []byte {
-  d := sha3.NewLegacyKeccak256()
-  for _, b := range data {
-    d.Write(b)
-  }
-  return d.Sum(nil)
+// generate an uuid v4 string
+func uuidV4() (u string) {
+  return fmt.Sprint(uuid.NewV4())
 }

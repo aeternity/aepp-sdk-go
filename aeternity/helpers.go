@@ -317,8 +317,7 @@ func StoreAccountToKeyStoreFile(account *Account, password, walletName string) (
     return
   }
   // generate the keystore file
-  k := newKey([]byte(account.SigningKey), account.Address)
-  jks, err := Encrypt(k, password, nil)
+  jks, err := KeystoreSeal(account, password)
   if err != nil {
     return
   }
@@ -345,12 +344,7 @@ func LoadAccountFromKeyStoreFile(keyFile, password string) (account *Account, er
     return
   }
   // decrypt keystore
-  k, err := Decrypt(jks, password)
-  if err != nil {
-    return
-  }
-  // recover the account
-  account, err = loadAccountFromPrivateKeyRaw(k.PrivateKey)
+  account, err = KeystoreOpen(jks, password)
   return
 }
 

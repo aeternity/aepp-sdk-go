@@ -18,16 +18,16 @@ require (
 	github.com/go-openapi/strfmt v0.0.0-20180703152050-913ee058e387
 	github.com/go-openapi/swag v0.0.0-20180703152219-2b0bd4f193d0
 	github.com/go-openapi/validate v0.0.0-20180703152151-9a6e517cddf1
-	github.com/go-swagger/go-swagger v0.17.0 // indirect
 	github.com/hashicorp/hcl v0.0.0-20180404174102-ef8a98b0bbce // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/magiconair/properties v1.8.0 // indirect
 	github.com/mailru/easyjson v0.0.0-20180730094502-03f2033d19d5 // indirect
 	github.com/matoous/go-nanoid v0.0.0-20180109130436-958d370425a1
 	github.com/mitchellh/mapstructure v0.0.0-20180715050151-f15292f7a699 // indirect
-	github.com/pborman/uuid v0.0.0-20180827223501-4c1ecd6722e8
+	github.com/pborman/uuid v0.0.0-20180827223501-4c1ecd6722e8 // indirect
 	github.com/pelletier/go-toml v1.2.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/satori/go.uuid v1.2.0
 	github.com/shibukawa/configdir v0.0.0-20170330084843-e180dbdc8da0
 	github.com/spf13/afero v1.1.1 // indirect
 	github.com/spf13/cast v1.2.0 // indirect

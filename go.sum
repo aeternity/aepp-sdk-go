@@ -32,8 +32,6 @@ github.com/go-openapi/swag v0.0.0-20180703152219-2b0bd4f193d0 h1:KOHIkUyLtY/OapQ
 github.com/go-openapi/swag v0.0.0-20180703152219-2b0bd4f193d0/go.mod h1:DXUve3Dpr1UfpPtxFw+EFuQ41HhCWZfha5jSVRG7C7I=
 github.com/go-openapi/validate v0.0.0-20180703152151-9a6e517cddf1 h1:T8Ce9y3KSeFTHh6COKvtnrl0aTvpR6dqXApeQmhF7Zw=
 github.com/go-openapi/validate v0.0.0-20180703152151-9a6e517cddf1/go.mod h1:ve8xoSHgqBUifiKgaVbxLmOE0ckvH0oXfsJcnm6SIz0=
-github.com/go-swagger/go-swagger v0.17.0 h1:VXtAcbBmNFxyDYIKp1udAscwbr9Y+/ZP+woNivlsHEY=
-github.com/go-swagger/go-swagger v0.17.0/go.mod h1:fOcXeMI1KPNv3uk4u7cR4VSyq0NyrYx4SS1/ajuTWDg=
 github.com/hashicorp/hcl v0.0.0-20180404174102-ef8a98b0bbce h1:xdsDDbiBDQTKASoGEZ+pEmF1OnWuu8AQ9I8iNbHNeno=
 github.com/hashicorp/hcl v0.0.0-20180404174102-ef8a98b0bbce/go.mod h1:oZtUIOe8dh44I2q6ScRibXws4Ajl+d+nod3AaR9vL5w=
 github.com/inconshreveable/mousetrap v1.0.0 h1:Z8tu5sraLXCXIcARxBp/8cbvlwVa7Z1NHg9XEKhtSvM=
@@ -52,6 +50,8 @@ github.com/pelletier/go-toml v1.2.0 h1:T5zMGML61Wp+FlcbWjRDT7yAxhJNAiPPLOFECq181
 github.com/pelletier/go-toml v1.2.0/go.mod h1:5z9KED0ma1S8pY6P1sdut58dfprrGBbd/94hg7ilaic=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
+github.com/satori/go.uuid v1.2.0 h1:0uYX9dsZ2yD7q2RtLRtPSdGDWzjeM3TbMJP9utgA0ww=
+github.com/satori/go.uuid v1.2.0/go.mod h1:dA0hQrYB0VpLJoorglMZABFdXlWrHn1NEOzdhQKdks0=
 github.com/shibukawa/configdir v0.0.0-20170330084843-e180dbdc8da0 h1:Xuk8ma/ibJ1fOy4Ee11vHhUFHQNpHhrBneOCNHVXS5w=
 github.com/shibukawa/configdir v0.0.0-20170330084843-e180dbdc8da0/go.mod h1:7AwjWCpdPhkSmNAgUv5C7EJ4AbmjEB3r047r3DXWu3Y=
 github.com/spf13/afero v1.1.1 h1:Lt3ihYMlE+lreX1GS4Qw4ZsNpYQLxIXKBTEOXm3nt6I=
