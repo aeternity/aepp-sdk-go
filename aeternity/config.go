@@ -52,9 +52,12 @@ type ClientConfig struct {
 
 // TuningConfig fine tuning of parameters of the client
 type TuningConfig struct {
-  ChainPollInteval int64 `yaml:"chain_poll_interval" mapstructure:"chain_poll_interval"`
-  ChainTimeout     int64 `yaml:"chain_timeout" mapstructure:"chain_timeout"`
-  OutputFormatJSON bool  `yaml:"-" mapstructure:"-"`
+  ChainPollInteval  int64  `yaml:"chain_poll_interval" mapstructure:"chain_poll_interval"`
+  ChainTimeout      int64  `yaml:"chain_timeout" mapstructure:"chain_timeout"`
+  CryptoKdfMemlimit uint32 `yaml:"crypto_kdf_memlimit" mapstructure:"crypto_kdf_memlimit"`
+  CryptoKdfOpslimit uint32 `yaml:"crypto_kdf_opslimit" mapstructure:"crypto_kdf_opslimit"`
+  CryptoKdfThreads  uint8  `yaml:"crypto_kdf_threads" mapstructure:"crypto_kdf_threads"`
+  OutputFormatJSON  bool   `yaml:"-" mapstructure:"-"`
 }
 
 // ProfileConfig a configuration profile
@@ -94,11 +97,14 @@ func (c *ProfileConfig) Defaults() *ProfileConfig {
   utils.DefaultIfEmptyInt64(&c.Client.Names.ClaimFee, 1)
   utils.DefaultIfEmptyInt64(&c.Client.Names.UpdateFee, 1)
   // for contracts
-  utils.DefaultIfEmptyInt64(&c.Client.Contracts.Gas, 40000000)
+  utils.DefaultIfEmptyInt64(&c.Client.Contracts.Gas, 1000)
   utils.DefaultIfEmptyInt64(&c.Client.Contracts.GasPrice, 1)
   // for tuning
   utils.DefaultIfEmptyInt64(&c.Tuning.ChainPollInteval, 1000)
   utils.DefaultIfEmptyInt64(&c.Tuning.ChainTimeout, 5000)
+  utils.DefaultIfEmptyUint32(&c.Tuning.CryptoKdfMemlimit, 1024*32) // 32mb
+  utils.DefaultIfEmptyUint32(&c.Tuning.CryptoKdfOpslimit, 4)
+  utils.DefaultIfEmptyUint8(&c.Tuning.CryptoKdfThreads, 4)
   return c
 }
 

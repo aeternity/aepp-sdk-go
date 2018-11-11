@@ -13,8 +13,6 @@ const (
   cryptoSecretType   = "ed25519"
   cryptoSymmetricAlg = "xsalsa20-poly1305"
   kdf                = "argon2id"
-  kdfMemLimit        = 64 * 1024
-  kdfOpsLimit        = 3 // time
   kdfThreads         = 4
   kdfKeySize         = 32
   formatVersion      = 1
@@ -43,8 +41,8 @@ type cipherParams struct {
 }
 
 type kdfParams struct {
-  Memlimit int    `json:"memlimit"`
-  Opslimit int    `json:"opslimit"` // time
+  Memlimit uint32 `json:"memlimit"`
+  Opslimit uint32 `json:"opslimit"` // time
   Salt     string `json:"salt"`
 }
 
@@ -58,7 +56,11 @@ func KeystoreOpen(data []byte, password string) (account *Account, err error) {
   fmt.Printf("%#v\n", k)
   // build the key from the password
   salt, err := hex.DecodeString(k.Crypto.KdfParams.Salt)
-  argonKey := argon2.IDKey([]byte(password), salt, kdfOpsLimit, kdfMemLimit, kdfThreads, kdfKeySize)
+  argonKey := argon2.IDKey([]byte(password), salt,
+    Config.P.Tuning.CryptoKdfOpslimit,
+    Config.P.Tuning.CryptoKdfMemlimit,
+    Config.P.Tuning.CryptoKdfThreads,
+    kdfKeySize)
   var key [kdfKeySize]byte
   copy(key[:], argonKey)
   // retrieve the nonce
@@ -81,11 +83,17 @@ func KeystoreOpen(data []byte, password string) (account *Account, err error) {
 // KeystoreSeal create an encrypted json keystore with the private key of the account
 func KeystoreSeal(account *Account, password string) (j []byte, e error) {
   // normalize pwd
-  salt, err := randomBytes(32)
+  salt, err := randomBytes(16)
   if err != nil {
     return
   }
-  argonKey := argon2.IDKey([]byte(password), salt, kdfOpsLimit, kdfMemLimit, kdfThreads, kdfKeySize)
+
+  argonKey := argon2.IDKey([]byte(password), salt,
+    Config.P.Tuning.CryptoKdfOpslimit,
+    Config.P.Tuning.CryptoKdfMemlimit,
+    Config.P.Tuning.CryptoKdfThreads,
+    kdfKeySize)
+
   var key [kdfKeySize]byte
   copy(key[:], argonKey)
   // generate nonce
@@ -111,8 +119,8 @@ func KeystoreSeal(account *Account, password string) (j []byte, e error) {
       Ciphertext:   hex.EncodeToString(encrypted),
       Kdf:          kdf,
       KdfParams: kdfParams{
-        Memlimit: kdfMemLimit,
-        Opslimit: kdfOpsLimit,
+        Memlimit: Config.P.Tuning.CryptoKdfMemlimit,
+        Opslimit: Config.P.Tuning.CryptoKdfOpslimit,
         Salt:     hex.EncodeToString(salt),
       },
     },

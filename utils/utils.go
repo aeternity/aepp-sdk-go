@@ -48,6 +48,20 @@ func DefaultIfEmptyInt64(v *int64, defaultV int64) {
   }
 }
 
+// DefaultIfEmptyUint8 set the value of an int to a default if it is nulled (0)
+func DefaultIfEmptyUint8(v *uint8, defaultV uint8) {
+  if *v <= 0 {
+    *v = defaultV
+  }
+}
+
+// DefaultIfEmptyUint32 set the value of an int to a default if it is nulled (0)
+func DefaultIfEmptyUint32(v *uint32, defaultV uint32) {
+  if *v <= 0 {
+    *v = defaultV
+  }
+}
+
 // DefaultIfEmptyUint64 set the value of an int to a default if it is nulled (0)
 func DefaultIfEmptyUint64(v *uint64, defaultV uint64) {
   if *v <= 0 {
