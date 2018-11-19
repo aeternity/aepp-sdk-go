@@ -80,7 +80,7 @@ func waitForTransaction(epochCli *apiclient.Epoch, txHash string) (blockHeight u
 // Spend transfer tokens from an account to another
 func (w *Wallet) Spend(recipientAddress string, amount int64, message string) (tx, txHash, signature string, ttl uint64, nonce uint64, err error) {
   // calculate the absolute ttl for the transaction
-  ttl, err = getAbsoluteHeight(w.epochCli, Config.P.Client.TxTTL)
+  ttl, err = getAbsoluteHeight(w.epochCli, Config.P.Client.TTL)
   if err != nil {
     return
   }
@@ -121,7 +121,7 @@ func computeCommitmentID(name string) (ch string, salt []byte, err error) {
 // NamePreclaim post a preclaim transaction to the chain
 func (n *Aens) NamePreclaim(name string) (tx, txHash, signature string, ttl uint64, nonce uint64, nameSalt int64, err error) {
   // get the ttl offset
-  ttl, err = getAbsoluteHeight(n.epochCli, Config.P.Client.TxTTL)
+  ttl, err = getAbsoluteHeight(n.epochCli, Config.P.Client.TTL)
   if err != nil {
     return
   }
@@ -150,7 +150,7 @@ func (n *Aens) NamePreclaim(name string) (tx, txHash, signature string, ttl uint
 // NameClaim perform a name claiming
 func (n *Aens) NameClaim(name string, nameSalt int64) (tx, txHash, signature string, ttl uint64, nonce uint64, err error) {
   // get the ttl offset
-  ttl, err = getAbsoluteHeight(n.epochCli, Config.P.Client.TxTTL)
+  ttl, err = getAbsoluteHeight(n.epochCli, Config.P.Client.TTL)
   if err != nil {
     return
   }
@@ -174,7 +174,7 @@ func (n *Aens) NameClaim(name string, nameSalt int64) (tx, txHash, signature str
 
 // NameUpdate perform a name update
 func (n *Aens) NameUpdate(name string, targetAddress string) (tx, txHash, signature string, ttl uint64, nonce uint64, err error) {
-  ttl, err = getAbsoluteHeight(n.epochCli, Config.P.Client.TxTTL)
+  ttl, err = getAbsoluteHeight(n.epochCli, Config.P.Client.TTL)
   if err != nil {
     return
   }
@@ -189,7 +189,7 @@ func (n *Aens) NameUpdate(name string, targetAddress string) (tx, txHash, signat
   if err != nil {
     return
   }
-  absNameTTL, err := getAbsoluteHeight(n.epochCli, Config.P.Client.Names.TTL)
+  absNameTTL, err := getAbsoluteHeight(n.epochCli, Config.P.Client.Names.NameTTL)
   if err != nil {
     return
   }
@@ -311,7 +311,7 @@ Main:
 // StoreAccountToKeyStoreFile store an account to a json file
 func StoreAccountToKeyStoreFile(account *Account, password, walletName string) (filePath string, err error) {
   // keys are in the same folder as config
-  basePath := filepath.Join(filepath.Dir(Config.ConfigPath), "keys")
+  basePath := filepath.Join(filepath.Dir(Config.ConfigPath), "accounts")
   err = os.MkdirAll(basePath, os.ModePerm)
   if err != nil {
     return
@@ -327,7 +327,7 @@ func StoreAccountToKeyStoreFile(account *Account, password, walletName string) (
     filePath = filepath.Join(basePath, walletName)
   }
   // write the file to disk
-  err = ioutil.WriteFile(filePath, jks, 0400)
+  err = ioutil.WriteFile(filePath, jks, 0600)
   return
 }
 
@@ -350,6 +350,7 @@ func LoadAccountFromKeyStoreFile(keyFile, password string) (account *Account, er
 
 // GetWalletPath try to locate a wallet
 func GetWalletPath(path string) (walletPath string, err error) {
+  // if file exists then load the file
   if _, err = os.Stat(path); !os.IsNotExist(err) {
     walletPath = path
     return
