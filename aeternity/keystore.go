@@ -13,7 +13,6 @@ const (
   cryptoSecretType   = "ed25519"
   cryptoSymmetricAlg = "xsalsa20-poly1305"
   kdf                = "argon2id"
-  kdfThreads         = 4
   kdfKeySize         = 32
   formatVersion      = 1
 )
@@ -41,9 +40,10 @@ type cipherParams struct {
 }
 
 type kdfParams struct {
-  Memlimit uint32 `json:"memlimit"`
-  Opslimit uint32 `json:"opslimit"` // time
-  Salt     string `json:"salt"`
+  Memlimit    uint32 `json:"memlimit"`
+  Opslimit    uint32 `json:"opslimit"` // time
+  Salt        string `json:"salt"`
+  Parallelism uint8  `json:"parallelism"`
 }
 
 // KeystoreOpen open and decrypt a keystore
@@ -53,13 +53,12 @@ func KeystoreOpen(data []byte, password string) (account *Account, err error) {
   if err != nil {
     return
   }
-  fmt.Printf("%#v\n", k)
   // build the key from the password
   salt, err := hex.DecodeString(k.Crypto.KdfParams.Salt)
   argonKey := argon2.IDKey([]byte(password), salt,
-    Config.P.Tuning.CryptoKdfOpslimit,
-    Config.P.Tuning.CryptoKdfMemlimit,
-    Config.P.Tuning.CryptoKdfThreads,
+    k.Crypto.KdfParams.Opslimit,
+    k.Crypto.KdfParams.Memlimit,
+    k.Crypto.KdfParams.Parallelism,
     kdfKeySize)
   var key [kdfKeySize]byte
   copy(key[:], argonKey)
@@ -87,7 +86,6 @@ func KeystoreSeal(account *Account, password string) (j []byte, e error) {
   if err != nil {
     return
   }
-
   argonKey := argon2.IDKey([]byte(password), salt,
     Config.P.Tuning.CryptoKdfOpslimit,
     Config.P.Tuning.CryptoKdfMemlimit,
@@ -104,12 +102,12 @@ func KeystoreSeal(account *Account, password string) (j []byte, e error) {
   var n24 [24]byte
   copy(n24[:], nonce)
   //
-  encrypted := secretbox.Seal(nil, account.SigningKey, &n24, &key)
-
+  privateKeyRaw := []byte(account.SigningKey)
+  encrypted := secretbox.Seal(nil, privateKeyRaw, &n24, &key)
   // serialize
   k := keystoreJSON{
     ID:        uuidV4(),
-    Name:      "test",
+    Name:      keyFileName(account.Address),
     Version:   formatVersion,
     PublicKey: account.Address,
     Crypto: crypto{
@@ -119,9 +117,10 @@ func KeystoreSeal(account *Account, password string) (j []byte, e error) {
       Ciphertext:   hex.EncodeToString(encrypted),
       Kdf:          kdf,
       KdfParams: kdfParams{
-        Memlimit: Config.P.Tuning.CryptoKdfMemlimit,
-        Opslimit: Config.P.Tuning.CryptoKdfOpslimit,
-        Salt:     hex.EncodeToString(salt),
+        Memlimit:    Config.P.Tuning.CryptoKdfMemlimit,
+        Opslimit:    Config.P.Tuning.CryptoKdfOpslimit,
+        Salt:        hex.EncodeToString(salt),
+        Parallelism: Config.P.Tuning.CryptoKdfThreads,
       },
     },
   }

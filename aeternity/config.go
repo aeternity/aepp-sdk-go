@@ -103,8 +103,8 @@ func (c *ProfileConfig) Defaults() *ProfileConfig {
   utils.DefaultIfEmptyInt64(&c.Tuning.ChainPollInteval, 1000)
   utils.DefaultIfEmptyInt64(&c.Tuning.ChainTimeout, 5000)
   utils.DefaultIfEmptyUint32(&c.Tuning.CryptoKdfMemlimit, 1024*32) // 32mb
-  utils.DefaultIfEmptyUint32(&c.Tuning.CryptoKdfOpslimit, 4)
-  utils.DefaultIfEmptyUint8(&c.Tuning.CryptoKdfThreads, 4)
+  utils.DefaultIfEmptyUint32(&c.Tuning.CryptoKdfOpslimit, 3)
+  utils.DefaultIfEmptyUint8(&c.Tuning.CryptoKdfThreads, 1)
   return c
 }
 
@@ -143,7 +143,7 @@ var Config ConfigSchema
 // GenerateDefaultConfig generate a default configuration
 func GenerateDefaultConfig(outFile, version string) {
   Config = ConfigSchema{
-    KeysFolder: filepath.Join(filepath.Dir(outFile), "keys"),
+    KeysFolder: filepath.Join(filepath.Dir(outFile), "accounts"),
     ConfigPath: outFile,
   }
   Config.NewProfile("default")
