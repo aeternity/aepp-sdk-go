@@ -29,6 +29,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/satori/go.uuid v1.2.0
 	github.com/shibukawa/configdir v0.0.0-20170330084843-e180dbdc8da0
+	github.com/skratchdot/open-golang v0.0.0-20160302144031-75fb7ed4208c
 	github.com/spf13/afero v1.1.1 // indirect
 	github.com/spf13/cast v1.2.0 // indirect
 	github.com/spf13/cobra v0.0.3
