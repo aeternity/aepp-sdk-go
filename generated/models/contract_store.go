@@ -12,6 +12,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // ContractStore contract store
@@ -19,6 +20,7 @@ import (
 type ContractStore struct {
 
 	// store
+	// Required: true
 	Store []*ContractStoreStore `json:"store"`
 }
 
@@ -38,8 +40,8 @@ func (m *ContractStore) Validate(formats strfmt.Registry) error {
 
 func (m *ContractStore) validateStore(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Store) { // not required
-		return nil
+	if err := validate.Required("store", "body", m.Store); err != nil {
+		return err
 	}
 
 	for i := 0; i < len(m.Store); i++ {

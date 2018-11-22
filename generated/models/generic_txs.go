@@ -12,6 +12,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // GenericTxs generic txs
@@ -19,6 +20,7 @@ import (
 type GenericTxs struct {
 
 	// transactions
+	// Required: true
 	Transactions []*GenericSignedTx `json:"transactions"`
 }
 
@@ -38,8 +40,8 @@ func (m *GenericTxs) Validate(formats strfmt.Registry) error {
 
 func (m *GenericTxs) validateTransactions(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Transactions) { // not required
-		return nil
+	if err := validate.Required("transactions", "body", m.Transactions); err != nil {
+		return err
 	}
 
 	for i := 0; i < len(m.Transactions); i++ {

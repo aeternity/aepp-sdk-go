@@ -80,7 +80,7 @@ func initConfig() {
     aeternity.Config.Defaults()
     aeternity.Config.Validate()
     aeternity.Config.ConfigPath = viper.ConfigFileUsed()
-    aeternity.Config.KeysFolder = filepath.Join(globalCfg.Path, "keys")
+    aeternity.Config.KeysFolder = filepath.Join(globalCfg.Path, "accounts")
   } else {
     switch err.(type) {
     case viper.ConfigFileNotFoundError:

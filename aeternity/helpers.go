@@ -27,12 +27,16 @@ func urlComponents(url string) (host string, schemas []string) {
 }
 
 // getAbsoluteHeight return the chain height adding the offset
-func getAbsoluteHeight(epochCli *apiclient.Epoch, offset int64) (height int64, err error) {
+func getAbsoluteHeight(epochCli *apiclient.Epoch, offset uint64) (height uint64, err error) {
   kb, err := getTopBlock(epochCli)
   if err != nil {
     return
   }
-  height = kb.Height + offset
+
+  if kb.KeyBlock == nil {
+    height = *kb.MicroBlock.Height + offset
+  }
+
   return
 }
 
@@ -48,7 +52,7 @@ func getNextNonce(epochCli *apiclient.Epoch, acccount *Account) (nextNonce uint6
 }
 
 // waitForTransaction to appear on the chain
-func waitForTransaction(epochCli *apiclient.Epoch, txHash string) (blockHeight int64, blockHash string, err error) {
+func waitForTransaction(epochCli *apiclient.Epoch, txHash string) (blockHeight uint64, blockHash string, err error) {
   // caclulate the date for the timeout
   ctm := Config.P.Tuning.ChainTimeout
   tm := time.Now().Add(time.Millisecond * time.Duration(ctm))
@@ -64,7 +68,7 @@ func waitForTransaction(epochCli *apiclient.Epoch, txHash string) (blockHeight i
       break
     }
     if len(tx.BlockHash) > 0 {
-      blockHeight = tx.BlockHeight
+      blockHeight = *tx.BlockHeight
       blockHash = fmt.Sprint(tx.BlockHash)
       break
     }
@@ -74,13 +78,14 @@ func waitForTransaction(epochCli *apiclient.Epoch, txHash string) (blockHeight i
 }
 
 // Spend transfer tokens from an account to another
-func (w *Wallet) Spend(recipientAddress string, amount int64, message string) (tx, txHash, signature string, ttl int64, nonce uint64, err error) {
+func (w *Wallet) Spend(recipientAddress string, amount int64, message string) (tx, txHash, signature string, ttl uint64, nonce uint64, err error) {
   // calculate the absolute ttl for the transaction
-  ttl, err = getAbsoluteHeight(w.epochCli, Config.P.Client.TxTTL)
+  ttl, err = getAbsoluteHeight(w.epochCli, Config.P.Client.TTL)
   if err != nil {
     return
   }
   // create the spend transaction
+
   nonce, err = getNextNonce(w.epochCli, w.owner)
   if err != nil {
     return
@@ -114,9 +119,9 @@ func computeCommitmentID(name string) (ch string, salt []byte, err error) {
 }
 
 // NamePreclaim post a preclaim transaction to the chain
-func (n *Aens) NamePreclaim(name string) (tx, txHash, signature string, ttl int64, nonce uint64, nameSalt int64, err error) {
+func (n *Aens) NamePreclaim(name string) (tx, txHash, signature string, ttl uint64, nonce uint64, nameSalt int64, err error) {
   // get the ttl offset
-  ttl, err = getAbsoluteHeight(n.epochCli, Config.P.Client.TxTTL)
+  ttl, err = getAbsoluteHeight(n.epochCli, Config.P.Client.TTL)
   if err != nil {
     return
   }
@@ -143,9 +148,9 @@ func (n *Aens) NamePreclaim(name string) (tx, txHash, signature string, ttl int6
 }
 
 // NameClaim perform a name claiming
-func (n *Aens) NameClaim(name string, nameSalt int64) (tx, txHash, signature string, ttl int64, nonce uint64, err error) {
+func (n *Aens) NameClaim(name string, nameSalt int64) (tx, txHash, signature string, ttl uint64, nonce uint64, err error) {
   // get the ttl offset
-  ttl, err = getAbsoluteHeight(n.epochCli, Config.P.Client.TxTTL)
+  ttl, err = getAbsoluteHeight(n.epochCli, Config.P.Client.TTL)
   if err != nil {
     return
   }
@@ -168,8 +173,8 @@ func (n *Aens) NameClaim(name string, nameSalt int64) (tx, txHash, signature str
 }
 
 // NameUpdate perform a name update
-func (n *Aens) NameUpdate(name string, targetAddress string) (tx, txHash, signature string, ttl int64, nonce uint64, err error) {
-  ttl, err = getAbsoluteHeight(n.epochCli, Config.P.Client.TxTTL)
+func (n *Aens) NameUpdate(name string, targetAddress string) (tx, txHash, signature string, ttl uint64, nonce uint64, err error) {
+  ttl, err = getAbsoluteHeight(n.epochCli, Config.P.Client.TTL)
   if err != nil {
     return
   }
@@ -184,7 +189,7 @@ func (n *Aens) NameUpdate(name string, targetAddress string) (tx, txHash, signat
   if err != nil {
     return
   }
-  absNameTTL, err := getAbsoluteHeight(n.epochCli, Config.P.Client.Names.TTL)
+  absNameTTL, err := getAbsoluteHeight(n.epochCli, Config.P.Client.Names.NameTTL)
   if err != nil {
     return
   }
@@ -207,10 +212,10 @@ func (o *Oracle) OracleRegister(queryFormat, responseFormat string) (tx, txHash,
 }
 
 // PrintGenerationByHeight utility function to print a generation by it's height
-func (ae *Ae) PrintGenerationByHeight(height int64) {
+func (ae *Ae) PrintGenerationByHeight(height uint64) {
   p := external.NewGetGenerationByHeightParams().WithHeight(height)
   if r, err := ae.External.GetGenerationByHeight(p); err == nil {
-    PrintObjectT("Generation", r.Payload)
+    PrintObject("generation", r.Payload)
     // search for transaction in the microblocks
     for _, mbh := range r.Payload.MicroBlocks {
       // get the microblok
@@ -224,7 +229,7 @@ func (ae *Ae) PrintGenerationByHeight(height int64) {
       for _, btx := range r.Payload.Transactions {
         p := external.NewGetTransactionByHashParams().WithHash(fmt.Sprint(btx.Hash))
         if r, err := ae.External.GetTransactionByHash(p); err == nil {
-          PrintObject(r.Payload)
+          PrintObject("transaction", r.Payload)
         }
       }
     }
@@ -239,14 +244,14 @@ func (ae *Ae) PrintGenerationByHeight(height int64) {
 }
 
 // WaitForTransactionUntillHeight waits for a transaction until heightLimit (inclusive) is reached
-func (ae *Ae) WaitForTransactionUntillHeight(height int64, txHash string) (blockHeight int64, blockHash, microBlockHash string, tx *models.GenericSignedTx, err error) {
+func (ae *Ae) WaitForTransactionUntillHeight(height uint64, txHash string) (blockHeight uint64, blockHash, microBlockHash string, tx *models.GenericSignedTx, err error) {
   kb, err := getCurrentKeyBlock(ae.Epoch)
   if err != nil {
     return
   }
   // current height
-  targetHeight := kb.Height
-  nextHeight := kb.Height
+  targetHeight := *kb.Height
+  nextHeight := *kb.Height
   // hold the generation
   var g *models.Generation
 
@@ -279,7 +284,7 @@ Main:
         if fmt.Sprint(btx.Hash) == txHash {
           // transaction found !!
           blockHash = fmt.Sprint(g.KeyBlock.Hash)
-          blockHeight = g.KeyBlock.Height
+          blockHeight = *g.KeyBlock.Height
           microBlockHash = mbhs
           tx = btx
           break Main
@@ -297,7 +302,7 @@ Main:
     if err != nil {
       break
     }
-    nextHeight = kb.Height
+    nextHeight = *kb.Height
   }
 
   return
@@ -306,14 +311,13 @@ Main:
 // StoreAccountToKeyStoreFile store an account to a json file
 func StoreAccountToKeyStoreFile(account *Account, password, walletName string) (filePath string, err error) {
   // keys are in the same folder as config
-  basePath := filepath.Join(filepath.Dir(Config.ConfigPath), "keys")
+  basePath := filepath.Join(filepath.Dir(Config.ConfigPath), "accounts")
   err = os.MkdirAll(basePath, os.ModePerm)
   if err != nil {
     return
   }
   // generate the keystore file
-  k := newKey([]byte(account.SigningKey), account.Address)
-  jks, err := Encrypt(k, password, nil)
+  jks, err := KeystoreSeal(account, password)
   if err != nil {
     return
   }
@@ -323,7 +327,7 @@ func StoreAccountToKeyStoreFile(account *Account, password, walletName string) (
     filePath = filepath.Join(basePath, walletName)
   }
   // write the file to disk
-  err = ioutil.WriteFile(filePath, jks, 0400)
+  err = ioutil.WriteFile(filePath, jks, 0600)
   return
 }
 
@@ -340,17 +344,13 @@ func LoadAccountFromKeyStoreFile(keyFile, password string) (account *Account, er
     return
   }
   // decrypt keystore
-  k, err := Decrypt(jks, password)
-  if err != nil {
-    return
-  }
-  // recover the account
-  account, err = loadAccountFromPrivateKeyRaw(k.PrivateKey)
+  account, err = KeystoreOpen(jks, password)
   return
 }
 
 // GetWalletPath try to locate a wallet
 func GetWalletPath(path string) (walletPath string, err error) {
+  // if file exists then load the file
   if _, err = os.Stat(path); !os.IsNotExist(err) {
     walletPath = path
     return

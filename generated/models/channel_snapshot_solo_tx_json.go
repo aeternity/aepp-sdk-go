@@ -16,38 +16,38 @@ import (
   "github.com/go-openapi/validate"
 )
 
-// ContractCreateTxObject contract create tx object
-// swagger:model ContractCreateTxObject
-type ContractCreateTxObject struct {
+// ChannelSnapshotSoloTxJSON channel snapshot solo tx JSON
+// swagger:model ChannelSnapshotSoloTxJSON
+type ChannelSnapshotSoloTxJSON struct {
   versionField *int64
 
-  ContractCreateData
+  ChannelSnapshotSoloTx
 }
 
 // Type gets the type of this subtype
-func (m *ContractCreateTxObject) Type() string {
-  return "contract_create_tx"
+func (m *ChannelSnapshotSoloTxJSON) Type() string {
+  return "ChannelSnapshotSoloTx"
 }
 
 // SetType sets the type of this subtype
-func (m *ContractCreateTxObject) SetType(val string) {
+func (m *ChannelSnapshotSoloTxJSON) SetType(val string) {
 
 }
 
 // Version gets the version of this subtype
-func (m *ContractCreateTxObject) Version() *int64 {
+func (m *ChannelSnapshotSoloTxJSON) Version() *int64 {
   return m.versionField
 }
 
 // SetVersion sets the version of this subtype
-func (m *ContractCreateTxObject) SetVersion(val *int64) {
+func (m *ChannelSnapshotSoloTxJSON) SetVersion(val *int64) {
   m.versionField = val
 }
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
-func (m *ContractCreateTxObject) UnmarshalJSON(raw []byte) error {
+func (m *ChannelSnapshotSoloTxJSON) UnmarshalJSON(raw []byte) error {
   var data struct {
-    ContractCreateData
+    ChannelSnapshotSoloTx
   }
   buf := bytes.NewBuffer(raw)
   dec := json.NewDecoder(buf)
@@ -72,7 +72,7 @@ func (m *ContractCreateTxObject) UnmarshalJSON(raw []byte) error {
     return err
   }
 
-  var result ContractCreateTxObject
+  var result ChannelSnapshotSoloTxJSON
 
   if base.Type != result.Type() {
     /* Not the type we're looking for. */
@@ -81,7 +81,7 @@ func (m *ContractCreateTxObject) UnmarshalJSON(raw []byte) error {
 
   result.versionField = base.Version
 
-  result.ContractCreateData = data.ContractCreateData
+  result.ChannelSnapshotSoloTx = data.ChannelSnapshotSoloTx
 
   *m = result
 
@@ -89,14 +89,14 @@ func (m *ContractCreateTxObject) UnmarshalJSON(raw []byte) error {
 }
 
 // MarshalJSON marshals this object with a polymorphic type to a JSON structure
-func (m ContractCreateTxObject) MarshalJSON() ([]byte, error) {
+func (m ChannelSnapshotSoloTxJSON) MarshalJSON() ([]byte, error) {
   var b1, b2, b3 []byte
   var err error
   b1, err = json.Marshal(struct {
-    ContractCreateData
+    ChannelSnapshotSoloTx
   }{
 
-    ContractCreateData: m.ContractCreateData,
+    ChannelSnapshotSoloTx: m.ChannelSnapshotSoloTx,
   },
   )
   if err != nil {
@@ -120,16 +120,16 @@ func (m ContractCreateTxObject) MarshalJSON() ([]byte, error) {
   return swag.ConcatJSON(b1, b2, b3), nil
 }
 
-// Validate validates this contract create tx object
-func (m *ContractCreateTxObject) Validate(formats strfmt.Registry) error {
+// Validate validates this channel snapshot solo tx JSON
+func (m *ChannelSnapshotSoloTxJSON) Validate(formats strfmt.Registry) error {
   var res []error
 
   if err := m.validateVersion(formats); err != nil {
     res = append(res, err)
   }
 
-  // validation for a type composition with ContractCreateData
-  if err := m.ContractCreateData.Validate(formats); err != nil {
+  // validation for a type composition with ChannelSnapshotSoloTx
+  if err := m.ChannelSnapshotSoloTx.Validate(formats); err != nil {
     res = append(res, err)
   }
 
@@ -139,7 +139,7 @@ func (m *ContractCreateTxObject) Validate(formats strfmt.Registry) error {
   return nil
 }
 
-func (m *ContractCreateTxObject) validateVersion(formats strfmt.Registry) error {
+func (m *ChannelSnapshotSoloTxJSON) validateVersion(formats strfmt.Registry) error {
 
   if err := validate.Required("version", "body", m.Version()); err != nil {
     return err
@@ -149,7 +149,7 @@ func (m *ContractCreateTxObject) validateVersion(formats strfmt.Registry) error 
 }
 
 // MarshalBinary interface implementation
-func (m *ContractCreateTxObject) MarshalBinary() ([]byte, error) {
+func (m *ChannelSnapshotSoloTxJSON) MarshalBinary() ([]byte, error) {
   if m == nil {
     return nil, nil
   }
@@ -157,8 +157,8 @@ func (m *ContractCreateTxObject) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *ContractCreateTxObject) UnmarshalBinary(b []byte) error {
-  var res ContractCreateTxObject
+func (m *ChannelSnapshotSoloTxJSON) UnmarshalBinary(b []byte) error {
+  var res ChannelSnapshotSoloTxJSON
   if err := swag.ReadJSON(b, &res); err != nil {
     return err
   }

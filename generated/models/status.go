@@ -20,44 +20,70 @@ import (
 type Status struct {
 
 	// difficulty
-	Difficulty float64 `json:"difficulty,omitempty"`
+	// Required: true
+	Difficulty *int64 `json:"difficulty"`
 
 	// genesis key block hash
-	GenesisKeyBlockHash EncodedHash `json:"genesis_key_block_hash,omitempty"`
+	// Required: true
+	GenesisKeyBlockHash EncodedHash `json:"genesis_key_block_hash"`
 
 	// listening
-	Listening bool `json:"listening,omitempty"`
+	// Required: true
+	Listening *bool `json:"listening"`
 
 	// node revision
-	NodeRevision string `json:"node_revision,omitempty"`
+	// Required: true
+	NodeRevision *string `json:"node_revision"`
 
 	// node version
-	NodeVersion string `json:"node_version,omitempty"`
+	// Required: true
+	NodeVersion *string `json:"node_version"`
 
 	// peer count
+	// Required: true
 	// Minimum: 0
-	PeerCount *int64 `json:"peer_count,omitempty"`
+	PeerCount *int64 `json:"peer_count"`
 
 	// pending transactions count
+	// Required: true
 	// Minimum: 0
-	PendingTransactionsCount *int64 `json:"pending_transactions_count,omitempty"`
+	PendingTransactionsCount *int64 `json:"pending_transactions_count"`
 
 	// protocols
+	// Required: true
 	Protocols []*Protocol `json:"protocols"`
 
 	// solutions
+	// Required: true
 	// Minimum: 0
-	Solutions *int64 `json:"solutions,omitempty"`
+	Solutions *int64 `json:"solutions"`
 
 	// syncing
-	Syncing bool `json:"syncing,omitempty"`
+	// Required: true
+	Syncing *bool `json:"syncing"`
 }
 
 // Validate validates this status
 func (m *Status) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateDifficulty(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateGenesisKeyBlockHash(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateListening(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateNodeRevision(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateNodeVersion(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -77,17 +103,26 @@ func (m *Status) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateSyncing(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
 	return nil
 }
 
-func (m *Status) validateGenesisKeyBlockHash(formats strfmt.Registry) error {
+func (m *Status) validateDifficulty(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.GenesisKeyBlockHash) { // not required
-		return nil
+	if err := validate.Required("difficulty", "body", m.Difficulty); err != nil {
+		return err
 	}
+
+	return nil
+}
+
+func (m *Status) validateGenesisKeyBlockHash(formats strfmt.Registry) error {
 
 	if err := m.GenesisKeyBlockHash.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
@@ -99,10 +134,37 @@ func (m *Status) validateGenesisKeyBlockHash(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *Status) validateListening(formats strfmt.Registry) error {
+
+	if err := validate.Required("listening", "body", m.Listening); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Status) validateNodeRevision(formats strfmt.Registry) error {
+
+	if err := validate.Required("node_revision", "body", m.NodeRevision); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Status) validateNodeVersion(formats strfmt.Registry) error {
+
+	if err := validate.Required("node_version", "body", m.NodeVersion); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (m *Status) validatePeerCount(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.PeerCount) { // not required
-		return nil
+	if err := validate.Required("peer_count", "body", m.PeerCount); err != nil {
+		return err
 	}
 
 	if err := validate.MinimumInt("peer_count", "body", int64(*m.PeerCount), 0, false); err != nil {
@@ -114,8 +176,8 @@ func (m *Status) validatePeerCount(formats strfmt.Registry) error {
 
 func (m *Status) validatePendingTransactionsCount(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.PendingTransactionsCount) { // not required
-		return nil
+	if err := validate.Required("pending_transactions_count", "body", m.PendingTransactionsCount); err != nil {
+		return err
 	}
 
 	if err := validate.MinimumInt("pending_transactions_count", "body", int64(*m.PendingTransactionsCount), 0, false); err != nil {
@@ -127,8 +189,8 @@ func (m *Status) validatePendingTransactionsCount(formats strfmt.Registry) error
 
 func (m *Status) validateProtocols(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Protocols) { // not required
-		return nil
+	if err := validate.Required("protocols", "body", m.Protocols); err != nil {
+		return err
 	}
 
 	for i := 0; i < len(m.Protocols); i++ {
@@ -152,11 +214,20 @@ func (m *Status) validateProtocols(formats strfmt.Registry) error {
 
 func (m *Status) validateSolutions(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Solutions) { // not required
-		return nil
+	if err := validate.Required("solutions", "body", m.Solutions); err != nil {
+		return err
 	}
 
 	if err := validate.MinimumInt("solutions", "body", int64(*m.Solutions), 0, false); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Status) validateSyncing(formats strfmt.Registry) error {
+
+	if err := validate.Required("syncing", "body", m.Syncing); err != nil {
 		return err
 	}
 

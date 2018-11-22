@@ -12,6 +12,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // Generation generation
@@ -19,9 +20,11 @@ import (
 type Generation struct {
 
 	// key block
-	KeyBlock *KeyBlock `json:"key_block,omitempty"`
+	// Required: true
+	KeyBlock *KeyBlock `json:"key_block"`
 
 	// micro blocks
+	// Required: true
 	MicroBlocks []EncodedHash `json:"micro_blocks"`
 }
 
@@ -45,8 +48,8 @@ func (m *Generation) Validate(formats strfmt.Registry) error {
 
 func (m *Generation) validateKeyBlock(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.KeyBlock) { // not required
-		return nil
+	if err := validate.Required("key_block", "body", m.KeyBlock); err != nil {
+		return err
 	}
 
 	if m.KeyBlock != nil {
@@ -63,8 +66,8 @@ func (m *Generation) validateKeyBlock(formats strfmt.Registry) error {
 
 func (m *Generation) validateMicroBlocks(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.MicroBlocks) { // not required
-		return nil
+	if err := validate.Required("micro_blocks", "body", m.MicroBlocks); err != nil {
+		return err
 	}
 
 	for i := 0; i < len(m.MicroBlocks); i++ {

@@ -9,7 +9,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
-	"strconv"
 
 	strfmt "github.com/go-openapi/strfmt"
 
@@ -22,11 +21,6 @@ import (
 // ChannelForceProgressTx channel force progress tx
 // swagger:model ChannelForceProgressTx
 type ChannelForceProgressTx struct {
-
-	// addresses
-	// Required: true
-	// Min Items: 1
-	Addresses []EncodedHash `json:"addresses"`
 
 	// channel id
 	// Required: true
@@ -43,15 +37,14 @@ type ChannelForceProgressTx struct {
 
 	// nonce
 	// Minimum: 0
-	Nonce *uint64 `json:"nonce,omitempty"`
+	Nonce *int64 `json:"nonce,omitempty"`
+
+	// The whole set of off-chain state trees
+	OffchainTrees EncodedHash `json:"offchain_trees,omitempty"`
 
 	// payload
 	// Required: true
 	Payload *string `json:"payload"`
-
-	// Proof of inclusion containing information for closing the channel
-	// Required: true
-	Poi *string `json:"poi"`
 
 	// Channel's next round
 	// Required: true
@@ -82,19 +75,17 @@ func (m *ChannelForceProgressTx) SetUpdate(val OffChainUpdate) {
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
 func (m *ChannelForceProgressTx) UnmarshalJSON(raw []byte) error {
 	var data struct {
-		Addresses []EncodedHash `json:"addresses"`
-
 		ChannelID EncodedHash `json:"channel_id"`
 
 		Fee *int64 `json:"fee"`
 
 		FromID EncodedHash `json:"from_id"`
 
-		Nonce *uint64 `json:"nonce,omitempty"`
+		Nonce *int64 `json:"nonce,omitempty"`
+
+		OffchainTrees EncodedHash `json:"offchain_trees,omitempty"`
 
 		Payload *string `json:"payload"`
-
-		Poi *string `json:"poi"`
 
 		Round *int64 `json:"round"`
 
@@ -119,9 +110,6 @@ func (m *ChannelForceProgressTx) UnmarshalJSON(raw []byte) error {
 
 	var result ChannelForceProgressTx
 
-	// addresses
-	result.Addresses = data.Addresses
-
 	// channel_id
 	result.ChannelID = data.ChannelID
 
@@ -134,11 +122,11 @@ func (m *ChannelForceProgressTx) UnmarshalJSON(raw []byte) error {
 	// nonce
 	result.Nonce = data.Nonce
 
+	// offchain_trees
+	result.OffchainTrees = data.OffchainTrees
+
 	// payload
 	result.Payload = data.Payload
-
-	// poi
-	result.Poi = data.Poi
 
 	// round
 	result.Round = data.Round
@@ -162,19 +150,17 @@ func (m ChannelForceProgressTx) MarshalJSON() ([]byte, error) {
 	var b1, b2, b3 []byte
 	var err error
 	b1, err = json.Marshal(struct {
-		Addresses []EncodedHash `json:"addresses"`
-
 		ChannelID EncodedHash `json:"channel_id"`
 
 		Fee *int64 `json:"fee"`
 
 		FromID EncodedHash `json:"from_id"`
 
-		Nonce *uint64 `json:"nonce,omitempty"`
+		Nonce *int64 `json:"nonce,omitempty"`
+
+		OffchainTrees EncodedHash `json:"offchain_trees,omitempty"`
 
 		Payload *string `json:"payload"`
-
-		Poi *string `json:"poi"`
 
 		Round *int64 `json:"round"`
 
@@ -182,8 +168,6 @@ func (m ChannelForceProgressTx) MarshalJSON() ([]byte, error) {
 
 		TTL *int64 `json:"ttl,omitempty"`
 	}{
-
-		Addresses: m.Addresses,
 
 		ChannelID: m.ChannelID,
 
@@ -193,9 +177,9 @@ func (m ChannelForceProgressTx) MarshalJSON() ([]byte, error) {
 
 		Nonce: m.Nonce,
 
-		Payload: m.Payload,
+		OffchainTrees: m.OffchainTrees,
 
-		Poi: m.Poi,
+		Payload: m.Payload,
 
 		Round: m.Round,
 
@@ -225,10 +209,6 @@ func (m ChannelForceProgressTx) MarshalJSON() ([]byte, error) {
 func (m *ChannelForceProgressTx) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateAddresses(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.validateChannelID(formats); err != nil {
 		res = append(res, err)
 	}
@@ -245,11 +225,11 @@ func (m *ChannelForceProgressTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validatePayload(formats); err != nil {
+	if err := m.validateOffchainTrees(formats); err != nil {
 		res = append(res, err)
 	}
 
-	if err := m.validatePoi(formats); err != nil {
+	if err := m.validatePayload(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -272,32 +252,6 @@ func (m *ChannelForceProgressTx) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
-	return nil
-}
-
-func (m *ChannelForceProgressTx) validateAddresses(formats strfmt.Registry) error {
-
-	if err := validate.Required("addresses", "body", m.Addresses); err != nil {
-		return err
-	}
-
-	iAddressesSize := int64(len(m.Addresses))
-
-	if err := validate.MinItems("addresses", "body", iAddressesSize, 1); err != nil {
-		return err
-	}
-
-	for i := 0; i < len(m.Addresses); i++ {
-
-		if err := m.Addresses[i].Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("addresses" + "." + strconv.Itoa(i))
-			}
-			return err
-		}
-
-	}
-
 	return nil
 }
 
@@ -351,18 +305,25 @@ func (m *ChannelForceProgressTx) validateNonce(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ChannelForceProgressTx) validatePayload(formats strfmt.Registry) error {
+func (m *ChannelForceProgressTx) validateOffchainTrees(formats strfmt.Registry) error {
 
-	if err := validate.Required("payload", "body", m.Payload); err != nil {
+	if swag.IsZero(m.OffchainTrees) { // not required
+		return nil
+	}
+
+	if err := m.OffchainTrees.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("offchain_trees")
+		}
 		return err
 	}
 
 	return nil
 }
 
-func (m *ChannelForceProgressTx) validatePoi(formats strfmt.Registry) error {
+func (m *ChannelForceProgressTx) validatePayload(formats strfmt.Registry) error {
 
-	if err := validate.Required("poi", "body", m.Poi); err != nil {
+	if err := validate.Required("payload", "body", m.Payload); err != nil {
 		return err
 	}
 

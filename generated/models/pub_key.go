@@ -8,7 +8,9 @@ package models
 import (
 	strfmt "github.com/go-openapi/strfmt"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // PubKey pub key
@@ -16,11 +18,30 @@ import (
 type PubKey struct {
 
 	// pub key
-	PubKey string `json:"pub_key,omitempty"`
+	// Required: true
+	PubKey *string `json:"pub_key"`
 }
 
 // Validate validates this pub key
 func (m *PubKey) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validatePubKey(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *PubKey) validatePubKey(formats strfmt.Registry) error {
+
+	if err := validate.Required("pub_key", "body", m.PubKey); err != nil {
+		return err
+	}
+
 	return nil
 }
 

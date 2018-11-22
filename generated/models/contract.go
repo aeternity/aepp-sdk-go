@@ -8,7 +8,9 @@ package models
 import (
 	strfmt "github.com/go-openapi/strfmt"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // Contract contract
@@ -16,14 +18,47 @@ import (
 type Contract struct {
 
 	// code
-	Code string `json:"code,omitempty"`
+	// Required: true
+	Code *string `json:"code"`
 
 	// options
-	Options string `json:"options,omitempty"`
+	// Required: true
+	Options *string `json:"options"`
 }
 
 // Validate validates this contract
 func (m *Contract) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateCode(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateOptions(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *Contract) validateCode(formats strfmt.Registry) error {
+
+	if err := validate.Required("code", "body", m.Code); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Contract) validateOptions(formats strfmt.Registry) error {
+
+	if err := validate.Required("options", "body", m.Options); err != nil {
+		return err
+	}
+
 	return nil
 }
 

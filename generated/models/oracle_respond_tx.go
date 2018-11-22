@@ -25,7 +25,8 @@ type OracleRespondTx struct {
 	Nonce int64 `json:"nonce,omitempty"`
 
 	// oracle id
-	OracleID EncodedHash `json:"oracle_id,omitempty"`
+	// Required: true
+	OracleID EncodedHash `json:"oracle_id"`
 
 	// query id
 	// Required: true
@@ -34,6 +35,10 @@ type OracleRespondTx struct {
 	// response
 	// Required: true
 	Response *string `json:"response"`
+
+	// response ttl
+	// Required: true
+	ResponseTTL *RelativeTTL `json:"response_ttl"`
 
 	// ttl
 	TTL int64 `json:"ttl,omitempty"`
@@ -59,6 +64,10 @@ func (m *OracleRespondTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateResponseTTL(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -75,10 +84,6 @@ func (m *OracleRespondTx) validateFee(formats strfmt.Registry) error {
 }
 
 func (m *OracleRespondTx) validateOracleID(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.OracleID) { // not required
-		return nil
-	}
 
 	if err := m.OracleID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
@@ -106,6 +111,24 @@ func (m *OracleRespondTx) validateResponse(formats strfmt.Registry) error {
 
 	if err := validate.Required("response", "body", m.Response); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (m *OracleRespondTx) validateResponseTTL(formats strfmt.Registry) error {
+
+	if err := validate.Required("response_ttl", "body", m.ResponseTTL); err != nil {
+		return err
+	}
+
+	if m.ResponseTTL != nil {
+		if err := m.ResponseTTL.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("response_ttl")
+			}
+			return err
+		}
 	}
 
 	return nil

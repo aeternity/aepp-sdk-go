@@ -18,7 +18,8 @@ import (
 type OracleRegisterTx struct {
 
 	// account id
-	AccountID EncodedHash `json:"account_id,omitempty"`
+	// Required: true
+	AccountID EncodedHash `json:"account_id"`
 
 	// fee
 	// Required: true
@@ -45,6 +46,10 @@ type OracleRegisterTx struct {
 
 	// ttl
 	TTL int64 `json:"ttl,omitempty"`
+
+	// vm version
+	// Minimum: 0
+	VMVersion *int64 `json:"vm_version,omitempty"`
 }
 
 // Validate validates this oracle register tx
@@ -75,6 +80,10 @@ func (m *OracleRegisterTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateVMVersion(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -82,10 +91,6 @@ func (m *OracleRegisterTx) Validate(formats strfmt.Registry) error {
 }
 
 func (m *OracleRegisterTx) validateAccountID(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.AccountID) { // not required
-		return nil
-	}
 
 	if err := m.AccountID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
@@ -145,6 +150,19 @@ func (m *OracleRegisterTx) validateQueryFormat(formats strfmt.Registry) error {
 func (m *OracleRegisterTx) validateResponseFormat(formats strfmt.Registry) error {
 
 	if err := validate.Required("response_format", "body", m.ResponseFormat); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *OracleRegisterTx) validateVMVersion(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.VMVersion) { // not required
+		return nil
+	}
+
+	if err := validate.MinimumInt("vm_version", "body", int64(*m.VMVersion), 0, false); err != nil {
 		return err
 	}
 

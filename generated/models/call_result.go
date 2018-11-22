@@ -8,7 +8,9 @@ package models
 import (
 	strfmt "github.com/go-openapi/strfmt"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // CallResult call result
@@ -16,11 +18,30 @@ import (
 type CallResult struct {
 
 	// out
-	Out string `json:"out,omitempty"`
+	// Required: true
+	Out *string `json:"out"`
 }
 
 // Validate validates this call result
 func (m *CallResult) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateOut(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *CallResult) validateOut(formats strfmt.Registry) error {
+
+	if err := validate.Required("out", "body", m.Out); err != nil {
+		return err
+	}
+
 	return nil
 }
 

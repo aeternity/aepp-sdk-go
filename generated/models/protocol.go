@@ -18,12 +18,14 @@ import (
 type Protocol struct {
 
 	// effective at height
+	// Required: true
 	// Minimum: 0
-	EffectiveAtHeight *int64 `json:"effective_at_height,omitempty"`
+	EffectiveAtHeight *int64 `json:"effective_at_height"`
 
-	// protocol version
+	// version
+	// Required: true
 	// Minimum: 1
-	ProtocolVersion int64 `json:"protocol_version,omitempty"`
+	Version *int64 `json:"version"`
 }
 
 // Validate validates this protocol
@@ -34,7 +36,7 @@ func (m *Protocol) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateProtocolVersion(formats); err != nil {
+	if err := m.validateVersion(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -46,8 +48,8 @@ func (m *Protocol) Validate(formats strfmt.Registry) error {
 
 func (m *Protocol) validateEffectiveAtHeight(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.EffectiveAtHeight) { // not required
-		return nil
+	if err := validate.Required("effective_at_height", "body", m.EffectiveAtHeight); err != nil {
+		return err
 	}
 
 	if err := validate.MinimumInt("effective_at_height", "body", int64(*m.EffectiveAtHeight), 0, false); err != nil {
@@ -57,13 +59,13 @@ func (m *Protocol) validateEffectiveAtHeight(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Protocol) validateProtocolVersion(formats strfmt.Registry) error {
+func (m *Protocol) validateVersion(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.ProtocolVersion) { // not required
-		return nil
+	if err := validate.Required("version", "body", m.Version); err != nil {
+		return err
 	}
 
-	if err := validate.MinimumInt("protocol_version", "body", int64(m.ProtocolVersion), 1, false); err != nil {
+	if err := validate.MinimumInt("version", "body", int64(*m.Version), 1, false); err != nil {
 		return err
 	}
 

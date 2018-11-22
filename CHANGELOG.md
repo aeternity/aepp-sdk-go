@@ -22,6 +22,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - fixed
 
+## [0.25.0-0.1.0-alpha]
+
+### Added
+
+- Add compatibility with epoch v0.25.0
+
+### Removed
+
+- Remove compatibility with epoch < v0.25.0
+
+### Changed 
+
+- Change keystore implementation with xsalsa-poly1305/argon2id
+
+
 ## [0.22.0-0.1.0-alpha]
 
 ### Added

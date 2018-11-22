@@ -17,7 +17,8 @@ import (
 type NameHash struct {
 
 	// name id
-	NameID EncodedHash `json:"name_id,omitempty"`
+	// Required: true
+	NameID EncodedHash `json:"name_id"`
 }
 
 // Validate validates this name hash
@@ -35,10 +36,6 @@ func (m *NameHash) Validate(formats strfmt.Registry) error {
 }
 
 func (m *NameHash) validateNameID(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.NameID) { // not required
-		return nil
-	}
 
 	if err := m.NameID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {

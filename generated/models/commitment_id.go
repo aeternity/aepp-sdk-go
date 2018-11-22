@@ -17,7 +17,8 @@ import (
 type CommitmentID struct {
 
 	// commitment id
-	CommitmentID EncodedHash `json:"commitment_id,omitempty"`
+	// Required: true
+	CommitmentID EncodedHash `json:"commitment_id"`
 }
 
 // Validate validates this commitment Id
@@ -35,10 +36,6 @@ func (m *CommitmentID) Validate(formats strfmt.Registry) error {
 }
 
 func (m *CommitmentID) validateCommitmentID(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.CommitmentID) { // not required
-		return nil
-	}
 
 	if err := m.CommitmentID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {

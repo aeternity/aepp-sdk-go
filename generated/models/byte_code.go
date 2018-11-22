@@ -8,7 +8,9 @@ package models
 import (
 	strfmt "github.com/go-openapi/strfmt"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // ByteCode byte code
@@ -16,11 +18,30 @@ import (
 type ByteCode struct {
 
 	// bytecode
-	Bytecode string `json:"bytecode,omitempty"`
+	// Required: true
+	Bytecode *string `json:"bytecode"`
 }
 
 // Validate validates this byte code
 func (m *ByteCode) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateBytecode(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *ByteCode) validateBytecode(formats strfmt.Registry) error {
+
+	if err := validate.Required("bytecode", "body", m.Bytecode); err != nil {
+		return err
+	}
+
 	return nil
 }
 
