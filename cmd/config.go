@@ -27,7 +27,7 @@ var configCmd = &cobra.Command{
   Short: "Print the configuration of the client",
   Long:  ``,
   Run: func(cmd *cobra.Command, args []string) {
-    aeternity.PrintObjectT("Configuration", aeternity.Config.P)
+    aeternity.PrintObject("configuration", aeternity.Config.P)
     // aeternity.Pp(
     // 	"Epoch URL", aeternity.Config.P.Epoch.URL,
     // 	"Epoch Internal URL", aeternity.Config.P.Epoch.InternalURL,
@@ -41,9 +41,8 @@ var editCmd = &cobra.Command{
   Short: "Open the config file for editing",
   Long:  ``,
   Run: func(cmd *cobra.Command, args []string) {
-    aeternity.PrintObjectT("Edit configuration at", aeternity.Config.ConfigPath)
+    aeternity.PrintObject("Configuration path", aeternity.Config.ConfigPath)
     open.Run(aeternity.Config.ConfigPath)
-    aeternity.PrintObjectT("Edit configuration completed", aeternity.Config.ConfigPath)
   },
 }
 

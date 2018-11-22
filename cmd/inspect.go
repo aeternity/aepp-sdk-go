@@ -52,12 +52,12 @@ func init() {
 
 }
 
-func printResult(v interface{}, err error) {
+func printResult(title string, v interface{}, err error) {
   if err != nil {
     fmt.Println(err)
     os.Exit(1)
   }
-  aeternity.PrintObject(v)
+  aeternity.PrintObject(title, v)
 }
 
 func inspect(cmd *cobra.Command, args []string) {
@@ -71,7 +71,7 @@ func inspect(cmd *cobra.Command, args []string) {
     // name
     if strings.HasSuffix(object, ".aet") {
       v, err := aeCli.APIGetNameEntryByName(object)
-      printResult(v, err)
+      printResult("aens", v, err)
       continue
     }
 
@@ -79,28 +79,28 @@ func inspect(cmd *cobra.Command, args []string) {
     case aeternity.PrefixAccount:
       // account balance
       v, err := aeCli.APIGetAccount(object)
-      printResult(v, err)
+      printResult("account", v, err)
 
     case aeternity.PrefixMicroBlockHash:
       v, err := aeCli.APIGetMicroBlockHeaderByHash(object)
-      printResult(v, err)
+      printResult("block", v, err)
       v1, err := aeCli.APIGetMicroBlockTransactionsByHash(object)
-      printResult(v1, err)
+      printResult("transaction", v1, err)
 
     case aeternity.PrefixKeyBlockHash:
       // block
       v, err := aeCli.APIGetKeyBlockByHash(object)
-      printResult(v, err)
+      printResult("key-block", v, err)
 
     case aeternity.PrefixTxHash:
       // transaction
       v, err := aeCli.APIGetTransactionByHash(object)
-      printResult(v, err)
+      printResult("transaction", v, err)
 
     case aeternity.PrefixOracle:
       // oracle
       v, err := aeCli.APIGetOracleByPubkey(object)
-      printResult(v, err)
+      printResult("oracle", v, err)
 
     default:
       fmt.Println("Object", object, "not yet supported")

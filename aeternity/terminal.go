@@ -43,33 +43,40 @@ func PpI(indentSize int, data ...interface{}) {
     rp := defaultIndentSize - indentSize
 
     fmt.Printf("%v%v %v\n",
-      times(" ", indentSize),
+      times("  ", indentSize),
       right(fmt.Sprintf("%v", data[i]), rp, "_"),
       data[i+1],
     )
   }
 }
 
-func printIf(v interface{}) {
-  var p func(n string, v reflect.Value, dept int)
-  p = func(n string, v reflect.Value, dept int) {
+// PpT pretty print indent Title
+func PpT(indentSize int, title string) {
+  fmt.Printf("%v%v\n", times("  ", indentSize), title)
+}
+
+func printIf(title string, v interface{}) {
+  var p func(title, n string, v reflect.Value, dept int)
+  p = func(title, n string, v reflect.Value, dept int) {
     switch v.Kind() {
     // If it is a pointer we need to unwrap and call once again
     case reflect.Ptr:
       if v.IsValid() {
-        p(n, v.Elem(), dept)
+        p(title, n, v.Elem(), dept)
       }
     case reflect.Interface:
-      p(n, v.Elem(), dept)
+      p(title, n, v.Elem(), dept)
     case reflect.Struct:
+      PpT(dept, fmt.Sprintf("<%s>", v.Type().Name()))
       dept++
       for i := 0; i < v.NumField(); i++ {
-        p(v.Type().Field(i).Name, v.Field(i), dept)
+        p("", v.Type().Field(i).Name, v.Field(i), dept)
       }
+      dept--
+      PpT(dept, fmt.Sprintf("</%s>", v.Type().Name()))
     case reflect.Slice:
-      dept++
       for i := 0; i < v.Len(); i++ {
-        p("", v.Index(i), dept)
+        p("", "", v.Index(i), dept)
       }
     default:
       if len(n) > 0 {
@@ -81,7 +88,7 @@ func printIf(v interface{}) {
       }
     }
   }
-  p("", reflect.ValueOf(v), -1)
+  p(title, "", reflect.ValueOf(v), 0)
 }
 
 func getErrorReason(v interface{}) (msg string) {
@@ -111,27 +118,20 @@ func getErrorReason(v interface{}) (msg string) {
   return
 }
 
-// PrintObject pretty print an object obtained from the api
-func PrintObject(i interface{}) {
-  PrintObjectT("", i)
-}
-
 // PrintError print error
 func PrintError(code string, e *models.Error) {
   Pp(code, e.Reason)
 }
 
-// PrintObjectT pretty print an object obtained from the api with a title
-func PrintObjectT(title string, i interface{}) {
+// PrintObject pretty print an object obtained from the api with a title
+func PrintObject(title string, i interface{}) {
   if Config.P.Tuning.OutputFormatJSON {
     j, _ := json.MarshalIndent(i, "", "  ")
     fmt.Printf("%s\n", j)
     return
   }
 
-  if len(title) > 0 {
-    fmt.Println(title)
-  }
+  printIf(title, i)
+  print("\n")
 
-  printIf(i)
 }

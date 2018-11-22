@@ -117,7 +117,7 @@ var balanceCmd = &cobra.Command{
       fmt.Println("Error retrieving the account: ", err)
       os.Exit(1)
     }
-    aeternity.PrintObject(a)
+    aeternity.PrintObject("account", a)
   },
 }
 
@@ -227,7 +227,7 @@ var spendCmd = &cobra.Command{
     }
     if waitForTx {
       _, _, _, tx, err := aeCli.WaitForTransactionUntillHeight(ttl, txHash)
-      aeternity.PrintObjectT("Transaction", tx)
+      aeternity.PrintObject("Transaction", tx)
       if err != nil {
         fmt.Println(err)
         os.Exit(1)

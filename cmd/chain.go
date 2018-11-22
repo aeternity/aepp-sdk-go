@@ -39,13 +39,13 @@ var topCmd = &cobra.Command{
       fmt.Println(err)
       os.Exit(1)
     }
-    aeternity.PrintObject(v)
+    aeternity.PrintObject("block", v)
   },
 }
 
-var versionCmd = &cobra.Command{
-  Use:   "version",
-  Short: "Get the status and version of the node running the chain",
+var statusCmd = &cobra.Command{
+  Use:   "status",
+  Short: "Get the status and status of the node running the chain",
   Long:  ``,
   Run: func(cmd *cobra.Command, args []string) {
     v, err := aeCli.APIGetStatus()
@@ -53,7 +53,7 @@ var versionCmd = &cobra.Command{
       fmt.Println(err)
       os.Exit(1)
     }
-    aeternity.PrintObject(v)
+    aeternity.PrintObject("epoch node", v)
   },
 }
 
@@ -97,7 +97,7 @@ var playCmd = &cobra.Command{
 func init() {
   RootCmd.AddCommand(chainCmd)
   chainCmd.AddCommand(topCmd)
-  chainCmd.AddCommand(versionCmd)
+  chainCmd.AddCommand(statusCmd)
   chainCmd.AddCommand(playCmd)
 
   playCmd.Flags().Uint64Var(&limit, "limit", 0, "Print at max 'limit' generations")

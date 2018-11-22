@@ -215,7 +215,7 @@ func (o *Oracle) OracleRegister(queryFormat, responseFormat string) (tx, txHash,
 func (ae *Ae) PrintGenerationByHeight(height uint64) {
   p := external.NewGetGenerationByHeightParams().WithHeight(height)
   if r, err := ae.External.GetGenerationByHeight(p); err == nil {
-    PrintObjectT("Generation", r.Payload)
+    PrintObject("generation", r.Payload)
     // search for transaction in the microblocks
     for _, mbh := range r.Payload.MicroBlocks {
       // get the microblok
@@ -229,7 +229,7 @@ func (ae *Ae) PrintGenerationByHeight(height uint64) {
       for _, btx := range r.Payload.Transactions {
         p := external.NewGetTransactionByHashParams().WithHash(fmt.Sprint(btx.Hash))
         if r, err := ae.External.GetTransactionByHash(p); err == nil {
-          PrintObject(r.Payload)
+          PrintObject("transaction", r.Payload)
         }
       }
     }
