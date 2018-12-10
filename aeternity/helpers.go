@@ -114,7 +114,7 @@ func computeCommitmentID(name string) (ch string, salt []byte, err error) {
   nh := append(namehash(name), salt...)
   nh, _ = hash(nh)
   // nh := namehash(name)
-  ch = encodeP(PrefixNameCommitment, nh)
+  ch = encodeP(PrefixCommitment, nh)
   return
 }
 
@@ -184,7 +184,7 @@ func (n *Aens) NameUpdate(name string, targetAddress string) (tx, txHash, signat
     return
   }
 
-  encodedNameHash := encodeP(PrefixNameHash, namehash(name))
+  encodedNameHash := encodeP(PrefixName, namehash(name))
   absClientTTL, err := getAbsoluteHeight(n.epochCli, Config.P.Client.Names.ClientTTL)
   if err != nil {
     return

@@ -18,10 +18,10 @@ func SignEncodeTx(kp *Account, txRaw []byte) (signedEncodedTx, signedEncodedTxHa
   // encode the message using rlp
   rlpTxRaw, err := createSignedTransaction(txRaw, [][]byte{sigRaw})
   // encode the rlp message with the prefix
-  signedEncodedTx = encodeP(PrefixTx, rlpTxRaw)
+  signedEncodedTx = encodeP(PrefixTransaction, rlpTxRaw)
   // compute the hash
   rlpTxHashRaw, err := hash(rlpTxRaw)
-  signedEncodedTxHash = encodeP(PrefixTxHash, rlpTxHashRaw)
+  signedEncodedTxHash = encodeP(PrefixTransactionHash, rlpTxHashRaw)
   // encode the signature
   signature = encodeP(PrefixSignature, sigRaw)
   return
@@ -165,13 +165,13 @@ func buildPointers(pointers []string) (ptrs [][]uint8, err error) {
   ptrs = make([][]uint8, len(pointers))
   for i, p := range pointers {
     switch GetHashPrefix(p) {
-    case PrefixAccount:
+    case PrefixAccountPubkey:
       pID, err := buildIDTag(IDTagName, p)
       ptrs[i] = pID
       if err != nil {
         break
       }
-    case PrefixOracle:
+    case PrefixOraclePubkey:
       pID, err := buildIDTag(IDTagOracle, p)
       ptrs[i] = pID
       if err != nil {

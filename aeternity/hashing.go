@@ -3,6 +3,7 @@ package aeternity
 import (
   "crypto/rand"
   "crypto/sha256"
+  "encoding/base64"
   "fmt"
   "github.com/btcsuite/btcutil/base58"
   "github.com/satori/go.uuid"
@@ -16,21 +17,38 @@ func hashSha256(data []byte) []byte {
   return d.Sum(nil)
 }
 
-// encode encode a byte array into base58 with chacksum
-func encode(in []byte) string {
-  c := hashSha256(hashSha256(in))
-  return base58.Encode(append(in, c[0:4]...))
-}
+// encode encode a byte array into base58 with chacksum and a prefix
+func encode(prefix HashPrefix, data []byte) string {
+  checksum := hashSha256(hashSha256(data))
+  in := append(data, checksum[0:4]...)
+  switch objectEncoding[prefix] {
+  case Base58c:
+    return base58.Encode(in)
+  case Base64c:
+    return base64.StdEncoding.EncodeToString(in)
+  default:
+    panic(fmt.Sprint("Encoding not supported"))
+  }
 
-// encodeP encode a byte array into base58 with chacksum and a prefix
-func encodeP(prefix HashPrefix, data []byte) string {
-  return fmt.Sprint(prefix, encode(data))
 }
 
 // decode decode a string encoded with base58 + checksum to a byte array
 func decode(in string) (out []byte, err error) {
+  // prefix and hash
+  var p HashPrefix
+  var h string
+  // validate input
+  if len(in) <= 3 || string(in[2]) == PrefixSeparator {
+    err = fmt.Errorf("Invalid object encoding")
+    return
+  }
+  // TODO: check for a valid encoding
+
   if len(in) >= 3 && string(in[2]) == PrefixSeparator {
-    in = in[3:]
+    p = HashPrefix(in[0:3])
+    h = in[3:]
+  }
+  switch objectEncoding[in[0:3]] {
   }
   raw := base58.Decode(in)
   if len(raw) < 5 {

@@ -1,12 +1,12 @@
 GOFILES = $(shell find . -name '*.go' -not -path './vendor/*')
 GOPACKAGES = $(shell go list ./...  | grep -v /vendor/)
-GIT_DESCR = $(shell git describe --always) 
+GIT_DESCR = $(shell git describe --tags --always) 
 APP=aecli
 # build output folder
 OUTPUTFOLDER = dist
 # docker image
 DOCKER_IMAGE = aeternity/aepps-sdk-go
-DOCKER_TAG = $(shell git describe --always)
+DOCKER_TAG = $(shell git describe --tags --always)
 # build paramters
 OS = linux
 ARCH = amd64

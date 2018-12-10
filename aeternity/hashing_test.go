@@ -118,7 +118,7 @@ func Test_namehash(t *testing.T) {
   }
   for _, tt := range tests {
     t.Run(tt.name, func(t *testing.T) {
-      got := encodeP(PrefixNameHash, namehash(tt.args.name))
+      got := encodeP(PrefixName, namehash(tt.args.name))
       if got != tt.want {
         t.Errorf("namehash() = %v, want %v", got, tt.want)
       }

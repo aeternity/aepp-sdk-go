@@ -27,7 +27,7 @@ func loadAccountFromPrivateKeyRaw(privb []byte) (account *Account, err error) {
 func loadAccountFromPrivateKey(priv ed25519.PrivateKey) (account *Account) {
   account = &Account{
     SigningKey: priv,
-    Address:    encodeP(PrefixAccount, []byte(fmt.Sprintf("%s", priv.Public()))),
+    Address:    encodeP(PrefixAccountPubkey, []byte(fmt.Sprintf("%s", priv.Public()))),
   }
   return
 }
