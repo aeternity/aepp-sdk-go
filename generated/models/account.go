@@ -6,106 +6,106 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-  strfmt "github.com/go-openapi/strfmt"
+	strfmt "github.com/go-openapi/strfmt"
 
-  "github.com/go-openapi/errors"
-  "github.com/go-openapi/swag"
-  "github.com/go-openapi/validate"
+	"github.com/go-openapi/errors"
+	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // Account account
 // swagger:model Account
 type Account struct {
 
-  // Balance
-  // Required: true
-  // Minimum: 0
-  Balance float64 `json:"balance"`
+	// Balance
+	// Required: true
+	// Minimum: 0
+	Balance float64 `json:"balance"`
 
-  // Public key
-  // Required: true
-  ID EncodedHash `json:"id"`
+	// Public key
+	// Required: true
+	ID EncodedHash `json:"id"`
 
-  // Nonce
-  // Required: true
-  // Minimum: 0
-  Nonce *uint64 `json:"nonce"`
+	// Nonce
+	// Required: true
+	// Minimum: 0
+	Nonce *uint64 `json:"nonce"`
 }
 
 // Validate validates this account
 func (m *Account) Validate(formats strfmt.Registry) error {
-  var res []error
+	var res []error
 
-  if err := m.validateBalance(formats); err != nil {
-    res = append(res, err)
-  }
+	if err := m.validateBalance(formats); err != nil {
+		res = append(res, err)
+	}
 
-  if err := m.validateID(formats); err != nil {
-    res = append(res, err)
-  }
+	if err := m.validateID(formats); err != nil {
+		res = append(res, err)
+	}
 
-  if err := m.validateNonce(formats); err != nil {
-    res = append(res, err)
-  }
+	if err := m.validateNonce(formats); err != nil {
+		res = append(res, err)
+	}
 
-  if len(res) > 0 {
-    return errors.CompositeValidationError(res...)
-  }
-  return nil
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
 }
 
 func (m *Account) validateBalance(formats strfmt.Registry) error {
 
-  if err := validate.Required("balance", "body", m.Balance); err != nil {
-    return err
-  }
+	if err := validate.Required("balance", "body", m.Balance); err != nil {
+		return err
+	}
 
-  if err := validate.MinimumNativeType("balance", "body", m.Balance, 0, false); err != nil {
-    return err
-  }
+	if err := validate.MinimumNativeType("balance", "body", m.Balance, 0, false); err != nil {
+		return err
+	}
 
-  return nil
+	return nil
 }
 
 func (m *Account) validateID(formats strfmt.Registry) error {
 
-  if err := m.ID.Validate(formats); err != nil {
-    if ve, ok := err.(*errors.Validation); ok {
-      return ve.ValidateName("id")
-    }
-    return err
-  }
+	if err := m.ID.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("id")
+		}
+		return err
+	}
 
-  return nil
+	return nil
 }
 
 func (m *Account) validateNonce(formats strfmt.Registry) error {
 
-  if err := validate.Required("nonce", "body", m.Nonce); err != nil {
-    return err
-  }
+	if err := validate.Required("nonce", "body", m.Nonce); err != nil {
+		return err
+	}
 
-  if err := validate.MinimumInt("nonce", "body", int64(*m.Nonce), 0, false); err != nil {
-    return err
-  }
+	if err := validate.MinimumInt("nonce", "body", int64(*m.Nonce), 0, false); err != nil {
+		return err
+	}
 
-  return nil
+	return nil
 }
 
 // MarshalBinary interface implementation
 func (m *Account) MarshalBinary() ([]byte, error) {
-  if m == nil {
-    return nil, nil
-  }
-  return swag.WriteJSON(m)
+	if m == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(m)
 }
 
 // UnmarshalBinary interface implementation
 func (m *Account) UnmarshalBinary(b []byte) error {
-  var res Account
-  if err := swag.ReadJSON(b, &res); err != nil {
-    return err
-  }
-  *m = res
-  return nil
+	var res Account
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*m = res
+	return nil
 }
