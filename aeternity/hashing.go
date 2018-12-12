@@ -18,38 +18,38 @@ func hashSha256(data []byte) []byte {
 	return d.Sum(nil)
 }
 
-// encode encode a byte array into base58 with chacksum and a prefix
+// encode a byte array into base58 with chacksum and a prefix
 func encode(prefix HashPrefix, data []byte) string {
 	checksum := hashSha256(hashSha256(data))
 	in := append(data, checksum[0:4]...)
 	switch objectEncoding[prefix] {
 	case Base58c:
-		return base58.Encode(in)
+		return fmt.Sprint(prefix, base58.Encode(in))
 	case Base64c:
-		return base64.StdEncoding.EncodeToString(in)
+		return fmt.Sprint(prefix, base64.StdEncoding.EncodeToString(in))
 	default:
 		panic(fmt.Sprint("Encoding not supported"))
 	}
 
 }
 
-// decode decode a string encoded with base58 + checksum to a byte array
+// decode a string encoded with base58 + checksum to a byte array
 func decode(in string) (out []byte, err error) {
 	// prefix and hash
 	var p HashPrefix
 	var h string
 	var raw []byte
-	// validate input
-	if len(in) <= 3 || string(in[2]) == PrefixSeparator {
+
+	// Validation
+	// 3 (**_) + 5 (Single byte, prefixed with Base58 4 character hash)
+	// then split it into p(refix) and h(ash)
+	if len(in) <= 8 || string(in[2]) != PrefixSeparator {
 		err = fmt.Errorf("Invalid object encoding")
 		return
 	}
-	// TODO: check for a valid encoding
+	p = HashPrefix(in[0:3])
+	h = in[3:]
 
-	if len(in) >= 3 && string(in[2]) == PrefixSeparator {
-		p = HashPrefix(in[0:3])
-		h = in[3:]
-	}
 	switch objectEncoding[p] {
 	case Base58c:
 		raw = base58.Decode(h)
