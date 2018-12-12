@@ -4,9 +4,10 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"time"
+
 	"golang.org/x/crypto/argon2"
 	"golang.org/x/crypto/nacl/secretbox"
-	"time"
 )
 
 const (
@@ -40,7 +41,7 @@ type cipherParams struct {
 }
 
 type kdfParams struct {
-	Memlimit    uint32 `json:"memlimit"`
+	Memlimit    uint32 `json:"memlimit_kib"`
 	Opslimit    uint32 `json:"opslimit"` // time
 	Salt        string `json:"salt"`
 	Parallelism uint8  `json:"parallelism"`

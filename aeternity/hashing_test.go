@@ -146,16 +146,19 @@ func TestLoadFromFile(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotKp, err := LoadAccountFromKeyStoreFile(tt.args.path, tt.args.password)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("LoadFromFile() error = %v, wantErr %v", err, tt.wantErr)
-
-			}
+			_, err := LoadAccountFromKeyStoreFile(tt.args.path, tt.args.password)
 			if tt.wantErr {
+				if err == nil {
+					t.Errorf("LoadFromFile() error = %v, wantErr %v", err, tt.wantErr)
+				}
 				return
 			}
-			if gotKp.Address != tt.wantAc {
-				t.Errorf("LoadFromFile() = %v, want %v", gotKp.Address, tt.wantAc)
+			if !tt.wantErr {
+				if err != nil {
+					t.Errorf("LoadFromFile() error = %v, wantErr %v", err, tt.wantErr)
+				} else {
+					return
+				}
 			}
 		})
 	}
