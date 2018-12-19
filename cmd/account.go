@@ -32,6 +32,7 @@ var (
 	payload         string
 	printPrivateKey bool
 	accountFileName string
+	password        string
 )
 
 // accountCmd represents the account command
@@ -199,14 +200,18 @@ var spendCmd = &cobra.Command{
 			fmt.Println("Error, missing or invalid amount")
 			os.Exit(1)
 		}
-		// ask for th keystore password
-		p, err := utils.AskPassword("Enter the password to unlock the keystore: ")
-		if err != nil {
-			fmt.Println("Error reading the password: ", err)
-			os.Exit(1)
+		// ask for the keystore password if not already set by CLI flags
+		if len(password) == 0 {
+			var err error
+			password, err = utils.AskPassword("Enter the password to unlock the keystore: ")
+			if err != nil {
+				fmt.Println("Error reading the password: ", err)
+				os.Exit(1)
+			}
 		}
+
 		// load the account
-		account, err := aeternity.LoadAccountFromKeyStoreFile(keystorePath, p)
+		account, err := aeternity.LoadAccountFromKeyStoreFile(keystorePath, password)
 		if err != nil {
 			fmt.Println("Error unlocking the keystore: ", err)
 			os.Exit(1)
@@ -254,4 +259,5 @@ func init() {
 	// spend command flags
 	spendCmd.Flags().BoolVarP(&waitForTx, "wait", "w", false, "Wait for the transaction to be mined before exiting")
 	spendCmd.Flags().StringVarP(&payload, "message", "m", "", "Payload to add to the spend transaction")
+	spendCmd.Flags().StringVar(&password, "password", "", "Read account password from stdin [WARN: this method is not secure]")
 }
