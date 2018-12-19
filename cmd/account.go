@@ -33,6 +33,7 @@ var (
 	printPrivateKey bool
 	accountFileName string
 	password        string
+	fee             string
 )
 
 // accountCmd represents the account command
@@ -241,14 +242,84 @@ var spendCmd = &cobra.Command{
 	},
 }
 
+var txCmd = &cobra.Command{
+	Use:   "tx SUBCOMMAND [ARGS]...",
+	Short: "Handle transactions creation",
+	Long:  ``,
+}
+
+var txSpendCmd = &cobra.Command{
+	Use:   "spend SENDER_ADDRESS RECIPIENT_ADDRESS AMOUNT",
+	Short: "Create a transaction to another account (unsigned)",
+	Long:  ``,
+	Args:  cobra.ExactArgs(3),
+	Run: func(cmd *cobra.Command, args []string) {
+		var (
+			sender    string
+			recipient string
+			amount    int64 // TODO potential problem with int64 for amount
+		)
+
+		// Load variables from arguments
+		sender = args[0]
+		recipient = args[1]
+		amount, _ = strconv.ParseInt(args[2], 10, 64)
+		var feeInt int64
+		if len(fee) == 0 {
+			feeInt = aeternity.Config.P.Client.Fee
+		} else {
+			feeInt, _ = strconv.ParseInt(fee, 10, 64)
+		}
+
+		// Validate arguments
+		if len(sender) == 0 {
+			fmt.Println("Error, missing or invalid sender address")
+			os.Exit(1)
+		}
+		if len(recipient) == 0 {
+			fmt.Println("Error, missing or invalid recipient address")
+			os.Exit(1)
+		}
+		if amount <= 0 {
+			fmt.Println("Error, missing or invalid amount")
+			os.Exit(1)
+		}
+		if feeInt <= 0 {
+			fmt.Println(feeInt)
+			fmt.Println("Error, missing or invalid fee")
+			os.Exit(1)
+		}
+
+		base64Tx, ttl, nonce, err := aeternity.SpendTransaction(sender, recipient, amount, feeInt, ``)
+		if err != nil {
+			fmt.Printf("Creating a Spend Transaction failed with %s", err)
+			os.Exit(1)
+		}
+
+		// Sender, Recipient, Amount, Ttl, Fee, Nonce, Payload, Encoded
+		aeternity.Pp(
+			"Sender acount", sender,
+			"Recipient account", recipient,
+			"Amount", amount,
+			"TTL", ttl,
+			"Fee", feeInt,
+			"Nonce", nonce,
+			"Payload", "not implemented",
+			"Encoded", base64Tx,
+		)
+	},
+}
+
 func init() {
 	RootCmd.AddCommand(accountCmd)
+	RootCmd.AddCommand(txCmd)
 	accountCmd.AddCommand(addressCmd)
 	accountCmd.AddCommand(spendCmd)
 	accountCmd.AddCommand(createCmd)
 	accountCmd.AddCommand(saveCmd)
 	accountCmd.AddCommand(balanceCmd)
 	accountCmd.AddCommand(listCmd)
+	txCmd.AddCommand(txSpendCmd)
 
 	// create flags
 	createCmd.Flags().StringVar(&accountFileName, "name", "", "Override the default name of a wallaet")
@@ -260,4 +331,6 @@ func init() {
 	spendCmd.Flags().BoolVarP(&waitForTx, "wait", "w", false, "Wait for the transaction to be mined before exiting")
 	spendCmd.Flags().StringVarP(&payload, "message", "m", "", "Payload to add to the spend transaction")
 	spendCmd.Flags().StringVar(&password, "password", "", "Read account password from stdin [WARN: this method is not secure]")
+	// tx spend command
+	txSpendCmd.Flags().StringVar(&fee, "fee", "", "Set the transaction fee (default=1)")
 }
