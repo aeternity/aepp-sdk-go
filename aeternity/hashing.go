@@ -18,7 +18,7 @@ func hashSha256(data []byte) []byte {
 	return d.Sum(nil)
 }
 
-// encode a byte array into base58 with chacksum and a prefix
+// encode a byte array into base58/base64 with chacksum and a prefix
 func encode(prefix HashPrefix, data []byte) string {
 	checksum := hashSha256(hashSha256(data))
 	in := append(data, checksum[0:4]...)
