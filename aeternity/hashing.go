@@ -33,7 +33,7 @@ func encode(prefix HashPrefix, data []byte) string {
 
 }
 
-// decode a string encoded with base58 + checksum to a byte array
+// decode a string encoded with base58/base64 + checksum to a byte array
 func decode(in string) (out []byte, err error) {
 	// prefix and hash
 	var p HashPrefix
@@ -107,4 +107,18 @@ func randomBytes(n int) ([]byte, error) {
 // generate an uuid v4 string
 func uuidV4() (u string) {
 	return fmt.Sprint(uuid.NewV4())
+}
+
+// naming
+func computeCommitmentID(name string) (ch string, salt []byte, err error) {
+	salt, err = randomBytes(32)
+	if err != nil {
+		return
+	}
+	// TODO: this is done using the api (concatenating )
+	nh := append(namehash(name), salt...)
+	nh, _ = hash(nh)
+	// nh := namehash(name)
+	ch = encode(PrefixCommitment, nh)
+	return
 }

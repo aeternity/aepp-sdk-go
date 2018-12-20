@@ -132,20 +132,6 @@ func (w *Wallet) Spend(recipientAddress string, amount int64, message string) (t
 	return
 }
 
-// naming
-func computeCommitmentID(name string) (ch string, salt []byte, err error) {
-	salt, err = randomBytes(32)
-	if err != nil {
-		return
-	}
-	// TODO: this is done using the api (concatenating )
-	nh := append(namehash(name), salt...)
-	nh, _ = hash(nh)
-	// nh := namehash(name)
-	ch = encode(PrefixCommitment, nh)
-	return
-}
-
 // NamePreclaim post a preclaim transaction to the chain
 func (n *Aens) NamePreclaim(name string) (tx, txHash, signature string, ttl uint64, nonce uint64, nameSalt int64, err error) {
 	// get the ttl offset
