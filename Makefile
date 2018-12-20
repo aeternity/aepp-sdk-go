@@ -56,6 +56,10 @@ lint: lint-all
 lint-all:
 	@golint -set_exit_status $(GOPACKAGES)
 
+install: build-dist
+	@cp dist/aecli $(GOPATH)/bin
+	@echo copied to GOPATH/bin
+
 clean:
 	@echo remove $(OUTPUTFOLDER) folder
 	@rm -rf dist
