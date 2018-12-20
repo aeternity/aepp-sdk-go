@@ -383,3 +383,14 @@ func ListWallets() (wallets []string, err error) {
 	wallets, err = filepath.Glob(filepath.Join(Config.KeysFolder, "*"))
 	return
 }
+
+func SignEncodeTxStr(kp *Account, txRaw string) (signedEncodedTx, signedEncodedTxHash, signature string, err error) {
+	txRawBytes, err := decode(txRaw)
+	if err != nil {
+		fmt.Println("Error decoding tx from base64")
+		os.Exit(1)
+	}
+
+	signedEncodedTx, signedEncodedTxHash, signature, err = SignEncodeTx(kp, txRawBytes)
+	return
+}

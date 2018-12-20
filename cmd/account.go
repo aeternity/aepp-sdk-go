@@ -133,6 +133,43 @@ var listCmd = &cobra.Command{
 	},
 }
 
+var signCmd = &cobra.Command{
+	Use:   "sign ACCOUNT_KEYSTORE UNSIGNED_TRANSACTION",
+	Short: "Sign the input (e.g. a transaction)",
+	Long:  ``,
+	Args:  cobra.ExactArgs(2),
+	Run: func(cmd *cobra.Command, args []string) {
+		// ask for the keystore password
+		p, err := utils.AskPassword("Enter the password to unlock the keystore: ")
+		if err != nil {
+			fmt.Println("Error reading the password: ", err)
+			os.Exit(1)
+		}
+		// load the account
+		account, err := aeternity.LoadAccountFromKeyStoreFile(args[0], p)
+		if err != nil {
+			fmt.Println("Error unlocking the keystore: ", err)
+			os.Exit(1)
+		}
+
+		txUnsignedBase64 := args[1]
+		txSignedBase64, txHash, signature, err := aeternity.SignEncodeTxStr(account, txUnsignedBase64)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		aeternity.Pp(
+			"Signing account address", account.Address,
+			"Signature", signature,
+			"Unsigned", txUnsignedBase64,
+			"Signed", txSignedBase64,
+			"Hash", txHash,
+		)
+
+	},
+}
+
 // saveCmd represents the generate subcommand
 var saveCmd = &cobra.Command{
 	Use:   "save ACCOUNT_HEX_STRING",
@@ -319,6 +356,7 @@ func init() {
 	accountCmd.AddCommand(saveCmd)
 	accountCmd.AddCommand(balanceCmd)
 	accountCmd.AddCommand(listCmd)
+	accountCmd.AddCommand(signCmd)
 	txCmd.AddCommand(txSpendCmd)
 
 	// create flags
