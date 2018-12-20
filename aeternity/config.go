@@ -109,7 +109,7 @@ func (c *ProfileConfig) Defaults() *ProfileConfig {
 	// for client
 	utils.DefaultIfEmptyStr(&c.Client.DefaultKey, "wallet.key")
 	utils.DefaultIfEmptyUint64(&c.Client.TTL, 500)
-	utils.DefaultIfEmptyInt64(&c.Client.Fee, 1)
+	utils.DefaultIfEmptyInt64(&c.Client.Fee, 20000)
 	// for aens
 	utils.DefaultIfEmptyUint64(&c.Client.Names.NameTTL, 500)
 	utils.DefaultIfEmptyUint64(&c.Client.Names.ClientTTL, 500)
