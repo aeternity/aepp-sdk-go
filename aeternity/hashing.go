@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/aeternity/aepp-sdk-go/rlp"
 	"github.com/btcsuite/btcutil/base58"
 	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/blake2b"
@@ -121,4 +122,32 @@ func computeCommitmentID(name string) (ch string, salt []byte, err error) {
 	// nh := namehash(name)
 	ch = encode(PrefixCommitment, nh)
 	return
+}
+
+func buildRLPMessage(tag uint, version uint, fields ...interface{}) (rlpRawMsg []byte, err error) {
+	// create a message of the transaction and signature
+	data := []interface{}{tag, version}
+	data = append(data, fields...)
+	// fmt.Printf("TX %#v\n\n", data)
+	// encode the message using rlp
+	rlpRawMsg, err = rlp.EncodeToBytes(data)
+	// fmt.Printf("ENCODED %#v\n\n", data)
+	return
+}
+
+// buildIDTag assemble an id() object
+// see https://github.com/aeternity/protocol/blob/epoch-v0.22.0/serializations.md#the-id-type
+func buildIDTag(IDTag uint8, encodedHash string) (v []uint8, err error) {
+	raw, err := decode(encodedHash)
+	v = []uint8{IDTag}
+	for _, x := range raw {
+		v = append(v, uint8(x))
+	}
+	return
+}
+
+func decodeRLPMessage(rawBytes []byte) []interface{} {
+	res := []interface{}{}
+	rlp.DecodeBytes(rawBytes, &res)
+	return res
 }
