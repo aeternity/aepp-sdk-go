@@ -3,6 +3,7 @@ package aeternity
 import (
   "crypto/rand"
   "crypto/sha256"
+	"encoding/base64"
   "fmt"
   "github.com/btcsuite/btcutil/base58"
   "github.com/satori/go.uuid"
@@ -22,9 +23,19 @@ func encode(in []byte) string {
   return base58.Encode(append(in, c[0:4]...))
 }
 
+func encode64(in []byte) string {
+	c := hashSha256(hashSha256(in))
+	return base64.StdEncoding.EncodeToString(append(in, c[0:4]...))
+}
+
 // encodeP encode a byte array into base58 with chacksum and a prefix
 func encodeP(prefix HashPrefix, data []byte) string {
   return fmt.Sprint(prefix, encode(data))
+}
+
+// encodeP64 encode a byte array into base64 with chacksum and a prefix
+func encodeP64(prefix HashPrefix, data []byte) string {
+  return fmt.Sprint(prefix, encode64(data))
 }
 
 // decode decode a string encoded with base58 + checksum to a byte array

@@ -18,7 +18,7 @@ func SignEncodeTx(kp *Account, txRaw []byte) (signedEncodedTx, signedEncodedTxHa
   // encode the message using rlp
   rlpTxRaw, err := createSignedTransaction(txRaw, [][]byte{sigRaw})
   // encode the rlp message with the prefix
-  signedEncodedTx = encodeP(PrefixTx, rlpTxRaw)
+  signedEncodedTx = encodeP64(PrefixTx, rlpTxRaw)
   // compute the hash
   rlpTxHashRaw, err := hash(rlpTxRaw)
   signedEncodedTxHash = encodeP(PrefixTxHash, rlpTxHashRaw)
