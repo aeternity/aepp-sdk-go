@@ -347,6 +347,53 @@ var txSpendCmd = &cobra.Command{
 	},
 }
 
+var txVerifyCmd = &cobra.Command{
+	Use:   "verify SENDER_ADDRESS SIGNED_TRANSACTION",
+	Short: "Verify the signature of a signed base64 transaction",
+	Long:  ``,
+	Args:  cobra.ExactArgs(2),
+	Run: func(cmd *cobra.Command, args []string) {
+		// Load variables from arguments
+		sender := args[0]
+		txSignedBase64 := args[1]
+
+		if len(sender) == 0 {
+			fmt.Println("Error, missing or invalid sender address")
+			os.Exit(1)
+		}
+		if len(txSignedBase64) == 0 || txSignedBase64[0:3] != "tx_" {
+			fmt.Println("Error, missing or invalid recipient address")
+			os.Exit(1)
+		}
+		valid, err := aeternity.VerifySignedTx(sender, txSignedBase64)
+		if err != nil {
+			fmt.Printf("Error while verifying signature: %s\n", err)
+		}
+		fmt.Printf("The signature is %t\n", valid)
+	},
+}
+
+var txBroadcastCmd = &cobra.Command{
+	Use:   "broadcast SIGNED_TRANSACTION",
+	Short: "Broadcast a transaction to the network",
+	Long:  ``,
+	Args:  cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		// Load variables from arguments
+		txSignedBase64 := args[0]
+
+		if len(txSignedBase64) == 0 || txSignedBase64[0:3] != "tx_" {
+			fmt.Println("Error, missing or invalid recipient address")
+			os.Exit(1)
+		}
+
+		err := aeternity.BroadcastTransaction(txSignedBase64)
+		if err != nil {
+			fmt.Println("Error while broadcasting transaction: ", err)
+		}
+	},
+}
+
 func init() {
 	RootCmd.AddCommand(accountCmd)
 	RootCmd.AddCommand(txCmd)
@@ -358,6 +405,8 @@ func init() {
 	accountCmd.AddCommand(listCmd)
 	accountCmd.AddCommand(signCmd)
 	txCmd.AddCommand(txSpendCmd)
+	txCmd.AddCommand(txVerifyCmd)
+	txCmd.AddCommand(txBroadcastCmd)
 
 	// create flags
 	createCmd.Flags().StringVar(&accountFileName, "name", "", "Override the default name of a wallaet")

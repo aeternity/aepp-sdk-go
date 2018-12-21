@@ -105,6 +105,19 @@ func SpendTransaction(sender string, recipient string, amount int64, fee int64, 
 	return base64Tx, ttl, nonce, err
 }
 
+// BroadcastTransaction does just that. It doesn't do anything else. It's a very simple function.
+func BroadcastTransaction(txSignedBase64 string) (err error) {
+	ae := NewCli(Config.P.Epoch.URL, true)
+
+	// Get back to RLP to calculate txhash
+	txRLP, _ := decode(txSignedBase64)
+
+	rlpTxHashRaw, _ := hash(txRLP)
+	signedEncodedTxHash := encode(PrefixTransactionHash, rlpTxHashRaw)
+	err = postTransaction(ae.Epoch, txSignedBase64, signedEncodedTxHash)
+	return
+}
+
 // Spend transfer tokens from an account to another
 func (w *Wallet) Spend(recipientAddress string, amount int64, message string) (tx, txHash, signature string, ttl uint64, nonce uint64, err error) {
 	// calculate the absolute ttl for the transaction
@@ -392,5 +405,23 @@ func SignEncodeTxStr(kp *Account, txRaw string) (signedEncodedTx, signedEncodedT
 	}
 
 	signedEncodedTx, signedEncodedTxHash, signature, err = SignEncodeTx(kp, txRawBytes)
+	return
+}
+
+// VerifySignedTx verifies a tx_ with signature
+func VerifySignedTx(accountID string, txSignedBase64 string) (valid bool, err error) {
+	txSigned, _ := decode(txSignedBase64)
+	txRLP := decodeRLPMessage(txSigned)
+
+	// RLP format of signed signature: [[Tag], [Version], [Signatures...], [Transaction]]
+	tx := txRLP[3].([]byte)
+	txSignature := txRLP[2].([]interface{})[0].([]byte)
+
+	msg := append([]byte(Config.P.Epoch.NetworkID), tx...)
+
+	valid, err = Verify(accountID, msg, txSignature)
+	if err != nil {
+		return
+	}
 	return
 }
