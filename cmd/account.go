@@ -36,14 +36,14 @@ var (
 	fee             int64
 )
 
-// accountCmd represents the account command
+// accountCmd implements the account command
 var accountCmd = &cobra.Command{
 	Use:   "account PRIVATE_KEY_PATH",
 	Short: "Interact with a account",
 	Long:  ``,
 }
 
-// addressCmd represents the address subcommand
+// addressCmd implements the account address subcommand
 var addressCmd = &cobra.Command{
 	Use:   "address ACCOUNT_KEYSTORE",
 	Short: "Print the aeternity account address",
@@ -69,7 +69,7 @@ var addressCmd = &cobra.Command{
 	},
 }
 
-// createCmd represents the generate subcommand
+// createCmd implements the account generate subcommand
 var createCmd = &cobra.Command{
 	Use:   "create",
 	Short: "Create a new account",
@@ -95,7 +95,7 @@ var createCmd = &cobra.Command{
 	},
 }
 
-// balanceCmd represents the generate subcommand
+// balanceCmd implements the account balance subcommand
 var balanceCmd = &cobra.Command{
 	Use:   "balance ACCOUNT_KEYSTORE",
 	Short: "Get the balance of an account",
@@ -123,7 +123,7 @@ var balanceCmd = &cobra.Command{
 	},
 }
 
-// listCmd represents the generate subcommand
+// listCmd implements the account list subcommand
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List the account in the default keys path",
@@ -133,6 +133,7 @@ var listCmd = &cobra.Command{
 	},
 }
 
+// signCmd implements the account sign subcommand
 var signCmd = &cobra.Command{
 	Use:   "sign ACCOUNT_KEYSTORE UNSIGNED_TRANSACTION",
 	Short: "Sign the input (e.g. a transaction)",
@@ -170,7 +171,7 @@ var signCmd = &cobra.Command{
 	},
 }
 
-// saveCmd represents the generate subcommand
+// saveCmd implements the account save subcommand
 var saveCmd = &cobra.Command{
 	Use:   "save ACCOUNT_HEX_STRING",
 	Short: "Save an account from a hex string to a keystore file",
@@ -197,7 +198,7 @@ var saveCmd = &cobra.Command{
 	},
 }
 
-// spendCmd represents the spend subcommand
+// spendCmd implements the account spend subcommand
 var spendCmd = &cobra.Command{
 	Use:   "spend ACCOUNT_KEYSTORE RECIPIENT_ADDRESS AMOUNT",
 	Short: "Print the aeternity account spend",
@@ -279,12 +280,15 @@ var spendCmd = &cobra.Command{
 	},
 }
 
+// txCmd implments the tx command
 var txCmd = &cobra.Command{
 	Use:   "tx SUBCOMMAND [ARGS]...",
 	Short: "Handle transactions creation",
 	Long:  ``,
 }
 
+// txSpendCmd implements the tx spend subcommand.
+// It returns an unsigned spend transaction (to be signed with account sign)
 var txSpendCmd = &cobra.Command{
 	Use:   "spend SENDER_ADDRESS RECIPIENT_ADDRESS AMOUNT",
 	Short: "Create a transaction to another account (unsigned)",
@@ -340,6 +344,8 @@ var txSpendCmd = &cobra.Command{
 	},
 }
 
+// txVerifyCmd implements the tx verify subocmmand.
+// It verfies the signature of a signed transaction
 var txVerifyCmd = &cobra.Command{
 	Use:   "verify SENDER_ADDRESS SIGNED_TRANSACTION",
 	Short: "Verify the signature of a signed base64 transaction",
@@ -355,7 +361,7 @@ var txVerifyCmd = &cobra.Command{
 			os.Exit(1)
 		}
 		if len(txSignedBase64) == 0 || txSignedBase64[0:3] != "tx_" {
-			fmt.Println("Error, missing or invalid recipient address")
+			fmt.Println("Error, missing or invalid base64 encoded transaction")
 			os.Exit(1)
 		}
 		valid, err := aeternity.VerifySignedTx(sender, txSignedBase64)
@@ -366,6 +372,8 @@ var txVerifyCmd = &cobra.Command{
 	},
 }
 
+// txBroadcastCmd implements the tx broadcast subcommand.
+// It broadcasts a signed transaction to the network
 var txBroadcastCmd = &cobra.Command{
 	Use:   "broadcast SIGNED_TRANSACTION",
 	Short: "Broadcast a transaction to the network",
@@ -401,17 +409,19 @@ func init() {
 	txCmd.AddCommand(txVerifyCmd)
 	txCmd.AddCommand(txBroadcastCmd)
 
-	// create flags
-	createCmd.Flags().StringVar(&accountFileName, "name", "", "Override the default name of a wallaet")
-	// save flags
-	saveCmd.Flags().StringVar(&accountFileName, "name", "", "Override the default name of a wallaet")
-	// address flags
+	// account sign flags
+	signCmd.Flags().StringVar(&password, "password", "", "Read account password from stdin [WARN: this method is not secure]")
+	// account create flags
+	createCmd.Flags().StringVar(&accountFileName, "name", "", "Override the default name of a wallet")
+	// account save flags
+	saveCmd.Flags().StringVar(&accountFileName, "name", "", "Override the default name of a wallet")
+	// account address flags
 	addressCmd.Flags().BoolVar(&printPrivateKey, "private-key", false, "Print the private key as hex string")
-	// spend command flags
+	// account spend command flags
 	spendCmd.Flags().BoolVarP(&waitForTx, "wait", "w", false, "Wait for the transaction to be mined before exiting")
 	spendCmd.Flags().StringVarP(&payload, "message", "m", "", "Payload to add to the spend transaction")
 	spendCmd.Flags().StringVar(&password, "password", "", "Read account password from stdin [WARN: this method is not secure]")
 	// tx spend command
 	// TODO Config is not initialized within cmd. This means default config vars have to be hardcoded into help messages
-	txSpendCmd.Flags().Int64Var(&fee, "fee", 20000, fmt.Sprintf("Set the transaction fee (default=%d)", 20000)
+	txSpendCmd.Flags().Int64Var(&fee, "fee", 20000, fmt.Sprintf("Set the transaction fee (default=%d)", 20000))
 }
