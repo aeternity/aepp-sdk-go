@@ -33,7 +33,7 @@ var (
 	printPrivateKey bool
 	accountFileName string
 	password        string
-	fee             string
+	fee             int64
 )
 
 // accountCmd represents the account command
@@ -301,12 +301,6 @@ var txSpendCmd = &cobra.Command{
 		sender = args[0]
 		recipient = args[1]
 		amount, _ = strconv.ParseInt(args[2], 10, 64)
-		var feeInt int64
-		if len(fee) == 0 {
-			feeInt = aeternity.Config.P.Client.Fee
-		} else {
-			feeInt, _ = strconv.ParseInt(fee, 10, 64)
-		}
 
 		// Validate arguments
 		if len(sender) == 0 {
@@ -321,13 +315,12 @@ var txSpendCmd = &cobra.Command{
 			fmt.Println("Error, missing or invalid amount")
 			os.Exit(1)
 		}
-		if feeInt <= 0 {
-			fmt.Println(feeInt)
+		if fee <= 0 {
 			fmt.Println("Error, missing or invalid fee")
 			os.Exit(1)
 		}
 
-		base64Tx, ttl, nonce, err := aeternity.SpendTransaction(sender, recipient, amount, feeInt, ``)
+		base64Tx, ttl, nonce, err := aeternity.SpendTransaction(sender, recipient, amount, fee, ``)
 		if err != nil {
 			fmt.Printf("Creating a Spend Transaction failed with %s", err)
 			os.Exit(1)
@@ -339,7 +332,7 @@ var txSpendCmd = &cobra.Command{
 			"Recipient account", recipient,
 			"Amount", amount,
 			"TTL", ttl,
-			"Fee", feeInt,
+			"Fee", fee,
 			"Nonce", nonce,
 			"Payload", "not implemented",
 			"Encoded", base64Tx,
@@ -419,5 +412,6 @@ func init() {
 	spendCmd.Flags().StringVarP(&payload, "message", "m", "", "Payload to add to the spend transaction")
 	spendCmd.Flags().StringVar(&password, "password", "", "Read account password from stdin [WARN: this method is not secure]")
 	// tx spend command
-	txSpendCmd.Flags().StringVar(&fee, "fee", "", "Set the transaction fee (default=1)")
+	// TODO Config is not initialized within cmd. This means default config vars have to be hardcoded into help messages
+	txSpendCmd.Flags().Int64Var(&fee, "fee", 20000, fmt.Sprintf("Set the transaction fee (default=%d)", 20000)
 }
