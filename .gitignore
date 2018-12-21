@@ -1,2 +1,4 @@
 dist
 vendor
+releases
+.vscode/
