@@ -14,17 +14,17 @@ services:
       - .:/go/src/app
 
   node:
-    image: aeternity/epoch:${TAG}
+    image: aeternity/aeternity:${TAG}
     hostname: node
     expose: [3013, 3113]
     environment:
-      EPOCH_CONFIG: /home/epoch/epoch.yaml
+      EPOCH_CONFIG: /home/aeternity/aeternity.yaml
     command: -aecore expected_mine_rate ${EPOCH_MINE_RATE:-15000}
     volumes:
-      - ${PWD}/build/docker/epoch_node_mean16.yaml:/home/epoch/epoch.yaml
-      - ${PWD}/build/docker/keys/node:/home/epoch/node/keys
-      - node_db:/home/epoch/node/data/mnesia
-      - node_keys:/home/epoch/node/keys
+      - ${PWD}/build/docker/aeternity_node_mean16.yaml:/home/aeternity/aeternity.yaml
+      - ${PWD}/build/docker/keys/node:/home/aeternity/node/keys
+      - node_db:/home/aeternity/node/data/mnesia
+      - node_keys:/home/aeternity/node/keys
 
 volumes:
   node_db:
