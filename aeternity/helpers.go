@@ -95,7 +95,7 @@ func SpendTransaction(sender string, recipient string, amount int64, fee int64, 
 	}
 
 	// run createSpendTransaction
-	rlpUnsignedTx, err := createSpendTransaction(sender, recipient, message, amount, Config.P.Client.Fee, ttl, nonce)
+	rlpUnsignedTx, err := SpendTx(sender, recipient, message, amount, Config.P.Client.Fee, ttl, nonce)
 	if err != nil {
 		return
 	}
@@ -131,7 +131,7 @@ func (w *Wallet) Spend(recipientAddress string, amount int64, message string) (t
 	if err != nil {
 		return
 	}
-	spendTxRaw, err := createSpendTransaction(w.owner.Address, recipientAddress, message, amount, Config.P.Client.Fee, ttl, nonce)
+	spendTxRaw, err := SpendTx(w.owner.Address, recipientAddress, message, amount, Config.P.Client.Fee, ttl, nonce)
 	if err != nil {
 		return
 	}
@@ -165,7 +165,12 @@ func (n *Aens) NamePreclaim(name string) (tx, txHash, signature string, ttl uint
 		return
 	}
 	// build the transaction
-	tx, txHash, signature, err = namePreclaimTxSigned(n.owner, cm, Config.P.Client.Names.PreClaimFee, ttl, nonce)
+	txRaw, err := NamePreclaimTx(n.owner.Address, cm, Config.P.Client.Names.PreClaimFee, ttl, nonce)
+	if err != nil {
+		return
+	}
+	// sign the transaction
+	tx, txHash, signature, err = SignEncodeTx(n.owner, txRaw)
 	if err != nil {
 		return
 	}
@@ -190,8 +195,13 @@ func (n *Aens) NameClaim(name string, nameSalt int64) (tx, txHash, signature str
 	// encodedName := encodeP(PrefixNameHash, []byte(name))
 	prefix := HashPrefix(name[0:3])
 	encodedName := encode(prefix, []byte(name))
-	// sign the above transaction with the private key
-	tx, txHash, signature, err = nameClaimTxSigned(n.owner, encodedName, nameSalt, Config.P.Client.Names.ClaimFee, ttl, nonce)
+	// create the transaction
+	txRaw, err := NameClaimTx(n.owner.Address, encodedName, nameSalt, Config.P.Client.Names.ClaimFee, ttl, nonce)
+	if err != nil {
+		return
+	}
+	// sign the transaction
+	tx, txHash, signature, err = SignEncodeTx(n.owner, txRaw)
 	if err != nil {
 		return
 	}
@@ -222,7 +232,12 @@ func (n *Aens) NameUpdate(name string, targetAddress string) (tx, txHash, signat
 		return
 	}
 	// create and sign the transaction
-	tx, txHash, signature, err = nameUpdateTxSigned(n.owner, encodedNameHash, []string{targetAddress}, absNameTTL, absClientTTL, Config.P.Client.Names.UpdateFee, ttl, nonce)
+	txRaw, err := NameUpdateTx(n.owner.Address, encodedNameHash, []string{targetAddress}, absNameTTL, absClientTTL, Config.P.Client.Names.UpdateFee, ttl, nonce)
+	if err != nil {
+		return
+	}
+	// sign the transaction
+	tx, txHash, signature, err = SignEncodeTx(n.owner, txRaw)
 	if err != nil {
 		return
 	}

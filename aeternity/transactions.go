@@ -36,9 +36,9 @@ func createSignedTransaction(txRaw []byte, signatures [][]byte) (rlpRawMsg []byt
 	return
 }
 
-// createSpendTransaction
+// SpendTx create a spend transaction
 // see https://github.com/aeternity/protocol/blob/epoch-v0.22.0/serializations.md
-func createSpendTransaction(senderID, recipientID, payload string, amount, fee int64, ttl, nonce uint64) (rlpRawMsg []byte, err error) {
+func SpendTx(senderID, recipientID, payload string, amount, fee int64, ttl, nonce uint64) (rlpRawMsg []byte, err error) {
 	// build id for the sender
 	sID, err := buildIDTag(IDTagAccount, senderID)
 	if err != nil {
@@ -63,9 +63,9 @@ func createSpendTransaction(senderID, recipientID, payload string, amount, fee i
 	return
 }
 
-// namePreclaimTx build a preclaim transaction
+// NamePreclaimTx build a preclaim transaction
 // see https://github.com/aeternity/protocol/blob/epoch-v0.22.0/serializations.md#name-service-preclaim-transaction
-func namePreclaimTx(accountID, commitmentID string, fee int64, ttl, nonce uint64) (rlpRawMsg []byte, err error) {
+func NamePreclaimTx(accountID, commitmentID string, fee int64, ttl, nonce uint64) (rlpRawMsg []byte, err error) {
 	// build id for the sender
 	aID, err := buildIDTag(IDTagAccount, accountID)
 	if err != nil {
@@ -88,20 +88,9 @@ func namePreclaimTx(accountID, commitmentID string, fee int64, ttl, nonce uint64
 	return
 }
 
-func namePreclaimTxSigned(account *Account, commitmentID string, fee int64, ttl, nonce uint64) (signedEncodedTx, signedEncodedTxHash, signature string, err error) {
-	// this is the transaction to sign
-	rawTx, err := namePreclaimTx(account.Address, commitmentID, fee, ttl, nonce)
-	if err != nil {
-		return
-	}
-	// sign the above transaction with the private key
-	signedEncodedTx, signedEncodedTxHash, signature, err = SignEncodeTx(account, rawTx)
-	return
-}
-
-// nameClaimTx build a preclaim transaction
+// NameClaimTx build a preclaim transaction
 // see https://github.com/aeternity/protocol/blob/epoch-v0.22.0/serializations.md#name-service-claim-transaction
-func nameClaimTx(accountID, name string, nameSalt, fee int64, ttl, nonce uint64) (rlpRawMsg []byte, err error) {
+func NameClaimTx(accountID, name string, nameSalt, fee int64, ttl, nonce uint64) (rlpRawMsg []byte, err error) {
 	// build id for the sender
 	aID, err := buildIDTag(IDTagAccount, accountID)
 	if err != nil {
@@ -122,17 +111,6 @@ func nameClaimTx(accountID, name string, nameSalt, fee int64, ttl, nonce uint64)
 		uint64(nameSalt),
 		uint64(fee),
 		ttl)
-	return
-}
-
-func nameClaimTxSigned(account *Account, name string, nameSalt, fee int64, ttl, nonce uint64) (signedEncodedTx, signedEncodedTxHash, signature string, err error) {
-	// this is the transaction to sign
-	rawTx, err := nameClaimTx(account.Address, name, nameSalt, fee, ttl, nonce)
-	if err != nil {
-		return
-	}
-	// sign the above transaction with the private key
-	signedEncodedTx, signedEncodedTxHash, signature, err = SignEncodeTx(account, rawTx)
 	return
 }
 
@@ -160,9 +138,9 @@ func buildPointers(pointers []string) (ptrs [][]uint8, err error) {
 	return
 }
 
-// nameUpdateTx build an update name transaction
+// NameUpdateTx build an update name transaction
 // see https://github.com/aeternity/protocol/blob/epoch-v0.22.0/serializations.md#name-service-update-transaction
-func nameUpdateTx(accountID, nameID string, pointers []string, nameTTL, clientTTL uint64, fee int64, ttl, nonce uint64) (rlpRawMsg []byte, err error) {
+func NameUpdateTx(accountID, nameID string, pointers []string, nameTTL, clientTTL uint64, fee int64, ttl, nonce uint64) (rlpRawMsg []byte, err error) {
 	// build id for the sender
 	aID, err := buildIDTag(IDTagAccount, accountID)
 	if err != nil {
@@ -194,20 +172,9 @@ func nameUpdateTx(accountID, nameID string, pointers []string, nameTTL, clientTT
 	return
 }
 
-func nameUpdateTxSigned(account *Account, nameID string, pointers []string, nameTTL, clientTTL uint64, fee int64, ttl, nonce uint64) (signedEncodedTx, signedEncodedTxHash, signature string, err error) {
-	// this is the transaction to sign
-	rawTx, err := nameUpdateTx(account.Address, nameID, pointers, nameTTL, clientTTL, fee, ttl, nonce)
-	if err != nil {
-
-	}
-	// sign the above transaction with the private key
-	signedEncodedTx, signedEncodedTxHash, signature, err = SignEncodeTx(account, rawTx)
-	return
-}
-
-// txOracleRegister
+// OracleRegisterTx register an oracle tx
 // see https://github.com/aeternity/protocol/blob/master/serializations.md#oracles
-func txOracleRegister(accountID, queryFormat, responseFormat string, queryFee, expires int64) (rlpRawMsg []byte, err error) {
+func OracleRegisterTx(accountID, queryFormat, responseFormat string, queryFee, expires int64) (rlpRawMsg []byte, err error) {
 	// build id for the account
 	aID, err := buildIDTag(IDTagAccount, accountID)
 	if err != nil {
