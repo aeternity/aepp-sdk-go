@@ -15,15 +15,8 @@
 package cmd
 
 import (
-	"crypto/tls"
-	"encoding/json"
 	"fmt"
-	"github.com/dghubble/sling"
-	"net/http"
-	"net/http/httptrace"
 	"os"
-	"regexp"
-	"time"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
 	"github.com/spf13/cobra"
@@ -106,7 +99,6 @@ func init() {
 	chainCmd.AddCommand(topCmd)
 	chainCmd.AddCommand(statusCmd)
 	chainCmd.AddCommand(playCmd)
-	chainCmd.AddCommand(proxyCmd)
 
 	playCmd.Flags().Uint64Var(&limit, "limit", 0, "Print at max 'limit' generations")
 	playCmd.Flags().Uint64Var(&startFromHeight, "height", 0, "Start playing the chain at 'height'")
@@ -121,97 +113,4 @@ func init() {
 	// is called directly, e.g.:
 	// chainCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-}
-
-var proxyCmd = &cobra.Command{
-	Use:   "proxy",
-	Short: "experimental proxy execution",
-	Long:  ``,
-	Run: func(cmd *cobra.Command, args []string) {
-		peers := new(Peers)
-		fmt.Println("Proxy starting")
-		sl := sling.New().Base("https://sdk-mainnet.aepps.com")
-		sl = sl.Set("User-Agent", "nodelb")
-		request, err := sl.Request()
-
-		trace := &httptrace.ClientTrace{
-			DNSDone: func(dnsInfo httptrace.DNSDoneInfo) {
-				fmt.Printf("DNS Info: %+v\n", dnsInfo)
-			},
-			GotConn: func(connInfo httptrace.GotConnInfo) {
-				fmt.Printf("Got Conn: %+v\n", connInfo)
-			},
-		}
-		request.WithContext(httptrace.WithClientTrace(request.Context(), trace))
-
-		fmt.Println("Requesting peers")
-		_, err = sl.Get("/v2/debug/peers").ReceiveSuccess(peers)
-		if err != nil {
-			fmt.Println("Error ", err)
-			return
-		}
-		r := regexp.MustCompile(`\d+\.\d+.\d+.\d+`)
-		for _, p := range peers.Peers {
-			ip := r.FindString(p)
-			fmt.Println("Peer ", p, "found (", ip, ")")
-			timeGet(fmt.Sprint("http://", ip, ":3013/v2/blocks/top"))
-		}
-
-	},
-}
-
-// Peers the struct for peers
-type Peers struct {
-	Blocked  []string `json:"blocked"`
-	Inbound  []string `json:"inbound"`
-	Outbound []string `json:"outbound"`
-	Peers    []string `json:"peers"`
-}
-
-type ChainHeight struct {
-	Height uint64 `json:"height"`
-}
-
-func timeGet(url string) {
-	var netClient = &http.Client{
-		Timeout: time.Second * 10,
-	}
-	netClient.Get("utl")
-	req, _ := http.NewRequest("GET", url, nil)
-
-	var start, connect, dns, tlsHandshake time.Time
-
-	trace := &httptrace.ClientTrace{
-
-		DNSStart: func(dsi httptrace.DNSStartInfo) { dns = time.Now() },
-		DNSDone: func(ddi httptrace.DNSDoneInfo) {
-			fmt.Printf("DNS Done: %v\n", time.Since(dns))
-		},
-
-		TLSHandshakeStart: func() { tlsHandshake = time.Now() },
-		TLSHandshakeDone: func(cs tls.ConnectionState, err error) {
-			fmt.Printf("TLS Handshake: %v\n", time.Since(tlsHandshake))
-		},
-
-		ConnectStart: func(network, addr string) { connect = time.Now() },
-		ConnectDone: func(network, addr string, err error) {
-			fmt.Printf("Connect time: %v\n", time.Since(connect))
-		},
-
-		GotFirstResponseByte: func() {
-			fmt.Printf("Time from start to first byte: %v\n", time.Since(start))
-		},
-	}
-
-	req = req.WithContext(httptrace.WithClientTrace(req.Context(), trace))
-	start = time.Now()
-	if resp, err := http.DefaultTransport.RoundTrip(req); err != nil {
-		fmt.Println(err)
-		return
-	} else {
-		defer resp.Body.Close()
-		ch := new(ChainHeight)
-		json.NewDecoder(resp.Body).Decode(ch)
-	}
-	fmt.Printf("Total time: %v\n", time.Since(start))
 }
