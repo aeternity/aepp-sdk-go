@@ -1,11 +1,5 @@
 package aeternity
 
-import (
-	"path/filepath"
-
-	utils "github.com/aeternity/aepp-sdk-go/utils"
-)
-
 const (
 	// ConfigFilename default configuration file name
 	ConfigFilename = "config"
@@ -79,13 +73,6 @@ type ProfileConfig struct {
 	Tuning TuningConfig `json:"tuning" yaml:"tuning" mapstructure:"tuning"`
 }
 
-// ConfigSchema define the configuration object
-type ConfigSchema struct {
-	P          *ProfileConfig `json:"-" yaml:"-" mapstructure:"-"` // holds the active profile
-	ConfigPath string         `json:"-" yaml:"-" mapstructure:"-"` // the path of the configuration file
-	KeysFolder string         `json:"-" yaml:"-" mapstructure:"-"`
-}
-
 var DefaultConfig = ProfileConfig{
 	Name: "Default Config",
 	Epoch: EpochConfig{
@@ -132,63 +119,5 @@ var DefaultConfig = ProfileConfig{
 	},
 }
 
-//Defaults generate configuration defaults
-func (c *ProfileConfig) Defaults() *ProfileConfig {
-	c.Client = ClientConfig{
-		Contracts: ContractConfig{},
-		Names:     AensConfig{},
-	}
-	// for server
-	utils.DefaultIfEmptyStr(&c.Epoch.URL, "https://sdk-edgenet.aepps.com")
-	utils.DefaultIfEmptyStr(&c.Epoch.URLInternal, "https://sdk-edgenet.aepps.com") // UNUSED
-	utils.DefaultIfEmptyStr(&c.Epoch.URLChannels, "https://sdk-edgenet.aepps.com") // UNUSED
-	utils.DefaultIfEmptyStr(&c.Epoch.NetworkID, "ae_mainnet")
-	// for client
-	utils.DefaultIfEmptyStr(&c.Client.DefaultKey, "wallet.key") // UNUSED
-	utils.DefaultIfEmptyUint64(&c.Client.TTL, 500)
-	utils.DefaultIfEmptyInt64(&c.Client.Fee, 20000)
-	// for aens
-	utils.DefaultIfEmptyUint64(&c.Client.Names.NameTTL, 500)
-	utils.DefaultIfEmptyUint64(&c.Client.Names.ClientTTL, 500)
-	utils.DefaultIfEmptyInt64(&c.Client.Names.PreClaimFee, 1)
-	utils.DefaultIfEmptyInt64(&c.Client.Names.ClaimFee, 1)
-	utils.DefaultIfEmptyInt64(&c.Client.Names.UpdateFee, 1)
-	// UNUSED for contracts
-	utils.DefaultIfEmptyInt64(&c.Client.Contracts.Gas, 1000)
-	utils.DefaultIfEmptyInt64(&c.Client.Contracts.GasPrice, 1)
-	// for tuning
-	utils.DefaultIfEmptyInt64(&c.Tuning.ChainPollInteval, 1000)
-	utils.DefaultIfEmptyInt64(&c.Tuning.ChainTimeout, 5000)
-	utils.DefaultIfEmptyUint32(&c.Tuning.CryptoKdfMemlimit, 1024*32) // 32mb
-	utils.DefaultIfEmptyUint32(&c.Tuning.CryptoKdfOpslimit, 3)
-	utils.DefaultIfEmptyUint8(&c.Tuning.CryptoKdfThreads, 1)
-	return c
-}
-
-//Validate configuration
-func (c *ProfileConfig) Validate() {
-
-}
-
-//Validate configuration
-func (c *ConfigSchema) Validate() {
-
-}
-
-//Defaults configuration
-func (c *ConfigSchema) Defaults() *ConfigSchema {
-	p := ProfileConfig{}
-	c.P = p.Defaults()
-	return c
-}
-
 // Config sytem configuration
-var Config ConfigSchema
-
-// GenerateDefaultConfig generate a default configuration
-func GenerateDefaultConfig(outFile, version string) {
-	Config = ConfigSchema{
-		KeysFolder: filepath.Join(filepath.Dir(outFile), "accounts"),
-		ConfigPath: outFile,
-	}
-}
+var Config ProfileConfig
