@@ -5,9 +5,9 @@ import (
 )
 
 // SignEncodeTx sign and encode a transaction
-func SignEncodeTx(kp *Account, txRaw []byte) (signedEncodedTx, signedEncodedTxHash, signature string, err error) {
+func SignEncodeTx(kp *Account, txRaw []byte, networkID string) (signedEncodedTx, signedEncodedTxHash, signature string, err error) {
 	// add the network_id to the transaction
-	msg := append([]byte(Config.P.Epoch.NetworkID), txRaw...)
+	msg := append([]byte(networkID), txRaw...)
 	// sign the transaction
 	sigRaw := kp.Sign(msg)
 	if err != nil {

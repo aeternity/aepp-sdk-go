@@ -136,7 +136,7 @@ func (w *Wallet) Spend(recipientAddress string, amount int64, message string) (t
 		return
 	}
 	// sign the transaction
-	tx, txHash, signature, err = SignEncodeTx(w.owner, spendTxRaw)
+	tx, txHash, signature, err = SignEncodeTx(w.owner, spendTxRaw, Config.P.Epoch.NetworkID)
 	if err != nil {
 		return
 	}
@@ -170,7 +170,7 @@ func (n *Aens) NamePreclaim(name string) (tx, txHash, signature string, ttl uint
 		return
 	}
 	// sign the transaction
-	tx, txHash, signature, err = SignEncodeTx(n.owner, txRaw)
+	tx, txHash, signature, err = SignEncodeTx(n.owner, txRaw, Config.P.Epoch.NetworkID)
 	if err != nil {
 		return
 	}
@@ -201,7 +201,7 @@ func (n *Aens) NameClaim(name string, nameSalt int64) (tx, txHash, signature str
 		return
 	}
 	// sign the transaction
-	tx, txHash, signature, err = SignEncodeTx(n.owner, txRaw)
+	tx, txHash, signature, err = SignEncodeTx(n.owner, txRaw, Config.P.Epoch.NetworkID)
 	if err != nil {
 		return
 	}
@@ -237,7 +237,7 @@ func (n *Aens) NameUpdate(name string, targetAddress string) (tx, txHash, signat
 		return
 	}
 	// sign the transaction
-	tx, txHash, signature, err = SignEncodeTx(n.owner, txRaw)
+	tx, txHash, signature, err = SignEncodeTx(n.owner, txRaw, Config.P.Epoch.NetworkID)
 	if err != nil {
 		return
 	}
@@ -412,6 +412,7 @@ func ListWallets() (wallets []string, err error) {
 	return
 }
 
+// SignEncodeTxStr sign and encode a transaction format as string (ex. tx_xyz)
 func SignEncodeTxStr(kp *Account, txRaw string) (signedEncodedTx, signedEncodedTxHash, signature string, err error) {
 	txRawBytes, err := decode(txRaw)
 	if err != nil {
@@ -419,7 +420,7 @@ func SignEncodeTxStr(kp *Account, txRaw string) (signedEncodedTx, signedEncodedT
 		os.Exit(1)
 	}
 
-	signedEncodedTx, signedEncodedTxHash, signature, err = SignEncodeTx(kp, txRawBytes)
+	signedEncodedTx, signedEncodedTxHash, signature, err = SignEncodeTx(kp, txRawBytes, Config.P.Epoch.NetworkID)
 	return
 }
 
