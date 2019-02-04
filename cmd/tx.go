@@ -102,34 +102,10 @@ var txVerifyCmd = &cobra.Command{
 	},
 }
 
-// txBroadcastCmd implements the tx broadcast subcommand.
-// It broadcasts a signed transaction to the network
-var txBroadcastCmd = &cobra.Command{
-	Use:   "broadcast SIGNED_TRANSACTION",
-	Short: "Broadcast a transaction to the network",
-	Long:  ``,
-	Args:  cobra.ExactArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
-		// Load variables from arguments
-		txSignedBase64 := args[0]
-
-		if len(txSignedBase64) == 0 || txSignedBase64[0:3] != "tx_" {
-			fmt.Println("Error, missing or invalid recipient address")
-			os.Exit(1)
-		}
-
-		err := aeternity.BroadcastTransaction(txSignedBase64)
-		if err != nil {
-			fmt.Println("Error while broadcasting transaction: ", err)
-		}
-	},
-}
-
 func init() {
 	RootCmd.AddCommand(txCmd)
 	txCmd.AddCommand(txSpendCmd)
 	txCmd.AddCommand(txVerifyCmd)
-	txCmd.AddCommand(txBroadcastCmd)
 
 	// tx spend command
 	// TODO Config is not initialized within cmd. This means default config vars have to be hardcoded into help messages
