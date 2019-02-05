@@ -353,12 +353,9 @@ Main:
 
 // StoreAccountToKeyStoreFile store an account to a json file
 func StoreAccountToKeyStoreFile(account *Account, password, walletName string) (filePath string, err error) {
-	// keys are in the same folder as config
-	basePath := filepath.Join(filepath.Dir(Config.ConfigPath), "accounts")
-	err = os.MkdirAll(basePath, os.ModePerm)
-	if err != nil {
-		return
-	}
+	// keystore will be saved in current directory
+	basePath, _ := os.Getwd()
+
 	// generate the keystore file
 	jks, err := KeystoreSeal(account, password)
 	if err != nil {

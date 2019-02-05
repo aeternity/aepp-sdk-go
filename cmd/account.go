@@ -166,20 +166,25 @@ var saveCmd = &cobra.Command{
 	Use:   "save ACCOUNT_HEX_STRING",
 	Short: "Save an account from a hex string to a keystore file",
 	Long:  ``,
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		account, err := aeternity.AccountFromHexString(args[0])
+		accountFileName := args[0]
+		account, err := aeternity.AccountFromHexString(args[1])
 		if err != nil {
 			fmt.Println("Error parsing the private key hex string:", err)
 			return
 		}
-		p, err := utils.AskPassword("Enter a password for your keystore: ")
-		if err != nil {
-			fmt.Println("Error reading the password: ", err)
-			return
+
+		if len(password) == 0 {
+			var err error
+			password, err = utils.AskPassword("Enter a password for your keystore: ")
+			if err != nil {
+				fmt.Println("Error reading the password: ", err)
+				os.Exit(1)
+			}
 		}
 
-		f, err := aeternity.StoreAccountToKeyStoreFile(account, p, accountFileName)
+		f, err := aeternity.StoreAccountToKeyStoreFile(account, password, accountFileName)
 		if err != nil {
 			fmt.Println("Error saving the keystore file: ", err)
 			return
@@ -284,7 +289,7 @@ func init() {
 	// account create flags
 	createCmd.Flags().StringVar(&accountFileName, "name", "", "Override the default name of a wallet")
 	// account save flags
-	saveCmd.Flags().StringVar(&accountFileName, "name", "", "Override the default name of a wallet")
+	saveCmd.Flags().StringVar(&password, "password", "", "Read account password from stdin [WARN: this method is not secure]")
 	// account address flags
 	addressCmd.Flags().BoolVar(&printPrivateKey, "private-key", false, "Print the private key as hex string")
 	// account spend command flags
