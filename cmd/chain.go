@@ -34,6 +34,7 @@ var topCmd = &cobra.Command{
 	Short: "Query the top block of the chain",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
+		aeCli := NewAeCli()
 		v, err := aeCli.APIGetTopBlock()
 		if err != nil {
 			fmt.Println(err)
@@ -48,6 +49,7 @@ var statusCmd = &cobra.Command{
 	Short: "Get the status and status of the node running the chain",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
+		aeCli := NewAeCli()
 		v, err := aeCli.APIGetStatus()
 		if err != nil {
 			fmt.Println(err)
@@ -63,6 +65,7 @@ var playCmd = &cobra.Command{
 	Short: "Query the blocks of the chain one after the other",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
+		aeCli := NewAeCli()
 		blockHeight, err := aeCli.APIGetHeight()
 		if err != nil {
 			fmt.Println(err)

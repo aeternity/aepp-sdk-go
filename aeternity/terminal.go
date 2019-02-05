@@ -125,7 +125,7 @@ func PrintError(code string, e *models.Error) {
 
 // PrintObject pretty print an object obtained from the api with a title
 func PrintObject(title string, i interface{}) {
-	if Config.P.Tuning.OutputFormatJSON {
+	if Config.Tuning.OutputFormatJSON {
 		j, _ := json.MarshalIndent(i, "", "  ")
 		fmt.Printf("%s\n", j)
 		return

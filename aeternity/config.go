@@ -73,7 +73,8 @@ type ProfileConfig struct {
 	Tuning TuningConfig `json:"tuning" yaml:"tuning" mapstructure:"tuning"`
 }
 
-var DefaultConfig = ProfileConfig{
+// Config sytem configuration
+var Config = ProfileConfig{
 	Name: "Default Config",
 	Epoch: EpochConfig{
 		URL:         "https://sdk-edgenet.aepps.com",
@@ -118,6 +119,3 @@ var DefaultConfig = ProfileConfig{
 		OutputFormatJSON:  false,
 	},
 }
-
-// Config sytem configuration
-var Config ProfileConfig

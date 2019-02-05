@@ -33,7 +33,7 @@ var RootCmd = &cobra.Command{
 	//	Run: func(cmd *cobra.Command, args []string) { },
 }
 
-var cfgFile string
+var nodeExternalAPI string
 var debug, outputFormatJSON bool
 var aeCli *aeternity.Ae
 
@@ -56,10 +56,10 @@ func NewAeCli() *aeternity.Ae {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
+	// cobra.OnInitialize(initConfig)
 	viper.AutomaticEnv() // read in environment variables that match
 	viper.SetEnvPrefix("AETERNITY")
-	viper.SetDefault("external-api", aeternity.DefaultConfig.Epoch.URL)
+	viper.SetDefault("external-api", aeternity.Config.Epoch.URL)
 
 	// Here you will define your flags and configuration settings.
 	// Cobra supports Persistent Flags, which, if defined here,
@@ -67,10 +67,4 @@ func init() {
 	RootCmd.PersistentFlags().StringVarP(&nodeExternalAPI, "external-api", "u", viper.GetString("EXTERNAL_API"), "aeternity node external API endpoint")
 	RootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "enable debug")
 	RootCmd.PersistentFlags().BoolVar(&outputFormatJSON, "json", false, "print output in json format")
-}
-
-// initConfig reads in config file and ENV variables if set.
-func initConfig() {
-	// set configuration parameters
-	aeternity.Config.P = &aeternity.DefaultConfig
 }
