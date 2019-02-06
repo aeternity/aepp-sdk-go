@@ -77,7 +77,7 @@ var encTests = []encTest{
 	{val: false, output: "80"},
 
 	// integers
-	{val: uint32(0), output: "80"},
+	{val: uint32(0), output: "00"},
 	{val: uint32(127), output: "7F"},
 	{val: uint32(128), output: "8180"},
 	{val: uint32(256), output: "820100"},
@@ -210,7 +210,7 @@ var encTests = []encTest{
 	{val: []RawValue{unhex("01"), unhex("02")}, output: "C20102"},
 
 	// structs
-	{val: simplestruct{}, output: "C28080"},
+	{val: simplestruct{}, output: "C20080"},
 	{val: simplestruct{A: 3, B: "foo"}, output: "C50383666F6F"},
 	{val: &recstruct{5, nil}, output: "C205C0"},
 	{val: &recstruct{5, &recstruct{4, &recstruct{3, nil}}}, output: "C605C404C203C0"},
@@ -221,7 +221,7 @@ var encTests = []encTest{
 	{val: &hasIgnoredField{A: 1, B: 2, C: 3}, output: "C20103"},
 
 	// nil
-	{val: (*uint)(nil), output: "80"},
+	{val: (*uint)(nil), output: "00"},
 	{val: (*string)(nil), output: "80"},
 	{val: (*[]byte)(nil), output: "80"},
 	{val: (*[10]byte)(nil), output: "80"},
