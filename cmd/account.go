@@ -17,9 +17,6 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"regexp"
-	"strconv"
-	"strings"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
 	"github.com/aeternity/aepp-sdk-go/utils"
@@ -193,92 +190,9 @@ var saveCmd = &cobra.Command{
 	},
 }
 
-// spendCmd implements the account spend subcommand
-var spendCmd = &cobra.Command{
-	Use:   "spend ACCOUNT_KEYSTORE RECIPIENT_ADDRESS AMOUNT",
-	Short: "Print the aeternity account spend",
-	Long:  ``,
-	Args:  cobra.ExactArgs(3),
-	Run: func(cmd *cobra.Command, args []string) {
-
-		var (
-			keystorePath string
-			recipient    string
-			amount       int64
-		)
-
-		// load variables
-		for _, a := range args {
-			if strings.HasPrefix(a, string(aeternity.PrefixAccountPubkey)) {
-				recipient = a
-				continue
-			}
-			if m, _ := regexp.MatchString(`^\d+$`, a); m {
-				amount, _ = strconv.ParseInt(a, 10, 64)
-			}
-			if p, err := aeternity.GetWalletPath(a); err == nil {
-				keystorePath = p
-			}
-		}
-
-		// validate variables
-		if len(recipient) == 0 {
-			fmt.Println("Error, missing or invalid recipient address")
-			os.Exit(1)
-		}
-		if len(keystorePath) == 0 {
-			fmt.Println("Error, missing or invalid keystore path")
-			os.Exit(1)
-		}
-		if amount <= 0 {
-			fmt.Println("Error, missing or invalid amount")
-			os.Exit(1)
-		}
-		// ask for the keystore password if not already set by CLI flags
-		if len(password) == 0 {
-			var err error
-			password, err = utils.AskPassword("Enter the password to unlock the keystore: ")
-			if err != nil {
-				fmt.Println("Error reading the password: ", err)
-				os.Exit(1)
-			}
-		}
-
-		// load the account
-		account, err := aeternity.LoadAccountFromKeyStoreFile(keystorePath, password)
-		if err != nil {
-			fmt.Println("Error unlocking the keystore: ", err)
-			os.Exit(1)
-		}
-		// run the transaction
-		_, txHash, _, ttl, _, err := aeCli.WithAccount(account).Spend(recipient, amount, payload)
-
-		// TODO: print also the ttl
-		aeternity.Pp(
-			"Sender Address", account.Address,
-			"Recipient Address", recipient,
-			"Amount", amount,
-			"TransactionHash", txHash,
-		)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		if waitForTx {
-			_, _, _, tx, err := aeCli.WaitForTransactionUntillHeight(ttl, txHash)
-			aeternity.PrintObject("Transaction", tx)
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
-		}
-	},
-}
-
 func init() {
 	RootCmd.AddCommand(accountCmd)
 	accountCmd.AddCommand(addressCmd)
-	accountCmd.AddCommand(spendCmd)
 	accountCmd.AddCommand(createCmd)
 	accountCmd.AddCommand(saveCmd)
 	accountCmd.AddCommand(balanceCmd)
@@ -292,9 +206,4 @@ func init() {
 	saveCmd.Flags().StringVar(&password, "password", "", "Read account password from stdin [WARN: this method is not secure]")
 	// account address flags
 	addressCmd.Flags().BoolVar(&printPrivateKey, "private-key", false, "Print the private key as hex string")
-	// account spend command flags
-	spendCmd.Flags().BoolVarP(&waitForTx, "wait", "w", false, "Wait for the transaction to be mined before exiting")
-	spendCmd.Flags().StringVarP(&payload, "message", "m", "", "Payload to add to the spend transaction")
-	spendCmd.Flags().StringVar(&password, "password", "", "Read account password from stdin [WARN: this method is not secure]")
-
 }
