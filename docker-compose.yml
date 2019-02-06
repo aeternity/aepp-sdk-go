@@ -16,7 +16,7 @@ services:
   node:
     image: aeternity/aeternity:${TAG}
     hostname: node
-    expose: [3013, 3113]
+    ports: ["3013:3013", "3113:3113"]
     environment:
       EPOCH_CONFIG: /home/aeternity/aeternity.yaml
     command: -aecore expected_mine_rate ${EPOCH_MINE_RATE:-15000}
