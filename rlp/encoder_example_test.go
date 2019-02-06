@@ -49,6 +49,6 @@ func ExampleEncoder() {
 	fmt.Printf("%v → %X\n", t, bytes)
 
 	// Output:
-	// <nil> → C28080
+	// <nil> → C20000
 	// &{foobar 5 6} → C20506
 }
