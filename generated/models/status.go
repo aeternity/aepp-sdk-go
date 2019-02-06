@@ -31,6 +31,10 @@ type Status struct {
 	// Required: true
 	Listening *bool `json:"listening"`
 
+	// network id
+	// Required: true
+	NetworkID *string `json:"network_id"`
+
 	// node revision
 	// Required: true
 	NodeRevision *string `json:"node_revision"`
@@ -76,6 +80,10 @@ func (m *Status) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateListening(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateNetworkID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -137,6 +145,15 @@ func (m *Status) validateGenesisKeyBlockHash(formats strfmt.Registry) error {
 func (m *Status) validateListening(formats strfmt.Registry) error {
 
 	if err := validate.Required("listening", "body", m.Listening); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Status) validateNetworkID(formats strfmt.Registry) error {
+
+	if err := validate.Required("network_id", "body", m.NetworkID); err != nil {
 		return err
 	}
 

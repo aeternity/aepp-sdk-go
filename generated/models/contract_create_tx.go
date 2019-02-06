@@ -65,7 +65,7 @@ type ContractCreateTx struct {
 	// Required: true
 	// Maximum: 255
 	// Minimum: 0
-	VMVersion *string `json:"vm_version"`
+	VMVersion *int64 `json:"vm_version"`
 }
 
 // Validate validates this contract create tx
@@ -235,13 +235,13 @@ func (m *ContractCreateTx) validateVMVersion(formats strfmt.Registry) error {
 		return err
 	}
 
-	// if err := validate.MinimumInt("vm_version", "body", int64(*m.VMVersion), 0, false); err != nil {
-	//   return err
-	// }
+	if err := validate.MinimumInt("vm_version", "body", int64(*m.VMVersion), 0, false); err != nil {
+		return err
+	}
 
-	// if err := validate.MaximumInt("vm_version", "body", int64(*m.VMVersion), 255, false); err != nil {
-	//   return err
-	// }
+	if err := validate.MaximumInt("vm_version", "body", int64(*m.VMVersion), 255, false); err != nil {
+		return err
+	}
 
 	return nil
 }
