@@ -2085,6 +2085,16 @@
     }
   },
   "definitions" : {
+    "Balance": {
+      "type" : "integer",
+      "minimum" : 0,
+      "x-go-type": {
+        "import": {
+          "package": "math/big"
+        },
+        "type": "Int"
+      }
+    },
     "EncodedHash" : {
       "type" : "string"
     },
@@ -2292,10 +2302,8 @@
           "$ref" : "#/definitions/EncodedHash"
         },
         "balance" : {
-          "type" : "integer",
-          "format" : "uint64",
-          "description" : "Balance",
-          "minimum" : 0
+          "$ref": "#/definitions/Balance",
+          "description" : "Balance"
         },
         "nonce" : {
           "type" : "integer",
