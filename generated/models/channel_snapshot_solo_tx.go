@@ -24,7 +24,7 @@ type ChannelSnapshotSoloTx struct {
 	// fee
 	// Required: true
 	// Minimum: 0
-	Fee *int64 `json:"fee"`
+	Fee *uint64 `json:"fee"`
 
 	// from id
 	// Required: true
@@ -32,7 +32,7 @@ type ChannelSnapshotSoloTx struct {
 
 	// nonce
 	// Minimum: 0
-	Nonce *int64 `json:"nonce,omitempty"`
+	Nonce *uint64 `json:"nonce,omitempty"`
 
 	// payload
 	// Required: true
@@ -40,7 +40,7 @@ type ChannelSnapshotSoloTx struct {
 
 	// ttl
 	// Minimum: 0
-	TTL *int64 `json:"ttl,omitempty"`
+	TTL *uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this channel snapshot solo tx

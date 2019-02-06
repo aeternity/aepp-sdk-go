@@ -22,7 +22,7 @@ type OffChainDeposit struct {
 
 	// Amount of tokens to deposit
 	// Required: true
-	Am *int64 `json:"am"`
+	Am *uint64 `json:"am"`
 
 	// Depositor of tokens
 	// Required: true
@@ -49,7 +49,7 @@ func (m *OffChainDeposit) UnmarshalJSON(raw []byte) error {
 
 		// Amount of tokens to deposit
 		// Required: true
-		Am *int64 `json:"am"`
+		Am *uint64 `json:"am"`
 
 		// Depositor of tokens
 		// Required: true
@@ -100,7 +100,7 @@ func (m OffChainDeposit) MarshalJSON() ([]byte, error) {
 
 		// Amount of tokens to deposit
 		// Required: true
-		Am *int64 `json:"am"`
+		Am *uint64 `json:"am"`
 
 		// Depositor of tokens
 		// Required: true

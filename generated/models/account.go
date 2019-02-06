@@ -20,7 +20,7 @@ type Account struct {
 	// Balance
 	// Required: true
 	// Minimum: 0
-	Balance *int64 `json:"balance"`
+	Balance *uint64 `json:"balance"`
 
 	// Public key
 	// Required: true
@@ -29,7 +29,7 @@ type Account struct {
 	// Nonce
 	// Required: true
 	// Minimum: 0
-	Nonce *int64 `json:"nonce"`
+	Nonce *uint64 `json:"nonce"`
 }
 
 // Validate validates this account

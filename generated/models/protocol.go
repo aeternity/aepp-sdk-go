@@ -20,12 +20,12 @@ type Protocol struct {
 	// effective at height
 	// Required: true
 	// Minimum: 0
-	EffectiveAtHeight *int64 `json:"effective_at_height"`
+	EffectiveAtHeight *uint64 `json:"effective_at_height"`
 
 	// version
 	// Required: true
 	// Minimum: 1
-	Version *int64 `json:"version"`
+	Version *uint64 `json:"version"`
 }
 
 // Validate validates this protocol

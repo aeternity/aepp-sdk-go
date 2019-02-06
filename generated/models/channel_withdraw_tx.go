@@ -20,7 +20,7 @@ type ChannelWithdrawTx struct {
 	// amount
 	// Required: true
 	// Minimum: 0
-	Amount *int64 `json:"amount"`
+	Amount *uint64 `json:"amount"`
 
 	// channel id
 	// Required: true
@@ -29,17 +29,17 @@ type ChannelWithdrawTx struct {
 	// fee
 	// Required: true
 	// Minimum: 0
-	Fee *int64 `json:"fee"`
+	Fee *uint64 `json:"fee"`
 
 	// nonce
 	// Required: true
 	// Minimum: 0
-	Nonce *int64 `json:"nonce"`
+	Nonce *uint64 `json:"nonce"`
 
 	// Channel's next round
 	// Required: true
 	// Minimum: 0
-	Round *int64 `json:"round"`
+	Round *uint64 `json:"round"`
 
 	// Root hash of the channel's internal state tree after the withdraw had been applied to it
 	// Required: true
@@ -51,7 +51,7 @@ type ChannelWithdrawTx struct {
 
 	// ttl
 	// Minimum: 0
-	TTL *int64 `json:"ttl,omitempty"`
+	TTL *uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this channel withdraw tx

@@ -22,7 +22,7 @@ type OffChainCallContract struct {
 
 	// Amount of tokens to transfer to the contract
 	// Required: true
-	Amount *int64 `json:"amount"`
+	Amount *uint64 `json:"amount"`
 
 	// Contract call data
 	// Required: true
@@ -38,15 +38,15 @@ type OffChainCallContract struct {
 
 	// Gas limit for the contract call
 	// Required: true
-	Gas *int64 `json:"gas"`
+	Gas *uint64 `json:"gas"`
 
 	// Gas price for the contract call
 	// Required: true
-	GasPrice *int64 `json:"gas_price"`
+	GasPrice *uint64 `json:"gas_price"`
 
 	// VM version of the contract
 	// Required: true
-	VMVersion *int64 `json:"vm_version"`
+	VMVersion *uint64 `json:"vm_version"`
 }
 
 // Op gets the op of this subtype
@@ -79,7 +79,7 @@ func (m *OffChainCallContract) UnmarshalJSON(raw []byte) error {
 
 		// Amount of tokens to transfer to the contract
 		// Required: true
-		Amount *int64 `json:"amount"`
+		Amount *uint64 `json:"amount"`
 
 		// Contract call data
 		// Required: true
@@ -95,15 +95,15 @@ func (m *OffChainCallContract) UnmarshalJSON(raw []byte) error {
 
 		// Gas limit for the contract call
 		// Required: true
-		Gas *int64 `json:"gas"`
+		Gas *uint64 `json:"gas"`
 
 		// Gas price for the contract call
 		// Required: true
-		GasPrice *int64 `json:"gas_price"`
+		GasPrice *uint64 `json:"gas_price"`
 
 		// VM version of the contract
 		// Required: true
-		VMVersion *int64 `json:"vm_version"`
+		VMVersion *uint64 `json:"vm_version"`
 	}
 	buf := bytes.NewBuffer(raw)
 	dec := json.NewDecoder(buf)
@@ -160,7 +160,7 @@ func (m OffChainCallContract) MarshalJSON() ([]byte, error) {
 
 		// Amount of tokens to transfer to the contract
 		// Required: true
-		Amount *int64 `json:"amount"`
+		Amount *uint64 `json:"amount"`
 
 		// Contract call data
 		// Required: true
@@ -176,15 +176,15 @@ func (m OffChainCallContract) MarshalJSON() ([]byte, error) {
 
 		// Gas limit for the contract call
 		// Required: true
-		Gas *int64 `json:"gas"`
+		Gas *uint64 `json:"gas"`
 
 		// Gas price for the contract call
 		// Required: true
-		GasPrice *int64 `json:"gas_price"`
+		GasPrice *uint64 `json:"gas_price"`
 
 		// VM version of the contract
 		// Required: true
-		VMVersion *int64 `json:"vm_version"`
+		VMVersion *uint64 `json:"vm_version"`
 	}{
 
 		Amount: m.Amount,

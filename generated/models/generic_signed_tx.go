@@ -28,7 +28,7 @@ type GenericSignedTx struct {
 
 	// block height
 	// Required: true
-	BlockHeight *int64 `json:"block_height"`
+	BlockHeight *uint64 `json:"block_height"`
 
 	// hash
 	// Required: true
@@ -57,7 +57,7 @@ func (m *GenericSignedTx) UnmarshalJSON(raw []byte) error {
 	var data struct {
 		BlockHash EncodedHash `json:"block_hash"`
 
-		BlockHeight *int64 `json:"block_height"`
+		BlockHeight *uint64 `json:"block_height"`
 
 		Hash EncodedHash `json:"hash"`
 
@@ -107,7 +107,7 @@ func (m GenericSignedTx) MarshalJSON() ([]byte, error) {
 	b1, err = json.Marshal(struct {
 		BlockHash EncodedHash `json:"block_hash"`
 
-		BlockHeight *int64 `json:"block_height"`
+		BlockHeight *uint64 `json:"block_height"`
 
 		Hash EncodedHash `json:"hash"`
 

@@ -23,17 +23,17 @@ type NameRevokeTx struct {
 
 	// fee
 	// Required: true
-	Fee *int64 `json:"fee"`
+	Fee *uint64 `json:"fee"`
 
 	// name id
 	// Required: true
 	NameID EncodedHash `json:"name_id"`
 
 	// nonce
-	Nonce int64 `json:"nonce,omitempty"`
+	Nonce uint64 `json:"nonce,omitempty"`
 
 	// ttl
-	TTL int64 `json:"ttl,omitempty"`
+	TTL uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this name revoke tx

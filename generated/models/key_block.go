@@ -27,14 +27,14 @@ type KeyBlock struct {
 
 	// height
 	// Required: true
-	Height *int64 `json:"height"`
+	Height *uint64 `json:"height"`
 
 	// miner
 	// Required: true
 	Miner EncodedHash `json:"miner"`
 
 	// nonce
-	Nonce int64 `json:"nonce,omitempty"`
+	Nonce uint64 `json:"nonce,omitempty"`
 
 	// pow
 	Pow Pow `json:"pow,omitempty"`
@@ -53,15 +53,15 @@ type KeyBlock struct {
 
 	// target
 	// Required: true
-	Target *int64 `json:"target"`
+	Target *uint64 `json:"target"`
 
 	// time
 	// Required: true
-	Time *int64 `json:"time"`
+	Time *uint64 `json:"time"`
 
 	// version
 	// Required: true
-	Version *int64 `json:"version"`
+	Version *uint64 `json:"version"`
 }
 
 // Validate validates this key block

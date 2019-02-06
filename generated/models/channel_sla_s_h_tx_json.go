@@ -19,7 +19,7 @@ import (
 // ChannelSLASHTxJSON channel slash tx JSON
 // swagger:model ChannelSlashTxJSON
 type ChannelSLASHTxJSON struct {
-	versionField *int64
+	versionField *uint64
 
 	ChannelSLASHTx
 }
@@ -35,12 +35,12 @@ func (m *ChannelSLASHTxJSON) SetType(val string) {
 }
 
 // Version gets the version of this subtype
-func (m *ChannelSLASHTxJSON) Version() *int64 {
+func (m *ChannelSLASHTxJSON) Version() *uint64 {
 	return m.versionField
 }
 
 // SetVersion sets the version of this subtype
-func (m *ChannelSLASHTxJSON) SetVersion(val *int64) {
+func (m *ChannelSLASHTxJSON) SetVersion(val *uint64) {
 	m.versionField = val
 }
 
@@ -62,7 +62,7 @@ func (m *ChannelSLASHTxJSON) UnmarshalJSON(raw []byte) error {
 
 		Type string `json:"type"`
 
-		Version *int64 `json:"version"`
+		Version *uint64 `json:"version"`
 	}
 	buf = bytes.NewBuffer(raw)
 	dec = json.NewDecoder(buf)
@@ -105,7 +105,7 @@ func (m ChannelSLASHTxJSON) MarshalJSON() ([]byte, error) {
 	b2, err = json.Marshal(struct {
 		Type string `json:"type"`
 
-		Version *int64 `json:"version"`
+		Version *uint64 `json:"version"`
 	}{
 
 		Type: m.Type(),

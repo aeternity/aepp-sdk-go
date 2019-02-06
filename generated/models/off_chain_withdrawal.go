@@ -22,7 +22,7 @@ type OffChainWithdrawal struct {
 
 	// Amount of tokens to withdraw
 	// Required: true
-	Am *int64 `json:"am"`
+	Am *uint64 `json:"am"`
 
 	// Withdrawer of tokens
 	// Required: true
@@ -49,7 +49,7 @@ func (m *OffChainWithdrawal) UnmarshalJSON(raw []byte) error {
 
 		// Amount of tokens to withdraw
 		// Required: true
-		Am *int64 `json:"am"`
+		Am *uint64 `json:"am"`
 
 		// Withdrawer of tokens
 		// Required: true
@@ -100,7 +100,7 @@ func (m OffChainWithdrawal) MarshalJSON() ([]byte, error) {
 
 		// Amount of tokens to withdraw
 		// Required: true
-		Am *int64 `json:"am"`
+		Am *uint64 `json:"am"`
 
 		// Withdrawer of tokens
 		// Required: true

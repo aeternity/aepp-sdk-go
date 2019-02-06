@@ -24,7 +24,7 @@ type ChannelSettleTx struct {
 	// fee
 	// Required: true
 	// Minimum: 0
-	Fee *int64 `json:"fee"`
+	Fee *uint64 `json:"fee"`
 
 	// from id
 	// Required: true
@@ -33,21 +33,21 @@ type ChannelSettleTx struct {
 	// initiator amount final
 	// Required: true
 	// Minimum: 0
-	InitiatorAmountFinal *int64 `json:"initiator_amount_final"`
+	InitiatorAmountFinal *uint64 `json:"initiator_amount_final"`
 
 	// nonce
 	// Required: true
 	// Minimum: 0
-	Nonce *int64 `json:"nonce"`
+	Nonce *uint64 `json:"nonce"`
 
 	// responder amount final
 	// Required: true
 	// Minimum: 0
-	ResponderAmountFinal *int64 `json:"responder_amount_final"`
+	ResponderAmountFinal *uint64 `json:"responder_amount_final"`
 
 	// ttl
 	// Minimum: 0
-	TTL *int64 `json:"ttl,omitempty"`
+	TTL *uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this channel settle tx

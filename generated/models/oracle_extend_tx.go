@@ -19,10 +19,10 @@ type OracleExtendTx struct {
 
 	// fee
 	// Required: true
-	Fee *int64 `json:"fee"`
+	Fee *uint64 `json:"fee"`
 
 	// nonce
-	Nonce int64 `json:"nonce,omitempty"`
+	Nonce uint64 `json:"nonce,omitempty"`
 
 	// oracle id
 	// Required: true
@@ -33,7 +33,7 @@ type OracleExtendTx struct {
 	OracleTTL *RelativeTTL `json:"oracle_ttl"`
 
 	// ttl
-	TTL int64 `json:"ttl,omitempty"`
+	TTL uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this oracle extend tx

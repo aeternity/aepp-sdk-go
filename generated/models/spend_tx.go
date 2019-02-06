@@ -20,14 +20,14 @@ type SpendTx struct {
 	// amount
 	// Required: true
 	// Minimum: 0
-	Amount *int64 `json:"amount"`
+	Amount *uint64 `json:"amount"`
 
 	// fee
 	// Required: true
-	Fee *int64 `json:"fee"`
+	Fee *uint64 `json:"fee"`
 
 	// nonce
-	Nonce int64 `json:"nonce,omitempty"`
+	Nonce uint64 `json:"nonce,omitempty"`
 
 	// payload
 	// Required: true
@@ -42,7 +42,7 @@ type SpendTx struct {
 	SenderID EncodedHash `json:"sender_id"`
 
 	// ttl
-	TTL int64 `json:"ttl,omitempty"`
+	TTL uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this spend tx

@@ -35,12 +35,12 @@ type RegisteredOracle struct {
 
 	// ttl
 	// Required: true
-	TTL *int64 `json:"ttl"`
+	TTL *uint64 `json:"ttl"`
 
 	// vm version
 	// Required: true
 	// Minimum: 0
-	VMVersion *int64 `json:"vm_version"`
+	VMVersion *uint64 `json:"vm_version"`
 }
 
 // Validate validates this registered oracle

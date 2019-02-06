@@ -21,7 +21,7 @@ type Status struct {
 
 	// difficulty
 	// Required: true
-	Difficulty *int64 `json:"difficulty"`
+	Difficulty *uint64 `json:"difficulty"`
 
 	// genesis key block hash
 	// Required: true
@@ -46,12 +46,12 @@ type Status struct {
 	// peer count
 	// Required: true
 	// Minimum: 0
-	PeerCount *int64 `json:"peer_count"`
+	PeerCount *uint64 `json:"peer_count"`
 
 	// pending transactions count
 	// Required: true
 	// Minimum: 0
-	PendingTransactionsCount *int64 `json:"pending_transactions_count"`
+	PendingTransactionsCount *uint64 `json:"pending_transactions_count"`
 
 	// protocols
 	// Required: true
@@ -60,7 +60,7 @@ type Status struct {
 	// solutions
 	// Required: true
 	// Minimum: 0
-	Solutions *int64 `json:"solutions"`
+	Solutions *uint64 `json:"solutions"`
 
 	// syncing
 	// Required: true
