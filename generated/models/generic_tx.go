@@ -30,14 +30,14 @@ type GenericTx interface {
 
 	// version
 	// Required: true
-	Version() *int64
-	SetVersion(*int64)
+	Version() *uint64
+	SetVersion(*uint64)
 }
 
 type genericTx struct {
 	typeField string
 
-	versionField *int64
+	versionField *uint64
 }
 
 // Type gets the type of this polymorphic type
@@ -51,12 +51,12 @@ func (m *genericTx) SetType(val string) {
 }
 
 // Version gets the version of this polymorphic type
-func (m *genericTx) Version() *int64 {
+func (m *genericTx) Version() *uint64 {
 	return m.versionField
 }
 
 // SetVersion sets the version of this polymorphic type
-func (m *genericTx) SetVersion(val *int64) {
+func (m *genericTx) SetVersion(val *uint64) {
 	m.versionField = val
 }
 

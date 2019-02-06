@@ -22,12 +22,12 @@ type Channel struct {
 	// channel amount
 	// Required: true
 	// Minimum: 0
-	ChannelAmount *int64 `json:"channel_amount"`
+	ChannelAmount *uint64 `json:"channel_amount"`
 
 	// channel reserve
 	// Required: true
 	// Minimum: 0
-	ChannelReserve *int64 `json:"channel_reserve"`
+	ChannelReserve *uint64 `json:"channel_reserve"`
 
 	// delegate ids
 	// Required: true
@@ -40,7 +40,7 @@ type Channel struct {
 	// initiator amount
 	// Required: true
 	// Minimum: 0
-	InitiatorAmount *int64 `json:"initiator_amount"`
+	InitiatorAmount *uint64 `json:"initiator_amount"`
 
 	// initiator id
 	// Required: true
@@ -49,16 +49,16 @@ type Channel struct {
 	// lock period
 	// Required: true
 	// Minimum: 0
-	LockPeriod *int64 `json:"lock_period"`
+	LockPeriod *uint64 `json:"lock_period"`
 
 	// locked until
 	// Required: true
-	LockedUntil *int64 `json:"locked_until"`
+	LockedUntil *uint64 `json:"locked_until"`
 
 	// responder amount
 	// Required: true
 	// Minimum: 0
-	ResponderAmount *int64 `json:"responder_amount"`
+	ResponderAmount *uint64 `json:"responder_amount"`
 
 	// responder id
 	// Required: true
@@ -67,12 +67,12 @@ type Channel struct {
 	// round
 	// Required: true
 	// Minimum: 0
-	Round *int64 `json:"round"`
+	Round *uint64 `json:"round"`
 
 	// solo round
 	// Required: true
 	// Minimum: 0
-	SoloRound *int64 `json:"solo_round"`
+	SoloRound *uint64 `json:"solo_round"`
 
 	// state hash
 	// Required: true

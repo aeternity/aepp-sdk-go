@@ -20,17 +20,17 @@ type ChannelCreateTx struct {
 	// channel reserve
 	// Required: true
 	// Minimum: 0
-	ChannelReserve *int64 `json:"channel_reserve"`
+	ChannelReserve *uint64 `json:"channel_reserve"`
 
 	// fee
 	// Required: true
 	// Minimum: 0
-	Fee *int64 `json:"fee"`
+	Fee *uint64 `json:"fee"`
 
 	// initiator amount
 	// Required: true
 	// Minimum: 0
-	InitiatorAmount *int64 `json:"initiator_amount"`
+	InitiatorAmount *uint64 `json:"initiator_amount"`
 
 	// initiator id
 	// Required: true
@@ -39,21 +39,21 @@ type ChannelCreateTx struct {
 	// lock period
 	// Required: true
 	// Minimum: 0
-	LockPeriod *int64 `json:"lock_period"`
+	LockPeriod *uint64 `json:"lock_period"`
 
 	// nonce
 	// Minimum: 0
-	Nonce *int64 `json:"nonce,omitempty"`
+	Nonce *uint64 `json:"nonce,omitempty"`
 
 	// push amount
 	// Required: true
 	// Minimum: 0
-	PushAmount *int64 `json:"push_amount"`
+	PushAmount *uint64 `json:"push_amount"`
 
 	// responder amount
 	// Required: true
 	// Minimum: 0
-	ResponderAmount *int64 `json:"responder_amount"`
+	ResponderAmount *uint64 `json:"responder_amount"`
 
 	// responder id
 	// Required: true
@@ -65,7 +65,7 @@ type ChannelCreateTx struct {
 
 	// ttl
 	// Minimum: 0
-	TTL *int64 `json:"ttl,omitempty"`
+	TTL *uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this channel create tx

@@ -23,10 +23,10 @@ type OracleRegisterTx struct {
 
 	// fee
 	// Required: true
-	Fee *int64 `json:"fee"`
+	Fee *uint64 `json:"fee"`
 
 	// nonce
-	Nonce int64 `json:"nonce,omitempty"`
+	Nonce uint64 `json:"nonce,omitempty"`
 
 	// oracle ttl
 	// Required: true
@@ -34,7 +34,7 @@ type OracleRegisterTx struct {
 
 	// query fee
 	// Required: true
-	QueryFee *int64 `json:"query_fee"`
+	QueryFee *uint64 `json:"query_fee"`
 
 	// query format
 	// Required: true
@@ -45,11 +45,11 @@ type OracleRegisterTx struct {
 	ResponseFormat *string `json:"response_format"`
 
 	// ttl
-	TTL int64 `json:"ttl,omitempty"`
+	TTL uint64 `json:"ttl,omitempty"`
 
 	// vm version
 	// Minimum: 0
-	VMVersion *int64 `json:"vm_version,omitempty"`
+	VMVersion *uint64 `json:"vm_version,omitempty"`
 }
 
 // Validate validates this oracle register tx

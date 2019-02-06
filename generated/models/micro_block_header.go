@@ -23,7 +23,7 @@ type MicroBlockHeader struct {
 
 	// height
 	// Required: true
-	Height *int64 `json:"height"`
+	Height *uint64 `json:"height"`
 
 	// "no_fraud" | api encoded Proof of Fraud hash
 	// Required: true
@@ -47,7 +47,7 @@ type MicroBlockHeader struct {
 
 	// time
 	// Required: true
-	Time *int64 `json:"time"`
+	Time *uint64 `json:"time"`
 
 	// txs hash
 	// Required: true
@@ -55,7 +55,7 @@ type MicroBlockHeader struct {
 
 	// version
 	// Required: true
-	Version *int64 `json:"version"`
+	Version *uint64 `json:"version"`
 }
 
 // Validate validates this micro block header

@@ -19,7 +19,7 @@ type OracleQuery struct {
 
 	// fee
 	// Required: true
-	Fee *int64 `json:"fee"`
+	Fee *uint64 `json:"fee"`
 
 	// id
 	// Required: true
@@ -48,11 +48,11 @@ type OracleQuery struct {
 	// sender nonce
 	// Required: true
 	// Minimum: 0
-	SenderNonce *int64 `json:"sender_nonce"`
+	SenderNonce *uint64 `json:"sender_nonce"`
 
 	// ttl
 	// Required: true
-	TTL *int64 `json:"ttl"`
+	TTL *uint64 `json:"ttl"`
 }
 
 // Validate validates this oracle query

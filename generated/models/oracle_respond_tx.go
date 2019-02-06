@@ -19,10 +19,10 @@ type OracleRespondTx struct {
 
 	// fee
 	// Required: true
-	Fee *int64 `json:"fee"`
+	Fee *uint64 `json:"fee"`
 
 	// Oracle nonce
-	Nonce int64 `json:"nonce,omitempty"`
+	Nonce uint64 `json:"nonce,omitempty"`
 
 	// oracle id
 	// Required: true
@@ -41,7 +41,7 @@ type OracleRespondTx struct {
 	ResponseTTL *RelativeTTL `json:"response_ttl"`
 
 	// ttl
-	TTL int64 `json:"ttl,omitempty"`
+	TTL uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this oracle respond tx

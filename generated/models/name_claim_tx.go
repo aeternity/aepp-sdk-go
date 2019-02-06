@@ -23,7 +23,7 @@ type NameClaimTx struct {
 
 	// fee
 	// Required: true
-	Fee *int64 `json:"fee"`
+	Fee *uint64 `json:"fee"`
 
 	// name
 	// Required: true
@@ -31,13 +31,13 @@ type NameClaimTx struct {
 
 	// name salt
 	// Required: true
-	NameSalt *int64 `json:"name_salt"`
+	NameSalt *uint64 `json:"name_salt"`
 
 	// nonce
-	Nonce int64 `json:"nonce,omitempty"`
+	Nonce uint64 `json:"nonce,omitempty"`
 
 	// ttl
-	TTL int64 `json:"ttl,omitempty"`
+	TTL uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this name claim tx

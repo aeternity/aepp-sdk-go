@@ -19,7 +19,7 @@ import (
 // NameRevokeTxJSON name revoke tx JSON
 // swagger:model NameRevokeTxJSON
 type NameRevokeTxJSON struct {
-	versionField *int64
+	versionField *uint64
 
 	NameRevokeTx
 }
@@ -35,12 +35,12 @@ func (m *NameRevokeTxJSON) SetType(val string) {
 }
 
 // Version gets the version of this subtype
-func (m *NameRevokeTxJSON) Version() *int64 {
+func (m *NameRevokeTxJSON) Version() *uint64 {
 	return m.versionField
 }
 
 // SetVersion sets the version of this subtype
-func (m *NameRevokeTxJSON) SetVersion(val *int64) {
+func (m *NameRevokeTxJSON) SetVersion(val *uint64) {
 	m.versionField = val
 }
 
@@ -62,7 +62,7 @@ func (m *NameRevokeTxJSON) UnmarshalJSON(raw []byte) error {
 
 		Type string `json:"type"`
 
-		Version *int64 `json:"version"`
+		Version *uint64 `json:"version"`
 	}
 	buf = bytes.NewBuffer(raw)
 	dec = json.NewDecoder(buf)
@@ -105,7 +105,7 @@ func (m NameRevokeTxJSON) MarshalJSON() ([]byte, error) {
 	b2, err = json.Marshal(struct {
 		Type string `json:"type"`
 
-		Version *int64 `json:"version"`
+		Version *uint64 `json:"version"`
 	}{
 
 		Type: m.Type(),

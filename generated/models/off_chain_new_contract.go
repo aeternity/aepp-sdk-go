@@ -30,7 +30,7 @@ type OffChainNewContract struct {
 
 	// Amount of tokens to deposit to the new contract
 	// Required: true
-	Deposit *int64 `json:"deposit"`
+	Deposit *uint64 `json:"deposit"`
 
 	// Contract owner
 	// Required: true
@@ -38,7 +38,7 @@ type OffChainNewContract struct {
 
 	// VM version of the contract
 	// Required: true
-	VMVersion *int64 `json:"vm_version"`
+	VMVersion *uint64 `json:"vm_version"`
 }
 
 // Op gets the op of this subtype
@@ -75,7 +75,7 @@ func (m *OffChainNewContract) UnmarshalJSON(raw []byte) error {
 
 		// Amount of tokens to deposit to the new contract
 		// Required: true
-		Deposit *int64 `json:"deposit"`
+		Deposit *uint64 `json:"deposit"`
 
 		// Contract owner
 		// Required: true
@@ -83,7 +83,7 @@ func (m *OffChainNewContract) UnmarshalJSON(raw []byte) error {
 
 		// VM version of the contract
 		// Required: true
-		VMVersion *int64 `json:"vm_version"`
+		VMVersion *uint64 `json:"vm_version"`
 	}
 	buf := bytes.NewBuffer(raw)
 	dec := json.NewDecoder(buf)
@@ -144,7 +144,7 @@ func (m OffChainNewContract) MarshalJSON() ([]byte, error) {
 
 		// Amount of tokens to deposit to the new contract
 		// Required: true
-		Deposit *int64 `json:"deposit"`
+		Deposit *uint64 `json:"deposit"`
 
 		// Contract owner
 		// Required: true
@@ -152,7 +152,7 @@ func (m OffChainNewContract) MarshalJSON() ([]byte, error) {
 
 		// VM version of the contract
 		// Required: true
-		VMVersion *int64 `json:"vm_version"`
+		VMVersion *uint64 `json:"vm_version"`
 	}{
 
 		CallData: m.CallData,

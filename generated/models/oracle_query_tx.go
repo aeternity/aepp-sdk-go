@@ -19,10 +19,10 @@ type OracleQueryTx struct {
 
 	// fee
 	// Required: true
-	Fee *int64 `json:"fee"`
+	Fee *uint64 `json:"fee"`
 
 	// Sender nonce
-	Nonce int64 `json:"nonce,omitempty"`
+	Nonce uint64 `json:"nonce,omitempty"`
 
 	// oracle id
 	// Required: true
@@ -34,7 +34,7 @@ type OracleQueryTx struct {
 
 	// query fee
 	// Required: true
-	QueryFee *int64 `json:"query_fee"`
+	QueryFee *uint64 `json:"query_fee"`
 
 	// query ttl
 	// Required: true
@@ -49,7 +49,7 @@ type OracleQueryTx struct {
 	SenderID EncodedHash `json:"sender_id"`
 
 	// ttl
-	TTL int64 `json:"ttl,omitempty"`
+	TTL uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this oracle query tx
