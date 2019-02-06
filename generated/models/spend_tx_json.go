@@ -26,7 +26,7 @@ type SpendTxJSON struct {
 
 // Type gets the type of this subtype
 func (m *SpendTxJSON) Type() string {
-	return "SpendTx"
+	return "SpendTxJSON"
 }
 
 // SetType sets the type of this subtype

@@ -23,9 +23,9 @@ type MicroBlockHeader struct {
 
 	// height
 	// Required: true
-	Height *uint64 `json:"height"`
+	Height *int64 `json:"height"`
 
-	// "no_fraud" | base58c encoded Proof of Fraud hash
+	// "no_fraud" | api encoded Proof of Fraud hash
 	// Required: true
 	PofHash *string `json:"pof_hash"`
 

@@ -20,7 +20,7 @@ type Account struct {
 	// Balance
 	// Required: true
 	// Minimum: 0
-	Balance float64 `json:"balance"`
+	Balance *int64 `json:"balance"`
 
 	// Public key
 	// Required: true
@@ -29,7 +29,7 @@ type Account struct {
 	// Nonce
 	// Required: true
 	// Minimum: 0
-	Nonce *uint64 `json:"nonce"`
+	Nonce *int64 `json:"nonce"`
 }
 
 // Validate validates this account
@@ -60,7 +60,7 @@ func (m *Account) validateBalance(formats strfmt.Registry) error {
 		return err
 	}
 
-	if err := validate.MinimumNativeType("balance", "body", m.Balance, 0, false); err != nil {
+	if err := validate.MinimumInt("balance", "body", int64(*m.Balance), 0, false); err != nil {
 		return err
 	}
 

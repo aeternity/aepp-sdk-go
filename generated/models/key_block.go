@@ -27,17 +27,17 @@ type KeyBlock struct {
 
 	// height
 	// Required: true
-	Height *uint64 `json:"height"`
+	Height *int64 `json:"height"`
 
 	// miner
 	// Required: true
 	Miner EncodedHash `json:"miner"`
 
 	// nonce
-	Nonce uint64 `json:"nonce,omitempty"`
+	Nonce int64 `json:"nonce,omitempty"`
 
 	// pow
-	Pow Pow `json:"pow"`
+	Pow Pow `json:"pow,omitempty"`
 
 	// prev hash
 	// Required: true
