@@ -97,8 +97,6 @@ var playCmd = &cobra.Command{
 	},
 }
 
-// broadcastCmd implements the tx broadcast subcommand.
-// It broadcasts a signed transaction to the network
 var broadcastCmd = &cobra.Command{
 	Use:   "broadcast SIGNED_TRANSACTION",
 	Short: "Broadcast a transaction to the network",
@@ -120,12 +118,46 @@ var broadcastCmd = &cobra.Command{
 	},
 }
 
+var ttlCmd = &cobra.Command{
+	Use:   "ttl",
+	Short: "Get the absolute TTL for a Transaction",
+	Long:  `Get the absolute TTL (node's height + recommended TTL offset) for a Transaction`,
+	Args:  cobra.ExactArgs(0),
+	Run: func(cmd *cobra.Command, args []string) {
+		ae := NewAeCli()
+		height, err := ae.APIGetHeight()
+		if err != nil {
+			fmt.Printf("Error getting height from the node: %v", err)
+			return
+		}
+		fmt.Println(height + aeternity.Config.Client.TTL)
+	},
+}
+
+var networkIDCmd = &cobra.Command{
+	Use:   "networkid",
+	Short: "Get the node's network_id",
+	Long:  ``,
+	Args:  cobra.ExactArgs(0),
+	Run: func(cmd *cobra.Command, args []string) {
+		ae := NewAeCli()
+		resp, err := ae.APIGetStatus()
+		if err != nil {
+			fmt.Printf("Error getting status information from the node: %v", err)
+			return
+		}
+		fmt.Println(*resp.NetworkID)
+	},
+}
+
 func init() {
 	RootCmd.AddCommand(chainCmd)
 	chainCmd.AddCommand(topCmd)
 	chainCmd.AddCommand(statusCmd)
 	chainCmd.AddCommand(playCmd)
 	chainCmd.AddCommand(broadcastCmd)
+	chainCmd.AddCommand(ttlCmd)
+	chainCmd.AddCommand(networkIDCmd)
 
 	playCmd.Flags().Uint64Var(&limit, "limit", 0, "Print at max 'limit' generations")
 	playCmd.Flags().Uint64Var(&startFromHeight, "height", 0, "Start playing the chain at 'height'")
