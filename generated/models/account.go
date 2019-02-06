@@ -11,6 +11,8 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
+
+	big "math/big"
 )
 
 // Account account
@@ -19,8 +21,7 @@ type Account struct {
 
 	// Balance
 	// Required: true
-	// Minimum: 0
-	Balance *uint64 `json:"balance"`
+	Balance big.Int `json:"balance"`
 
 	// Public key
 	// Required: true
@@ -56,11 +57,10 @@ func (m *Account) Validate(formats strfmt.Registry) error {
 
 func (m *Account) validateBalance(formats strfmt.Registry) error {
 
-	if err := validate.Required("balance", "body", m.Balance); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("balance", "body", int64(*m.Balance), 0, false); err != nil {
+	if err := m.Balance.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("balance")
+		}
 		return err
 	}
 
