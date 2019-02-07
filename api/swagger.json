@@ -2108,6 +2108,16 @@
     "EncodedHash" : {
       "type" : "string"
     },
+    "Fee": {
+      "type" : "integer",
+      "minimum" : 0,
+      "x-go-type": {
+        "import": {
+          "package": "math/big"
+        },
+        "type": "Int"
+      }
+    },
     "Pow" : {
       "type" : "array",
       "items" : {
@@ -2354,7 +2364,7 @@
           "type" : "string"
         },
         "query_fee" : {
-          "type" : "integer"
+          "$ref" : "#/definitions/Fee"
         },
         "ttl" : {
           "type" : "integer",
@@ -2407,8 +2417,7 @@
           "$ref" : "#/definitions/TTL"
         },
         "fee" : {
-          "type" : "integer",
-          "format" : "uint64"
+          "$ref" : "#/definitions/Fee"
         }
       },
       "example" : {
@@ -2478,8 +2487,7 @@
           "$ref" : "#/definitions/Amount"
         },
         "fee" : {
-          "type" : "integer",
-          "format" : "uint64"
+          "$ref" : "#/definitions/Fee"
         },
         "ttl" : {
           "type" : "integer",
@@ -2517,8 +2525,7 @@
           "type" : "string"
         },
         "query_fee" : {
-          "type" : "integer",
-          "format" : "uint64"
+          "$ref" : "#/definitions/Fee"
         },
         "oracle_ttl" : {
           "$ref" : "#/definitions/TTL"
@@ -2531,8 +2538,7 @@
           "format" : "uint64"
         },
         "fee" : {
-          "type" : "integer",
-          "format" : "uint64"
+          "$ref" : "#/definitions/Fee"
         },
         "ttl" : {
           "type" : "integer",
@@ -2564,8 +2570,7 @@
       "required" : [ "fee", "oracle_id", "oracle_ttl" ],
       "properties" : {
         "fee" : {
-          "type" : "integer",
-          "format" : "uint64"
+          "$ref" : "#/definitions/Fee"
         },
         "oracle_ttl" : {
           "$ref" : "#/definitions/RelativeTTL"
@@ -2604,8 +2609,7 @@
           "type" : "string"
         },
         "query_fee" : {
-          "type" : "integer",
-          "format" : "uint64"
+          "$ref" : "#/definitions/Fee"
         },
         "query_ttl" : {
           "$ref" : "#/definitions/TTL"
@@ -2614,8 +2618,7 @@
           "$ref" : "#/definitions/RelativeTTL"
         },
         "fee" : {
-          "type" : "integer",
-          "format" : "uint64"
+          "$ref" : "#/definitions/Fee"
         },
         "ttl" : {
           "type" : "integer",
@@ -2662,8 +2665,7 @@
           "$ref" : "#/definitions/RelativeTTL"
         },
         "fee" : {
-          "type" : "integer",
-          "format" : "uint64"
+          "$ref" : "#/definitions/Fee"
         },
         "ttl" : {
           "type" : "integer",
@@ -2767,8 +2769,7 @@
           "$ref" : "#/definitions/EncodedHash"
         },
         "fee" : {
-          "type" : "integer",
-          "format" : "uint64"
+          "$ref" : "#/definitions/Fee"
         },
         "ttl" : {
           "type" : "integer",
@@ -2802,8 +2803,7 @@
           "format" : "uint64"
         },
         "fee" : {
-          "type" : "integer",
-          "format" : "uint64"
+          "$ref" : "#/definitions/Fee"
         },
         "ttl" : {
           "type" : "integer",
@@ -2848,8 +2848,7 @@
           "format" : "uint64"
         },
         "fee" : {
-          "type" : "integer",
-          "format" : "uint64"
+          "$ref" : "#/definitions/Fee"
         },
         "ttl" : {
           "type" : "integer",
@@ -2891,8 +2890,7 @@
           "$ref" : "#/definitions/EncodedHash"
         },
         "fee" : {
-          "type" : "integer",
-          "format" : "uint64"
+          "$ref" : "#/definitions/Fee"
         },
         "ttl" : {
           "type" : "integer",
@@ -2923,8 +2921,7 @@
           "$ref" : "#/definitions/EncodedHash"
         },
         "fee" : {
-          "type" : "integer",
-          "format" : "uint64"
+          "$ref" : "#/definitions/Fee"
         },
         "ttl" : {
           "type" : "integer",
@@ -3086,9 +3083,7 @@
           "minimum" : 0
         },
         "fee" : {
-          "type" : "integer",
-          "format" : "uint64",
-          "minimum" : 0
+          "$ref" : "#/definitions/Fee"
         },
         "nonce" : {
           "type" : "integer",
@@ -3133,9 +3128,7 @@
           "minimum" : 0
         },
         "fee" : {
-          "type" : "integer",
-          "format" : "uint64",
-          "minimum" : 0
+          "$ref" : "#/definitions/Fee"
         },
         "nonce" : {
           "type" : "integer",
@@ -3183,9 +3176,7 @@
           "minimum" : 0
         },
         "fee" : {
-          "type" : "integer",
-          "format" : "uint64",
-          "minimum" : 0
+          "$ref" : "#/definitions/Fee"
         },
         "nonce" : {
           "type" : "integer",
@@ -3247,9 +3238,7 @@
           "minimum" : 0
         },
         "fee" : {
-          "type" : "integer",
-          "format" : "uint64",
-          "minimum" : 0
+          "$ref" : "#/definitions/Fee"
         },
         "nonce" : {
           "type" : "integer",
@@ -3284,9 +3273,7 @@
           "minimum" : 0
         },
         "fee" : {
-          "type" : "integer",
-          "format" : "uint64",
-          "minimum" : 0
+          "$ref" : "#/definitions/Fee"
         },
         "nonce" : {
           "type" : "integer",
@@ -3323,9 +3310,7 @@
           "minimum" : 0
         },
         "fee" : {
-          "type" : "integer",
-          "format" : "uint64",
-          "minimum" : 0
+          "$ref" : "#/definitions/Fee"
         },
         "nonce" : {
           "type" : "integer",
@@ -3366,9 +3351,7 @@
           "minimum" : 0
         },
         "fee" : {
-          "type" : "integer",
-          "format" : "uint64",
-          "minimum" : 0
+          "$ref" : "#/definitions/Fee"
         },
         "nonce" : {
           "type" : "integer",
@@ -3412,9 +3395,7 @@
           "minimum" : 0
         },
         "fee" : {
-          "type" : "integer",
-          "format" : "uint64",
-          "minimum" : 0
+          "$ref" : "#/definitions/Fee"
         },
         "nonce" : {
           "type" : "integer",
@@ -3451,9 +3432,7 @@
           "minimum" : 0
         },
         "fee" : {
-          "type" : "integer",
-          "format" : "uint64",
-          "minimum" : 0
+          "$ref" : "#/definitions/Fee"
         },
         "nonce" : {
           "type" : "integer",
@@ -4195,9 +4174,8 @@
           "minimum" : 0
         },
         "fee" : {
-          "type" : "integer",
-          "description" : "Transaction fee",
-          "minimum" : 0
+          "$ref" : "#/definitions/Fee",
+          "description" : "Transaction fee"
         },
         "ttl" : {
           "type" : "integer",
@@ -4266,9 +4244,8 @@
           "minimum" : 0
         },
         "fee" : {
-          "type" : "integer",
-          "description" : "Transaction fee",
-          "minimum" : 0
+          "$ref" : "#/definitions/Fee",
+          "description" : "Transaction fee"
         },
         "ttl" : {
           "type" : "integer",
@@ -4322,9 +4299,8 @@
           "maximum" : 255
         },
         "fee" : {
-          "type" : "integer",
-          "description" : "Transaction fee",
-          "minimum" : 0
+          "$ref" : "#/definitions/Fee",
+          "description" : "Transaction fee"
         },
         "ttl" : {
           "type" : "integer",
@@ -4387,9 +4363,8 @@
           "maximum" : 255
         },
         "fee" : {
-          "type" : "integer",
-          "description" : "Transaction fee",
-          "minimum" : 0
+          "$ref" : "#/definitions/Fee",
+          "description" : "Transaction fee"
         },
         "ttl" : {
           "type" : "integer",

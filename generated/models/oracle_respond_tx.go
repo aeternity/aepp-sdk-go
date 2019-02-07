@@ -11,6 +11,8 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
+
+	big "math/big"
 )
 
 // OracleRespondTx oracle respond tx
@@ -19,7 +21,7 @@ type OracleRespondTx struct {
 
 	// fee
 	// Required: true
-	Fee *uint64 `json:"fee"`
+	Fee big.Int `json:"fee"`
 
 	// Oracle nonce
 	Nonce uint64 `json:"nonce,omitempty"`
@@ -76,7 +78,10 @@ func (m *OracleRespondTx) Validate(formats strfmt.Registry) error {
 
 func (m *OracleRespondTx) validateFee(formats strfmt.Registry) error {
 
-	if err := validate.Required("fee", "body", m.Fee); err != nil {
+	if err := m.Fee.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("fee")
+		}
 		return err
 	}
 

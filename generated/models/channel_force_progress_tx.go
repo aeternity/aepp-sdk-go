@@ -16,6 +16,8 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
+
+	big "math/big"
 )
 
 // ChannelForceProgressTx channel force progress tx
@@ -28,8 +30,7 @@ type ChannelForceProgressTx struct {
 
 	// fee
 	// Required: true
-	// Minimum: 0
-	Fee *uint64 `json:"fee"`
+	Fee big.Int `json:"fee"`
 
 	// from id
 	// Required: true
@@ -77,7 +78,7 @@ func (m *ChannelForceProgressTx) UnmarshalJSON(raw []byte) error {
 	var data struct {
 		ChannelID EncodedHash `json:"channel_id"`
 
-		Fee *uint64 `json:"fee"`
+		Fee big.Int `json:"fee"`
 
 		FromID EncodedHash `json:"from_id"`
 
@@ -152,7 +153,7 @@ func (m ChannelForceProgressTx) MarshalJSON() ([]byte, error) {
 	b1, err = json.Marshal(struct {
 		ChannelID EncodedHash `json:"channel_id"`
 
-		Fee *uint64 `json:"fee"`
+		Fee big.Int `json:"fee"`
 
 		FromID EncodedHash `json:"from_id"`
 
@@ -269,11 +270,10 @@ func (m *ChannelForceProgressTx) validateChannelID(formats strfmt.Registry) erro
 
 func (m *ChannelForceProgressTx) validateFee(formats strfmt.Registry) error {
 
-	if err := validate.Required("fee", "body", m.Fee); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("fee", "body", int64(*m.Fee), 0, false); err != nil {
+	if err := m.Fee.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("fee")
+		}
 		return err
 	}
 

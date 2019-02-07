@@ -29,8 +29,7 @@ type ChannelWithdrawTx struct {
 
 	// fee
 	// Required: true
-	// Minimum: 0
-	Fee *uint64 `json:"fee"`
+	Fee big.Int `json:"fee"`
 
 	// nonce
 	// Required: true
@@ -123,11 +122,10 @@ func (m *ChannelWithdrawTx) validateChannelID(formats strfmt.Registry) error {
 
 func (m *ChannelWithdrawTx) validateFee(formats strfmt.Registry) error {
 
-	if err := validate.Required("fee", "body", m.Fee); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("fee", "body", int64(*m.Fee), 0, false); err != nil {
+	if err := m.Fee.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("fee")
+		}
 		return err
 	}
 

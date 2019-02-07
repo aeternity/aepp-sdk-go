@@ -13,6 +13,8 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
+
+	big "math/big"
 )
 
 // NameUpdateTx name update tx
@@ -29,7 +31,7 @@ type NameUpdateTx struct {
 
 	// fee
 	// Required: true
-	Fee *uint64 `json:"fee"`
+	Fee big.Int `json:"fee"`
 
 	// name id
 	// Required: true
@@ -107,7 +109,10 @@ func (m *NameUpdateTx) validateClientTTL(formats strfmt.Registry) error {
 
 func (m *NameUpdateTx) validateFee(formats strfmt.Registry) error {
 
-	if err := validate.Required("fee", "body", m.Fee); err != nil {
+	if err := m.Fee.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("fee")
+		}
 		return err
 	}
 

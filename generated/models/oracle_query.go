@@ -11,6 +11,8 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
+
+	big "math/big"
 )
 
 // OracleQuery oracle query
@@ -19,7 +21,7 @@ type OracleQuery struct {
 
 	// fee
 	// Required: true
-	Fee *uint64 `json:"fee"`
+	Fee big.Int `json:"fee"`
 
 	// id
 	// Required: true
@@ -103,7 +105,10 @@ func (m *OracleQuery) Validate(formats strfmt.Registry) error {
 
 func (m *OracleQuery) validateFee(formats strfmt.Registry) error {
 
-	if err := validate.Required("fee", "body", m.Fee); err != nil {
+	if err := m.Fee.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("fee")
+		}
 		return err
 	}
 

@@ -11,6 +11,8 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
+
+	big "math/big"
 )
 
 // OracleQueryTx oracle query tx
@@ -19,7 +21,7 @@ type OracleQueryTx struct {
 
 	// fee
 	// Required: true
-	Fee *uint64 `json:"fee"`
+	Fee big.Int `json:"fee"`
 
 	// Sender nonce
 	Nonce uint64 `json:"nonce,omitempty"`
@@ -34,7 +36,7 @@ type OracleQueryTx struct {
 
 	// query fee
 	// Required: true
-	QueryFee *uint64 `json:"query_fee"`
+	QueryFee big.Int `json:"query_fee"`
 
 	// query ttl
 	// Required: true
@@ -92,7 +94,10 @@ func (m *OracleQueryTx) Validate(formats strfmt.Registry) error {
 
 func (m *OracleQueryTx) validateFee(formats strfmt.Registry) error {
 
-	if err := validate.Required("fee", "body", m.Fee); err != nil {
+	if err := m.Fee.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("fee")
+		}
 		return err
 	}
 
@@ -122,7 +127,10 @@ func (m *OracleQueryTx) validateQuery(formats strfmt.Registry) error {
 
 func (m *OracleQueryTx) validateQueryFee(formats strfmt.Registry) error {
 
-	if err := validate.Required("query_fee", "body", m.QueryFee); err != nil {
+	if err := m.QueryFee.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("query_fee")
+		}
 		return err
 	}
 

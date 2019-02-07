@@ -11,6 +11,8 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
+
+	big "math/big"
 )
 
 // RegisteredOracle registered oracle
@@ -23,7 +25,7 @@ type RegisteredOracle struct {
 
 	// query fee
 	// Required: true
-	QueryFee *int64 `json:"query_fee"`
+	QueryFee big.Int `json:"query_fee"`
 
 	// query format
 	// Required: true
@@ -91,7 +93,10 @@ func (m *RegisteredOracle) validateID(formats strfmt.Registry) error {
 
 func (m *RegisteredOracle) validateQueryFee(formats strfmt.Registry) error {
 
-	if err := validate.Required("query_fee", "body", m.QueryFee); err != nil {
+	if err := m.QueryFee.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("query_fee")
+		}
 		return err
 	}
 

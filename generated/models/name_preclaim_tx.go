@@ -10,7 +10,8 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
+
+	big "math/big"
 )
 
 // NamePreclaimTx name preclaim tx
@@ -27,7 +28,7 @@ type NamePreclaimTx struct {
 
 	// fee
 	// Required: true
-	Fee *uint64 `json:"fee"`
+	Fee big.Int `json:"fee"`
 
 	// nonce
 	Nonce uint64 `json:"nonce,omitempty"`
@@ -84,7 +85,10 @@ func (m *NamePreclaimTx) validateCommitmentID(formats strfmt.Registry) error {
 
 func (m *NamePreclaimTx) validateFee(formats strfmt.Registry) error {
 
-	if err := validate.Required("fee", "body", m.Fee); err != nil {
+	if err := m.Fee.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("fee")
+		}
 		return err
 	}
 
