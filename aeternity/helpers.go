@@ -105,43 +105,20 @@ func SpendTransaction(sender string, recipient string, amount int64, fee int64, 
 	return base64Tx, ttl, nonce, err
 }
 
-// BroadcastTransaction does just that. It doesn't do anything else. It's a very simple function.
+// BroadcastTransaction recalculates the transaction hash and sends the transaction to the node.
 func BroadcastTransaction(txSignedBase64 string) (err error) {
 	ae := NewCli(Config.Epoch.URL, true)
 
 	// Get back to RLP to calculate txhash
 	txRLP, _ := decode(txSignedBase64)
 
+	// calculate the hash of the decoded txRLP
 	rlpTxHashRaw, _ := hash(txRLP)
+	// base58/64 encode the hash with the th_ prefix
 	signedEncodedTxHash := encode(PrefixTransactionHash, rlpTxHashRaw)
+
+	// send it to the network
 	err = postTransaction(ae.Epoch, txSignedBase64, signedEncodedTxHash)
-	return
-}
-
-// Spend transfer tokens from an account to another
-func (w *Wallet) Spend(recipientAddress string, amount int64, message string) (tx, txHash, signature string, ttl uint64, nonce uint64, err error) {
-	// calculate the absolute ttl for the transaction
-	ttl, err = getAbsoluteHeight(w.epochCli, Config.Client.TTL)
-	if err != nil {
-		return
-	}
-	// create the spend transaction
-
-	nonce, err = getNextNonce(w.epochCli, w.owner.Address)
-	if err != nil {
-		return
-	}
-	spendTxRaw, err := SpendTx(w.owner.Address, recipientAddress, message, amount, Config.Client.Fee, ttl, nonce)
-	if err != nil {
-		return
-	}
-	// sign the transaction
-	tx, txHash, signature, err = SignEncodeTx(w.owner, spendTxRaw, Config.Epoch.NetworkID)
-	if err != nil {
-		return
-	}
-	// post the transaction
-	err = postTransaction(w.epochCli, tx, txHash)
 	return
 }
 
@@ -353,12 +330,9 @@ Main:
 
 // StoreAccountToKeyStoreFile store an account to a json file
 func StoreAccountToKeyStoreFile(account *Account, password, walletName string) (filePath string, err error) {
-	// keys are in the same folder as config
-	basePath := filepath.Join(filepath.Dir(Config.ConfigPath), "accounts")
-	err = os.MkdirAll(basePath, os.ModePerm)
-	if err != nil {
-		return
-	}
+	// keystore will be saved in current directory
+	basePath, _ := os.Getwd()
+
 	// generate the keystore file
 	jks, err := KeystoreSeal(account, password)
 	if err != nil {
