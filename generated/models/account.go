@@ -57,9 +57,11 @@ func (m *Account) Validate(formats strfmt.Registry) error {
 
 func (m *Account) validateBalance(formats strfmt.Registry) error {
 
-	var zero big.Int // Golang should initialize this to 0
-	if m.Balance.Cmp(&zero) != 1 {
-		return errors.New(-1, "swagger deserialization: balance was not larger than 0")
+	if err := m.Balance.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("balance")
+		}
+		return err
 	}
 
 	return nil

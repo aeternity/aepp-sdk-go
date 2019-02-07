@@ -11,6 +11,8 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
+
+	big "math/big"
 )
 
 // ChannelCloseMutualTx channel close mutual tx
@@ -32,8 +34,7 @@ type ChannelCloseMutualTx struct {
 
 	// initiator amount final
 	// Required: true
-	// Minimum: 0
-	InitiatorAmountFinal *uint64 `json:"initiator_amount_final"`
+	InitiatorAmountFinal big.Int `json:"initiator_amount_final"`
 
 	// nonce
 	// Required: true
@@ -42,8 +43,7 @@ type ChannelCloseMutualTx struct {
 
 	// responder amount final
 	// Required: true
-	// Minimum: 0
-	ResponderAmountFinal *uint64 `json:"responder_amount_final"`
+	ResponderAmountFinal big.Int `json:"responder_amount_final"`
 
 	// ttl
 	// Minimum: 0
@@ -127,11 +127,10 @@ func (m *ChannelCloseMutualTx) validateFromID(formats strfmt.Registry) error {
 
 func (m *ChannelCloseMutualTx) validateInitiatorAmountFinal(formats strfmt.Registry) error {
 
-	if err := validate.Required("initiator_amount_final", "body", m.InitiatorAmountFinal); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("initiator_amount_final", "body", int64(*m.InitiatorAmountFinal), 0, false); err != nil {
+	if err := m.InitiatorAmountFinal.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("initiator_amount_final")
+		}
 		return err
 	}
 
@@ -153,11 +152,10 @@ func (m *ChannelCloseMutualTx) validateNonce(formats strfmt.Registry) error {
 
 func (m *ChannelCloseMutualTx) validateResponderAmountFinal(formats strfmt.Registry) error {
 
-	if err := validate.Required("responder_amount_final", "body", m.ResponderAmountFinal); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("responder_amount_final", "body", int64(*m.ResponderAmountFinal), 0, false); err != nil {
+	if err := m.ResponderAmountFinal.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("responder_amount_final")
+		}
 		return err
 	}
 

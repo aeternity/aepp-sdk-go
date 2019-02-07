@@ -2085,6 +2085,16 @@
     }
   },
   "definitions" : {
+    "Amount": {
+      "type" : "integer",
+      "minimum" : 0,
+      "x-go-type": {
+        "import": {
+          "package": "math/big"
+        },
+        "type": "Int"
+      }
+    },
     "Balance": {
       "type" : "integer",
       "minimum" : 0,
@@ -2465,9 +2475,7 @@
           "$ref" : "#/definitions/EncodedHash"
         },
         "amount" : {
-          "type" : "integer",
-          "format" : "uint64",
-          "minimum" : 0
+          "$ref" : "#/definitions/Amount"
         },
         "fee" : {
           "type" : "integer",
@@ -2989,24 +2997,16 @@
           "$ref" : "#/definitions/EncodedHash"
         },
         "channel_amount" : {
-          "type" : "integer",
-          "format" : "uint64",
-          "minimum" : 0
+          "$ref" : "#/definitions/Amount"
         },
         "initiator_amount" : {
-          "type" : "integer",
-          "format" : "uint64",
-          "minimum" : 0
+          "$ref" : "#/definitions/Amount"
         },
         "responder_amount" : {
-          "type" : "integer",
-          "format" : "uint64",
-          "minimum" : 0
+          "$ref" : "#/definitions/Amount"
         },
         "channel_reserve" : {
-          "type" : "integer",
-          "format" : "uint64",
-          "minimum" : 0
+          "$ref" : "#/definitions/Amount"
         },
         "delegate_ids" : {
           "type" : "array",
@@ -3061,27 +3061,19 @@
           "$ref" : "#/definitions/EncodedHash"
         },
         "initiator_amount" : {
-          "type" : "integer",
-          "format" : "uint64",
-          "minimum" : 0
+          "$ref" : "#/definitions/Amount"
         },
         "responder_id" : {
           "$ref" : "#/definitions/EncodedHash"
         },
         "responder_amount" : {
-          "type" : "integer",
-          "format" : "uint64",
-          "minimum" : 0
+          "$ref" : "#/definitions/Amount"
         },
         "push_amount" : {
-          "type" : "integer",
-          "format" : "uint64",
-          "minimum" : 0
+          "$ref" : "#/definitions/Amount"
         },
         "channel_reserve" : {
-          "type" : "integer",
-          "format" : "uint64",
-          "minimum" : 0
+          "$ref" : "#/definitions/Amount"
         },
         "lock_period" : {
           "type" : "integer",
@@ -3133,9 +3125,7 @@
           "$ref" : "#/definitions/EncodedHash"
         },
         "amount" : {
-          "type" : "integer",
-          "format" : "uint64",
-          "minimum" : 0
+          "$ref" : "#/definitions/Amount"
         },
         "ttl" : {
           "type" : "integer",
@@ -3185,9 +3175,7 @@
           "$ref" : "#/definitions/EncodedHash"
         },
         "amount" : {
-          "type" : "integer",
-          "format" : "uint64",
-          "minimum" : 0
+          "$ref" : "#/definitions/Amount"
         },
         "ttl" : {
           "type" : "integer",
@@ -3285,14 +3273,10 @@
           "$ref" : "#/definitions/EncodedHash"
         },
         "initiator_amount_final" : {
-          "type" : "integer",
-          "format" : "uint64",
-          "minimum" : 0
+          "$ref" : "#/definitions/Amount"
         },
         "responder_amount_final" : {
-          "type" : "integer",
-          "format" : "uint64",
-          "minimum" : 0
+          "$ref" : "#/definitions/Amount"
         },
         "ttl" : {
           "type" : "integer",
@@ -3417,14 +3401,10 @@
           "$ref" : "#/definitions/EncodedHash"
         },
         "initiator_amount_final" : {
-          "type" : "integer",
-          "format" : "uint64",
-          "minimum" : 0
+          "$ref" : "#/definitions/Amount"
         },
         "responder_amount_final" : {
-          "type" : "integer",
-          "format" : "uint64",
-          "minimum" : 0
+          "$ref" : "#/definitions/Amount"
         },
         "ttl" : {
           "type" : "integer",

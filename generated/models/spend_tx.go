@@ -11,6 +11,8 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
+
+	big "math/big"
 )
 
 // SpendTx spend tx
@@ -19,8 +21,7 @@ type SpendTx struct {
 
 	// amount
 	// Required: true
-	// Minimum: 0
-	Amount *uint64 `json:"amount"`
+	Amount big.Int `json:"amount"`
 
 	// fee
 	// Required: true
@@ -77,11 +78,10 @@ func (m *SpendTx) Validate(formats strfmt.Registry) error {
 
 func (m *SpendTx) validateAmount(formats strfmt.Registry) error {
 
-	if err := validate.Required("amount", "body", m.Amount); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("amount", "body", int64(*m.Amount), 0, false); err != nil {
+	if err := m.Amount.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("amount")
+		}
 		return err
 	}
 
