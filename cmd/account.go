@@ -123,16 +123,6 @@ var balanceCmd = &cobra.Command{
 	},
 }
 
-// listCmd implements the account list subcommand
-var listCmd = &cobra.Command{
-	Use:   "list",
-	Short: "List the account in the default keys path",
-	Long:  ``,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(aeternity.ListWallets())
-	},
-}
-
 // signCmd implements the account sign subcommand
 var signCmd = &cobra.Command{
 	Use:   "sign ACCOUNT_KEYSTORE UNSIGNED_TRANSACTION",
@@ -287,7 +277,6 @@ func init() {
 	accountCmd.AddCommand(createCmd)
 	accountCmd.AddCommand(saveCmd)
 	accountCmd.AddCommand(balanceCmd)
-	accountCmd.AddCommand(listCmd)
 	accountCmd.AddCommand(signCmd)
 
 	// account sign flags

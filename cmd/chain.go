@@ -34,6 +34,7 @@ var topCmd = &cobra.Command{
 	Short: "Query the top block of the chain",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
+		aeCli := NewAeCli()
 		v, err := aeCli.APIGetTopBlock()
 		if err != nil {
 			fmt.Println(err)
@@ -48,6 +49,7 @@ var statusCmd = &cobra.Command{
 	Short: "Get the status and status of the node running the chain",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
+		aeCli := NewAeCli()
 		v, err := aeCli.APIGetStatus()
 		if err != nil {
 			fmt.Println(err)
@@ -63,6 +65,7 @@ var playCmd = &cobra.Command{
 	Short: "Query the blocks of the chain one after the other",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
+		aeCli := NewAeCli()
 		blockHeight, err := aeCli.APIGetHeight()
 		if err != nil {
 			fmt.Println(err)
@@ -94,11 +97,35 @@ var playCmd = &cobra.Command{
 	},
 }
 
+// broadcastCmd implements the tx broadcast subcommand.
+// It broadcasts a signed transaction to the network
+var broadcastCmd = &cobra.Command{
+	Use:   "broadcast SIGNED_TRANSACTION",
+	Short: "Broadcast a transaction to the network",
+	Long:  ``,
+	Args:  cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		// Load variables from arguments
+		txSignedBase64 := args[0]
+
+		if len(txSignedBase64) == 0 || txSignedBase64[0:3] != "tx_" {
+			fmt.Println("Error, missing or invalid recipient address")
+			os.Exit(1)
+		}
+
+		err := aeternity.BroadcastTransaction(txSignedBase64)
+		if err != nil {
+			fmt.Println("Error while broadcasting transaction: ", err)
+		}
+	},
+}
+
 func init() {
 	RootCmd.AddCommand(chainCmd)
 	chainCmd.AddCommand(topCmd)
 	chainCmd.AddCommand(statusCmd)
 	chainCmd.AddCommand(playCmd)
+	chainCmd.AddCommand(broadcastCmd)
 
 	playCmd.Flags().Uint64Var(&limit, "limit", 0, "Print at max 'limit' generations")
 	playCmd.Flags().Uint64Var(&startFromHeight, "height", 0, "Start playing the chain at 'height'")

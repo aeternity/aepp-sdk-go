@@ -54,7 +54,7 @@ func getNextNonce(epochCli *apiclient.Epoch, accountID string) (nextNonce uint64
 // waitForTransaction to appear on the chain
 func waitForTransaction(epochCli *apiclient.Epoch, txHash string) (blockHeight uint64, blockHash string, err error) {
 	// caclulate the date for the timeout
-	ctm := Config.P.Tuning.ChainTimeout
+	ctm := Config.Tuning.ChainTimeout
 	tm := time.Now().Add(time.Millisecond * time.Duration(ctm))
 	// start querying the transaction
 	for {
@@ -72,7 +72,7 @@ func waitForTransaction(epochCli *apiclient.Epoch, txHash string) (blockHeight u
 			blockHash = fmt.Sprint(tx.BlockHash)
 			break
 		}
-		time.Sleep(time.Millisecond * time.Duration(Config.P.Tuning.ChainPollInteval))
+		time.Sleep(time.Millisecond * time.Duration(Config.Tuning.ChainPollInteval))
 	}
 	return
 }
@@ -80,10 +80,10 @@ func waitForTransaction(epochCli *apiclient.Epoch, txHash string) (blockHeight u
 // SpendTransaction creates an unsigned Spend Transaction, just like Wallet.Spend()
 // but without generating th_, POSTing the Transaction or assuming the keystore is present
 func SpendTransaction(sender string, recipient string, amount int64, fee int64, message string) (base64Tx string, ttl uint64, nonce uint64, err error) {
-	ae := NewCli(Config.P.Epoch.URL, false)
+	ae := NewCli(Config.Epoch.URL, false)
 
 	// calculate the absolute ttl for the transaction
-	ttl, err = getAbsoluteHeight(ae.Epoch, Config.P.Client.TTL)
+	ttl, err = getAbsoluteHeight(ae.Epoch, Config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -95,7 +95,7 @@ func SpendTransaction(sender string, recipient string, amount int64, fee int64, 
 	}
 
 	// run createSpendTransaction
-	rlpUnsignedTx, err := SpendTx(sender, recipient, message, amount, Config.P.Client.Fee, ttl, nonce)
+	rlpUnsignedTx, err := SpendTx(sender, recipient, message, amount, Config.Client.Fee, ttl, nonce)
 	if err != nil {
 		return
 	}
@@ -107,7 +107,7 @@ func SpendTransaction(sender string, recipient string, amount int64, fee int64, 
 
 // BroadcastTransaction does just that. It doesn't do anything else. It's a very simple function.
 func BroadcastTransaction(txSignedBase64 string) (err error) {
-	ae := NewCli(Config.P.Epoch.URL, true)
+	ae := NewCli(Config.Epoch.URL, true)
 
 	// Get back to RLP to calculate txhash
 	txRLP, _ := decode(txSignedBase64)
@@ -121,7 +121,7 @@ func BroadcastTransaction(txSignedBase64 string) (err error) {
 // Spend transfer tokens from an account to another
 func (w *Wallet) Spend(recipientAddress string, amount int64, message string) (tx, txHash, signature string, ttl uint64, nonce uint64, err error) {
 	// calculate the absolute ttl for the transaction
-	ttl, err = getAbsoluteHeight(w.epochCli, Config.P.Client.TTL)
+	ttl, err = getAbsoluteHeight(w.epochCli, Config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -131,12 +131,12 @@ func (w *Wallet) Spend(recipientAddress string, amount int64, message string) (t
 	if err != nil {
 		return
 	}
-	spendTxRaw, err := SpendTx(w.owner.Address, recipientAddress, message, amount, Config.P.Client.Fee, ttl, nonce)
+	spendTxRaw, err := SpendTx(w.owner.Address, recipientAddress, message, amount, Config.Client.Fee, ttl, nonce)
 	if err != nil {
 		return
 	}
 	// sign the transaction
-	tx, txHash, signature, err = SignEncodeTx(w.owner, spendTxRaw, Config.P.Epoch.NetworkID)
+	tx, txHash, signature, err = SignEncodeTx(w.owner, spendTxRaw, Config.Epoch.NetworkID)
 	if err != nil {
 		return
 	}
@@ -148,7 +148,7 @@ func (w *Wallet) Spend(recipientAddress string, amount int64, message string) (t
 // NamePreclaim post a preclaim transaction to the chain
 func (n *Aens) NamePreclaim(name string) (tx, txHash, signature string, ttl uint64, nonce uint64, nameSalt int64, err error) {
 	// get the ttl offset
-	ttl, err = getAbsoluteHeight(n.epochCli, Config.P.Client.TTL)
+	ttl, err = getAbsoluteHeight(n.epochCli, Config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -165,12 +165,12 @@ func (n *Aens) NamePreclaim(name string) (tx, txHash, signature string, ttl uint
 		return
 	}
 	// build the transaction
-	txRaw, err := NamePreclaimTx(n.owner.Address, cm, Config.P.Client.Names.PreClaimFee, ttl, nonce)
+	txRaw, err := NamePreclaimTx(n.owner.Address, cm, Config.Client.Names.PreClaimFee, ttl, nonce)
 	if err != nil {
 		return
 	}
 	// sign the transaction
-	tx, txHash, signature, err = SignEncodeTx(n.owner, txRaw, Config.P.Epoch.NetworkID)
+	tx, txHash, signature, err = SignEncodeTx(n.owner, txRaw, Config.Epoch.NetworkID)
 	if err != nil {
 		return
 	}
@@ -182,7 +182,7 @@ func (n *Aens) NamePreclaim(name string) (tx, txHash, signature string, ttl uint
 // NameClaim perform a name claiming
 func (n *Aens) NameClaim(name string, nameSalt int64) (tx, txHash, signature string, ttl uint64, nonce uint64, err error) {
 	// get the ttl offset
-	ttl, err = getAbsoluteHeight(n.epochCli, Config.P.Client.TTL)
+	ttl, err = getAbsoluteHeight(n.epochCli, Config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -196,12 +196,12 @@ func (n *Aens) NameClaim(name string, nameSalt int64) (tx, txHash, signature str
 	prefix := HashPrefix(name[0:3])
 	encodedName := encode(prefix, []byte(name))
 	// create the transaction
-	txRaw, err := NameClaimTx(n.owner.Address, encodedName, nameSalt, Config.P.Client.Names.ClaimFee, ttl, nonce)
+	txRaw, err := NameClaimTx(n.owner.Address, encodedName, nameSalt, Config.Client.Names.ClaimFee, ttl, nonce)
 	if err != nil {
 		return
 	}
 	// sign the transaction
-	tx, txHash, signature, err = SignEncodeTx(n.owner, txRaw, Config.P.Epoch.NetworkID)
+	tx, txHash, signature, err = SignEncodeTx(n.owner, txRaw, Config.Epoch.NetworkID)
 	if err != nil {
 		return
 	}
@@ -212,7 +212,7 @@ func (n *Aens) NameClaim(name string, nameSalt int64) (tx, txHash, signature str
 
 // NameUpdate perform a name update
 func (n *Aens) NameUpdate(name string, targetAddress string) (tx, txHash, signature string, ttl uint64, nonce uint64, err error) {
-	ttl, err = getAbsoluteHeight(n.epochCli, Config.P.Client.TTL)
+	ttl, err = getAbsoluteHeight(n.epochCli, Config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -223,21 +223,21 @@ func (n *Aens) NameUpdate(name string, targetAddress string) (tx, txHash, signat
 	}
 
 	encodedNameHash := encode(PrefixName, namehash(name))
-	absClientTTL, err := getAbsoluteHeight(n.epochCli, Config.P.Client.Names.ClientTTL)
+	absClientTTL, err := getAbsoluteHeight(n.epochCli, Config.Client.Names.ClientTTL)
 	if err != nil {
 		return
 	}
-	absNameTTL, err := getAbsoluteHeight(n.epochCli, Config.P.Client.Names.NameTTL)
+	absNameTTL, err := getAbsoluteHeight(n.epochCli, Config.Client.Names.NameTTL)
 	if err != nil {
 		return
 	}
 	// create and sign the transaction
-	txRaw, err := NameUpdateTx(n.owner.Address, encodedNameHash, []string{targetAddress}, absNameTTL, absClientTTL, Config.P.Client.Names.UpdateFee, ttl, nonce)
+	txRaw, err := NameUpdateTx(n.owner.Address, encodedNameHash, []string{targetAddress}, absNameTTL, absClientTTL, Config.Client.Names.UpdateFee, ttl, nonce)
 	if err != nil {
 		return
 	}
 	// sign the transaction
-	tx, txHash, signature, err = SignEncodeTx(n.owner, txRaw, Config.P.Epoch.NetworkID)
+	tx, txHash, signature, err = SignEncodeTx(n.owner, txRaw, Config.Epoch.NetworkID)
 	if err != nil {
 		return
 	}
@@ -250,7 +250,7 @@ func (n *Aens) NameUpdate(name string, targetAddress string) (tx, txHash, signat
 // TODO: not implemented
 func (o *Oracle) OracleRegister(queryFormat, responseFormat string) (tx, txHash, signature string, ttl int64, nonce uint64, err error) {
 	// TODO: specs incomplete
-	//txOracleCreate(o.owner.Address, queryFormat, responseFormat, Config.P.Client.Oracles.QueryFee, Config.P.Client.Oracles.Expires)
+	//txOracleCreate(o.owner.Address, queryFormat, responseFormat, Config.Client.Oracles.QueryFee, Config.Client.Oracles.Expires)
 	return
 }
 
@@ -398,17 +398,6 @@ func GetWalletPath(path string) (walletPath string, err error) {
 		walletPath = path
 		return
 	}
-	// check by name in the default location
-	path = filepath.Join(Config.KeysFolder, path)
-	if _, err = os.Stat(path); !os.IsNotExist(err) {
-		walletPath = path
-	}
-	return
-}
-
-// ListWallets in the default wallet paths
-func ListWallets() (wallets []string, err error) {
-	wallets, err = filepath.Glob(filepath.Join(Config.KeysFolder, "*"))
 	return
 }
 
@@ -420,7 +409,7 @@ func SignEncodeTxStr(kp *Account, txRaw string) (signedEncodedTx, signedEncodedT
 		os.Exit(1)
 	}
 
-	signedEncodedTx, signedEncodedTxHash, signature, err = SignEncodeTx(kp, txRawBytes, Config.P.Epoch.NetworkID)
+	signedEncodedTx, signedEncodedTxHash, signature, err = SignEncodeTx(kp, txRawBytes, Config.Epoch.NetworkID)
 	return
 }
 
@@ -433,7 +422,7 @@ func VerifySignedTx(accountID string, txSignedBase64 string) (valid bool, err er
 	tx := txRLP[3].([]byte)
 	txSignature := txRLP[2].([]interface{})[0].([]byte)
 
-	msg := append([]byte(Config.P.Epoch.NetworkID), tx...)
+	msg := append([]byte(Config.Epoch.NetworkID), tx...)
 
 	valid, err = Verify(accountID, msg, txSignature)
 	if err != nil {
