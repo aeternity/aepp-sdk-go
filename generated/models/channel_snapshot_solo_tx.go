@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 
-	big "math/big"
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // ChannelSnapshotSoloTx channel snapshot solo tx
@@ -25,7 +25,7 @@ type ChannelSnapshotSoloTx struct {
 
 	// fee
 	// Required: true
-	Fee big.Int `json:"fee"`
+	Fee utils.BigInt `json:"fee"`
 
 	// from id
 	// Required: true

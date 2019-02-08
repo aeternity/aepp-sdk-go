@@ -2595,9 +2595,9 @@
       "minimum": 0,
       "x-go-type": {
         "import": {
-          "package": "math/big"
+          "package": "github.com/aeternity/aepp-sdk-go/utils"
         },
-        "type": "Int"
+        "type": "BigInt"
       }
     },
     "Balance": {
@@ -2605,9 +2605,9 @@
       "minimum": 0,
       "x-go-type": {
         "import": {
-          "package": "math/big"
+          "package": "github.com/aeternity/aepp-sdk-go/utils"
         },
-        "type": "Int"
+        "type": "BigInt"
       }
     },
     "EncodedHash": {
@@ -2618,9 +2618,9 @@
       "minimum": 0,
       "x-go-type": {
         "import": {
-          "package": "math/big"
+          "package": "github.com/aeternity/aepp-sdk-go/utils"
         },
-        "type": "Int"
+        "type": "BigInt"
       }
     },
     "Pow": {

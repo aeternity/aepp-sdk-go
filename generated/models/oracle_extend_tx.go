@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 
-	big "math/big"
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // OracleExtendTx oracle extend tx
@@ -21,7 +21,7 @@ type OracleExtendTx struct {
 
 	// fee
 	// Required: true
-	Fee big.Int `json:"fee"`
+	Fee utils.BigInt `json:"fee"`
 
 	// nonce
 	Nonce uint64 `json:"nonce,omitempty"`

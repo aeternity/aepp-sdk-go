@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 
-	big "math/big"
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // Account account
@@ -21,7 +21,7 @@ type Account struct {
 
 	// Balance
 	// Required: true
-	Balance big.Int `json:"balance"`
+	Balance utils.BigInt `json:"balance"`
 
 	// Public key
 	// Required: true

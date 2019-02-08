@@ -17,7 +17,7 @@ import (
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 
-	big "math/big"
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // ChannelForceProgressTx channel force progress tx
@@ -30,7 +30,7 @@ type ChannelForceProgressTx struct {
 
 	// fee
 	// Required: true
-	Fee big.Int `json:"fee"`
+	Fee utils.BigInt `json:"fee"`
 
 	// from id
 	// Required: true
@@ -78,7 +78,7 @@ func (m *ChannelForceProgressTx) UnmarshalJSON(raw []byte) error {
 	var data struct {
 		ChannelID EncodedHash `json:"channel_id"`
 
-		Fee big.Int `json:"fee"`
+		Fee utils.BigInt `json:"fee"`
 
 		FromID EncodedHash `json:"from_id"`
 
@@ -153,7 +153,7 @@ func (m ChannelForceProgressTx) MarshalJSON() ([]byte, error) {
 	b1, err = json.Marshal(struct {
 		ChannelID EncodedHash `json:"channel_id"`
 
-		Fee big.Int `json:"fee"`
+		Fee utils.BigInt `json:"fee"`
 
 		FromID EncodedHash `json:"from_id"`
 

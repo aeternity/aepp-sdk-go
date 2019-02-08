@@ -11,7 +11,7 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 
-	big "math/big"
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // NamePreclaimTx name preclaim tx
@@ -28,7 +28,7 @@ type NamePreclaimTx struct {
 
 	// fee
 	// Required: true
-	Fee big.Int `json:"fee"`
+	Fee utils.BigInt `json:"fee"`
 
 	// nonce
 	Nonce uint64 `json:"nonce,omitempty"`

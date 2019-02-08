@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 
-	big "math/big"
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // ChannelCreateTx channel create tx
@@ -21,15 +21,15 @@ type ChannelCreateTx struct {
 
 	// channel reserve
 	// Required: true
-	ChannelReserve big.Int `json:"channel_reserve"`
+	ChannelReserve utils.BigInt `json:"channel_reserve"`
 
 	// fee
 	// Required: true
-	Fee big.Int `json:"fee"`
+	Fee utils.BigInt `json:"fee"`
 
 	// initiator amount
 	// Required: true
-	InitiatorAmount big.Int `json:"initiator_amount"`
+	InitiatorAmount utils.BigInt `json:"initiator_amount"`
 
 	// initiator id
 	// Required: true
@@ -46,11 +46,11 @@ type ChannelCreateTx struct {
 
 	// push amount
 	// Required: true
-	PushAmount big.Int `json:"push_amount"`
+	PushAmount utils.BigInt `json:"push_amount"`
 
 	// responder amount
 	// Required: true
-	ResponderAmount big.Int `json:"responder_amount"`
+	ResponderAmount utils.BigInt `json:"responder_amount"`
 
 	// responder id
 	// Required: true

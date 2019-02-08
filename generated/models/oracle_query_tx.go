@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 
-	big "math/big"
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // OracleQueryTx oracle query tx
@@ -21,7 +21,7 @@ type OracleQueryTx struct {
 
 	// fee
 	// Required: true
-	Fee big.Int `json:"fee"`
+	Fee utils.BigInt `json:"fee"`
 
 	// Sender nonce
 	Nonce uint64 `json:"nonce,omitempty"`
@@ -36,7 +36,7 @@ type OracleQueryTx struct {
 
 	// query fee
 	// Required: true
-	QueryFee big.Int `json:"query_fee"`
+	QueryFee utils.BigInt `json:"query_fee"`
 
 	// query ttl
 	// Required: true

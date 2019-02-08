@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 
-	big "math/big"
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // RegisteredOracle registered oracle
@@ -25,7 +25,7 @@ type RegisteredOracle struct {
 
 	// query fee
 	// Required: true
-	QueryFee big.Int `json:"query_fee"`
+	QueryFee utils.BigInt `json:"query_fee"`
 
 	// query format
 	// Required: true

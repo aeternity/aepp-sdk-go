@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 
-	big "math/big"
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // OracleRespondTx oracle respond tx
@@ -21,7 +21,7 @@ type OracleRespondTx struct {
 
 	// fee
 	// Required: true
-	Fee big.Int `json:"fee"`
+	Fee utils.BigInt `json:"fee"`
 
 	// Oracle nonce
 	Nonce uint64 `json:"nonce,omitempty"`

@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 
-	big "math/big"
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // ChannelDepositTx channel deposit tx
@@ -21,7 +21,7 @@ type ChannelDepositTx struct {
 
 	// amount
 	// Required: true
-	Amount big.Int `json:"amount"`
+	Amount utils.BigInt `json:"amount"`
 
 	// channel id
 	// Required: true
@@ -29,7 +29,7 @@ type ChannelDepositTx struct {
 
 	// fee
 	// Required: true
-	Fee big.Int `json:"fee"`
+	Fee utils.BigInt `json:"fee"`
 
 	// from id
 	// Required: true

@@ -14,7 +14,7 @@ import (
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 
-	big "math/big"
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // Channel channel
@@ -23,11 +23,11 @@ type Channel struct {
 
 	// channel amount
 	// Required: true
-	ChannelAmount big.Int `json:"channel_amount"`
+	ChannelAmount utils.BigInt `json:"channel_amount"`
 
 	// channel reserve
 	// Required: true
-	ChannelReserve big.Int `json:"channel_reserve"`
+	ChannelReserve utils.BigInt `json:"channel_reserve"`
 
 	// delegate ids
 	// Required: true
@@ -39,7 +39,7 @@ type Channel struct {
 
 	// initiator amount
 	// Required: true
-	InitiatorAmount big.Int `json:"initiator_amount"`
+	InitiatorAmount utils.BigInt `json:"initiator_amount"`
 
 	// initiator id
 	// Required: true
@@ -56,7 +56,7 @@ type Channel struct {
 
 	// responder amount
 	// Required: true
-	ResponderAmount big.Int `json:"responder_amount"`
+	ResponderAmount utils.BigInt `json:"responder_amount"`
 
 	// responder id
 	// Required: true

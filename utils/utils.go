@@ -2,12 +2,15 @@ package utils
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
+	"math/big"
 	"os"
 	"strconv"
 	"strings"
 	"syscall"
 
+	"github.com/go-openapi/strfmt"
 	gonanoid "github.com/matoous/go-nanoid"
 	"golang.org/x/crypto/ssh/terminal"
 )
@@ -130,4 +133,18 @@ func AskPassword(question string) (password string, err error) {
 	}
 	password = string(bytePassword)
 	return
+}
+
+// BigInt is used by swagger as a big.Int type with Validate() function
+type BigInt big.Int
+
+// Validate only checks that the number is >=0
+func (b *BigInt) Validate(formats strfmt.Registry) error {
+	var zero big.Int
+	var convertedCustomBigInt = big.Int(*b)
+
+	if convertedCustomBigInt.Cmp(&zero) != 1 {
+		return errors.New("swagger deserialization: Balance Validation failed")
+	}
+	return nil
 }

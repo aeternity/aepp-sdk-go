@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 
-	big "math/big"
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // ChannelSettleTx channel settle tx
@@ -25,7 +25,7 @@ type ChannelSettleTx struct {
 
 	// fee
 	// Required: true
-	Fee big.Int `json:"fee"`
+	Fee utils.BigInt `json:"fee"`
 
 	// from id
 	// Required: true
@@ -33,7 +33,7 @@ type ChannelSettleTx struct {
 
 	// initiator amount final
 	// Required: true
-	InitiatorAmountFinal big.Int `json:"initiator_amount_final"`
+	InitiatorAmountFinal utils.BigInt `json:"initiator_amount_final"`
 
 	// nonce
 	// Required: true
@@ -42,7 +42,7 @@ type ChannelSettleTx struct {
 
 	// responder amount final
 	// Required: true
-	ResponderAmountFinal big.Int `json:"responder_amount_final"`
+	ResponderAmountFinal utils.BigInt `json:"responder_amount_final"`
 
 	// ttl
 	// Minimum: 0

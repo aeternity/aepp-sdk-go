@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 
-	big "math/big"
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // ContractCallCompute contract call compute
@@ -40,7 +40,7 @@ type ContractCallCompute struct {
 
 	// Transaction fee
 	// Required: true
-	Fee big.Int `json:"fee"`
+	Fee utils.BigInt `json:"fee"`
 
 	// Contract call data function (deprecated, use call)
 	Function string `json:"function,omitempty"`
