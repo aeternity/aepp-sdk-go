@@ -13,6 +13,8 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
+
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // NameUpdateTx name update tx
@@ -25,11 +27,11 @@ type NameUpdateTx struct {
 
 	// client ttl
 	// Required: true
-	ClientTTL *int64 `json:"client_ttl"`
+	ClientTTL *uint64 `json:"client_ttl"`
 
 	// fee
 	// Required: true
-	Fee *int64 `json:"fee"`
+	Fee utils.BigInt `json:"fee"`
 
 	// name id
 	// Required: true
@@ -37,17 +39,17 @@ type NameUpdateTx struct {
 
 	// name ttl
 	// Required: true
-	NameTTL *int64 `json:"name_ttl"`
+	NameTTL *uint64 `json:"name_ttl"`
 
 	// nonce
-	Nonce int64 `json:"nonce,omitempty"`
+	Nonce uint64 `json:"nonce,omitempty"`
 
 	// pointers
 	// Required: true
 	Pointers []*NamePointer `json:"pointers"`
 
 	// ttl
-	TTL int64 `json:"ttl,omitempty"`
+	TTL uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this name update tx
@@ -107,7 +109,10 @@ func (m *NameUpdateTx) validateClientTTL(formats strfmt.Registry) error {
 
 func (m *NameUpdateTx) validateFee(formats strfmt.Registry) error {
 
-	if err := validate.Required("fee", "body", m.Fee); err != nil {
+	if err := m.Fee.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("fee")
+		}
 		return err
 	}
 

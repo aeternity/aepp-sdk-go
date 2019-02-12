@@ -25,7 +25,7 @@ type MicroBlockHeader struct {
 	// Required: true
 	Height *uint64 `json:"height"`
 
-	// "no_fraud" | base58c encoded Proof of Fraud hash
+	// "no_fraud" | api encoded Proof of Fraud hash
 	// Required: true
 	PofHash *string `json:"pof_hash"`
 
@@ -47,7 +47,7 @@ type MicroBlockHeader struct {
 
 	// time
 	// Required: true
-	Time *int64 `json:"time"`
+	Time *uint64 `json:"time"`
 
 	// txs hash
 	// Required: true
@@ -55,7 +55,7 @@ type MicroBlockHeader struct {
 
 	// version
 	// Required: true
-	Version *int64 `json:"version"`
+	Version *uint64 `json:"version"`
 }
 
 // Validate validates this micro block header

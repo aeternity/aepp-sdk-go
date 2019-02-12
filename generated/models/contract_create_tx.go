@@ -11,6 +11,8 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
+
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // ContractCreateTx contract create tx
@@ -37,8 +39,7 @@ type ContractCreateTx struct {
 
 	// Transaction fee
 	// Required: true
-	// Minimum: 0
-	Fee *int64 `json:"fee"`
+	Fee utils.BigInt `json:"fee"`
 
 	// Contract gas
 	// Required: true
@@ -65,7 +66,7 @@ type ContractCreateTx struct {
 	// Required: true
 	// Maximum: 255
 	// Minimum: 0
-	VMVersion *string `json:"vm_version"`
+	VMVersion *int64 `json:"vm_version"`
 }
 
 // Validate validates this contract create tx
@@ -167,11 +168,10 @@ func (m *ContractCreateTx) validateDeposit(formats strfmt.Registry) error {
 
 func (m *ContractCreateTx) validateFee(formats strfmt.Registry) error {
 
-	if err := validate.Required("fee", "body", m.Fee); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("fee", "body", int64(*m.Fee), 0, false); err != nil {
+	if err := m.Fee.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("fee")
+		}
 		return err
 	}
 
@@ -235,13 +235,13 @@ func (m *ContractCreateTx) validateVMVersion(formats strfmt.Registry) error {
 		return err
 	}
 
-	// if err := validate.MinimumInt("vm_version", "body", int64(*m.VMVersion), 0, false); err != nil {
-	//   return err
-	// }
+	if err := validate.MinimumInt("vm_version", "body", int64(*m.VMVersion), 0, false); err != nil {
+		return err
+	}
 
-	// if err := validate.MaximumInt("vm_version", "body", int64(*m.VMVersion), 255, false); err != nil {
-	//   return err
-	// }
+	if err := validate.MaximumInt("vm_version", "body", int64(*m.VMVersion), 255, false); err != nil {
+		return err
+	}
 
 	return nil
 }

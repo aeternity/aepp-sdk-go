@@ -19,7 +19,7 @@ type InlineResponse2002 struct {
 
 	// Count
 	// Minimum: 1
-	Count int64 `json:"count,omitempty"`
+	Count uint64 `json:"count,omitempty"`
 }
 
 // Validate validates this inline response 200 2

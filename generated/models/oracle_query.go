@@ -11,6 +11,8 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
+
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // OracleQuery oracle query
@@ -19,7 +21,7 @@ type OracleQuery struct {
 
 	// fee
 	// Required: true
-	Fee *int64 `json:"fee"`
+	Fee utils.BigInt `json:"fee"`
 
 	// id
 	// Required: true
@@ -48,11 +50,11 @@ type OracleQuery struct {
 	// sender nonce
 	// Required: true
 	// Minimum: 0
-	SenderNonce *int64 `json:"sender_nonce"`
+	SenderNonce *uint64 `json:"sender_nonce"`
 
 	// ttl
 	// Required: true
-	TTL *int64 `json:"ttl"`
+	TTL *uint64 `json:"ttl"`
 }
 
 // Validate validates this oracle query
@@ -103,7 +105,10 @@ func (m *OracleQuery) Validate(formats strfmt.Registry) error {
 
 func (m *OracleQuery) validateFee(formats strfmt.Registry) error {
 
-	if err := validate.Required("fee", "body", m.Fee); err != nil {
+	if err := m.Fee.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("fee")
+		}
 		return err
 	}
 

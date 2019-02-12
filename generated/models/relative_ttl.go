@@ -27,7 +27,7 @@ type RelativeTTL struct {
 	// value
 	// Required: true
 	// Minimum: 1
-	Value *int64 `json:"value"`
+	Value *uint64 `json:"value"`
 }
 
 // Validate validates this relative TTL

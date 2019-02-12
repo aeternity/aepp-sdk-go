@@ -11,6 +11,8 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
+
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // OracleRegisterTx oracle register tx
@@ -23,10 +25,10 @@ type OracleRegisterTx struct {
 
 	// fee
 	// Required: true
-	Fee *int64 `json:"fee"`
+	Fee utils.BigInt `json:"fee"`
 
 	// nonce
-	Nonce int64 `json:"nonce,omitempty"`
+	Nonce uint64 `json:"nonce,omitempty"`
 
 	// oracle ttl
 	// Required: true
@@ -34,7 +36,7 @@ type OracleRegisterTx struct {
 
 	// query fee
 	// Required: true
-	QueryFee *int64 `json:"query_fee"`
+	QueryFee utils.BigInt `json:"query_fee"`
 
 	// query format
 	// Required: true
@@ -45,11 +47,11 @@ type OracleRegisterTx struct {
 	ResponseFormat *string `json:"response_format"`
 
 	// ttl
-	TTL int64 `json:"ttl,omitempty"`
+	TTL uint64 `json:"ttl,omitempty"`
 
 	// vm version
 	// Minimum: 0
-	VMVersion *int64 `json:"vm_version,omitempty"`
+	VMVersion *uint64 `json:"vm_version,omitempty"`
 }
 
 // Validate validates this oracle register tx
@@ -104,7 +106,10 @@ func (m *OracleRegisterTx) validateAccountID(formats strfmt.Registry) error {
 
 func (m *OracleRegisterTx) validateFee(formats strfmt.Registry) error {
 
-	if err := validate.Required("fee", "body", m.Fee); err != nil {
+	if err := m.Fee.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("fee")
+		}
 		return err
 	}
 
@@ -131,7 +136,10 @@ func (m *OracleRegisterTx) validateOracleTTL(formats strfmt.Registry) error {
 
 func (m *OracleRegisterTx) validateQueryFee(formats strfmt.Registry) error {
 
-	if err := validate.Required("query_fee", "body", m.QueryFee); err != nil {
+	if err := m.QueryFee.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("query_fee")
+		}
 		return err
 	}
 

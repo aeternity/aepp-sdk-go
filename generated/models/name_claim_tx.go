@@ -11,6 +11,8 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
+
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // NameClaimTx name claim tx
@@ -23,7 +25,7 @@ type NameClaimTx struct {
 
 	// fee
 	// Required: true
-	Fee *int64 `json:"fee"`
+	Fee utils.BigInt `json:"fee"`
 
 	// name
 	// Required: true
@@ -34,10 +36,10 @@ type NameClaimTx struct {
 	NameSalt *uint64 `json:"name_salt"`
 
 	// nonce
-	Nonce int64 `json:"nonce,omitempty"`
+	Nonce uint64 `json:"nonce,omitempty"`
 
 	// ttl
-	TTL int64 `json:"ttl,omitempty"`
+	TTL uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this name claim tx
@@ -80,7 +82,10 @@ func (m *NameClaimTx) validateAccountID(formats strfmt.Registry) error {
 
 func (m *NameClaimTx) validateFee(formats strfmt.Registry) error {
 
-	if err := validate.Required("fee", "body", m.Fee); err != nil {
+	if err := m.Fee.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("fee")
+		}
 		return err
 	}
 

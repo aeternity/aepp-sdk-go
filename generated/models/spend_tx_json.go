@@ -19,14 +19,14 @@ import (
 // SpendTxJSON spend tx JSON
 // swagger:model SpendTxJSON
 type SpendTxJSON struct {
-	versionField *int64
+	versionField *uint64
 
 	SpendTx
 }
 
 // Type gets the type of this subtype
 func (m *SpendTxJSON) Type() string {
-	return "SpendTx"
+	return "SpendTxJSON"
 }
 
 // SetType sets the type of this subtype
@@ -35,12 +35,12 @@ func (m *SpendTxJSON) SetType(val string) {
 }
 
 // Version gets the version of this subtype
-func (m *SpendTxJSON) Version() *int64 {
+func (m *SpendTxJSON) Version() *uint64 {
 	return m.versionField
 }
 
 // SetVersion sets the version of this subtype
-func (m *SpendTxJSON) SetVersion(val *int64) {
+func (m *SpendTxJSON) SetVersion(val *uint64) {
 	m.versionField = val
 }
 
@@ -62,7 +62,7 @@ func (m *SpendTxJSON) UnmarshalJSON(raw []byte) error {
 
 		Type string `json:"type"`
 
-		Version *int64 `json:"version"`
+		Version *uint64 `json:"version"`
 	}
 	buf = bytes.NewBuffer(raw)
 	dec = json.NewDecoder(buf)
@@ -105,7 +105,7 @@ func (m SpendTxJSON) MarshalJSON() ([]byte, error) {
 	b2, err = json.Marshal(struct {
 		Type string `json:"type"`
 
-		Version *int64 `json:"version"`
+		Version *uint64 `json:"version"`
 	}{
 
 		Type: m.Type(),

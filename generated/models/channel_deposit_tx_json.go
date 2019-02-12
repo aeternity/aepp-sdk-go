@@ -19,14 +19,14 @@ import (
 // ChannelDepositTxJSON channel deposit tx JSON
 // swagger:model ChannelDepositTxJSON
 type ChannelDepositTxJSON struct {
-	versionField *int64
+	versionField *uint64
 
 	ChannelDepositTx
 }
 
 // Type gets the type of this subtype
 func (m *ChannelDepositTxJSON) Type() string {
-	return "ChannelDepositTx"
+	return "ChannelDepositTxJSON"
 }
 
 // SetType sets the type of this subtype
@@ -35,12 +35,12 @@ func (m *ChannelDepositTxJSON) SetType(val string) {
 }
 
 // Version gets the version of this subtype
-func (m *ChannelDepositTxJSON) Version() *int64 {
+func (m *ChannelDepositTxJSON) Version() *uint64 {
 	return m.versionField
 }
 
 // SetVersion sets the version of this subtype
-func (m *ChannelDepositTxJSON) SetVersion(val *int64) {
+func (m *ChannelDepositTxJSON) SetVersion(val *uint64) {
 	m.versionField = val
 }
 
@@ -62,7 +62,7 @@ func (m *ChannelDepositTxJSON) UnmarshalJSON(raw []byte) error {
 
 		Type string `json:"type"`
 
-		Version *int64 `json:"version"`
+		Version *uint64 `json:"version"`
 	}
 	buf = bytes.NewBuffer(raw)
 	dec = json.NewDecoder(buf)
@@ -105,7 +105,7 @@ func (m ChannelDepositTxJSON) MarshalJSON() ([]byte, error) {
 	b2, err = json.Marshal(struct {
 		Type string `json:"type"`
 
-		Version *int64 `json:"version"`
+		Version *uint64 `json:"version"`
 	}{
 
 		Type: m.Type(),

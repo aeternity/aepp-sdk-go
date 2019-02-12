@@ -16,6 +16,8 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
+
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // ChannelForceProgressTx channel force progress tx
@@ -28,8 +30,7 @@ type ChannelForceProgressTx struct {
 
 	// fee
 	// Required: true
-	// Minimum: 0
-	Fee *int64 `json:"fee"`
+	Fee utils.BigInt `json:"fee"`
 
 	// from id
 	// Required: true
@@ -37,7 +38,7 @@ type ChannelForceProgressTx struct {
 
 	// nonce
 	// Minimum: 0
-	Nonce *int64 `json:"nonce,omitempty"`
+	Nonce *uint64 `json:"nonce,omitempty"`
 
 	// The whole set of off-chain state trees
 	OffchainTrees EncodedHash `json:"offchain_trees,omitempty"`
@@ -49,7 +50,7 @@ type ChannelForceProgressTx struct {
 	// Channel's next round
 	// Required: true
 	// Minimum: 0
-	Round *int64 `json:"round"`
+	Round *uint64 `json:"round"`
 
 	// Channel's next state_hash
 	// Required: true
@@ -57,7 +58,7 @@ type ChannelForceProgressTx struct {
 
 	// ttl
 	// Minimum: 0
-	TTL *int64 `json:"ttl,omitempty"`
+	TTL *uint64 `json:"ttl,omitempty"`
 
 	updateField OffChainUpdate
 }
@@ -77,21 +78,21 @@ func (m *ChannelForceProgressTx) UnmarshalJSON(raw []byte) error {
 	var data struct {
 		ChannelID EncodedHash `json:"channel_id"`
 
-		Fee *int64 `json:"fee"`
+		Fee utils.BigInt `json:"fee"`
 
 		FromID EncodedHash `json:"from_id"`
 
-		Nonce *int64 `json:"nonce,omitempty"`
+		Nonce *uint64 `json:"nonce,omitempty"`
 
 		OffchainTrees EncodedHash `json:"offchain_trees,omitempty"`
 
 		Payload *string `json:"payload"`
 
-		Round *int64 `json:"round"`
+		Round *uint64 `json:"round"`
 
 		StateHash EncodedHash `json:"state_hash"`
 
-		TTL *int64 `json:"ttl,omitempty"`
+		TTL *uint64 `json:"ttl,omitempty"`
 
 		Update json.RawMessage `json:"update"`
 	}
@@ -152,21 +153,21 @@ func (m ChannelForceProgressTx) MarshalJSON() ([]byte, error) {
 	b1, err = json.Marshal(struct {
 		ChannelID EncodedHash `json:"channel_id"`
 
-		Fee *int64 `json:"fee"`
+		Fee utils.BigInt `json:"fee"`
 
 		FromID EncodedHash `json:"from_id"`
 
-		Nonce *int64 `json:"nonce,omitempty"`
+		Nonce *uint64 `json:"nonce,omitempty"`
 
 		OffchainTrees EncodedHash `json:"offchain_trees,omitempty"`
 
 		Payload *string `json:"payload"`
 
-		Round *int64 `json:"round"`
+		Round *uint64 `json:"round"`
 
 		StateHash EncodedHash `json:"state_hash"`
 
-		TTL *int64 `json:"ttl,omitempty"`
+		TTL *uint64 `json:"ttl,omitempty"`
 	}{
 
 		ChannelID: m.ChannelID,
@@ -269,11 +270,10 @@ func (m *ChannelForceProgressTx) validateChannelID(formats strfmt.Registry) erro
 
 func (m *ChannelForceProgressTx) validateFee(formats strfmt.Registry) error {
 
-	if err := validate.Required("fee", "body", m.Fee); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("fee", "body", int64(*m.Fee), 0, false); err != nil {
+	if err := m.Fee.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("fee")
+		}
 		return err
 	}
 

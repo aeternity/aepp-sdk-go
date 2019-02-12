@@ -21,7 +21,7 @@ type Status struct {
 
 	// difficulty
 	// Required: true
-	Difficulty *int64 `json:"difficulty"`
+	Difficulty *uint64 `json:"difficulty"`
 
 	// genesis key block hash
 	// Required: true
@@ -30,6 +30,10 @@ type Status struct {
 	// listening
 	// Required: true
 	Listening *bool `json:"listening"`
+
+	// network id
+	// Required: true
+	NetworkID *string `json:"network_id"`
 
 	// node revision
 	// Required: true
@@ -42,12 +46,12 @@ type Status struct {
 	// peer count
 	// Required: true
 	// Minimum: 0
-	PeerCount *int64 `json:"peer_count"`
+	PeerCount *uint64 `json:"peer_count"`
 
 	// pending transactions count
 	// Required: true
 	// Minimum: 0
-	PendingTransactionsCount *int64 `json:"pending_transactions_count"`
+	PendingTransactionsCount *uint64 `json:"pending_transactions_count"`
 
 	// protocols
 	// Required: true
@@ -56,7 +60,7 @@ type Status struct {
 	// solutions
 	// Required: true
 	// Minimum: 0
-	Solutions *int64 `json:"solutions"`
+	Solutions *uint64 `json:"solutions"`
 
 	// syncing
 	// Required: true
@@ -76,6 +80,10 @@ func (m *Status) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateListening(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateNetworkID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -137,6 +145,15 @@ func (m *Status) validateGenesisKeyBlockHash(formats strfmt.Registry) error {
 func (m *Status) validateListening(formats strfmt.Registry) error {
 
 	if err := validate.Required("listening", "body", m.Listening); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Status) validateNetworkID(formats strfmt.Registry) error {
+
+	if err := validate.Required("network_id", "body", m.NetworkID); err != nil {
 		return err
 	}
 

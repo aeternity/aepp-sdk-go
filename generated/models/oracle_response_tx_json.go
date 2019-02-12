@@ -19,14 +19,14 @@ import (
 // OracleResponseTxJSON oracle response tx JSON
 // swagger:model OracleResponseTxJSON
 type OracleResponseTxJSON struct {
-	versionField *int64
+	versionField *uint64
 
 	OracleRespondTx
 }
 
 // Type gets the type of this subtype
 func (m *OracleResponseTxJSON) Type() string {
-	return "OracleResponseTx"
+	return "OracleResponseTxJSON"
 }
 
 // SetType sets the type of this subtype
@@ -35,12 +35,12 @@ func (m *OracleResponseTxJSON) SetType(val string) {
 }
 
 // Version gets the version of this subtype
-func (m *OracleResponseTxJSON) Version() *int64 {
+func (m *OracleResponseTxJSON) Version() *uint64 {
 	return m.versionField
 }
 
 // SetVersion sets the version of this subtype
-func (m *OracleResponseTxJSON) SetVersion(val *int64) {
+func (m *OracleResponseTxJSON) SetVersion(val *uint64) {
 	m.versionField = val
 }
 
@@ -62,7 +62,7 @@ func (m *OracleResponseTxJSON) UnmarshalJSON(raw []byte) error {
 
 		Type string `json:"type"`
 
-		Version *int64 `json:"version"`
+		Version *uint64 `json:"version"`
 	}
 	buf = bytes.NewBuffer(raw)
 	dec = json.NewDecoder(buf)
@@ -105,7 +105,7 @@ func (m OracleResponseTxJSON) MarshalJSON() ([]byte, error) {
 	b2, err = json.Marshal(struct {
 		Type string `json:"type"`
 
-		Version *int64 `json:"version"`
+		Version *uint64 `json:"version"`
 	}{
 
 		Type: m.Type(),
