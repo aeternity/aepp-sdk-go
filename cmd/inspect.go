@@ -61,6 +61,7 @@ func printResult(title string, v interface{}, err error) {
 }
 
 func inspect(cmd *cobra.Command, args []string) {
+	aeCli := NewAeCli()
 	for _, object := range args {
 		// height
 		if matched, _ := regexp.MatchString(`^\d+$`, object); matched {

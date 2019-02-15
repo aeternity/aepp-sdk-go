@@ -99,6 +99,7 @@ var balanceCmd = &cobra.Command{
 	Long:  ``,
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		aeCli := NewAeCli()
 		// ask for th keystore password
 		p, err := utils.AskPassword("Enter the password to unlock the keystore: ")
 		if err != nil {
