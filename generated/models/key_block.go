@@ -57,7 +57,7 @@ type KeyBlock struct {
 
 	// time
 	// Required: true
-	Time *uint64 `json:"time"`
+	Time *int64 `json:"time"`
 
 	// version
 	// Required: true

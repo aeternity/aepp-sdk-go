@@ -2683,7 +2683,7 @@
         },
         "time": {
           "type": "integer",
-          "format": "uint64"
+          "format": "int64"
         },
         "version": {
           "type": "integer",
@@ -2748,7 +2748,7 @@
         },
         "time": {
           "type": "integer",
-          "format": "uint64"
+          "format": "int64"
         },
         "version": {
           "type": "integer",
