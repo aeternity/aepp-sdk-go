@@ -33,7 +33,7 @@ var inspectCmd = &cobra.Command{
 	Long: `Inspect an object of the chain
 
 Valid object to inspect are block hash, transaction hash, accounts`,
-	Run:  inspect,
+	Run:  inspectFunc,
 	Args: cobra.MinimumNArgs(1),
 }
 
@@ -60,7 +60,7 @@ func printResult(title string, v interface{}, err error) {
 	aeternity.PrintObject(title, v)
 }
 
-func inspect(cmd *cobra.Command, args []string) {
+func inspectFunc(cmd *cobra.Command, args []string) {
 	aeCli := NewAeCli()
 	for _, object := range args {
 		// height
