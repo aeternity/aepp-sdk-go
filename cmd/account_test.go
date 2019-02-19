@@ -19,7 +19,10 @@ func TestCreate(t *testing.T) {
 	defer os.RemoveAll(dir)
 	os.Chdir(dir)
 
-	createFunc(&emptyCmd, []string{"test.json"})
+	err = createFunc(&emptyCmd, []string{"test.json"})
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestAddress(t *testing.T) {
@@ -33,8 +36,15 @@ func TestAddress(t *testing.T) {
 	defer os.RemoveAll(dir)
 	os.Chdir(dir)
 
-	createFunc(&emptyCmd, []string{"test.json"})
-	addressFunc(&emptyCmd, []string{"test.json"})
+	err = createFunc(&emptyCmd, []string{"test.json"})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = addressFunc(&emptyCmd, []string{"test.json"})
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestSave(t *testing.T) {
@@ -48,10 +58,14 @@ func TestSave(t *testing.T) {
 	defer os.RemoveAll(dir)
 	os.Chdir(dir)
 
-	saveFunc(&emptyCmd, []string{"test.json", privateKey})
+	err = saveFunc(&emptyCmd, []string{"test.json", privateKey})
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestBalance(t *testing.T) {
+	setCLIConfig()
 	password = "password"
 	emptyCmd := cobra.Command{}
 	dir, err := ioutil.TempDir("", "aecli")
@@ -61,6 +75,33 @@ func TestBalance(t *testing.T) {
 	defer os.RemoveAll(dir)
 	os.Chdir(dir)
 
-	createFunc(&emptyCmd, []string{"test.json"})
-	balanceFunc(&emptyCmd, []string{"test.json"})
+	err = createFunc(&emptyCmd, []string{"test.json"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = balanceFunc(&emptyCmd, []string{"test.json"})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSign(t *testing.T) {
+	password = "password"
+	emptyCmd := cobra.Command{}
+	dir, err := ioutil.TempDir("", "aecli")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(dir)
+	os.Chdir(dir)
+
+	err = createFunc(&emptyCmd, []string{"test.json"})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = signFunc(&emptyCmd, []string{"test.json", "tx_+E8MAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vOhAR8To7CL8AFABmKmi2nYdfeAPOxMCGR/btXYTHiXvVCjCoJOIIKC5wGAkBVBMQ=="})
+	if err != nil {
+		t.Fatal(err)
+	}
 }
