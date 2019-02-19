@@ -33,30 +33,34 @@ var topCmd = &cobra.Command{
 	Use:   "top",
 	Short: "Query the top block of the chain",
 	Long:  ``,
-	Run: func(cmd *cobra.Command, args []string) {
-		aeCli := NewAeCli()
-		v, err := aeCli.APIGetTopBlock()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		aeternity.PrintObject("block", v)
-	},
+	Run:   topFunc,
+}
+
+func topFunc(cmd *cobra.Command, args []string) {
+	aeCli := NewAeCli()
+	v, err := aeCli.APIGetTopBlock()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	aeternity.PrintObject("block", v)
 }
 
 var statusCmd = &cobra.Command{
 	Use:   "status",
 	Short: "Get the status and status of the node running the chain",
 	Long:  ``,
-	Run: func(cmd *cobra.Command, args []string) {
-		aeCli := NewAeCli()
-		v, err := aeCli.APIGetStatus()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		aeternity.PrintObject("epoch node", v)
-	},
+	Run:   statusFunc,
+}
+
+func statusFunc(cmd *cobra.Command, args []string) {
+	aeCli := NewAeCli()
+	v, err := aeCli.APIGetStatus()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	aeternity.PrintObject("epoch node", v)
 }
 
 var limit, startFromHeight uint64
@@ -64,37 +68,39 @@ var playCmd = &cobra.Command{
 	Use:   "play",
 	Short: "Query the blocks of the chain one after the other",
 	Long:  ``,
-	Run: func(cmd *cobra.Command, args []string) {
-		aeCli := NewAeCli()
-		blockHeight, err := aeCli.APIGetHeight()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+	Run:   playFunc,
+}
 
-		// deal with the height parameter
-		if startFromHeight > blockHeight {
-			fmt.Printf("Height (%d) is greater that the top block (%d)", startFromHeight, blockHeight)
-			os.Exit(1)
-		}
+func playFunc(cmd *cobra.Command, args []string) {
+	aeCli := NewAeCli()
+	blockHeight, err := aeCli.APIGetHeight()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 
-		if startFromHeight > 0 {
-			blockHeight = startFromHeight
+	// deal with the height parameter
+	if startFromHeight > blockHeight {
+		fmt.Printf("Height (%d) is greater that the top block (%d)", startFromHeight, blockHeight)
+		os.Exit(1)
+	}
+
+	if startFromHeight > 0 {
+		blockHeight = startFromHeight
+	}
+	// deal with the limit parameter
+	targetHeight := uint64(0)
+	if limit > 0 {
+		th := blockHeight - limit
+		if th > targetHeight {
+			targetHeight = th
 		}
-		// deal with the limit parameter
-		targetHeight := uint64(0)
-		if limit > 0 {
-			th := blockHeight - limit
-			if th > targetHeight {
-				targetHeight = th
-			}
-		}
-		// run the play
-		for ; blockHeight > targetHeight; blockHeight-- {
-			aeCli.PrintGenerationByHeight(blockHeight)
-			fmt.Println("")
-		}
-	},
+	}
+	// run the play
+	for ; blockHeight > targetHeight; blockHeight-- {
+		aeCli.PrintGenerationByHeight(blockHeight)
+		fmt.Println("")
+	}
 }
 
 var broadcastCmd = &cobra.Command{
@@ -102,20 +108,22 @@ var broadcastCmd = &cobra.Command{
 	Short: "Broadcast a transaction to the network",
 	Long:  ``,
 	Args:  cobra.ExactArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
-		// Load variables from arguments
-		txSignedBase64 := args[0]
+	Run:   broadcastFunc,
+}
 
-		if len(txSignedBase64) == 0 || txSignedBase64[0:3] != "tx_" {
-			fmt.Println("Error, missing or invalid recipient address")
-			os.Exit(1)
-		}
+func broadcastFunc(cmd *cobra.Command, args []string) {
+	// Load variables from arguments
+	txSignedBase64 := args[0]
 
-		err := aeternity.BroadcastTransaction(txSignedBase64)
-		if err != nil {
-			fmt.Println("Error while broadcasting transaction: ", err)
-		}
-	},
+	if len(txSignedBase64) == 0 || txSignedBase64[0:3] != "tx_" {
+		fmt.Println("Error, missing or invalid recipient address")
+		os.Exit(1)
+	}
+
+	err := aeternity.BroadcastTransaction(txSignedBase64)
+	if err != nil {
+		fmt.Println("Error while broadcasting transaction: ", err)
+	}
 }
 
 var ttlCmd = &cobra.Command{
@@ -123,15 +131,17 @@ var ttlCmd = &cobra.Command{
 	Short: "Get the absolute TTL for a Transaction",
 	Long:  `Get the absolute TTL (node's height + recommended TTL offset) for a Transaction`,
 	Args:  cobra.ExactArgs(0),
-	Run: func(cmd *cobra.Command, args []string) {
-		ae := NewAeCli()
-		height, err := ae.APIGetHeight()
-		if err != nil {
-			fmt.Printf("Error getting height from the node: %v", err)
-			return
-		}
-		fmt.Println(height + aeternity.Config.Client.TTL)
-	},
+	Run:   ttlFunc,
+}
+
+func ttlFunc(cmd *cobra.Command, args []string) {
+	ae := NewAeCli()
+	height, err := ae.APIGetHeight()
+	if err != nil {
+		fmt.Printf("Error getting height from the node: %v", err)
+		return
+	}
+	fmt.Println(height + aeternity.Config.Client.TTL)
 }
 
 var networkIDCmd = &cobra.Command{
@@ -139,15 +149,17 @@ var networkIDCmd = &cobra.Command{
 	Short: "Get the node's network_id",
 	Long:  ``,
 	Args:  cobra.ExactArgs(0),
-	Run: func(cmd *cobra.Command, args []string) {
-		ae := NewAeCli()
-		resp, err := ae.APIGetStatus()
-		if err != nil {
-			fmt.Printf("Error getting status information from the node: %v", err)
-			return
-		}
-		fmt.Println(*resp.NetworkID)
-	},
+	Run:   networkIDFunc,
+}
+
+func networkIDFunc(cmd *cobra.Command, args []string) {
+	ae := NewAeCli()
+	resp, err := ae.APIGetStatus()
+	if err != nil {
+		fmt.Printf("Error getting status information from the node: %v", err)
+		return
+	}
+	fmt.Println(*resp.NetworkID)
 }
 
 func init() {
