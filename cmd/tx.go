@@ -24,54 +24,56 @@ var txSpendCmd = &cobra.Command{
 	Short: "Create a transaction to another account (unsigned)",
 	Long:  ``,
 	Args:  cobra.ExactArgs(3),
-	Run: func(cmd *cobra.Command, args []string) {
-		var (
-			sender    string
-			recipient string
-			amount    int64 // TODO potential problem with int64 for amount
-		)
+	Run:   txSpendFunc,
+}
 
-		// Load variables from arguments
-		sender = args[0]
-		recipient = args[1]
-		amount, _ = strconv.ParseInt(args[2], 10, 64)
+func txSpendFunc(cmd *cobra.Command, args []string) {
+	var (
+		sender    string
+		recipient string
+		amount    int64 // TODO potential problem with int64 for amount
+	)
 
-		// Validate arguments
-		if len(sender) == 0 {
-			fmt.Println("Error, missing or invalid sender address")
-			os.Exit(1)
-		}
-		if len(recipient) == 0 {
-			fmt.Println("Error, missing or invalid recipient address")
-			os.Exit(1)
-		}
-		if amount <= 0 {
-			fmt.Println("Error, missing or invalid amount")
-			os.Exit(1)
-		}
-		if fee <= 0 {
-			fmt.Println("Error, missing or invalid fee")
-			os.Exit(1)
-		}
+	// Load variables from arguments
+	sender = args[0]
+	recipient = args[1]
+	amount, _ = strconv.ParseInt(args[2], 10, 64)
 
-		base64Tx, ttl, nonce, err := aeternity.SpendTransaction(sender, recipient, amount, fee, ``)
-		if err != nil {
-			fmt.Printf("Creating a Spend Transaction failed with %s", err)
-			os.Exit(1)
-		}
+	// Validate arguments
+	if len(sender) == 0 {
+		fmt.Println("Error, missing or invalid sender address")
+		os.Exit(1)
+	}
+	if len(recipient) == 0 {
+		fmt.Println("Error, missing or invalid recipient address")
+		os.Exit(1)
+	}
+	if amount <= 0 {
+		fmt.Println("Error, missing or invalid amount")
+		os.Exit(1)
+	}
+	if fee <= 0 {
+		fmt.Println("Error, missing or invalid fee")
+		os.Exit(1)
+	}
 
-		// Sender, Recipient, Amount, Ttl, Fee, Nonce, Payload, Encoded
-		aeternity.Pp(
-			"Sender acount", sender,
-			"Recipient account", recipient,
-			"Amount", amount,
-			"TTL", ttl,
-			"Fee", fee,
-			"Nonce", nonce,
-			"Payload", "not implemented",
-			"Encoded", base64Tx,
-		)
-	},
+	base64Tx, ttl, nonce, err := aeternity.SpendTransaction(sender, recipient, amount, fee, ``)
+	if err != nil {
+		fmt.Printf("Creating a Spend Transaction failed with %s", err)
+		os.Exit(1)
+	}
+
+	// Sender, Recipient, Amount, Ttl, Fee, Nonce, Payload, Encoded
+	aeternity.Pp(
+		"Sender acount", sender,
+		"Recipient account", recipient,
+		"Amount", amount,
+		"TTL", ttl,
+		"Fee", fee,
+		"Nonce", nonce,
+		"Payload", "not implemented",
+		"Encoded", base64Tx,
+	)
 }
 
 // txVerifyCmd implements the tx verify subocmmand.
@@ -81,25 +83,27 @@ var txVerifyCmd = &cobra.Command{
 	Short: "Verify the signature of a signed base64 transaction",
 	Long:  ``,
 	Args:  cobra.ExactArgs(2),
-	Run: func(cmd *cobra.Command, args []string) {
-		// Load variables from arguments
-		sender := args[0]
-		txSignedBase64 := args[1]
+	Run:   txVerifyFunc,
+}
 
-		if len(sender) == 0 {
-			fmt.Println("Error, missing or invalid sender address")
-			os.Exit(1)
-		}
-		if len(txSignedBase64) == 0 || txSignedBase64[0:3] != "tx_" {
-			fmt.Println("Error, missing or invalid base64 encoded transaction")
-			os.Exit(1)
-		}
-		valid, err := aeternity.VerifySignedTx(sender, txSignedBase64)
-		if err != nil {
-			fmt.Printf("Error while verifying signature: %s\n", err)
-		}
-		fmt.Printf("The signature is %t\n", valid)
-	},
+func txVerifyFunc(cmd *cobra.Command, args []string) {
+	// Load variables from arguments
+	sender := args[0]
+	txSignedBase64 := args[1]
+
+	if len(sender) == 0 {
+		fmt.Println("Error, missing or invalid sender address")
+		os.Exit(1)
+	}
+	if len(txSignedBase64) == 0 || txSignedBase64[0:3] != "tx_" {
+		fmt.Println("Error, missing or invalid base64 encoded transaction")
+		os.Exit(1)
+	}
+	valid, err := aeternity.VerifySignedTx(sender, txSignedBase64)
+	if err != nil {
+		fmt.Printf("Error while verifying signature: %s\n", err)
+	}
+	fmt.Printf("The signature is %t\n", valid)
 }
 
 func init() {
