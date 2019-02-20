@@ -1,8 +1,8 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
-	"os"
 	"strconv"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
@@ -24,10 +24,10 @@ var txSpendCmd = &cobra.Command{
 	Short: "Create a transaction to another account (unsigned)",
 	Long:  ``,
 	Args:  cobra.ExactArgs(3),
-	Run:   txSpendFunc,
+	RunE:  txSpendFunc,
 }
 
-func txSpendFunc(cmd *cobra.Command, args []string) {
+func txSpendFunc(cmd *cobra.Command, args []string) (err error) {
 	var (
 		sender    string
 		recipient string
@@ -41,26 +41,21 @@ func txSpendFunc(cmd *cobra.Command, args []string) {
 
 	// Validate arguments
 	if len(sender) == 0 {
-		fmt.Println("Error, missing or invalid sender address")
-		os.Exit(1)
+		return errors.New("Error, missing or invalid sender address")
 	}
 	if len(recipient) == 0 {
-		fmt.Println("Error, missing or invalid recipient address")
-		os.Exit(1)
+		return errors.New("Error, missing or invalid recipient address")
 	}
 	if amount <= 0 {
-		fmt.Println("Error, missing or invalid amount")
-		os.Exit(1)
+		return errors.New("Error, missing or invalid amount")
 	}
 	if fee <= 0 {
-		fmt.Println("Error, missing or invalid fee")
-		os.Exit(1)
+		return errors.New("Error, missing or invalid fee")
 	}
 
 	base64Tx, ttl, nonce, err := aeternity.SpendTransaction(sender, recipient, amount, fee, ``)
 	if err != nil {
-		fmt.Printf("Creating a Spend Transaction failed with %s", err)
-		os.Exit(1)
+		return err
 	}
 
 	// Sender, Recipient, Amount, Ttl, Fee, Nonce, Payload, Encoded
@@ -74,6 +69,7 @@ func txSpendFunc(cmd *cobra.Command, args []string) {
 		"Payload", "not implemented",
 		"Encoded", base64Tx,
 	)
+	return nil
 }
 
 // txVerifyCmd implements the tx verify subocmmand.
@@ -83,27 +79,27 @@ var txVerifyCmd = &cobra.Command{
 	Short: "Verify the signature of a signed base64 transaction",
 	Long:  ``,
 	Args:  cobra.ExactArgs(2),
-	Run:   txVerifyFunc,
+	RunE:  txVerifyFunc,
 }
 
-func txVerifyFunc(cmd *cobra.Command, args []string) {
+func txVerifyFunc(cmd *cobra.Command, args []string) (err error) {
 	// Load variables from arguments
 	sender := args[0]
 	txSignedBase64 := args[1]
 
 	if len(sender) == 0 {
-		fmt.Println("Error, missing or invalid sender address")
-		os.Exit(1)
+		return errors.New("Error, missing or invalid sender address")
 	}
 	if len(txSignedBase64) == 0 || txSignedBase64[0:3] != "tx_" {
-		fmt.Println("Error, missing or invalid base64 encoded transaction")
-		os.Exit(1)
+		return errors.New("Error, missing or invalid base64 encoded transaction")
 	}
 	valid, err := aeternity.VerifySignedTx(sender, txSignedBase64)
 	if err != nil {
-		fmt.Printf("Error while verifying signature: %s\n", err)
+		err := fmt.Errorf("error while verifying signature: %s", err)
+		return err
 	}
 	fmt.Printf("The signature is %t\n", valid)
+	return nil
 }
 
 func init() {
@@ -112,6 +108,5 @@ func init() {
 	txCmd.AddCommand(txVerifyCmd)
 
 	// tx spend command
-	// TODO Config is not initialized within cmd. This means default config vars have to be hardcoded into help messages
-	txSpendCmd.Flags().Int64Var(&fee, "fee", 20000, fmt.Sprintf("Set the transaction fee (default=%d)", 20000))
+	txSpendCmd.Flags().Int64Var(&fee, "fee", aeternity.Config.Client.Fee, fmt.Sprintf("Set the transaction fee (default=%d)", aeternity.Config.Client.Fee))
 }
