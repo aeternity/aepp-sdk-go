@@ -15,8 +15,8 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
-	"os"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
 	"github.com/spf13/cobra"
@@ -33,34 +33,34 @@ var topCmd = &cobra.Command{
 	Use:   "top",
 	Short: "Query the top block of the chain",
 	Long:  ``,
-	Run:   topFunc,
+	RunE:  topFunc,
 }
 
-func topFunc(cmd *cobra.Command, args []string) {
+func topFunc(cmd *cobra.Command, args []string) (err error) {
 	aeCli := NewAeCli()
 	v, err := aeCli.APIGetTopBlock()
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		return err
 	}
 	aeternity.PrintObject("block", v)
+	return nil
 }
 
 var statusCmd = &cobra.Command{
 	Use:   "status",
 	Short: "Get the status and status of the node running the chain",
 	Long:  ``,
-	Run:   statusFunc,
+	RunE:  statusFunc,
 }
 
-func statusFunc(cmd *cobra.Command, args []string) {
+func statusFunc(cmd *cobra.Command, args []string) (err error) {
 	aeCli := NewAeCli()
 	v, err := aeCli.APIGetStatus()
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		return err
 	}
 	aeternity.PrintObject("epoch node", v)
+	return nil
 }
 
 var limit, startFromHeight uint64
@@ -68,21 +68,20 @@ var playCmd = &cobra.Command{
 	Use:   "play",
 	Short: "Query the blocks of the chain one after the other",
 	Long:  ``,
-	Run:   playFunc,
+	RunE:  playFunc,
 }
 
-func playFunc(cmd *cobra.Command, args []string) {
+func playFunc(cmd *cobra.Command, args []string) (err error) {
 	aeCli := NewAeCli()
 	blockHeight, err := aeCli.APIGetHeight()
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		return err
 	}
 
 	// deal with the height parameter
 	if startFromHeight > blockHeight {
-		fmt.Printf("Height (%d) is greater that the top block (%d)", startFromHeight, blockHeight)
-		os.Exit(1)
+		err := fmt.Errorf("Height (%d) is greater that the top block (%d)", startFromHeight, blockHeight)
+		return err
 	}
 
 	if startFromHeight > 0 {
@@ -101,6 +100,8 @@ func playFunc(cmd *cobra.Command, args []string) {
 		aeCli.PrintGenerationByHeight(blockHeight)
 		fmt.Println("")
 	}
+
+	return nil
 }
 
 var broadcastCmd = &cobra.Command{
@@ -108,22 +109,25 @@ var broadcastCmd = &cobra.Command{
 	Short: "Broadcast a transaction to the network",
 	Long:  ``,
 	Args:  cobra.ExactArgs(1),
-	Run:   broadcastFunc,
+	RunE:  broadcastFunc,
 }
 
-func broadcastFunc(cmd *cobra.Command, args []string) {
+func broadcastFunc(cmd *cobra.Command, args []string) (err error) {
 	// Load variables from arguments
 	txSignedBase64 := args[0]
 
 	if len(txSignedBase64) == 0 || txSignedBase64[0:3] != "tx_" {
-		fmt.Println("Error, missing or invalid recipient address")
-		os.Exit(1)
+		err := errors.New("Error, missing or invalid recipient address")
+		return err
 	}
 
-	err := aeternity.BroadcastTransaction(txSignedBase64)
+	err = aeternity.BroadcastTransaction(txSignedBase64)
 	if err != nil {
-		fmt.Println("Error while broadcasting transaction: ", err)
+		errFinal := fmt.Errorf("Error while broadcasting transaction: %v", err)
+		return errFinal
 	}
+
+	return nil
 }
 
 var ttlCmd = &cobra.Command{
@@ -131,17 +135,18 @@ var ttlCmd = &cobra.Command{
 	Short: "Get the absolute TTL for a Transaction",
 	Long:  `Get the absolute TTL (node's height + recommended TTL offset) for a Transaction`,
 	Args:  cobra.ExactArgs(0),
-	Run:   ttlFunc,
+	RunE:  ttlFunc,
 }
 
-func ttlFunc(cmd *cobra.Command, args []string) {
+func ttlFunc(cmd *cobra.Command, args []string) (err error) {
 	ae := NewAeCli()
 	height, err := ae.APIGetHeight()
 	if err != nil {
-		fmt.Printf("Error getting height from the node: %v", err)
-		return
+		errFinal := fmt.Errorf("Error getting height from the node: %v", err)
+		return errFinal
 	}
 	fmt.Println(height + aeternity.Config.Client.TTL)
+	return nil
 }
 
 var networkIDCmd = &cobra.Command{
@@ -149,17 +154,18 @@ var networkIDCmd = &cobra.Command{
 	Short: "Get the node's network_id",
 	Long:  ``,
 	Args:  cobra.ExactArgs(0),
-	Run:   networkIDFunc,
+	RunE:  networkIDFunc,
 }
 
-func networkIDFunc(cmd *cobra.Command, args []string) {
+func networkIDFunc(cmd *cobra.Command, args []string) (err error) {
 	ae := NewAeCli()
 	resp, err := ae.APIGetStatus()
 	if err != nil {
-		fmt.Printf("Error getting status information from the node: %v", err)
-		return
+		errFinal := fmt.Errorf("Error getting status information from the node: %v", err)
+		return errFinal
 	}
 	fmt.Println(*resp.NetworkID)
+	return nil
 }
 
 func init() {

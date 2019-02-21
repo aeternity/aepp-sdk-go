@@ -19,26 +19,38 @@ func setCLIConfig() {
 	}
 }
 
-func TestTop(t *testing.T) {
+func TestChainTop(t *testing.T) {
 	setCLIConfig()
 	emptyCmd := cobra.Command{}
-	topFunc(&emptyCmd, []string{})
+	err := topFunc(&emptyCmd, []string{})
+	if err != nil {
+		t.Error(err)
+	}
 }
 
-func TestStatus(t *testing.T) {
+func TestChainStatus(t *testing.T) {
 	setCLIConfig()
 	emptyCmd := cobra.Command{}
-	statusFunc(&emptyCmd, []string{})
+	err := statusFunc(&emptyCmd, []string{})
+	if err != nil {
+		t.Error(err)
+	}
 }
 
-func TestTtl(t *testing.T) {
+func TestChainTtl(t *testing.T) {
 	setCLIConfig()
 	emptyCmd := cobra.Command{}
-	ttlFunc(&emptyCmd, []string{})
+	err := ttlFunc(&emptyCmd, []string{})
+	if err != nil {
+		t.Error(err)
+	}
 }
 
-func TestNetworkID(t *testing.T) {
+func TestChainNetworkID(t *testing.T) {
 	setCLIConfig()
 	emptyCmd := cobra.Command{}
-	networkIDFunc(&emptyCmd, []string{})
+	err := networkIDFunc(&emptyCmd, []string{})
+	if err != nil {
+		t.Error(err)
+	}
 }
