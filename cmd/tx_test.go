@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func TxSpend(t *testing.T) {
+func TestTxSpend(t *testing.T) {
 	sender := "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"
 	recipient := "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v"
 	emptyCmd := cobra.Command{}
