@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bufio"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math/big"
@@ -156,4 +157,22 @@ func (b *BigInt) validate() error {
 		return errors.New("swagger deserialization: Balance Validation failed")
 	}
 	return nil
+}
+
+// UnmarshalJSON implements encoding/json/RawMessage.UnmarshalJSON
+func (b *BigInt) UnmarshalJSON(data []byte) error {
+	err := json.Unmarshal(data, &b.Int)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// MarshalJSON calls json.Marshal() on the BigInt.Int field.
+func (b *BigInt) MarshalJSON() ([]byte, error) {
+	if b == nil {
+		return []byte("null"), nil
+	}
+	return json.Marshal(b.Int)
 }
