@@ -136,12 +136,21 @@ func AskPassword(question string) (password string, err error) {
 }
 
 // BigInt is used by swagger as a big.Int type with Validate() function
-type BigInt big.Int
+type BigInt struct {
+	*big.Int
+}
 
-// Validate only checks that the number is >=0
+// Validate is an exported function that swagger uses.
+// However, the implementation does not need 'formats', so it is broken
+// out into validate().
 func (b *BigInt) Validate(formats strfmt.Registry) error {
+	return b.validate()
+}
+
+// validate checks that the number is >=0
+func (b *BigInt) validate() error {
 	var zero big.Int
-	var convertedCustomBigInt = big.Int(*b)
+	var convertedCustomBigInt = b
 
 	if convertedCustomBigInt.Cmp(&zero) != 1 {
 		return errors.New("swagger deserialization: Balance Validation failed")
