@@ -20,6 +20,11 @@ import (
 // swagger:model OffChainCallContract
 type OffChainCallContract struct {
 
+	// ABI version for the call/calldata
+	// Maximum: 65535
+	// Minimum: 0
+	AbiVersion *int64 `json:"abi_version,omitempty"`
+
 	// Amount of tokens to transfer to the contract
 	// Required: true
 	Amount *uint64 `json:"amount"`
@@ -44,9 +49,10 @@ type OffChainCallContract struct {
 	// Required: true
 	GasPrice *uint64 `json:"gas_price"`
 
-	// VM version of the contract
-	// Required: true
-	VMVersion *uint64 `json:"vm_version"`
+	// ABI version for the call/calldata
+	// Maximum: 65535
+	// Minimum: 0
+	VMVersion *int64 `json:"vm_version,omitempty"`
 }
 
 // Op gets the op of this subtype
@@ -58,6 +64,8 @@ func (m *OffChainCallContract) Op() string {
 func (m *OffChainCallContract) SetOp(val string) {
 
 }
+
+// AbiVersion gets the abi version of this subtype
 
 // Amount gets the amount of this subtype
 
@@ -76,6 +84,11 @@ func (m *OffChainCallContract) SetOp(val string) {
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
 func (m *OffChainCallContract) UnmarshalJSON(raw []byte) error {
 	var data struct {
+
+		// ABI version for the call/calldata
+		// Maximum: 65535
+		// Minimum: 0
+		AbiVersion *int64 `json:"abi_version,omitempty"`
 
 		// Amount of tokens to transfer to the contract
 		// Required: true
@@ -101,9 +114,10 @@ func (m *OffChainCallContract) UnmarshalJSON(raw []byte) error {
 		// Required: true
 		GasPrice *uint64 `json:"gas_price"`
 
-		// VM version of the contract
-		// Required: true
-		VMVersion *uint64 `json:"vm_version"`
+		// ABI version for the call/calldata
+		// Maximum: 65535
+		// Minimum: 0
+		VMVersion *int64 `json:"vm_version,omitempty"`
 	}
 	buf := bytes.NewBuffer(raw)
 	dec := json.NewDecoder(buf)
@@ -133,6 +147,8 @@ func (m *OffChainCallContract) UnmarshalJSON(raw []byte) error {
 		return errors.New(422, "invalid op value: %q", base.Op)
 	}
 
+	result.AbiVersion = data.AbiVersion
+
 	result.Amount = data.Amount
 
 	result.CallData = data.CallData
@@ -158,6 +174,11 @@ func (m OffChainCallContract) MarshalJSON() ([]byte, error) {
 	var err error
 	b1, err = json.Marshal(struct {
 
+		// ABI version for the call/calldata
+		// Maximum: 65535
+		// Minimum: 0
+		AbiVersion *int64 `json:"abi_version,omitempty"`
+
 		// Amount of tokens to transfer to the contract
 		// Required: true
 		Amount *uint64 `json:"amount"`
@@ -182,10 +203,13 @@ func (m OffChainCallContract) MarshalJSON() ([]byte, error) {
 		// Required: true
 		GasPrice *uint64 `json:"gas_price"`
 
-		// VM version of the contract
-		// Required: true
-		VMVersion *uint64 `json:"vm_version"`
+		// ABI version for the call/calldata
+		// Maximum: 65535
+		// Minimum: 0
+		VMVersion *int64 `json:"vm_version,omitempty"`
 	}{
+
+		AbiVersion: m.AbiVersion,
 
 		Amount: m.Amount,
 
@@ -223,6 +247,10 @@ func (m OffChainCallContract) MarshalJSON() ([]byte, error) {
 func (m *OffChainCallContract) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateAbiVersion(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateAmount(formats); err != nil {
 		res = append(res, err)
 	}
@@ -254,6 +282,23 @@ func (m *OffChainCallContract) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *OffChainCallContract) validateAbiVersion(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.AbiVersion) { // not required
+		return nil
+	}
+
+	if err := validate.MinimumInt("abi_version", "body", int64(*m.AbiVersion), 0, false); err != nil {
+		return err
+	}
+
+	if err := validate.MaximumInt("abi_version", "body", int64(*m.AbiVersion), 65535, false); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -322,7 +367,15 @@ func (m *OffChainCallContract) validateGasPrice(formats strfmt.Registry) error {
 
 func (m *OffChainCallContract) validateVMVersion(formats strfmt.Registry) error {
 
-	if err := validate.Required("vm_version", "body", m.VMVersion); err != nil {
+	if swag.IsZero(m.VMVersion) { // not required
+		return nil
+	}
+
+	if err := validate.MinimumInt("vm_version", "body", int64(*m.VMVersion), 0, false); err != nil {
+		return err
+	}
+
+	if err := validate.MaximumInt("vm_version", "body", int64(*m.VMVersion), 65535, false); err != nil {
 		return err
 	}
 
