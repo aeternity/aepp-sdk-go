@@ -45,7 +45,7 @@ type StateChannelConfig struct {
 // ClientConfig client paramters configuration
 type ClientConfig struct {
 	TTL                uint64             `json:"ttl" yaml:"ttl" mapstructure:"ttl"`
-	Fee                int64              `json:"fee" yaml:"fee" mapstructure:"fee"`
+	Fee                uint64             `json:"fee" yaml:"fee" mapstructure:"fee"`
 	DefaultKey         string             `json:"default_key_name" yaml:"default_key_name" mapstructure:"default_key_name"`
 	Names              AensConfig         `json:"names" yaml:"names" mapstructure:"names"`
 	Contracts          ContractConfig     `json:"contracts" yaml:"contracts" mapstructure:"contracts"`

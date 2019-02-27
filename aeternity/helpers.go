@@ -79,7 +79,7 @@ func waitForTransaction(epochCli *apiclient.Epoch, txHash string) (blockHeight u
 
 // SpendTransaction creates an unsigned Spend Transaction, just like Wallet.Spend()
 // but without generating th_, POSTing the Transaction or assuming the keystore is present
-func SpendTransaction(sender string, recipient string, amount int64, fee int64, message string) (base64Tx string, ttl uint64, nonce uint64, err error) {
+func SpendTransaction(sender string, recipient string, amount uint64, fee uint64, message string) (base64Tx string, ttl uint64, nonce uint64, err error) {
 	ae := NewCli(Config.Epoch.URL, false)
 
 	// calculate the absolute ttl for the transaction

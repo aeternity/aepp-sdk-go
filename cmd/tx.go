@@ -31,13 +31,13 @@ func txSpendFunc(cmd *cobra.Command, args []string) (err error) {
 	var (
 		sender    string
 		recipient string
-		amount    int64 // TODO potential problem with int64 for amount
+		amount    uint64 // TODO potential problem with uint64 not big.Int
 	)
 
 	// Load variables from arguments
 	sender = args[0]
 	recipient = args[1]
-	amount, _ = strconv.ParseInt(args[2], 10, 64)
+	amount, _ = strconv.ParseUint(args[2], 10, 64)
 
 	// Validate arguments
 	if len(sender) == 0 {
@@ -72,7 +72,7 @@ func txSpendFunc(cmd *cobra.Command, args []string) (err error) {
 	return nil
 }
 
-// txVerifyCmd implements the tx verify subocmmand.
+// txVerifyCmd implements the tx verify subcommand.
 // It verfies the signature of a signed transaction
 var txVerifyCmd = &cobra.Command{
 	Use:   "verify SENDER_ADDRESS SIGNED_TRANSACTION",
@@ -108,5 +108,5 @@ func init() {
 	txCmd.AddCommand(txVerifyCmd)
 
 	// tx spend command
-	txSpendCmd.Flags().Int64Var(&fee, "fee", aeternity.Config.Client.Fee, fmt.Sprintf("Set the transaction fee (default=%d)", aeternity.Config.Client.Fee))
+	txSpendCmd.Flags().Uint64Var(&fee, "fee", aeternity.Config.Client.Fee, fmt.Sprintf("Set the transaction fee (default=%d)", aeternity.Config.Client.Fee))
 }

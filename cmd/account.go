@@ -27,7 +27,7 @@ var (
 	printPrivateKey bool
 	accountFileName string
 	password        string
-	fee             int64
+	fee             uint64
 )
 
 // accountCmd implements the account command
