@@ -123,7 +123,7 @@ func BroadcastTransaction(txSignedBase64 string) (err error) {
 }
 
 // NamePreclaim post a preclaim transaction to the chain
-func (n *Aens) NamePreclaim(name string) (tx, txHash, signature string, ttl uint64, nonce uint64, nameSalt int64, err error) {
+func (n *Aens) NamePreclaim(name string) (tx, txHash, signature string, ttl uint64, nonce uint64, nameSalt uint64, err error) {
 	// get the ttl offset
 	ttl, err = getAbsoluteHeight(n.epochCli, Config.Client.TTL)
 	if err != nil {
@@ -134,8 +134,8 @@ func (n *Aens) NamePreclaim(name string) (tx, txHash, signature string, ttl uint
 	if err != nil {
 		return
 	}
-	// convert the stalt to a int64
-	nameSalt = int64(binary.BigEndian.Uint64(salt))
+	// convert the salt back into uint64 from binary
+	nameSalt = binary.BigEndian.Uint64(salt)
 	// get the account nonce
 	nonce, err = getNextNonce(n.epochCli, n.owner.Address)
 	if err != nil {
@@ -157,7 +157,7 @@ func (n *Aens) NamePreclaim(name string) (tx, txHash, signature string, ttl uint
 }
 
 // NameClaim perform a name claiming
-func (n *Aens) NameClaim(name string, nameSalt int64) (tx, txHash, signature string, ttl uint64, nonce uint64, err error) {
+func (n *Aens) NameClaim(name string, nameSalt uint64) (tx, txHash, signature string, ttl uint64, nonce uint64, err error) {
 	// get the ttl offset
 	ttl, err = getAbsoluteHeight(n.epochCli, Config.Client.TTL)
 	if err != nil {

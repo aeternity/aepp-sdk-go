@@ -17,9 +17,9 @@ type EpochConfig struct {
 type AensConfig struct {
 	NameTTL     uint64 `json:"name_ttl" yaml:"name_ttl" mapstructure:"name_ttl"`
 	ClientTTL   uint64 `json:"client_ttl" yaml:"client_ttl" mapstructure:"client_ttl"`
-	PreClaimFee int64  `json:"preclaim_fee" yaml:"preclaim_fee" mapstructure:"preclaim_fee"`
-	ClaimFee    int64  `json:"claim_fee" yaml:"claim_fee" mapstructure:"claim_fee"`
-	UpdateFee   int64  `json:"update_fee" yaml:"update_fee" mapstructure:"update_fee"`
+	PreClaimFee uint64 `json:"preclaim_fee" yaml:"preclaim_fee" mapstructure:"preclaim_fee"`
+	ClaimFee    uint64 `json:"claim_fee" yaml:"claim_fee" mapstructure:"claim_fee"`
+	UpdateFee   uint64 `json:"update_fee" yaml:"update_fee" mapstructure:"update_fee"`
 }
 
 // ContractConfig configurations for contracts

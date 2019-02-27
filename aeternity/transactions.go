@@ -65,7 +65,7 @@ func SpendTx(senderID, recipientID, payload string, amount, fee uint64, ttl, non
 
 // NamePreclaimTx build a preclaim transaction
 // see https://github.com/aeternity/protocol/blob/epoch-v0.22.0/serializations.md#name-service-preclaim-transaction
-func NamePreclaimTx(accountID, commitmentID string, fee int64, ttl, nonce uint64) (rlpRawMsg []byte, err error) {
+func NamePreclaimTx(accountID, commitmentID string, fee uint64, ttl, nonce uint64) (rlpRawMsg []byte, err error) {
 	// build id for the sender
 	aID, err := buildIDTag(IDTagAccount, accountID)
 	if err != nil {
@@ -90,7 +90,7 @@ func NamePreclaimTx(accountID, commitmentID string, fee int64, ttl, nonce uint64
 
 // NameClaimTx build a preclaim transaction
 // see https://github.com/aeternity/protocol/blob/epoch-v0.22.0/serializations.md#name-service-claim-transaction
-func NameClaimTx(accountID, name string, nameSalt, fee int64, ttl, nonce uint64) (rlpRawMsg []byte, err error) {
+func NameClaimTx(accountID, name string, nameSalt, fee uint64, ttl, nonce uint64) (rlpRawMsg []byte, err error) {
 	// build id for the sender
 	aID, err := buildIDTag(IDTagAccount, accountID)
 	if err != nil {
@@ -140,7 +140,7 @@ func buildPointers(pointers []string) (ptrs [][]uint8, err error) {
 
 // NameUpdateTx build an update name transaction
 // see https://github.com/aeternity/protocol/blob/epoch-v0.22.0/serializations.md#name-service-update-transaction
-func NameUpdateTx(accountID, nameID string, pointers []string, nameTTL, clientTTL uint64, fee int64, ttl, nonce uint64) (rlpRawMsg []byte, err error) {
+func NameUpdateTx(accountID, nameID string, pointers []string, nameTTL, clientTTL uint64, fee uint64, ttl, nonce uint64) (rlpRawMsg []byte, err error) {
 	// build id for the sender
 	aID, err := buildIDTag(IDTagAccount, accountID)
 	if err != nil {
