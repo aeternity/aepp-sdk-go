@@ -28,6 +28,8 @@ var (
 	accountFileName string
 	password        string
 	fee             uint64
+	ttl             uint64
+	nonce           uint64
 )
 
 // accountCmd implements the account command
