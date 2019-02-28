@@ -110,5 +110,5 @@ func init() {
 	// tx spend command
 	txSpendCmd.Flags().Uint64Var(&fee, "fee", aeternity.Config.Client.Fee, fmt.Sprintf("Set the transaction fee (default=%d)", aeternity.Config.Client.Fee))
 	txSpendCmd.Flags().Uint64Var(&ttl, "ttl", aeternity.Config.Client.TTL, fmt.Sprintf("Set the TTL in keyblocks (default=%d)", aeternity.Config.Client.TTL))
-	txSpendCmd.Flags().Uint64Var(&nonce, "nonce", 0, fmt.Sprint("Set the transaction nonce, if not it will be automatically generated"))
+	txSpendCmd.Flags().Uint64Var(&nonce, "nonce", 0, fmt.Sprint("Set the sender account nonce, if not the chain will be queried for its value"))
 }
