@@ -16,12 +16,12 @@ func SignEncodeTx(kp *Account, txRaw []byte, networkID string) (signedEncodedTx,
 	// encode the message using rlp
 	rlpTxRaw, err := createSignedTransaction(txRaw, [][]byte{sigRaw})
 	// encode the rlp message with the prefix
-	signedEncodedTx = encode(PrefixTransaction, rlpTxRaw)
+	signedEncodedTx = Encode(PrefixTransaction, rlpTxRaw)
 	// compute the hash
 	rlpTxHashRaw, err := hash(rlpTxRaw)
-	signedEncodedTxHash = encode(PrefixTransactionHash, rlpTxHashRaw)
+	signedEncodedTxHash = Encode(PrefixTransactionHash, rlpTxHashRaw)
 	// encode the signature
-	signature = encode(PrefixSignature, sigRaw)
+	signature = Encode(PrefixSignature, sigRaw)
 	return
 }
 

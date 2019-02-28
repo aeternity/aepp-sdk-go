@@ -68,7 +68,7 @@ func TestKeyPair_Sign(t *testing.T) {
 	}
 }
 
-func Test_decode(t *testing.T) {
+func Test_Decode(t *testing.T) {
 	type args struct {
 		in string
 	}
@@ -90,13 +90,13 @@ func Test_decode(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotOut, err := decode(tt.args.in)
+			gotOut, err := Decode(tt.args.in)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("decode() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Decode() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !tt.wantErr && !reflect.DeepEqual(gotOut, tt.wantOut) {
-				t.Errorf("decode() = %v, want %v", gotOut, tt.wantOut)
+				t.Errorf("Decode() = %v, want %v", gotOut, tt.wantOut)
 			}
 		})
 	}
@@ -118,7 +118,7 @@ func Test_namehash(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := encode(PrefixName, namehash(tt.args.name))
+			got := Encode(PrefixName, namehash(tt.args.name))
 			if got != tt.want {
 				t.Errorf("namehash() = %v, want %v", got, tt.want)
 			}

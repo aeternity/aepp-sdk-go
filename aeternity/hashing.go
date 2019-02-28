@@ -19,8 +19,8 @@ func hashSha256(data []byte) []byte {
 	return d.Sum(nil)
 }
 
-// encode a byte array into base58/base64 with chacksum and a prefix
-func encode(prefix HashPrefix, data []byte) string {
+// Encode a byte array into base58/base64 with chacksum and a prefix
+func Encode(prefix HashPrefix, data []byte) string {
 	checksum := hashSha256(hashSha256(data))
 	in := append(data, checksum[0:4]...)
 	switch objectEncoding[prefix] {
@@ -34,8 +34,8 @@ func encode(prefix HashPrefix, data []byte) string {
 
 }
 
-// decode a string encoded with base58/base64 + checksum to a byte array
-func decode(in string) (out []byte, err error) {
+// Decode a string encoded with base58/base64 + checksum to a byte array
+func Decode(in string) (out []byte, err error) {
 	// prefix and hash
 	var p HashPrefix
 	var h string
@@ -62,7 +62,7 @@ func decode(in string) (out []byte, err error) {
 		return nil, err
 	}
 	out = raw[:len(raw)-4]
-	if chk := encode(p, out); in != chk {
+	if chk := Encode(p, out); in != chk {
 		err = fmt.Errorf("Invalid checksum, expected %s got %s", chk, in)
 		return nil, err
 	}
@@ -120,7 +120,7 @@ func computeCommitmentID(name string) (ch string, salt []byte, err error) {
 	nh := append(namehash(name), salt...)
 	nh, _ = hash(nh)
 	// nh := namehash(name)
-	ch = encode(PrefixCommitment, nh)
+	ch = Encode(PrefixCommitment, nh)
 	return
 }
 
@@ -138,7 +138,7 @@ func buildRLPMessage(tag uint, version uint, fields ...interface{}) (rlpRawMsg [
 // buildIDTag assemble an id() object
 // see https://github.com/aeternity/protocol/blob/epoch-v0.22.0/serializations.md#the-id-type
 func buildIDTag(IDTag uint8, encodedHash string) (v []uint8, err error) {
-	raw, err := decode(encodedHash)
+	raw, err := Decode(encodedHash)
 	v = []uint8{IDTag}
 	for _, x := range raw {
 		v = append(v, uint8(x))
