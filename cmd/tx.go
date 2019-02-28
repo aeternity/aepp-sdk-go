@@ -53,7 +53,7 @@ func txSpendFunc(cmd *cobra.Command, args []string) (err error) {
 		return errors.New("Error, missing or invalid fee")
 	}
 
-	base64Tx, ttl, nonce, err := aeternity.SpendTransaction(sender, recipient, amount, fee, ``)
+	base64Tx, err := aeternity.SpendTxStr(sender, recipient, amount, fee, ttl, nonce, "")
 	if err != nil {
 		return err
 	}
