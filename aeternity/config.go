@@ -77,24 +77,20 @@ type ProfileConfig struct {
 var Config = ProfileConfig{
 	Name: "Default Config",
 	Epoch: EpochConfig{
-		URL:         "https://sdk-edgenet.aepps.com",
-		URLInternal: "https://sdk-edgenet.aepps.com",
-		URLChannels: "https://sdk-edgenet.aepps.com",
+		URL:         "https://sdk-unstable.aepps.com",
+		URLInternal: "https://sdk-unstable.aepps.com",
+		URLChannels: "https://sdk-unstable.aepps.com",
 		NetworkID:   "ae_mainnet",
 	},
 	Client: ClientConfig{
-		TTL:        500,
-		Fee:        20000,
-		DefaultKey: "wallet.key", // UNUSED
+		TTL: 500,
+		Fee: 2e14,
 		Names: AensConfig{
-			NameTTL:     500,
-			ClientTTL:   500,
-			PreClaimFee: 1,
-			ClaimFee:    1,
-			UpdateFee:   1,
+			NameTTL:   500,
+			ClientTTL: 500,
 		},
 		Contracts: ContractConfig{ // UNUSED
-			Gas:       1000,
+			Gas:       1e9,
 			GasPrice:  1,
 			Deposit:   0,
 			VMVersion: 0,
