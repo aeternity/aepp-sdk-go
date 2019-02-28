@@ -38,7 +38,7 @@ func createSignedTransaction(txRaw []byte, signatures [][]byte) (rlpRawMsg []byt
 
 // SpendTx create a spend transaction
 // see https://github.com/aeternity/protocol/blob/epoch-v0.22.0/serializations.md
-func SpendTx(senderID, recipientID, payload string, amount, fee uint64, ttl, nonce uint64) (rlpRawMsg []byte, err error) {
+func SpendTx(senderID, recipientID string, amount, fee, ttl, nonce uint64, payload string) (rlpRawMsg []byte, err error) {
 	// build id for the sender
 	sID, err := buildIDTag(IDTagAccount, senderID)
 	if err != nil {

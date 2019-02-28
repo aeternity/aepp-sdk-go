@@ -92,8 +92,8 @@ func waitForTransaction(epochCli *apiclient.Epoch, txHash string) (blockHeight u
 }
 
 // SpendTxStr creates an unsigned SpendTx but returns the base64 representation instead of an RLP bytestring
-func SpendTxStr(sender string, recipient string, amount uint64, fee uint64, ttl uint64, nonce uint64, message string) (base64Tx string, err error) {
-	rlpUnsignedTx, err := SpendTx(sender, recipient, message, amount, Config.Client.Fee, ttl, nonce)
+func SpendTxStr(sender, recipient string, amount, fee, ttl, nonce uint64, message string) (base64Tx string, err error) {
+	rlpUnsignedTx, err := SpendTx(sender, recipient, amount, fee, ttl, nonce, message)
 	if err != nil {
 		return
 	}
