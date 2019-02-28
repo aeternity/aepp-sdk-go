@@ -12,7 +12,10 @@ import (
 func TestSpendTxWithNode(t *testing.T) {
 	sender := "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"
 	senderPrivateKey := os.Getenv("INTEGRATION_TEST_SENDER_PRIVATE_KEY")
-	senderAccount, _ := aeternity.AccountFromHexString(senderPrivateKey)
+	senderAccount, err := aeternity.AccountFromHexString(senderPrivateKey)
+	if err != nil {
+		t.Fatal(err)
+	}
 	recipient := "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v"
 	message := "Hello World"
 
