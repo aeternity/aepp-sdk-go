@@ -77,9 +77,9 @@ type ProfileConfig struct {
 var Config = ProfileConfig{
 	Name: "Default Config",
 	Epoch: EpochConfig{
-		URL:         "https://sdk-unstable.aepps.com",
-		URLInternal: "https://sdk-unstable.aepps.com",
-		URLChannels: "https://sdk-unstable.aepps.com",
+		URL:         "https://sdk-mainnet.aepps.com",
+		URLInternal: "https://sdk-mainnet.aepps.com",
+		URLChannels: "https://sdk-mainnet.aepps.com",
 		NetworkID:   "ae_mainnet",
 	},
 	Client: ClientConfig{
