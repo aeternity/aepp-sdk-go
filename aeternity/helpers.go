@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aeternity/aepp-sdk-go/utils"
+
 	apiclient "github.com/aeternity/aepp-sdk-go/generated/client"
 	"github.com/aeternity/aepp-sdk-go/generated/client/external"
 	"github.com/aeternity/aepp-sdk-go/generated/models"
@@ -92,7 +94,7 @@ func waitForTransaction(epochCli *apiclient.Epoch, txHash string) (blockHeight u
 }
 
 // SpendTxStr creates an unsigned SpendTx but returns the base64 representation instead of an RLP bytestring
-func SpendTxStr(sender, recipient string, amount, fee, ttl, nonce uint64, message string) (base64Tx string, err error) {
+func SpendTxStr(sender, recipient string, amount, fee utils.BigInt, ttl, nonce uint64, message string) (base64Tx string, err error) {
 	rlpUnsignedTx, err := SpendTx(sender, recipient, amount, fee, ttl, nonce, message)
 	if err != nil {
 		return

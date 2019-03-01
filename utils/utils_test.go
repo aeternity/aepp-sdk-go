@@ -25,7 +25,21 @@ func TestBigInt(t *testing.T) {
 	fmt.Println(resultBig)
 }
 
-func TestValidate(t *testing.T) {
+func TestBigIntNewStr(t *testing.T) {
+	a, err := NewBigIntStr("20000000000000000000") // 2e19
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ex := BigInt{Int: &big.Int{}}
+	ex.SetString("20000000000000000000", 10)
+	if ex.Cmp(a.Int) != 0 {
+		t.Fatalf("Expected 20000000000000000000 but got %v", a.String())
+	}
+
+}
+
+func TestBigIntValidate(t *testing.T) {
 	var amount = BigInt{&big.Int{}}
 	var tests = []struct {
 		input    int64
@@ -47,7 +61,7 @@ func TestValidate(t *testing.T) {
 	}
 }
 
-func TestUnmarshalJSON(t *testing.T) {
+func TestBigIntUnmarshalJSON(t *testing.T) {
 	maxuint64AsString := []byte("18446744073709551615")
 	maxuint64AsBigInt := BigInt{&big.Int{}}
 	maxuint64AsBigInt.SetString("18446744073709551615", 10)

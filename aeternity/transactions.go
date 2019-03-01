@@ -2,6 +2,8 @@ package aeternity
 
 import (
 	"fmt"
+
+	"github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // SignEncodeTx sign and encode a transaction
@@ -38,7 +40,7 @@ func createSignedTransaction(txRaw []byte, signatures [][]byte) (rlpRawMsg []byt
 
 // SpendTx create a spend transaction
 // see https://github.com/aeternity/protocol/blob/epoch-v0.22.0/serializations.md
-func SpendTx(senderID, recipientID string, amount, fee, ttl, nonce uint64, payload string) (rlpRawMsg []byte, err error) {
+func SpendTx(senderID, recipientID string, amount, fee utils.BigInt, ttl, nonce uint64, payload string) (rlpRawMsg []byte, err error) {
 	// build id for the sender
 	sID, err := buildIDTag(IDTagAccount, senderID)
 	if err != nil {
@@ -55,8 +57,8 @@ func SpendTx(senderID, recipientID string, amount, fee, ttl, nonce uint64, paylo
 		rlpMessageVersion,
 		sID,
 		rID,
-		uint64(amount),
-		uint64(fee),
+		amount.Bytes(),
+		fee.Bytes(),
 		ttl,
 		nonce,
 		[]byte(payload))

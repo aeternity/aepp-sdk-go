@@ -136,14 +136,14 @@ func AskPassword(question string) (password string, err error) {
 	return
 }
 
-// BigInt is used by swagger as a big.Int type with Validate() function
+// BigInt is a big.Int, but includes a Validate() method for swagger
+// Once created, it can be used just like a big.Int.
 type BigInt struct {
 	*big.Int
 }
 
-// Validate is an exported function that swagger uses.
-// However, the implementation does not need 'formats', so it is broken
-// out into validate().
+// Validate is calls validate() to ensure that value is >= 0.
+// The actual validate() does not need 'formats' from swagger, which is why Validate() wraps validate().
 func (b *BigInt) Validate(formats strfmt.Registry) error {
 	return b.validate()
 }
@@ -175,4 +175,18 @@ func (b *BigInt) MarshalJSON() ([]byte, error) {
 		return []byte("null"), nil
 	}
 	return json.Marshal(b.Int)
+}
+
+// NewBigInt creates a BigInt with its Int struct field
+func NewBigInt() (i *BigInt) {
+	return &BigInt{Int: &big.Int{}}
+}
+
+func NewBigIntStr(number string) (i *BigInt, err error) {
+	i = &BigInt{Int: new(big.Int)}
+	_, success := i.SetString(number, 10)
+	if success == false {
+		return nil, errors.New("Could not parse string as a number")
+	}
+	return i, nil
 }
