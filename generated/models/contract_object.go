@@ -19,6 +19,11 @@ import (
 // swagger:model ContractObject
 type ContractObject struct {
 
+	// abi version
+	// Maximum: 65535
+	// Minimum: 0
+	AbiVersion *int64 `json:"abi_version,omitempty"`
+
 	// active
 	// Required: true
 	Active *bool `json:"active"`
@@ -45,7 +50,7 @@ type ContractObject struct {
 
 	// vm version
 	// Required: true
-	// Maximum: 255
+	// Maximum: 65535
 	// Minimum: 0
 	VMVersion *int64 `json:"vm_version"`
 }
@@ -53,6 +58,10 @@ type ContractObject struct {
 // Validate validates this contract object
 func (m *ContractObject) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := m.validateAbiVersion(formats); err != nil {
+		res = append(res, err)
+	}
 
 	if err := m.validateActive(formats); err != nil {
 		res = append(res, err)
@@ -85,6 +94,23 @@ func (m *ContractObject) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *ContractObject) validateAbiVersion(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.AbiVersion) { // not required
+		return nil
+	}
+
+	if err := validate.MinimumInt("abi_version", "body", int64(*m.AbiVersion), 0, false); err != nil {
+		return err
+	}
+
+	if err := validate.MaximumInt("abi_version", "body", int64(*m.AbiVersion), 65535, false); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -169,7 +195,7 @@ func (m *ContractObject) validateVMVersion(formats strfmt.Registry) error {
 		return err
 	}
 
-	if err := validate.MaximumInt("vm_version", "body", int64(*m.VMVersion), 255, false); err != nil {
+	if err := validate.MaximumInt("vm_version", "body", int64(*m.VMVersion), 65535, false); err != nil {
 		return err
 	}
 

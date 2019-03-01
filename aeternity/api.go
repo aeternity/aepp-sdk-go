@@ -8,6 +8,9 @@ import (
 	"github.com/aeternity/aepp-sdk-go/generated/models"
 )
 
+// Ae.API*() methods are the stable interface to Go code that uses this SDK.
+// Logic implementation is handled by the unexported functions.
+
 // APIGetStatus post transaction
 func (ae *Ae) APIGetStatus() (status *models.Status, err error) {
 	return getStatus(ae.Epoch)

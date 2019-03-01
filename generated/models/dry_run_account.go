@@ -10,7 +10,8 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
+
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // DryRunAccount dry run account
@@ -19,7 +20,7 @@ type DryRunAccount struct {
 
 	// amount
 	// Required: true
-	Amount *int64 `json:"amount"`
+	Amount utils.BigInt `json:"amount"`
 
 	// pub key
 	// Required: true
@@ -46,7 +47,10 @@ func (m *DryRunAccount) Validate(formats strfmt.Registry) error {
 
 func (m *DryRunAccount) validateAmount(formats strfmt.Registry) error {
 
-	if err := validate.Required("amount", "body", m.Amount); err != nil {
+	if err := m.Amount.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("amount")
+		}
 		return err
 	}
 

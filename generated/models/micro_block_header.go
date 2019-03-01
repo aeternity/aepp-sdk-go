@@ -47,7 +47,7 @@ type MicroBlockHeader struct {
 
 	// time
 	// Required: true
-	Time *uint64 `json:"time"`
+	Time *int64 `json:"time"`
 
 	// txs hash
 	// Required: true

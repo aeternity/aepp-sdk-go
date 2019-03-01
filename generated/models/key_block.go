@@ -29,6 +29,10 @@ type KeyBlock struct {
 	// Required: true
 	Height *uint64 `json:"height"`
 
+	// info
+	// Required: true
+	Info EncodedByteArray `json:"info"`
+
 	// miner
 	// Required: true
 	Miner EncodedHash `json:"miner"`
@@ -57,7 +61,7 @@ type KeyBlock struct {
 
 	// time
 	// Required: true
-	Time *uint64 `json:"time"`
+	Time *int64 `json:"time"`
 
 	// version
 	// Required: true
@@ -77,6 +81,10 @@ func (m *KeyBlock) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateHeight(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateInfo(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -145,6 +153,18 @@ func (m *KeyBlock) validateHash(formats strfmt.Registry) error {
 func (m *KeyBlock) validateHeight(formats strfmt.Registry) error {
 
 	if err := validate.Required("height", "body", m.Height); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *KeyBlock) validateInfo(formats strfmt.Registry) error {
+
+	if err := m.Info.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("info")
+		}
 		return err
 	}
 

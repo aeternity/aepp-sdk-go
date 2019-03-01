@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aeternity/aepp-sdk-go/utils"
+
 	apiclient "github.com/aeternity/aepp-sdk-go/generated/client"
 	"github.com/aeternity/aepp-sdk-go/generated/client/external"
 	"github.com/aeternity/aepp-sdk-go/generated/models"
@@ -26,8 +28,8 @@ func urlComponents(url string) (host string, schemas []string) {
 	return
 }
 
-// getAbsoluteHeight return the chain height adding the offset
-func getAbsoluteHeight(epochCli *apiclient.Epoch, offset uint64) (height uint64, err error) {
+// GetTTL returns the chain height + offset
+func GetTTL(epochCli *apiclient.Epoch, offset uint64) (height uint64, err error) {
 	kb, err := getTopBlock(epochCli)
 	if err != nil {
 		return
@@ -40,15 +42,29 @@ func getAbsoluteHeight(epochCli *apiclient.Epoch, offset uint64) (height uint64,
 	return
 }
 
-// getNextNonce retrieve the next nonce for an account
-// it has to query the chain to do so
-func getNextNonce(epochCli *apiclient.Epoch, accountID string) (nextNonce uint64, err error) {
+// GetNextNonce retrieves the current nonce for an account + 1
+func GetNextNonce(epochCli *apiclient.Epoch, accountID string) (nextNonce uint64, err error) {
 	a, err := getAccount(epochCli, accountID)
 	if err != nil {
 		return
 	}
 	nextNonce = *a.Nonce + 1
 	return
+}
+
+// GetTTLNonce is a convenience function that combines GetTTL() and GetNextNonce()
+func GetTTLNonce(epochCli *apiclient.Epoch, accountID string, offset uint64) (ttl, nonce uint64, err error) {
+	ttl, err = GetTTL(epochCli, offset)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	nonce, err = GetNextNonce(epochCli, accountID)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	return ttl, nonce, nil
 }
 
 // waitForTransaction to appear on the chain
@@ -77,32 +93,16 @@ func waitForTransaction(epochCli *apiclient.Epoch, txHash string) (blockHeight u
 	return
 }
 
-// SpendTransaction creates an unsigned Spend Transaction, just like Wallet.Spend()
-// but without generating th_, POSTing the Transaction or assuming the keystore is present
-func SpendTransaction(sender string, recipient string, amount int64, fee int64, message string) (base64Tx string, ttl uint64, nonce uint64, err error) {
-	ae := NewCli(Config.Epoch.URL, false)
-
-	// calculate the absolute ttl for the transaction
-	ttl, err = getAbsoluteHeight(ae.Epoch, Config.Client.TTL)
+// SpendTxStr creates an unsigned SpendTx but returns the base64 representation instead of an RLP bytestring
+func SpendTxStr(sender, recipient string, amount, fee utils.BigInt, ttl, nonce uint64, message string) (base64Tx string, err error) {
+	rlpUnsignedTx, err := SpendTx(sender, recipient, amount, fee, ttl, nonce, message)
 	if err != nil {
 		return
 	}
 
-	// get the account's nonce
-	nonce, err = getNextNonce(ae.Epoch, sender)
-	if err != nil {
-		return
-	}
+	base64Tx = Encode(PrefixTransaction, rlpUnsignedTx)
 
-	// run createSpendTransaction
-	rlpUnsignedTx, err := SpendTx(sender, recipient, message, amount, Config.Client.Fee, ttl, nonce)
-	if err != nil {
-		return
-	}
-
-	base64Tx = encode(PrefixTransaction, rlpUnsignedTx)
-
-	return base64Tx, ttl, nonce, err
+	return base64Tx, err
 }
 
 // BroadcastTransaction recalculates the transaction hash and sends the transaction to the node.
@@ -110,12 +110,12 @@ func BroadcastTransaction(txSignedBase64 string) (err error) {
 	ae := NewCli(Config.Epoch.URL, true)
 
 	// Get back to RLP to calculate txhash
-	txRLP, _ := decode(txSignedBase64)
+	txRLP, _ := Decode(txSignedBase64)
 
 	// calculate the hash of the decoded txRLP
 	rlpTxHashRaw, _ := hash(txRLP)
 	// base58/64 encode the hash with the th_ prefix
-	signedEncodedTxHash := encode(PrefixTransactionHash, rlpTxHashRaw)
+	signedEncodedTxHash := Encode(PrefixTransactionHash, rlpTxHashRaw)
 
 	// send it to the network
 	err = postTransaction(ae.Epoch, txSignedBase64, signedEncodedTxHash)
@@ -123,24 +123,15 @@ func BroadcastTransaction(txSignedBase64 string) (err error) {
 }
 
 // NamePreclaim post a preclaim transaction to the chain
-func (n *Aens) NamePreclaim(name string) (tx, txHash, signature string, ttl uint64, nonce uint64, nameSalt int64, err error) {
-	// get the ttl offset
-	ttl, err = getAbsoluteHeight(n.epochCli, Config.Client.TTL)
-	if err != nil {
-		return
-	}
+func (n *Aens) NamePreclaim(name string) (tx, txHash, signature string, ttl uint64, nonce uint64, nameSalt uint64, err error) {
 	// calculate the commitment and get the preclaim salt
 	cm, salt, err := computeCommitmentID(name)
 	if err != nil {
 		return
 	}
-	// convert the stalt to a int64
-	nameSalt = int64(binary.BigEndian.Uint64(salt))
-	// get the account nonce
-	nonce, err = getNextNonce(n.epochCli, n.owner.Address)
-	if err != nil {
-		return
-	}
+	// convert the salt back into uint64 from binary
+	nameSalt = binary.BigEndian.Uint64(salt)
+
 	// build the transaction
 	txRaw, err := NamePreclaimTx(n.owner.Address, cm, Config.Client.Names.PreClaimFee, ttl, nonce)
 	if err != nil {
@@ -157,21 +148,11 @@ func (n *Aens) NamePreclaim(name string) (tx, txHash, signature string, ttl uint
 }
 
 // NameClaim perform a name claiming
-func (n *Aens) NameClaim(name string, nameSalt int64) (tx, txHash, signature string, ttl uint64, nonce uint64, err error) {
-	// get the ttl offset
-	ttl, err = getAbsoluteHeight(n.epochCli, Config.Client.TTL)
-	if err != nil {
-		return
-	}
-	// get the account nonce
-	nonce, err = getNextNonce(n.epochCli, n.owner.Address)
-	if err != nil {
-		return
-	}
+func (n *Aens) NameClaim(name string, nameSalt uint64) (tx, txHash, signature string, ttl uint64, nonce uint64, err error) {
 	//TODO: do we need the encoded name here?
 	// encodedName := encodeP(PrefixNameHash, []byte(name))
 	prefix := HashPrefix(name[0:3])
-	encodedName := encode(prefix, []byte(name))
+	encodedName := Encode(prefix, []byte(name))
 	// create the transaction
 	txRaw, err := NameClaimTx(n.owner.Address, encodedName, nameSalt, Config.Client.Names.ClaimFee, ttl, nonce)
 	if err != nil {
@@ -189,27 +170,13 @@ func (n *Aens) NameClaim(name string, nameSalt int64) (tx, txHash, signature str
 
 // NameUpdate perform a name update
 func (n *Aens) NameUpdate(name string, targetAddress string) (tx, txHash, signature string, ttl uint64, nonce uint64, err error) {
-	ttl, err = getAbsoluteHeight(n.epochCli, Config.Client.TTL)
-	if err != nil {
-		return
-	}
-	// get the account nonce
-	nonce, err = getNextNonce(n.epochCli, n.owner.Address)
-	if err != nil {
-		return
-	}
-
-	encodedNameHash := encode(PrefixName, namehash(name))
-	absClientTTL, err := getAbsoluteHeight(n.epochCli, Config.Client.Names.ClientTTL)
-	if err != nil {
-		return
-	}
-	absNameTTL, err := getAbsoluteHeight(n.epochCli, Config.Client.Names.NameTTL)
+	encodedNameHash := Encode(PrefixName, namehash(name))
+	absNameTTL, err := GetTTL(n.epochCli, Config.Client.Names.NameTTL)
 	if err != nil {
 		return
 	}
 	// create and sign the transaction
-	txRaw, err := NameUpdateTx(n.owner.Address, encodedNameHash, []string{targetAddress}, absNameTTL, absClientTTL, Config.Client.Names.UpdateFee, ttl, nonce)
+	txRaw, err := NameUpdateTx(n.owner.Address, encodedNameHash, []string{targetAddress}, absNameTTL, Config.Client.Names.ClientTTL, Config.Client.Names.UpdateFee, ttl, nonce)
 	if err != nil {
 		return
 	}
@@ -377,7 +344,7 @@ func GetWalletPath(path string) (walletPath string, err error) {
 
 // SignEncodeTxStr sign and encode a transaction format as string (ex. tx_xyz)
 func SignEncodeTxStr(kp *Account, txRaw string) (signedEncodedTx, signedEncodedTxHash, signature string, err error) {
-	txRawBytes, err := decode(txRaw)
+	txRawBytes, err := Decode(txRaw)
 	if err != nil {
 		fmt.Println("Error decoding tx from base64")
 		os.Exit(1)
@@ -389,7 +356,7 @@ func SignEncodeTxStr(kp *Account, txRaw string) (signedEncodedTx, signedEncodedT
 
 // VerifySignedTx verifies a tx_ with signature
 func VerifySignedTx(accountID string, txSignedBase64 string) (valid bool, err error) {
-	txSigned, _ := decode(txSignedBase64)
+	txSigned, _ := Decode(txSignedBase64)
 	txRLP := decodeRLPMessage(txSigned)
 
 	// RLP format of signed signature: [[Tag], [Version], [Signatures...], [Transaction]]

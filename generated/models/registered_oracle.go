@@ -19,6 +19,11 @@ import (
 // swagger:model RegisteredOracle
 type RegisteredOracle struct {
 
+	// abi version
+	// Maximum: 65535
+	// Minimum: 0
+	AbiVersion *int64 `json:"abi_version,omitempty"`
+
 	// id
 	// Required: true
 	ID EncodedHash `json:"id"`
@@ -40,14 +45,18 @@ type RegisteredOracle struct {
 	TTL *uint64 `json:"ttl"`
 
 	// vm version
-	// Required: true
+	// Maximum: 65535
 	// Minimum: 0
-	VMVersion *uint64 `json:"vm_version"`
+	VMVersion *int64 `json:"vm_version,omitempty"`
 }
 
 // Validate validates this registered oracle
 func (m *RegisteredOracle) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := m.validateAbiVersion(formats); err != nil {
+		res = append(res, err)
+	}
 
 	if err := m.validateID(formats); err != nil {
 		res = append(res, err)
@@ -76,6 +85,23 @@ func (m *RegisteredOracle) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *RegisteredOracle) validateAbiVersion(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.AbiVersion) { // not required
+		return nil
+	}
+
+	if err := validate.MinimumInt("abi_version", "body", int64(*m.AbiVersion), 0, false); err != nil {
+		return err
+	}
+
+	if err := validate.MaximumInt("abi_version", "body", int64(*m.AbiVersion), 65535, false); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -132,11 +158,15 @@ func (m *RegisteredOracle) validateTTL(formats strfmt.Registry) error {
 
 func (m *RegisteredOracle) validateVMVersion(formats strfmt.Registry) error {
 
-	if err := validate.Required("vm_version", "body", m.VMVersion); err != nil {
-		return err
+	if swag.IsZero(m.VMVersion) { // not required
+		return nil
 	}
 
 	if err := validate.MinimumInt("vm_version", "body", int64(*m.VMVersion), 0, false); err != nil {
+		return err
+	}
+
+	if err := validate.MaximumInt("vm_version", "body", int64(*m.VMVersion), 65535, false); err != nil {
 		return err
 	}
 

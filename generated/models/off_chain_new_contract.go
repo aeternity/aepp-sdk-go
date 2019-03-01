@@ -20,6 +20,11 @@ import (
 // swagger:model OffChainNewContract
 type OffChainNewContract struct {
 
+	// ABI version of the contract
+	// Maximum: 65535
+	// Minimum: 0
+	AbiVersion *int64 `json:"abi_version,omitempty"`
+
 	// Contract call data
 	// Required: true
 	CallData EncodedByteArray `json:"call_data"`
@@ -38,7 +43,9 @@ type OffChainNewContract struct {
 
 	// VM version of the contract
 	// Required: true
-	VMVersion *uint64 `json:"vm_version"`
+	// Maximum: 65535
+	// Minimum: 0
+	VMVersion *int64 `json:"vm_version"`
 }
 
 // Op gets the op of this subtype
@@ -50,6 +57,8 @@ func (m *OffChainNewContract) Op() string {
 func (m *OffChainNewContract) SetOp(val string) {
 
 }
+
+// AbiVersion gets the abi version of this subtype
 
 // CallData gets the call data of this subtype
 
@@ -64,6 +73,11 @@ func (m *OffChainNewContract) SetOp(val string) {
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
 func (m *OffChainNewContract) UnmarshalJSON(raw []byte) error {
 	var data struct {
+
+		// ABI version of the contract
+		// Maximum: 65535
+		// Minimum: 0
+		AbiVersion *int64 `json:"abi_version,omitempty"`
 
 		// Contract call data
 		// Required: true
@@ -83,7 +97,9 @@ func (m *OffChainNewContract) UnmarshalJSON(raw []byte) error {
 
 		// VM version of the contract
 		// Required: true
-		VMVersion *uint64 `json:"vm_version"`
+		// Maximum: 65535
+		// Minimum: 0
+		VMVersion *int64 `json:"vm_version"`
 	}
 	buf := bytes.NewBuffer(raw)
 	dec := json.NewDecoder(buf)
@@ -113,6 +129,8 @@ func (m *OffChainNewContract) UnmarshalJSON(raw []byte) error {
 		return errors.New(422, "invalid op value: %q", base.Op)
 	}
 
+	result.AbiVersion = data.AbiVersion
+
 	result.CallData = data.CallData
 
 	result.Code = data.Code
@@ -134,6 +152,11 @@ func (m OffChainNewContract) MarshalJSON() ([]byte, error) {
 	var err error
 	b1, err = json.Marshal(struct {
 
+		// ABI version of the contract
+		// Maximum: 65535
+		// Minimum: 0
+		AbiVersion *int64 `json:"abi_version,omitempty"`
+
 		// Contract call data
 		// Required: true
 		CallData EncodedByteArray `json:"call_data"`
@@ -152,8 +175,12 @@ func (m OffChainNewContract) MarshalJSON() ([]byte, error) {
 
 		// VM version of the contract
 		// Required: true
-		VMVersion *uint64 `json:"vm_version"`
+		// Maximum: 65535
+		// Minimum: 0
+		VMVersion *int64 `json:"vm_version"`
 	}{
+
+		AbiVersion: m.AbiVersion,
 
 		CallData: m.CallData,
 
@@ -187,6 +214,10 @@ func (m OffChainNewContract) MarshalJSON() ([]byte, error) {
 func (m *OffChainNewContract) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateAbiVersion(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateCallData(formats); err != nil {
 		res = append(res, err)
 	}
@@ -210,6 +241,23 @@ func (m *OffChainNewContract) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *OffChainNewContract) validateAbiVersion(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.AbiVersion) { // not required
+		return nil
+	}
+
+	if err := validate.MinimumInt("abi_version", "body", int64(*m.AbiVersion), 0, false); err != nil {
+		return err
+	}
+
+	if err := validate.MaximumInt("abi_version", "body", int64(*m.AbiVersion), 65535, false); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -267,6 +315,14 @@ func (m *OffChainNewContract) validateOwner(formats strfmt.Registry) error {
 func (m *OffChainNewContract) validateVMVersion(formats strfmt.Registry) error {
 
 	if err := validate.Required("vm_version", "body", m.VMVersion); err != nil {
+		return err
+	}
+
+	if err := validate.MinimumInt("vm_version", "body", int64(*m.VMVersion), 0, false); err != nil {
+		return err
+	}
+
+	if err := validate.MaximumInt("vm_version", "body", int64(*m.VMVersion), 65535, false); err != nil {
 		return err
 	}
 

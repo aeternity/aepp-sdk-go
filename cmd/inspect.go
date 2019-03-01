@@ -33,7 +33,7 @@ var inspectCmd = &cobra.Command{
 	Long: `Inspect an object of the chain
 
 Valid object to inspect are block hash, transaction hash, accounts`,
-	Run:  inspect,
+	RunE: inspectFunc,
 	Args: cobra.MinimumNArgs(1),
 }
 
@@ -60,7 +60,8 @@ func printResult(title string, v interface{}, err error) {
 	aeternity.PrintObject(title, v)
 }
 
-func inspect(cmd *cobra.Command, args []string) {
+func inspectFunc(cmd *cobra.Command, args []string) (err error) {
+	aeCli := NewAeCli()
 	for _, object := range args {
 		// height
 		if matched, _ := regexp.MatchString(`^\d+$`, object); matched {
@@ -71,6 +72,9 @@ func inspect(cmd *cobra.Command, args []string) {
 		// name
 		if strings.HasSuffix(object, ".aet") {
 			v, err := aeCli.APIGetNameEntryByName(object)
+			if err != nil {
+				return err
+			}
 			printResult("aens", v, err)
 			continue
 		}
@@ -79,31 +83,51 @@ func inspect(cmd *cobra.Command, args []string) {
 		case aeternity.PrefixAccountPubkey:
 			// account balance
 			v, err := aeCli.APIGetAccount(object)
+			if err != nil {
+				return err
+			}
+
 			printResult("account", v, err)
 
 		case aeternity.PrefixMicroBlockHash:
 			v, err := aeCli.APIGetMicroBlockHeaderByHash(object)
+			if err != nil {
+				return err
+			}
 			printResult("block", v, err)
 			v1, err := aeCli.APIGetMicroBlockTransactionsByHash(object)
+			if err != nil {
+				return err
+			}
 			printResult("transaction", v1, err)
 
 		case aeternity.PrefixKeyBlockHash:
 			// block
 			v, err := aeCli.APIGetKeyBlockByHash(object)
+			if err != nil {
+				return err
+			}
 			printResult("key-block", v, err)
 
 		case aeternity.PrefixTransactionHash:
 			// transaction
 			v, err := aeCli.APIGetTransactionByHash(object)
+			if err != nil {
+				return err
+			}
 			printResult("transaction", v, err)
 
 		case aeternity.PrefixOraclePubkey:
 			// oracle
 			v, err := aeCli.APIGetOracleByPubkey(object)
+			if err != nil {
+				return err
+			}
 			printResult("oracle", v, err)
 
 		default:
-			fmt.Println("Object", object, "not yet supported")
+			return fmt.Errorf("Object %v not yet supported", object)
 		}
 	}
+	return nil
 }

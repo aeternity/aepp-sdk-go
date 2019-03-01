@@ -15,9 +15,6 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/aeternity/aepp-sdk-go/aeternity"
 	"github.com/aeternity/aepp-sdk-go/utils"
 
@@ -30,7 +27,9 @@ var (
 	printPrivateKey bool
 	accountFileName string
 	password        string
-	fee             int64
+	fee             string // leave it as a string because viper cannot parse it directly into a BigInt
+	ttl             uint64
+	nonce           uint64
 )
 
 // accountCmd implements the account command
@@ -46,50 +45,69 @@ var addressCmd = &cobra.Command{
 	Short: "Print the aeternity account address",
 	Long:  ``,
 	Args:  cobra.ExactArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
-		// ask for th keystore password
-		p, err := utils.AskPassword("Enter the password to unlock the keystore: ")
-		if err != nil {
-			fmt.Println("Error reading the password: ", err)
-			os.Exit(1)
-		}
-		// load the account
-		account, err := aeternity.LoadAccountFromKeyStoreFile(args[0], p)
-		if err != nil {
-			fmt.Println("Error unlocking the keystore: ", err)
-			os.Exit(1)
-		}
-		aeternity.Pp("Account address", account.Address)
-		if printPrivateKey {
-			aeternity.Pp("Account private key", account.SigningKeyToHexString())
-		}
-	},
+	RunE:  addressFunc,
+}
+
+func getPassword() (p string, err error) {
+	if len(password) != 0 {
+		return password, nil
+	}
+	p, err = utils.AskPassword("Enter the password to unlock the keystore: ")
+	if err != nil {
+		return "", err
+	}
+	return p, nil
+}
+
+func addressFunc(cmd *cobra.Command, args []string) error {
+	p, err := getPassword()
+	if err != nil {
+		return err
+	}
+
+	// load the account
+	account, err := aeternity.LoadAccountFromKeyStoreFile(args[0], p)
+	if err != nil {
+		return err
+	}
+
+	aeternity.Pp("Account address", account.Address)
+	if printPrivateKey {
+		aeternity.Pp("Account private key", account.SigningKeyToHexString())
+	}
+
+	return nil
 }
 
 // createCmd implements the account generate subcommand
 var createCmd = &cobra.Command{
-	Use:   "create",
+	Use:   "create ACCOUNT_KEYSTORE",
 	Short: "Create a new account",
 	Long:  ``,
-	Run: func(cmd *cobra.Command, args []string) {
-		account, _ := aeternity.NewAccount()
-		// ask for password
-		p, err := utils.AskPassword("Enter a password for your keystore: ")
-		if err != nil {
-			fmt.Println("Error reading the password: ", err)
-			return
-		}
-		// check if a name was given
-		f, err := aeternity.StoreAccountToKeyStoreFile(account, p, accountFileName)
-		if err != nil {
-			fmt.Println("Error saving the keystore file: ", err)
-			return
-		}
-		aeternity.Pp(
-			"Wallet path", f,
-			"Account address", account.Address,
-		)
-	},
+	Args:  cobra.ExactArgs(1),
+	RunE:  createFunc,
+}
+
+func createFunc(cmd *cobra.Command, args []string) (err error) {
+	account, _ := aeternity.NewAccount()
+	p, err := getPassword()
+	if err != nil {
+		return err
+	}
+	accountFileName = args[0]
+
+	// check if a name was given
+	f, err := aeternity.StoreAccountToKeyStoreFile(account, p, accountFileName)
+	if err != nil {
+		return err
+	}
+
+	aeternity.Pp(
+		"Wallet path", f,
+		"Account address", account.Address,
+	)
+
+	return nil
 }
 
 // balanceCmd implements the account balance subcommand
@@ -98,26 +116,26 @@ var balanceCmd = &cobra.Command{
 	Short: "Get the balance of an account",
 	Long:  ``,
 	Args:  cobra.ExactArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
-		// ask for th keystore password
-		p, err := utils.AskPassword("Enter the password to unlock the keystore: ")
-		if err != nil {
-			fmt.Println("Error reading the password: ", err)
-			os.Exit(1)
-		}
-		// load the account
-		account, err := aeternity.LoadAccountFromKeyStoreFile(args[0], p)
-		if err != nil {
-			fmt.Println("Error unlocking the keystore: ", err)
-			os.Exit(1)
-		}
-		a, err := aeCli.APIGetAccount(account.Address)
-		if err != nil {
-			fmt.Println("Error retrieving the account: ", err)
-			os.Exit(1)
-		}
-		aeternity.PrintObject("account", a)
-	},
+	RunE:  balanceFunc,
+}
+
+func balanceFunc(cmd *cobra.Command, args []string) (err error) {
+	aeCli := NewAeCli()
+	p, err := getPassword()
+
+	// load the account
+	account, err := aeternity.LoadAccountFromKeyStoreFile(args[0], p)
+	if err != nil {
+		return err
+	}
+
+	a, err := aeCli.APIGetAccount(account.Address)
+	if err != nil {
+		return err
+	}
+
+	aeternity.PrintObject("account", a)
+	return nil
 }
 
 // signCmd implements the account sign subcommand
@@ -126,68 +144,60 @@ var signCmd = &cobra.Command{
 	Short: "Sign the input (e.g. a transaction)",
 	Long:  ``,
 	Args:  cobra.ExactArgs(2),
-	Run: func(cmd *cobra.Command, args []string) {
-		// ask for the keystore password
-		p, err := utils.AskPassword("Enter the password to unlock the keystore: ")
-		if err != nil {
-			fmt.Println("Error reading the password: ", err)
-			os.Exit(1)
-		}
-		// load the account
-		account, err := aeternity.LoadAccountFromKeyStoreFile(args[0], p)
-		if err != nil {
-			fmt.Println("Error unlocking the keystore: ", err)
-			os.Exit(1)
-		}
+	RunE:  signFunc,
+}
 
-		txUnsignedBase64 := args[1]
-		txSignedBase64, txHash, signature, err := aeternity.SignEncodeTxStr(account, txUnsignedBase64)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+func signFunc(cmd *cobra.Command, args []string) (err error) {
+	p, err := getPassword()
 
-		aeternity.Pp(
-			"Signing account address", account.Address,
-			"Signature", signature,
-			"Unsigned", txUnsignedBase64,
-			"Signed", txSignedBase64,
-			"Hash", txHash,
-		)
+	// load the account
+	account, err := aeternity.LoadAccountFromKeyStoreFile(args[0], p)
+	if err != nil {
+		return err
+	}
 
-	},
+	txUnsignedBase64 := args[1]
+	txSignedBase64, txHash, signature, err := aeternity.SignEncodeTxStr(account, txUnsignedBase64)
+	if err != nil {
+		return err
+	}
+
+	aeternity.Pp(
+		"Signing account address", account.Address,
+		"Signature", signature,
+		"Unsigned", txUnsignedBase64,
+		"Signed", txSignedBase64,
+		"Hash", txHash,
+	)
+	return nil
 }
 
 // saveCmd implements the account save subcommand
 var saveCmd = &cobra.Command{
-	Use:   "save ACCOUNT_HEX_STRING",
+	Use:   "save ACCOUNT_KEYSTORE ACCOUNT_HEX_STRING",
 	Short: "Save an account from a hex string to a keystore file",
 	Long:  ``,
 	Args:  cobra.ExactArgs(2),
-	Run: func(cmd *cobra.Command, args []string) {
-		accountFileName := args[0]
-		account, err := aeternity.AccountFromHexString(args[1])
-		if err != nil {
-			fmt.Println("Error parsing the private key hex string:", err)
-			return
-		}
+	RunE:  saveFunc,
+}
 
-		if len(password) == 0 {
-			var err error
-			password, err = utils.AskPassword("Enter a password for your keystore: ")
-			if err != nil {
-				fmt.Println("Error reading the password: ", err)
-				os.Exit(1)
-			}
-		}
+func saveFunc(cmd *cobra.Command, args []string) (err error) {
+	accountFileName := args[0]
+	account, err := aeternity.AccountFromHexString(args[1])
+	if err != nil {
+		return err
+	}
 
-		f, err := aeternity.StoreAccountToKeyStoreFile(account, password, accountFileName)
-		if err != nil {
-			fmt.Println("Error saving the keystore file: ", err)
-			return
-		}
-		aeternity.Pp("Keystore path ", f)
-	},
+	p, err := getPassword()
+
+	f, err := aeternity.StoreAccountToKeyStoreFile(account, p, accountFileName)
+	if err != nil {
+		return err
+	}
+
+	aeternity.Pp("Keystore path ", f)
+
+	return nil
 }
 
 func init() {
@@ -197,13 +207,7 @@ func init() {
 	accountCmd.AddCommand(saveCmd)
 	accountCmd.AddCommand(balanceCmd)
 	accountCmd.AddCommand(signCmd)
-
-	// account sign flags
-	signCmd.Flags().StringVar(&password, "password", "", "Read account password from stdin [WARN: this method is not secure]")
-	// account create flags
-	createCmd.Flags().StringVar(&accountFileName, "name", "", "Override the default name of a wallet")
-	// account save flags
-	saveCmd.Flags().StringVar(&password, "password", "", "Read account password from stdin [WARN: this method is not secure]")
+	accountCmd.PersistentFlags().StringVar(&password, "password", "", "Read account password from stdin [WARN: this method is not secure]")
 	// account address flags
 	addressCmd.Flags().BoolVar(&printPrivateKey, "private-key", false, "Print the private key as hex string")
 }

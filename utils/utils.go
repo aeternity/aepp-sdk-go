@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bufio"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math/big"
@@ -135,16 +136,57 @@ func AskPassword(question string) (password string, err error) {
 	return
 }
 
-// BigInt is used by swagger as a big.Int type with Validate() function
-type BigInt big.Int
+// BigInt is a big.Int, but includes a Validate() method for swagger
+// Once created, it can be used just like a big.Int.
+type BigInt struct {
+	*big.Int
+}
 
-// Validate only checks that the number is >=0
+// Validate is calls validate() to ensure that value is >= 0.
+// The actual validate() does not need 'formats' from swagger, which is why Validate() wraps validate().
 func (b *BigInt) Validate(formats strfmt.Registry) error {
+	return b.validate()
+}
+
+// validate checks that the number is >=0
+func (b *BigInt) validate() error {
 	var zero big.Int
-	var convertedCustomBigInt = big.Int(*b)
+	var convertedCustomBigInt = b
 
 	if convertedCustomBigInt.Cmp(&zero) != 1 {
 		return errors.New("swagger deserialization: Balance Validation failed")
 	}
 	return nil
+}
+
+// UnmarshalJSON implements encoding/json/RawMessage.UnmarshalJSON
+func (b *BigInt) UnmarshalJSON(data []byte) error {
+	err := json.Unmarshal(data, &b.Int)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// MarshalJSON calls json.Marshal() on the BigInt.Int field.
+func (b *BigInt) MarshalJSON() ([]byte, error) {
+	if b == nil {
+		return []byte("null"), nil
+	}
+	return json.Marshal(b.Int)
+}
+
+// NewBigInt creates a BigInt with its Int struct field
+func NewBigInt() (i *BigInt) {
+	return &BigInt{Int: &big.Int{}}
+}
+
+func NewBigIntStr(number string) (i *BigInt, err error) {
+	i = &BigInt{Int: new(big.Int)}
+	_, success := i.SetString(number, 10)
+	if success == false {
+		return nil, errors.New("Could not parse string as a number")
+	}
+	return i, nil
 }

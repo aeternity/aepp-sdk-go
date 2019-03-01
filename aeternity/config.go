@@ -1,5 +1,11 @@
 package aeternity
 
+import (
+	"math/big"
+
+	"github.com/aeternity/aepp-sdk-go/utils"
+)
+
 const (
 	// ConfigFilename default configuration file name
 	ConfigFilename = "config"
@@ -17,9 +23,9 @@ type EpochConfig struct {
 type AensConfig struct {
 	NameTTL     uint64 `json:"name_ttl" yaml:"name_ttl" mapstructure:"name_ttl"`
 	ClientTTL   uint64 `json:"client_ttl" yaml:"client_ttl" mapstructure:"client_ttl"`
-	PreClaimFee int64  `json:"preclaim_fee" yaml:"preclaim_fee" mapstructure:"preclaim_fee"`
-	ClaimFee    int64  `json:"claim_fee" yaml:"claim_fee" mapstructure:"claim_fee"`
-	UpdateFee   int64  `json:"update_fee" yaml:"update_fee" mapstructure:"update_fee"`
+	PreClaimFee uint64 `json:"preclaim_fee" yaml:"preclaim_fee" mapstructure:"preclaim_fee"`
+	ClaimFee    uint64 `json:"claim_fee" yaml:"claim_fee" mapstructure:"claim_fee"`
+	UpdateFee   uint64 `json:"update_fee" yaml:"update_fee" mapstructure:"update_fee"`
 }
 
 // ContractConfig configurations for contracts
@@ -45,7 +51,7 @@ type StateChannelConfig struct {
 // ClientConfig client paramters configuration
 type ClientConfig struct {
 	TTL                uint64             `json:"ttl" yaml:"ttl" mapstructure:"ttl"`
-	Fee                int64              `json:"fee" yaml:"fee" mapstructure:"fee"`
+	Fee                utils.BigInt       `json:"fee" yaml:"fee" mapstructure:"fee"`
 	DefaultKey         string             `json:"default_key_name" yaml:"default_key_name" mapstructure:"default_key_name"`
 	Names              AensConfig         `json:"names" yaml:"names" mapstructure:"names"`
 	Contracts          ContractConfig     `json:"contracts" yaml:"contracts" mapstructure:"contracts"`
@@ -77,24 +83,20 @@ type ProfileConfig struct {
 var Config = ProfileConfig{
 	Name: "Default Config",
 	Epoch: EpochConfig{
-		URL:         "https://sdk-edgenet.aepps.com",
-		URLInternal: "https://sdk-edgenet.aepps.com",
-		URLChannels: "https://sdk-edgenet.aepps.com",
+		URL:         "https://sdk-mainnet.aepps.com",
+		URLInternal: "https://sdk-mainnet.aepps.com",
+		URLChannels: "https://sdk-mainnet.aepps.com",
 		NetworkID:   "ae_mainnet",
 	},
 	Client: ClientConfig{
-		TTL:        500,
-		Fee:        20000,
-		DefaultKey: "wallet.key", // UNUSED
+		TTL: 500,
+		Fee: utils.BigInt{Int: big.NewInt(200000000000000)},
 		Names: AensConfig{
-			NameTTL:     500,
-			ClientTTL:   500,
-			PreClaimFee: 1,
-			ClaimFee:    1,
-			UpdateFee:   1,
+			NameTTL:   500,
+			ClientTTL: 500,
 		},
 		Contracts: ContractConfig{ // UNUSED
-			Gas:       1000,
+			Gas:       1e9,
 			GasPrice:  1,
 			Deposit:   0,
 			VMVersion: 0,

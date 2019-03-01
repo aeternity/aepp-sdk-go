@@ -19,10 +19,14 @@ import (
 // swagger:model ContractCreateTx
 type ContractCreateTx struct {
 
+	// ABI version
+	// Maximum: 65535
+	// Minimum: 0
+	AbiVersion *int64 `json:"abi_version,omitempty"`
+
 	// Amount
 	// Required: true
-	// Minimum: 0
-	Amount *int64 `json:"amount"`
+	Amount utils.BigInt `json:"amount"`
 
 	// Contract call data
 	// Required: true
@@ -64,7 +68,7 @@ type ContractCreateTx struct {
 
 	// Virtual machine's version
 	// Required: true
-	// Maximum: 255
+	// Maximum: 65535
 	// Minimum: 0
 	VMVersion *int64 `json:"vm_version"`
 }
@@ -72,6 +76,10 @@ type ContractCreateTx struct {
 // Validate validates this contract create tx
 func (m *ContractCreateTx) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := m.validateAbiVersion(formats); err != nil {
+		res = append(res, err)
+	}
 
 	if err := m.validateAmount(formats); err != nil {
 		res = append(res, err)
@@ -119,13 +127,29 @@ func (m *ContractCreateTx) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractCreateTx) validateAmount(formats strfmt.Registry) error {
+func (m *ContractCreateTx) validateAbiVersion(formats strfmt.Registry) error {
 
-	if err := validate.Required("amount", "body", m.Amount); err != nil {
+	if swag.IsZero(m.AbiVersion) { // not required
+		return nil
+	}
+
+	if err := validate.MinimumInt("abi_version", "body", int64(*m.AbiVersion), 0, false); err != nil {
 		return err
 	}
 
-	if err := validate.MinimumInt("amount", "body", int64(*m.Amount), 0, false); err != nil {
+	if err := validate.MaximumInt("abi_version", "body", int64(*m.AbiVersion), 65535, false); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *ContractCreateTx) validateAmount(formats strfmt.Registry) error {
+
+	if err := m.Amount.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("amount")
+		}
 		return err
 	}
 
@@ -239,7 +263,7 @@ func (m *ContractCreateTx) validateVMVersion(formats strfmt.Registry) error {
 		return err
 	}
 
-	if err := validate.MaximumInt("vm_version", "body", int64(*m.VMVersion), 255, false); err != nil {
+	if err := validate.MaximumInt("vm_version", "body", int64(*m.VMVersion), 65535, false); err != nil {
 		return err
 	}
 
