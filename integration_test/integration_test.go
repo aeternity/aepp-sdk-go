@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
+	"github.com/aeternity/aepp-sdk-go/utils"
 )
 
 func TestSpendTxWithNode(t *testing.T) {
@@ -33,14 +34,17 @@ func TestSpendTxWithNode(t *testing.T) {
 		fmt.Printf("Recipient already exists, expectedAmount after test is %s\n", expectedAmount.String())
 	}
 
-	fee := uint64(5e13)
+	amount := utils.NewBigInt()
+	amount.SetInt64(10)
+	fee := utils.NewBigInt()
+	fee.SetUint64(uint64(5e13))
 	ttl, nonce, err := aeternity.GetTTLNonce(aeCli.Epoch, sender, aeternity.Config.Client.TTL)
 	if err != nil {
 		t.Fatalf("Error in GetTTLNonce(): %v", err)
 	}
 
 	// create the SpendTransaction
-	base64TxMsg, err := aeternity.SpendTxStr(sender, recipient, 10, fee, ttl, nonce, message)
+	base64TxMsg, err := aeternity.SpendTxStr(sender, recipient, *amount, *fee, ttl, nonce, message)
 	if err != nil {
 		t.Fatalf("SpendTx errored out: %v", err)
 	}

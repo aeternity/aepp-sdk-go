@@ -1,5 +1,11 @@
 package aeternity
 
+import (
+	"math/big"
+
+	"github.com/aeternity/aepp-sdk-go/utils"
+)
+
 const (
 	// ConfigFilename default configuration file name
 	ConfigFilename = "config"
@@ -45,7 +51,7 @@ type StateChannelConfig struct {
 // ClientConfig client paramters configuration
 type ClientConfig struct {
 	TTL                uint64             `json:"ttl" yaml:"ttl" mapstructure:"ttl"`
-	Fee                uint64             `json:"fee" yaml:"fee" mapstructure:"fee"`
+	Fee                utils.BigInt       `json:"fee" yaml:"fee" mapstructure:"fee"`
 	DefaultKey         string             `json:"default_key_name" yaml:"default_key_name" mapstructure:"default_key_name"`
 	Names              AensConfig         `json:"names" yaml:"names" mapstructure:"names"`
 	Contracts          ContractConfig     `json:"contracts" yaml:"contracts" mapstructure:"contracts"`
@@ -84,7 +90,7 @@ var Config = ProfileConfig{
 	},
 	Client: ClientConfig{
 		TTL: 500,
-		Fee: 2e14,
+		Fee: utils.BigInt{Int: big.NewInt(200000000000000)},
 		Names: AensConfig{
 			NameTTL:   500,
 			ClientTTL: 500,

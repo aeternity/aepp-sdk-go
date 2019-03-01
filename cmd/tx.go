@@ -3,7 +3,9 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"strconv"
+	"math/big"
+
+	"github.com/aeternity/aepp-sdk-go/utils"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
 
@@ -31,13 +33,15 @@ func txSpendFunc(cmd *cobra.Command, args []string) (err error) {
 	var (
 		sender    string
 		recipient string
-		amount    uint64 // TODO potential problem with uint64 not big.Int
+		amount    *utils.BigInt
+		feeBigInt *utils.BigInt
 	)
 
 	// Load variables from arguments
 	sender = args[0]
 	recipient = args[1]
-	amount, _ = strconv.ParseUint(args[2], 10, 64)
+	amount, err = utils.NewBigIntStr(args[2])
+	feeBigInt, _ = utils.NewBigIntStr(fee)
 
 	// Validate arguments
 	if len(sender) == 0 {
@@ -46,14 +50,14 @@ func txSpendFunc(cmd *cobra.Command, args []string) (err error) {
 	if len(recipient) == 0 {
 		return errors.New("Error, missing or invalid recipient address")
 	}
-	if amount <= 0 {
+	if amount.Cmp(big.NewInt(0)) == -1 {
 		return errors.New("Error, missing or invalid amount")
 	}
-	if fee <= 0 {
+	if feeBigInt.Cmp(big.NewInt(0)) == -1 {
 		return errors.New("Error, missing or invalid fee")
 	}
 
-	base64Tx, err := aeternity.SpendTxStr(sender, recipient, amount, fee, ttl, nonce, "")
+	base64Tx, err := aeternity.SpendTxStr(sender, recipient, *amount, *feeBigInt, ttl, nonce, "")
 	if err != nil {
 		return err
 	}
@@ -108,7 +112,7 @@ func init() {
 	txCmd.AddCommand(txVerifyCmd)
 
 	// tx spend command
-	txSpendCmd.Flags().Uint64Var(&fee, "fee", aeternity.Config.Client.Fee, fmt.Sprintf("Set the transaction fee (default=%d)", aeternity.Config.Client.Fee))
+	txSpendCmd.Flags().StringVar(&fee, "fee", aeternity.Config.Client.Fee.String(), fmt.Sprintf("Set the transaction fee (default=%s)", aeternity.Config.Client.Fee.String()))
 	txSpendCmd.Flags().Uint64Var(&ttl, "ttl", aeternity.Config.Client.TTL, fmt.Sprintf("Set the TTL in keyblocks (default=%d)", aeternity.Config.Client.TTL))
 	txSpendCmd.Flags().Uint64Var(&nonce, "nonce", 0, fmt.Sprint("Set the sender account nonce, if not the chain will be queried for its value"))
 }

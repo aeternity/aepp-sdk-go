@@ -27,7 +27,7 @@ var (
 	printPrivateKey bool
 	accountFileName string
 	password        string
-	fee             uint64
+	fee             string // leave it as a string because viper cannot parse it directly into a BigInt
 	ttl             uint64
 	nonce           uint64
 )
