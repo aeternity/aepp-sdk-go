@@ -1,8 +1,6 @@
 package aeternity
 
 import (
-	"math/big"
-
 	"github.com/aeternity/aepp-sdk-go/utils"
 )
 
@@ -90,7 +88,7 @@ var Config = ProfileConfig{
 	},
 	Client: ClientConfig{
 		TTL: 500,
-		Fee: utils.BigInt{Int: big.NewInt(200000000000000)},
+		Fee: *utils.RequireBigIntFromString("200000000000000"),
 		Names: AensConfig{
 			NameTTL:   500,
 			ClientTTL: 500,

@@ -2,7 +2,6 @@ package utils
 
 import (
 	"bufio"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"math/big"
@@ -136,57 +135,58 @@ func AskPassword(question string) (password string, err error) {
 	return
 }
 
-// BigInt is a big.Int, but includes a Validate() method for swagger
+// BigInt is composed of a big.Int, but includes a Validate() method for swagger and other convenience functions.
 // Once created, it can be used just like a big.Int.
 type BigInt struct {
-	*big.Int
+	big.Int
 }
 
 // Validate is calls validate() to ensure that value is >= 0.
 // The actual validate() does not need 'formats' from swagger, which is why Validate() wraps validate().
-func (b *BigInt) Validate(formats strfmt.Registry) error {
-	return b.validate()
+func (b BigInt) Validate(formats strfmt.Registry) error {
+	return b.LargerOrEqualToZero()
 }
 
-// validate checks that the number is >=0
-func (b *BigInt) validate() error {
-	var zero big.Int
-	var convertedCustomBigInt = b
+// LargerThanZero checks that the number is >=0
+func (b BigInt) LargerThanZero() error {
+	zero := NewBigInt()
 
-	if convertedCustomBigInt.Cmp(&zero) != 1 {
-		return errors.New("swagger deserialization: Balance Validation failed")
+	if b.Cmp(&zero.Int) != 1 {
+		return fmt.Errorf("%v was not larger than 0", b.Int.String())
 	}
 	return nil
 }
 
-// UnmarshalJSON implements encoding/json/RawMessage.UnmarshalJSON
-func (b *BigInt) UnmarshalJSON(data []byte) error {
-	err := json.Unmarshal(data, &b.Int)
-	if err != nil {
-		return err
-	}
+// LargerOrEqualToZero checks that the number is >=0
+func (b BigInt) LargerOrEqualToZero() error {
+	zero := NewBigInt()
 
+	if b.Cmp(&zero.Int) == -1 {
+		return fmt.Errorf("%v was negative", b.Int.String())
+	}
 	return nil
 }
 
-// MarshalJSON calls json.Marshal() on the BigInt.Int field.
-func (b *BigInt) MarshalJSON() ([]byte, error) {
-	if b == nil {
-		return []byte("null"), nil
-	}
-	return json.Marshal(b.Int)
-}
-
-// NewBigInt creates a BigInt with its Int struct field
+// NewBigInt returns a new BigInt with its Int struct field initialized
 func NewBigInt() (i *BigInt) {
-	return &BigInt{Int: &big.Int{}}
+	return &BigInt{Int: big.Int{}}
 }
 
-func NewBigIntStr(number string) (i *BigInt, err error) {
-	i = &BigInt{Int: new(big.Int)}
+// NewBigIntFromString returns a new BigInt from a string representation
+func NewBigIntFromString(number string) (i *BigInt, err error) {
+	i = &BigInt{Int: big.Int{}}
 	_, success := i.SetString(number, 10)
 	if success == false {
 		return nil, errors.New("Could not parse string as a number")
 	}
 	return i, nil
+}
+
+// RequireBigIntFromString returns a new BigInt from a string representation or panics if NewBigIntFromString would have returned an error.
+func RequireBigIntFromString(number string) *BigInt {
+	i, err := NewBigIntFromString(number)
+	if err != nil {
+		panic(err)
+	}
+	return i
 }

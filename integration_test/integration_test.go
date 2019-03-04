@@ -30,14 +30,14 @@ func TestSpendTxWithNode(t *testing.T) {
 	if err != nil {
 		expectedAmount.SetInt64(10)
 	} else {
-		expectedAmount.Add(recipientAccount.Balance.Int, big.NewInt(10))
-		fmt.Printf("Recipient already exists, expectedAmount after test is %s\n", expectedAmount.String())
+		expectedAmount.Add(&recipientAccount.Balance.Int, big.NewInt(10))
+		fmt.Printf("Recipient already exists with balance %v, expectedAmount after test is %s\n", recipientAccount.Balance.String(), expectedAmount.String())
 	}
 
 	amount := utils.NewBigInt()
 	amount.SetInt64(10)
 	fee := utils.NewBigInt()
-	fee.SetUint64(uint64(5e13))
+	fee.SetUint64(uint64(2e13))
 	ttl, nonce, err := aeternity.GetTTLNonce(aeCli.Epoch, sender, aeternity.Config.Client.TTL)
 	if err != nil {
 		t.Fatalf("Error in GetTTLNonce(): %v", err)
@@ -72,6 +72,6 @@ func TestSpendTxWithNode(t *testing.T) {
 	}
 
 	if recipientAccount.Balance.Cmp(&expectedAmount) != 0 {
-		t.Fatalf("Recipient should have %v, but has %v instead", expectedAmount, recipientAccount.Balance.Int)
+		t.Fatalf("Recipient should have %v, but has %v instead", expectedAmount.String(), recipientAccount.Balance.String())
 	}
 }
