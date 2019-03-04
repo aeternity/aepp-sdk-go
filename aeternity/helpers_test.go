@@ -11,9 +11,9 @@ import (
 func TestSpendTxStr(t *testing.T) {
 	sender := "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"
 	recipient := "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v"
-	amount := utils.BigInt{Int: &big.Int{}}
+	amount := utils.BigInt{Int: big.Int{}}
 	amount.SetInt64(10)
-	fee := utils.BigInt{Int: &big.Int{}}
+	fee := utils.BigInt{Int: big.Int{}}
 	fee.SetInt64(10)
 	message := "Hello World"
 	ttl := uint64(10)
