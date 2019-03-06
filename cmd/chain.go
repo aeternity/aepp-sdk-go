@@ -59,7 +59,7 @@ func statusFunc(cmd *cobra.Command, args []string) (err error) {
 	if err != nil {
 		return err
 	}
-	aeternity.PrintObject("epoch node", v)
+	aeternity.PrintObject("node", v)
 	return nil
 }
 

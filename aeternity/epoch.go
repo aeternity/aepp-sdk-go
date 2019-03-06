@@ -8,7 +8,7 @@ import (
 
 // Ae the aeternity client
 type Ae struct {
-	*apiclient.Epoch
+	*apiclient.Node
 	*Wallet
 	*Aens
 	*Contract
@@ -16,13 +16,13 @@ type Ae struct {
 
 // Wallet high level abstraction for operation on a wallet
 type Wallet struct {
-	epochCli *apiclient.Epoch
-	owner    *Account
+	nodeCli *apiclient.Node
+	owner   *Account
 }
 
 // Aens abstractions for aens operations
 type Aens struct {
-	epochCli     *apiclient.Epoch
+	nodeCli      *apiclient.Node
 	owner        *Account
 	name         string
 	preClaimSalt []byte
@@ -30,61 +30,61 @@ type Aens struct {
 
 // Contract abstractions for contracts
 type Contract struct {
-	epochCli *apiclient.Epoch
-	owner    *Account
-	source   string
+	nodeCli *apiclient.Node
+	owner   *Account
+	source  string
 }
 
 // Oracle abstractions for oracles
 type Oracle struct {
-	epochCli *apiclient.Epoch
-	owner    *Account
+	nodeCli *apiclient.Node
+	owner   *Account
 }
 
-// NewCli obtain a new epochCli instance
-func NewCli(epochURL string, debug bool) *Ae {
+// NewCli obtain a new nodeCli instance
+func NewCli(nodeURL string, debug bool) *Ae {
 	// create the transport
-	host, schemas := urlComponents(epochURL)
+	host, schemas := urlComponents(nodeURL)
 	transport := httptransport.New(host, "/v2", schemas)
 	transport.SetDebug(debug)
 	// create the API client, with the transport
 	openAPIClinet := apiclient.New(transport, strfmt.Default)
 	aecli := &Ae{
-		Epoch: openAPIClinet,
+		Node: openAPIClinet,
 		Wallet: &Wallet{
-			epochCli: openAPIClinet,
+			nodeCli: openAPIClinet,
 		},
 		Aens: &Aens{
-			epochCli: openAPIClinet,
+			nodeCli: openAPIClinet,
 		},
 		Contract: &Contract{
-			epochCli: openAPIClinet,
+			nodeCli: openAPIClinet,
 		},
 	}
 	return aecli
 }
 
-// NewCliW obtain a new epochCli instance
-func NewCliW(epochURL string, kp *Account, debug bool) *Ae {
+// NewCliW obtain a new nodeCli instance
+func NewCliW(nodeURL string, kp *Account, debug bool) *Ae {
 	// create the transport
-	host, schemas := urlComponents(epochURL)
+	host, schemas := urlComponents(nodeURL)
 	transport := httptransport.New(host, "/v2", schemas)
 	transport.SetDebug(debug)
 	// create the API client, with the transport
 	openAPIClinet := apiclient.New(transport, strfmt.Default)
 	aecli := &Ae{
-		Epoch: openAPIClinet,
+		Node: openAPIClinet,
 		Wallet: &Wallet{
-			epochCli: openAPIClinet,
-			owner:    kp,
+			nodeCli: openAPIClinet,
+			owner:   kp,
 		},
 		Aens: &Aens{
-			epochCli: openAPIClinet,
-			owner:    kp,
+			nodeCli: openAPIClinet,
+			owner:   kp,
 		},
 		Contract: &Contract{
-			epochCli: openAPIClinet,
-			owner:    kp,
+			nodeCli: openAPIClinet,
+			owner:   kp,
 		},
 	}
 	return aecli

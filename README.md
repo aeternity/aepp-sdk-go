@@ -16,5 +16,5 @@ replace every integer (int64) with a uint64 in the swagger.json
 generate the client (using [go-swagger](https://github.com/go-swagger/go-swagger))
 
 ```
-rm -rf generated/* && swagger generate client -f api/swagger.json -A epoch  --with-flatten=minimal --target generated  --tags=external --api-package=operations --client-package=client
+rm -rf generated/* && swagger generate client -f api/swagger.json -A node  --with-flatten=minimal --target generated  --tags=external --api-package=operations --client-package=client
 ```

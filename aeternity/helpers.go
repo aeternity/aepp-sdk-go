@@ -29,8 +29,8 @@ func urlComponents(url string) (host string, schemas []string) {
 }
 
 // GetTTL returns the chain height + offset
-func GetTTL(epochCli *apiclient.Epoch, offset uint64) (height uint64, err error) {
-	kb, err := getTopBlock(epochCli)
+func GetTTL(nodeCli *apiclient.Node, offset uint64) (height uint64, err error) {
+	kb, err := getTopBlock(nodeCli)
 	if err != nil {
 		return
 	}
@@ -43,8 +43,8 @@ func GetTTL(epochCli *apiclient.Epoch, offset uint64) (height uint64, err error)
 }
 
 // GetNextNonce retrieves the current nonce for an account + 1
-func GetNextNonce(epochCli *apiclient.Epoch, accountID string) (nextNonce uint64, err error) {
-	a, err := getAccount(epochCli, accountID)
+func GetNextNonce(nodeCli *apiclient.Node, accountID string) (nextNonce uint64, err error) {
+	a, err := getAccount(nodeCli, accountID)
 	if err != nil {
 		return
 	}
@@ -53,13 +53,13 @@ func GetNextNonce(epochCli *apiclient.Epoch, accountID string) (nextNonce uint64
 }
 
 // GetTTLNonce is a convenience function that combines GetTTL() and GetNextNonce()
-func GetTTLNonce(epochCli *apiclient.Epoch, accountID string, offset uint64) (ttl, nonce uint64, err error) {
-	ttl, err = GetTTL(epochCli, offset)
+func GetTTLNonce(nodeCli *apiclient.Node, accountID string, offset uint64) (ttl, nonce uint64, err error) {
+	ttl, err = GetTTL(nodeCli, offset)
 	if err != nil {
 		return 0, 0, err
 	}
 
-	nonce, err = GetNextNonce(epochCli, accountID)
+	nonce, err = GetNextNonce(nodeCli, accountID)
 	if err != nil {
 		return 0, 0, err
 	}
@@ -68,7 +68,7 @@ func GetTTLNonce(epochCli *apiclient.Epoch, accountID string, offset uint64) (tt
 }
 
 // waitForTransaction to appear on the chain
-func waitForTransaction(epochCli *apiclient.Epoch, txHash string) (blockHeight uint64, blockHash string, err error) {
+func waitForTransaction(nodeCli *apiclient.Node, txHash string) (blockHeight uint64, blockHash string, err error) {
 	// caclulate the date for the timeout
 	ctm := Config.Tuning.ChainTimeout
 	tm := time.Now().Add(time.Millisecond * time.Duration(ctm))
@@ -79,7 +79,7 @@ func waitForTransaction(epochCli *apiclient.Epoch, txHash string) (blockHeight u
 			err = fmt.Errorf("Timeout waiting for the transaction to appear")
 			break // timeout execed
 		}
-		tx, err := getTransactionByHash(epochCli, txHash)
+		tx, err := getTransactionByHash(nodeCli, txHash)
 		if err != nil {
 			break
 		}
@@ -107,7 +107,7 @@ func SpendTxStr(sender, recipient string, amount, fee utils.BigInt, ttl, nonce u
 
 // BroadcastTransaction recalculates the transaction hash and sends the transaction to the node.
 func BroadcastTransaction(txSignedBase64 string) (err error) {
-	ae := NewCli(Config.Epoch.URL, true)
+	ae := NewCli(Config.Node.URL, true)
 
 	// Get back to RLP to calculate txhash
 	txRLP, _ := Decode(txSignedBase64)
@@ -118,7 +118,7 @@ func BroadcastTransaction(txSignedBase64 string) (err error) {
 	signedEncodedTxHash := Encode(PrefixTransactionHash, rlpTxHashRaw)
 
 	// send it to the network
-	err = postTransaction(ae.Epoch, txSignedBase64, signedEncodedTxHash)
+	err = postTransaction(ae.Node, txSignedBase64, signedEncodedTxHash)
 	return
 }
 
@@ -138,12 +138,12 @@ func (n *Aens) NamePreclaim(name string) (tx, txHash, signature string, ttl uint
 		return
 	}
 	// sign the transaction
-	tx, txHash, signature, err = SignEncodeTx(n.owner, txRaw, Config.Epoch.NetworkID)
+	tx, txHash, signature, err = SignEncodeTx(n.owner, txRaw, Config.Node.NetworkID)
 	if err != nil {
 		return
 	}
 	// post transaction to the chain
-	err = postTransaction(n.epochCli, tx, txHash)
+	err = postTransaction(n.nodeCli, tx, txHash)
 	return
 }
 
@@ -159,19 +159,19 @@ func (n *Aens) NameClaim(name string, nameSalt uint64) (tx, txHash, signature st
 		return
 	}
 	// sign the transaction
-	tx, txHash, signature, err = SignEncodeTx(n.owner, txRaw, Config.Epoch.NetworkID)
+	tx, txHash, signature, err = SignEncodeTx(n.owner, txRaw, Config.Node.NetworkID)
 	if err != nil {
 		return
 	}
 	// post transaction to the chain
-	err = postTransaction(n.epochCli, tx, txHash)
+	err = postTransaction(n.nodeCli, tx, txHash)
 	return
 }
 
 // NameUpdate perform a name update
 func (n *Aens) NameUpdate(name string, targetAddress string) (tx, txHash, signature string, ttl uint64, nonce uint64, err error) {
 	encodedNameHash := Encode(PrefixName, namehash(name))
-	absNameTTL, err := GetTTL(n.epochCli, Config.Client.Names.NameTTL)
+	absNameTTL, err := GetTTL(n.nodeCli, Config.Client.Names.NameTTL)
 	if err != nil {
 		return
 	}
@@ -181,12 +181,12 @@ func (n *Aens) NameUpdate(name string, targetAddress string) (tx, txHash, signat
 		return
 	}
 	// sign the transaction
-	tx, txHash, signature, err = SignEncodeTx(n.owner, txRaw, Config.Epoch.NetworkID)
+	tx, txHash, signature, err = SignEncodeTx(n.owner, txRaw, Config.Node.NetworkID)
 	if err != nil {
 		return
 	}
 	// post transaction to the chain
-	err = postTransaction(n.epochCli, tx, txHash)
+	err = postTransaction(n.nodeCli, tx, txHash)
 	return
 }
 
@@ -232,7 +232,7 @@ func (ae *Ae) PrintGenerationByHeight(height uint64) {
 
 // WaitForTransactionUntillHeight waits for a transaction until heightLimit (inclusive) is reached
 func (ae *Ae) WaitForTransactionUntillHeight(height uint64, txHash string) (blockHeight uint64, blockHash, microBlockHash string, tx *models.GenericSignedTx, err error) {
-	kb, err := getCurrentKeyBlock(ae.Epoch)
+	kb, err := getCurrentKeyBlock(ae.Node)
 	if err != nil {
 		return
 	}
@@ -285,7 +285,7 @@ Main:
 			targetHeight = nextHeight
 		}
 		// update nextHeight
-		kb, err = getCurrentKeyBlock(ae.Epoch)
+		kb, err = getCurrentKeyBlock(ae.Node)
 		if err != nil {
 			break
 		}
@@ -350,7 +350,7 @@ func SignEncodeTxStr(kp *Account, txRaw string) (signedEncodedTx, signedEncodedT
 		os.Exit(1)
 	}
 
-	signedEncodedTx, signedEncodedTxHash, signature, err = SignEncodeTx(kp, txRawBytes, Config.Epoch.NetworkID)
+	signedEncodedTx, signedEncodedTxHash, signature, err = SignEncodeTx(kp, txRawBytes, Config.Node.NetworkID)
 	return
 }
 
@@ -363,7 +363,7 @@ func VerifySignedTx(accountID string, txSignedBase64 string) (valid bool, err er
 	tx := txRLP[3].([]byte)
 	txSignature := txRLP[2].([]interface{})[0].([]byte)
 
-	msg := append([]byte(Config.Epoch.NetworkID), tx...)
+	msg := append([]byte(Config.Node.NetworkID), tx...)
 
 	valid, err = Verify(accountID, msg, txSignature)
 	if err != nil {

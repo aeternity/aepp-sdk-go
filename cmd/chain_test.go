@@ -11,8 +11,8 @@ import (
 // For now, just verify that none of the commands segfault.
 
 func setConfigTestParams() {
-	aeternity.Config.Epoch.URL = "http://localhost:3013"
-	aeternity.Config.Epoch.NetworkID = "ae_docker"
+	aeternity.Config.Node.URL = "http://localhost:3013"
+	aeternity.Config.Node.NetworkID = "ae_docker"
 }
 
 func TestChainTop(t *testing.T) {

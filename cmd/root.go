@@ -50,21 +50,21 @@ func Execute(v string) {
 // config vars to be read immediately, with this helper function you can
 // defer the reading of the variables until the subcommand's execution)
 func NewAeCli() *aeternity.Ae {
-	return aeternity.NewCli(aeternity.Config.Epoch.URL, debug)
+	return aeternity.NewCli(aeternity.Config.Node.URL, debug)
 }
 
 func init() {
 	// cobra.OnInitialize(initConfig)
 	viper.AutomaticEnv() // read in environment variables that match
 	viper.SetEnvPrefix("AETERNITY")
-	viper.SetDefault("external-api", aeternity.Config.Epoch.URL)
-	viper.SetDefault("network-id", aeternity.Config.Epoch.NetworkID)
+	viper.SetDefault("external-api", aeternity.Config.Node.URL)
+	viper.SetDefault("network-id", aeternity.Config.Node.NetworkID)
 
 	// Here you will define your flags and configuration settings.
 	// Cobra supports Persistent Flags, which, if defined here,
 	// will be global for your application.
-	RootCmd.PersistentFlags().StringVarP(&aeternity.Config.Epoch.URL, "external-api", "u", viper.GetString("EXTERNAL_API"), "node external API endpoint")
-	RootCmd.PersistentFlags().StringVarP(&aeternity.Config.Epoch.NetworkID, "network-id", "n", viper.GetString("NETWORK_ID"), "network ID for custom private net")
+	RootCmd.PersistentFlags().StringVarP(&aeternity.Config.Node.URL, "external-api", "u", viper.GetString("EXTERNAL_API"), "node external API endpoint")
+	RootCmd.PersistentFlags().StringVarP(&aeternity.Config.Node.NetworkID, "network-id", "n", viper.GetString("NETWORK_ID"), "network ID for custom private net")
 	RootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "enable debug")
 	RootCmd.PersistentFlags().BoolVar(&outputFormatJSON, "json", false, "print output in json format")
 }
