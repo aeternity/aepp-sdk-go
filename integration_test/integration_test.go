@@ -20,9 +20,9 @@ func TestSpendTxWithNode(t *testing.T) {
 	recipient := "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v"
 	message := "Hello World"
 
-	aeternity.Config.Epoch.URL = "http://localhost:3013"
-	aeternity.Config.Epoch.NetworkID = "ae_docker"
-	aeCli := aeternity.NewCli(aeternity.Config.Epoch.URL, false)
+	aeternity.Config.Node.URL = "http://localhost:3013"
+	aeternity.Config.Node.NetworkID = "ae_docker"
+	aeCli := aeternity.NewCli(aeternity.Config.Node.URL, false)
 
 	// In case this test has been run before, get recipient's account info. If it exists, expectedAmount = amount + 10
 	var expectedAmount big.Int
@@ -38,7 +38,7 @@ func TestSpendTxWithNode(t *testing.T) {
 	amount.SetInt64(10)
 	fee := utils.NewBigInt()
 	fee.SetUint64(uint64(2e13))
-	ttl, nonce, err := aeternity.GetTTLNonce(aeCli.Epoch, sender, aeternity.Config.Client.TTL)
+	ttl, nonce, err := aeternity.GetTTLNonce(aeCli.Node, sender, aeternity.Config.Client.TTL)
 	if err != nil {
 		t.Fatalf("Error in GetTTLNonce(): %v", err)
 	}

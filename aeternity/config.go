@@ -9,8 +9,8 @@ const (
 	ConfigFilename = "config"
 )
 
-// EpochConfig configuration for the epoch node
-type EpochConfig struct {
+// NodeConfig configuration for the node node
+type NodeConfig struct {
 	URL         string `yaml:"url" json:"url" mapstructure:"url"`
 	URLInternal string `yaml:"url_internal" json:"url_internal" mapstructure:"url_internal"`
 	URLChannels string `yaml:"url_channels" json:"url_channels" mapstructure:"url_channels"`
@@ -72,7 +72,7 @@ type TuningConfig struct {
 // ProfileConfig a configuration profile
 type ProfileConfig struct {
 	Name   string       `json:"name" yaml:"name" mapstructure:"name"`
-	Epoch  EpochConfig  `json:"epoch" yaml:"epoch" mapstructure:"epoch"`
+	Node   NodeConfig   `json:"node" yaml:"node" mapstructure:"node"`
 	Client ClientConfig `json:"client" yaml:"client" mapstructure:"client"`
 	Tuning TuningConfig `json:"tuning" yaml:"tuning" mapstructure:"tuning"`
 }
@@ -80,7 +80,7 @@ type ProfileConfig struct {
 // Config sytem configuration
 var Config = ProfileConfig{
 	Name: "Default Config",
-	Epoch: EpochConfig{
+	Node: NodeConfig{
 		URL:         "https://sdk-mainnet.aepps.com",
 		URLInternal: "https://sdk-mainnet.aepps.com",
 		URLChannels: "https://sdk-mainnet.aepps.com",
