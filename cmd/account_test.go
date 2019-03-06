@@ -80,8 +80,8 @@ func TestAccountBalanceNotFound(t *testing.T) {
 		t.Error(err)
 	}
 	err = balanceFunc(&emptyCmd, []string{"test.json"})
-	if err == nil {
-		t.Error("Expected 'Account not found' error but got nil instead")
+	if err.Error() != "Error: Account not found" {
+		t.Errorf("Expected 'Account not found' error but got %s instead", err.Error())
 	}
 }
 

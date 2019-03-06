@@ -102,7 +102,7 @@ func getErrorReason(v interface{}) (msg string) {
 			}
 		case reflect.Struct:
 			if v.Type() == reflect.TypeOf(models.Error{}) {
-				msg = fmt.Sprint(v.FieldByName("Reason"))
+				msg = fmt.Sprint(reflect.Indirect(v.FieldByName("Reason")))
 				break
 			}
 			for i := 0; i < v.NumField(); i++ {
