@@ -44,14 +44,14 @@ func TestSpendTxWithNode(t *testing.T) {
 	}
 
 	// create the SpendTransaction
-	base64TxMsg, err := aeternity.SpendTxStr(sender, recipient, *amount, *fee, ttl, nonce, message)
+	base64TxMsg, err := aeternity.SpendTxStr(sender, recipient, *amount, *fee, message, ttl, nonce)
 	if err != nil {
 		t.Fatalf("SpendTx errored out: %v", err)
 	}
 	fmt.Println(base64TxMsg)
 
 	// sign the transaction, output params for debugging
-	signedBase64TxMsg, txHash, signature, err := aeternity.SignEncodeTxStr(senderAccount, base64TxMsg)
+	signedBase64TxMsg, txHash, signature, err := aeternity.SignEncodeTxStr(senderAccount, base64TxMsg, aeternity.Config.Node.NetworkID)
 	if err != nil {
 		t.Error(err)
 	}
