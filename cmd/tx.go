@@ -57,7 +57,7 @@ func txSpendFunc(cmd *cobra.Command, args []string) (err error) {
 		return errors.New("Error, missing or invalid fee")
 	}
 
-	base64Tx, err := aeternity.SpendTxStr(sender, recipient, *amount, *feeBigInt, ttl, nonce, "")
+	base64Tx, err := aeternity.SpendTxStr(sender, recipient, *amount, *feeBigInt, "", ttl, nonce)
 	if err != nil {
 		return err
 	}
@@ -97,7 +97,7 @@ func txVerifyFunc(cmd *cobra.Command, args []string) (err error) {
 	if len(txSignedBase64) == 0 || txSignedBase64[0:3] != "tx_" {
 		return errors.New("Error, missing or invalid base64 encoded transaction")
 	}
-	valid, err := aeternity.VerifySignedTx(sender, txSignedBase64)
+	valid, err := aeternity.VerifySignedTx(sender, txSignedBase64, aeternity.Config.Node.NetworkID)
 	if err != nil {
 		err := fmt.Errorf("error while verifying signature: %s", err)
 		return err

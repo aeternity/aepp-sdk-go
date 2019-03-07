@@ -94,8 +94,8 @@ func waitForTransaction(nodeCli *apiclient.Node, txHash string) (blockHeight uin
 }
 
 // SpendTxStr creates an unsigned SpendTx but returns the base64 representation instead of an RLP bytestring
-func SpendTxStr(sender, recipient string, amount, fee utils.BigInt, ttl, nonce uint64, message string) (base64Tx string, err error) {
-	rlpUnsignedTx, err := SpendTx(sender, recipient, amount, fee, ttl, nonce, message)
+func SpendTxStr(sender, recipient string, amount, fee utils.BigInt, message string, ttl, nonce uint64) (base64Tx string, err error) {
+	rlpUnsignedTx, err := SpendTx(sender, recipient, amount, fee, message, ttl, nonce)
 	if err != nil {
 		return
 	}
@@ -122,12 +122,12 @@ func BroadcastTransaction(txSignedBase64 string) (err error) {
 	return
 }
 
-// NamePreclaim post a preclaim transaction to the chain
-func (n *Aens) NamePreclaim(name string) (tx, txHash, signature string, ttl uint64, nonce uint64, nameSalt uint64, err error) {
+// NamePreclaimTxStr creates a name preclaim transaction and nameSalt (required for claiming)
+func (n *Aens) NamePreclaimTxStr(name string, ttl, nonce uint64) (tx string, nameSalt uint64, err error) {
 	// calculate the commitment and get the preclaim salt
 	cm, salt, err := computeCommitmentID(name)
 	if err != nil {
-		return
+		return "", 0, err
 	}
 	// convert the salt back into uint64 from binary
 	nameSalt = binary.BigEndian.Uint64(salt)
@@ -135,20 +135,15 @@ func (n *Aens) NamePreclaim(name string) (tx, txHash, signature string, ttl uint
 	// build the transaction
 	txRaw, err := NamePreclaimTx(n.owner.Address, cm, Config.Client.Names.PreClaimFee, ttl, nonce)
 	if err != nil {
-		return
+		return "", 0, err
 	}
-	// sign the transaction
-	tx, txHash, signature, err = SignEncodeTx(n.owner, txRaw, Config.Node.NetworkID)
-	if err != nil {
-		return
-	}
-	// post transaction to the chain
-	err = postTransaction(n.nodeCli, tx, txHash)
+
+	tx = Encode(PrefixTransaction, txRaw)
 	return
 }
 
-// NameClaim perform a name claiming
-func (n *Aens) NameClaim(name string, nameSalt uint64) (tx, txHash, signature string, ttl uint64, nonce uint64, err error) {
+// NameClaimTxStr creates a claim transaction
+func (n *Aens) NameClaimTxStr(name string, nameSalt, ttl, nonce uint64) (tx string, err error) {
 	//TODO: do we need the encoded name here?
 	// encodedName := encodeP(PrefixNameHash, []byte(name))
 	prefix := HashPrefix(name[0:3])
@@ -156,37 +151,27 @@ func (n *Aens) NameClaim(name string, nameSalt uint64) (tx, txHash, signature st
 	// create the transaction
 	txRaw, err := NameClaimTx(n.owner.Address, encodedName, nameSalt, Config.Client.Names.ClaimFee, ttl, nonce)
 	if err != nil {
-		return
+		return "", err
 	}
-	// sign the transaction
-	tx, txHash, signature, err = SignEncodeTx(n.owner, txRaw, Config.Node.NetworkID)
-	if err != nil {
-		return
-	}
-	// post transaction to the chain
-	err = postTransaction(n.nodeCli, tx, txHash)
+
+	tx = Encode(PrefixTransaction, txRaw)
 	return
 }
 
 // NameUpdate perform a name update
-func (n *Aens) NameUpdate(name string, targetAddress string) (tx, txHash, signature string, ttl uint64, nonce uint64, err error) {
+func (n *Aens) NameUpdate(name string, targetAddress string, ttl, nonce uint64) (tx string, err error) {
 	encodedNameHash := Encode(PrefixName, namehash(name))
 	absNameTTL, err := GetTTL(n.nodeCli, Config.Client.Names.NameTTL)
 	if err != nil {
-		return
+		return "", err
 	}
 	// create and sign the transaction
 	txRaw, err := NameUpdateTx(n.owner.Address, encodedNameHash, []string{targetAddress}, absNameTTL, Config.Client.Names.ClientTTL, Config.Client.Names.UpdateFee, ttl, nonce)
 	if err != nil {
-		return
+		return "", err
 	}
-	// sign the transaction
-	tx, txHash, signature, err = SignEncodeTx(n.owner, txRaw, Config.Node.NetworkID)
-	if err != nil {
-		return
-	}
-	// post transaction to the chain
-	err = postTransaction(n.nodeCli, tx, txHash)
+
+	tx = Encode(PrefixTransaction, txRaw)
 	return
 }
 
@@ -230,8 +215,8 @@ func (ae *Ae) PrintGenerationByHeight(height uint64) {
 	}
 }
 
-// WaitForTransactionUntillHeight waits for a transaction until heightLimit (inclusive) is reached
-func (ae *Ae) WaitForTransactionUntillHeight(height uint64, txHash string) (blockHeight uint64, blockHash, microBlockHash string, tx *models.GenericSignedTx, err error) {
+// WaitForTransactionUntilHeight waits for a transaction until heightLimit (inclusive) is reached
+func (ae *Ae) WaitForTransactionUntilHeight(height uint64, txHash string) (blockHeight uint64, blockHash, microBlockHash string, tx *models.GenericSignedTx, err error) {
 	kb, err := getCurrentKeyBlock(ae.Node)
 	if err != nil {
 		return
@@ -343,27 +328,27 @@ func GetWalletPath(path string) (walletPath string, err error) {
 }
 
 // SignEncodeTxStr sign and encode a transaction format as string (ex. tx_xyz)
-func SignEncodeTxStr(kp *Account, txRaw string) (signedEncodedTx, signedEncodedTxHash, signature string, err error) {
-	txRawBytes, err := Decode(txRaw)
+func SignEncodeTxStr(kp *Account, tx string, networkID string) (signedEncodedTx, signedEncodedTxHash, signature string, err error) {
+	txRaw, err := Decode(tx)
 	if err != nil {
 		fmt.Println("Error decoding tx from base64")
 		os.Exit(1)
 	}
 
-	signedEncodedTx, signedEncodedTxHash, signature, err = SignEncodeTx(kp, txRawBytes, Config.Node.NetworkID)
+	signedEncodedTx, signedEncodedTxHash, signature, err = SignEncodeTx(kp, txRaw, networkID)
 	return
 }
 
 // VerifySignedTx verifies a tx_ with signature
-func VerifySignedTx(accountID string, txSignedBase64 string) (valid bool, err error) {
-	txSigned, _ := Decode(txSignedBase64)
-	txRLP := decodeRLPMessage(txSigned)
+func VerifySignedTx(accountID string, txSigned string, networkID string) (valid bool, err error) {
+	txRawSigned, _ := Decode(txSigned)
+	txRLP := decodeRLPMessage(txRawSigned)
 
 	// RLP format of signed signature: [[Tag], [Version], [Signatures...], [Transaction]]
 	tx := txRLP[3].([]byte)
 	txSignature := txRLP[2].([]interface{})[0].([]byte)
 
-	msg := append([]byte(Config.Node.NetworkID), tx...)
+	msg := append([]byte(networkID), tx...)
 
 	valid, err = Verify(accountID, msg, txSignature)
 	if err != nil {

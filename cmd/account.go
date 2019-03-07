@@ -157,7 +157,7 @@ func signFunc(cmd *cobra.Command, args []string) (err error) {
 	}
 
 	txUnsignedBase64 := args[1]
-	txSignedBase64, txHash, signature, err := aeternity.SignEncodeTxStr(account, txUnsignedBase64)
+	txSignedBase64, txHash, signature, err := aeternity.SignEncodeTxStr(account, txUnsignedBase64, aeternity.Config.Node.NetworkID)
 	if err != nil {
 		return err
 	}

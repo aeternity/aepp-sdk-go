@@ -20,7 +20,7 @@ func TestSpendTxStr(t *testing.T) {
 	nonce := uint64(1)
 	eBase64TxMsg := "tx_+FYMAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vOhAR8To7CL8AFABmKmi2nYdfeAPOxMCGR/btXYTHiXvVCjCgoKAYtIZWxsbyBXb3JsZPSZjdM="
 
-	base64TxMsg, err := aeternity.SpendTxStr(sender, recipient, amount, fee, ttl, nonce, message)
+	base64TxMsg, err := aeternity.SpendTxStr(sender, recipient, amount, fee, message, ttl, nonce)
 	if err != nil {
 		t.Fatalf("SpendTx could not create a SpendTransaction: %v", err)
 	}
