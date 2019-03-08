@@ -141,8 +141,8 @@ type BigInt struct {
 	big.Int
 }
 
-// Validate is calls validate() to ensure that value is >= 0.
-// The actual validate() does not need 'formats' from swagger, which is why Validate() wraps validate().
+// Validate ensures that the BigInt's value is >= 0.
+// The actual check does not need 'formats' from swagger, which is why Validate() wraps that function.
 func (b BigInt) Validate(formats strfmt.Registry) error {
 	return b.LargerOrEqualToZero()
 }
@@ -188,5 +188,12 @@ func RequireBigIntFromString(number string) *BigInt {
 	if err != nil {
 		panic(err)
 	}
+	return i
+}
+
+// NewBigIntFromUint64 returns a new BigInt from a uint64 representation
+func NewBigIntFromUint64(number uint64) (i *BigInt) {
+	i = &BigInt{Int: big.Int{}}
+	i.SetUint64(number)
 	return i
 }
