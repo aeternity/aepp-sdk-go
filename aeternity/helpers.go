@@ -106,9 +106,7 @@ func SpendTxStr(sender, recipient string, amount, fee utils.BigInt, message stri
 }
 
 // BroadcastTransaction recalculates the transaction hash and sends the transaction to the node.
-func BroadcastTransaction(txSignedBase64 string) (err error) {
-	ae := NewCli(Config.Node.URL, true)
-
+func BroadcastTransaction(nodeCli *apiclient.Node, txSignedBase64 string) (err error) {
 	// Get back to RLP to calculate txhash
 	txRLP, _ := Decode(txSignedBase64)
 
@@ -118,7 +116,7 @@ func BroadcastTransaction(txSignedBase64 string) (err error) {
 	signedEncodedTxHash := Encode(PrefixTransactionHash, rlpTxHashRaw)
 
 	// send it to the network
-	err = postTransaction(ae.Node, txSignedBase64, signedEncodedTxHash)
+	err = postTransaction(nodeCli, txSignedBase64, signedEncodedTxHash)
 	return
 }
 
