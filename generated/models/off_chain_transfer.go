@@ -22,7 +22,7 @@ type OffChainTransfer struct {
 
 	// Amount of tokens to transfer
 	// Required: true
-	Am *int64 `json:"am"`
+	Am *uint64 `json:"am"`
 
 	// Sender of tokens
 	// Required: true
@@ -55,7 +55,7 @@ func (m *OffChainTransfer) UnmarshalJSON(raw []byte) error {
 
 		// Amount of tokens to transfer
 		// Required: true
-		Am *int64 `json:"am"`
+		Am *uint64 `json:"am"`
 
 		// Sender of tokens
 		// Required: true
@@ -112,7 +112,7 @@ func (m OffChainTransfer) MarshalJSON() ([]byte, error) {
 
 		// Amount of tokens to transfer
 		// Required: true
-		Am *int64 `json:"am"`
+		Am *uint64 `json:"am"`
 
 		// Sender of tokens
 		// Required: true

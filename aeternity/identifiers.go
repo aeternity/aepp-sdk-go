@@ -7,36 +7,72 @@ import (
 // HashPrefix a prefix for an aeternity object hash
 type HashPrefix string
 
+// ObjectEncoding the encoding of an object
+type ObjectEncoding string
+
+// Encoding strategies
 const (
-	// PrefixSeparator the separator for the prefixes
-	PrefixSeparator = "_"
-	// PrefixAccount prefix of an account address
-	PrefixAccount = HashPrefix("ak_")
-	// PrefixTx prefix of a transaction
-	PrefixTx = HashPrefix("tx_")
-	// PrefixTxHash prefix of a transaction hash
-	PrefixTxHash = HashPrefix("th_")
-	// PrefixKeyBlockHash prefix of a block hash
-	PrefixKeyBlockHash = HashPrefix("kh_")
-	// PrefixMicroBlockHash prefix of a block hash TODO: what is the real prefix
-	PrefixMicroBlockHash = HashPrefix("mh_")
-	// PrefixContract prefix of a contract address
-	PrefixContract = HashPrefix("ct_")
-	// PrefixNameHash prefix of an a name hash
-	PrefixNameHash = HashPrefix("nm_")
-	// PrefixSignature prefix of an a signature
-	PrefixSignature = HashPrefix("sg_")
-	// PrefixBlockTxHash prefix of a block transaction hash
-	PrefixBlockTxHash = HashPrefix("bx_")
-	// PrefixBlockStateHash prefix of a block state hash
-	PrefixBlockStateHash = HashPrefix("bs_")
-	// PrefixChannel prefix of a channel
-	PrefixChannel = HashPrefix("ch_")
-	// PrefixNameCommitment prefix of a name commmitment hash
-	PrefixNameCommitment = HashPrefix("cm_")
-	// PrefixOracle prefix of an oracle
-	PrefixOracle = HashPrefix("ok_")
+	Base58c = ObjectEncoding("b58c")
+	Base64c = ObjectEncoding("b64c")
 )
+
+// Prefixes
+const (
+	// Prefix separator
+	PrefixSeparator = "_"
+
+	// Base58 prefixes
+	PrefixAccountPubkey         = HashPrefix("ak_")
+	PrefixBlockProofOfFraudHash = HashPrefix("bf_")
+	PrefixBlockStateHash        = HashPrefix("bs_")
+	PrefixBlockTransactionHash  = HashPrefix("bx_")
+	PrefixChannel               = HashPrefix("ch_")
+	PrefixCommitment            = HashPrefix("cm_")
+	PrefixContractPubkey        = HashPrefix("ct_")
+	PrefixKeyBlockHash          = HashPrefix("kh_")
+	PrefixMicroBlockHash        = HashPrefix("mh_")
+	PrefixName                  = HashPrefix("nm_")
+	PrefixOraclePubkey          = HashPrefix("ok_")
+	PrefixOracleQueryID         = HashPrefix("oq_")
+	PrefixPeerPubkey            = HashPrefix("pp_")
+	PrefixSignature             = HashPrefix("sg_")
+	PrefixTransactionHash       = HashPrefix("th_")
+
+	// Base 64 encoded transactions
+	PrefixContractByteArray = HashPrefix("cb_")
+	PrefixOracleResponse    = HashPrefix("or_")
+	PrefixOracleQuery       = HashPrefix("ov_")
+	PrefixProofOfInclusion  = HashPrefix("pi_")
+	PrefixStateTrees        = HashPrefix("ss_")
+	PrefixState             = HashPrefix("st_")
+	PrefixTransaction       = HashPrefix("tx_")
+)
+
+// store the encoding
+var objectEncoding = map[HashPrefix]ObjectEncoding{
+	PrefixContractByteArray:     Base64c,
+	PrefixOracleResponse:        Base64c,
+	PrefixOracleQuery:           Base64c,
+	PrefixProofOfInclusion:      Base64c,
+	PrefixStateTrees:            Base64c,
+	PrefixState:                 Base64c,
+	PrefixTransaction:           Base64c,
+	PrefixAccountPubkey:         Base58c,
+	PrefixBlockProofOfFraudHash: Base58c,
+	PrefixBlockStateHash:        Base58c,
+	PrefixBlockTransactionHash:  Base58c,
+	PrefixChannel:               Base58c,
+	PrefixCommitment:            Base58c,
+	PrefixContractPubkey:        Base58c,
+	PrefixKeyBlockHash:          Base58c,
+	PrefixMicroBlockHash:        Base58c,
+	PrefixName:                  Base58c,
+	PrefixOraclePubkey:          Base58c,
+	PrefixOracleQueryID:         Base58c,
+	PrefixPeerPubkey:            Base58c,
+	PrefixSignature:             Base58c,
+	PrefixTransactionHash:       Base58c,
+}
 
 // GetHashPrefix get the prefix of an hash, panics if the hash is too short
 func GetHashPrefix(hash string) (p HashPrefix) {

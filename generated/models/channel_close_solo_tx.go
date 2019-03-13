@@ -11,6 +11,8 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
+
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // ChannelCloseSoloTx channel close solo tx
@@ -23,8 +25,7 @@ type ChannelCloseSoloTx struct {
 
 	// fee
 	// Required: true
-	// Minimum: 0
-	Fee *int64 `json:"fee"`
+	Fee utils.BigInt `json:"fee"`
 
 	// from id
 	// Required: true
@@ -32,7 +33,7 @@ type ChannelCloseSoloTx struct {
 
 	// nonce
 	// Minimum: 0
-	Nonce *int64 `json:"nonce,omitempty"`
+	Nonce *uint64 `json:"nonce,omitempty"`
 
 	// payload
 	// Required: true
@@ -44,7 +45,7 @@ type ChannelCloseSoloTx struct {
 
 	// ttl
 	// Minimum: 0
-	TTL *int64 `json:"ttl,omitempty"`
+	TTL *uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this channel close solo tx
@@ -99,11 +100,10 @@ func (m *ChannelCloseSoloTx) validateChannelID(formats strfmt.Registry) error {
 
 func (m *ChannelCloseSoloTx) validateFee(formats strfmt.Registry) error {
 
-	if err := validate.Required("fee", "body", m.Fee); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("fee", "body", int64(*m.Fee), 0, false); err != nil {
+	if err := m.Fee.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("fee")
+		}
 		return err
 	}
 

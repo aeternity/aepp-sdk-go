@@ -6,241 +6,264 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-  strfmt "github.com/go-openapi/strfmt"
+	strfmt "github.com/go-openapi/strfmt"
 
-  "github.com/go-openapi/errors"
-  "github.com/go-openapi/swag"
-  "github.com/go-openapi/validate"
+	"github.com/go-openapi/errors"
+	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
+
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // ContractCallTx contract call tx
 // swagger:model ContractCallTx
 type ContractCallTx struct {
 
-  // Amount
-  // Required: true
-  // Minimum: 0
-  Amount *int64 `json:"amount"`
+	// ABI version
+	// Maximum: 65535
+	// Minimum: 0
+	AbiVersion *int64 `json:"abi_version,omitempty"`
 
-  // Contract call data
-  // Required: true
-  CallData EncodedByteArray `json:"call_data"`
+	// Amount
+	// Required: true
+	Amount utils.BigInt `json:"amount"`
 
-  // Contract caller pub_key
-  // Required: true
-  CallerID EncodedHash `json:"caller_id"`
+	// Contract call data
+	// Required: true
+	CallData EncodedByteArray `json:"call_data"`
 
-  // Contract's pub_key
-  // Required: true
-  ContractID EncodedHash `json:"contract_id"`
+	// Contract caller pub_key
+	// Required: true
+	CallerID EncodedHash `json:"caller_id"`
 
-  // Transaction fee
-  // Required: true
-  // Minimum: 0
-  Fee *int64 `json:"fee"`
+	// Contract's pub_key
+	// Required: true
+	ContractID EncodedHash `json:"contract_id"`
 
-  // Contract gas
-  // Required: true
-  // Minimum: 0
-  Gas *int64 `json:"gas"`
+	// Transaction fee
+	// Required: true
+	Fee utils.BigInt `json:"fee"`
 
-  // Gas price
-  // Required: true
-  // Minimum: 0
-  GasPrice *int64 `json:"gas_price"`
+	// Contract gas
+	// Required: true
+	// Minimum: 0
+	Gas *int64 `json:"gas"`
 
-  // Caller's nonce
-  Nonce int64 `json:"nonce,omitempty"`
+	// Gas price
+	// Required: true
+	// Minimum: 0
+	GasPrice *int64 `json:"gas_price"`
 
-  // Transaction TTL
-  // Minimum: 0
-  TTL *int64 `json:"ttl,omitempty"`
+	// Caller's nonce
+	Nonce int64 `json:"nonce,omitempty"`
 
-  // Virtual machine's version
-  // Required: true
-  // Maximum: 255
-  // Minimum: 0
-  VMVersion *string `json:"vm_version"`
+	// Transaction TTL
+	// Minimum: 0
+	TTL *int64 `json:"ttl,omitempty"`
+
+	// VM version
+	// Maximum: 65535
+	// Minimum: 0
+	VMVersion *int64 `json:"vm_version,omitempty"`
 }
 
 // Validate validates this contract call tx
 func (m *ContractCallTx) Validate(formats strfmt.Registry) error {
-  var res []error
+	var res []error
 
-  if err := m.validateAmount(formats); err != nil {
-    res = append(res, err)
-  }
+	if err := m.validateAbiVersion(formats); err != nil {
+		res = append(res, err)
+	}
 
-  if err := m.validateCallData(formats); err != nil {
-    res = append(res, err)
-  }
+	if err := m.validateAmount(formats); err != nil {
+		res = append(res, err)
+	}
 
-  if err := m.validateCallerID(formats); err != nil {
-    res = append(res, err)
-  }
+	if err := m.validateCallData(formats); err != nil {
+		res = append(res, err)
+	}
 
-  if err := m.validateContractID(formats); err != nil {
-    res = append(res, err)
-  }
+	if err := m.validateCallerID(formats); err != nil {
+		res = append(res, err)
+	}
 
-  if err := m.validateFee(formats); err != nil {
-    res = append(res, err)
-  }
+	if err := m.validateContractID(formats); err != nil {
+		res = append(res, err)
+	}
 
-  if err := m.validateGas(formats); err != nil {
-    res = append(res, err)
-  }
+	if err := m.validateFee(formats); err != nil {
+		res = append(res, err)
+	}
 
-  if err := m.validateGasPrice(formats); err != nil {
-    res = append(res, err)
-  }
+	if err := m.validateGas(formats); err != nil {
+		res = append(res, err)
+	}
 
-  if err := m.validateTTL(formats); err != nil {
-    res = append(res, err)
-  }
+	if err := m.validateGasPrice(formats); err != nil {
+		res = append(res, err)
+	}
 
-  if err := m.validateVMVersion(formats); err != nil {
-    res = append(res, err)
-  }
+	if err := m.validateTTL(formats); err != nil {
+		res = append(res, err)
+	}
 
-  if len(res) > 0 {
-    return errors.CompositeValidationError(res...)
-  }
-  return nil
+	if err := m.validateVMVersion(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *ContractCallTx) validateAbiVersion(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.AbiVersion) { // not required
+		return nil
+	}
+
+	if err := validate.MinimumInt("abi_version", "body", int64(*m.AbiVersion), 0, false); err != nil {
+		return err
+	}
+
+	if err := validate.MaximumInt("abi_version", "body", int64(*m.AbiVersion), 65535, false); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (m *ContractCallTx) validateAmount(formats strfmt.Registry) error {
 
-  if err := validate.Required("amount", "body", m.Amount); err != nil {
-    return err
-  }
+	if err := m.Amount.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("amount")
+		}
+		return err
+	}
 
-  if err := validate.MinimumInt("amount", "body", int64(*m.Amount), 0, false); err != nil {
-    return err
-  }
-
-  return nil
+	return nil
 }
 
 func (m *ContractCallTx) validateCallData(formats strfmt.Registry) error {
 
-  if err := m.CallData.Validate(formats); err != nil {
-    if ve, ok := err.(*errors.Validation); ok {
-      return ve.ValidateName("call_data")
-    }
-    return err
-  }
+	if err := m.CallData.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("call_data")
+		}
+		return err
+	}
 
-  return nil
+	return nil
 }
 
 func (m *ContractCallTx) validateCallerID(formats strfmt.Registry) error {
 
-  if err := m.CallerID.Validate(formats); err != nil {
-    if ve, ok := err.(*errors.Validation); ok {
-      return ve.ValidateName("caller_id")
-    }
-    return err
-  }
+	if err := m.CallerID.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("caller_id")
+		}
+		return err
+	}
 
-  return nil
+	return nil
 }
 
 func (m *ContractCallTx) validateContractID(formats strfmt.Registry) error {
 
-  if err := m.ContractID.Validate(formats); err != nil {
-    if ve, ok := err.(*errors.Validation); ok {
-      return ve.ValidateName("contract_id")
-    }
-    return err
-  }
+	if err := m.ContractID.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("contract_id")
+		}
+		return err
+	}
 
-  return nil
+	return nil
 }
 
 func (m *ContractCallTx) validateFee(formats strfmt.Registry) error {
 
-  if err := validate.Required("fee", "body", m.Fee); err != nil {
-    return err
-  }
+	if err := m.Fee.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("fee")
+		}
+		return err
+	}
 
-  if err := validate.MinimumInt("fee", "body", int64(*m.Fee), 0, false); err != nil {
-    return err
-  }
-
-  return nil
+	return nil
 }
 
 func (m *ContractCallTx) validateGas(formats strfmt.Registry) error {
 
-  if err := validate.Required("gas", "body", m.Gas); err != nil {
-    return err
-  }
+	if err := validate.Required("gas", "body", m.Gas); err != nil {
+		return err
+	}
 
-  if err := validate.MinimumInt("gas", "body", int64(*m.Gas), 0, false); err != nil {
-    return err
-  }
+	if err := validate.MinimumInt("gas", "body", int64(*m.Gas), 0, false); err != nil {
+		return err
+	}
 
-  return nil
+	return nil
 }
 
 func (m *ContractCallTx) validateGasPrice(formats strfmt.Registry) error {
 
-  if err := validate.Required("gas_price", "body", m.GasPrice); err != nil {
-    return err
-  }
+	if err := validate.Required("gas_price", "body", m.GasPrice); err != nil {
+		return err
+	}
 
-  if err := validate.MinimumInt("gas_price", "body", int64(*m.GasPrice), 0, false); err != nil {
-    return err
-  }
+	if err := validate.MinimumInt("gas_price", "body", int64(*m.GasPrice), 0, false); err != nil {
+		return err
+	}
 
-  return nil
+	return nil
 }
 
 func (m *ContractCallTx) validateTTL(formats strfmt.Registry) error {
 
-  if swag.IsZero(m.TTL) { // not required
-    return nil
-  }
+	if swag.IsZero(m.TTL) { // not required
+		return nil
+	}
 
-  if err := validate.MinimumInt("ttl", "body", int64(*m.TTL), 0, false); err != nil {
-    return err
-  }
+	if err := validate.MinimumInt("ttl", "body", int64(*m.TTL), 0, false); err != nil {
+		return err
+	}
 
-  return nil
+	return nil
 }
 
 func (m *ContractCallTx) validateVMVersion(formats strfmt.Registry) error {
 
-  if err := validate.Required("vm_version", "body", m.VMVersion); err != nil {
-    return err
-  }
+	if swag.IsZero(m.VMVersion) { // not required
+		return nil
+	}
 
-  // if err := validate.MinimumInt("vm_version", "body", int64(*m.VMVersion), 0, false); err != nil {
-  //   return err
-  // }
+	if err := validate.MinimumInt("vm_version", "body", int64(*m.VMVersion), 0, false); err != nil {
+		return err
+	}
 
-  // if err := validate.MaximumInt("vm_version", "body", int64(*m.VMVersion), 255, false); err != nil {
-  //   return err
-  // }
+	if err := validate.MaximumInt("vm_version", "body", int64(*m.VMVersion), 65535, false); err != nil {
+		return err
+	}
 
-  return nil
+	return nil
 }
 
 // MarshalBinary interface implementation
 func (m *ContractCallTx) MarshalBinary() ([]byte, error) {
-  if m == nil {
-    return nil, nil
-  }
-  return swag.WriteJSON(m)
+	if m == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(m)
 }
 
 // UnmarshalBinary interface implementation
 func (m *ContractCallTx) UnmarshalBinary(b []byte) error {
-  var res ContractCallTx
-  if err := swag.ReadJSON(b, &res); err != nil {
-    return err
-  }
-  *m = res
-  return nil
+	var res ContractCallTx
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*m = res
+	return nil
 }

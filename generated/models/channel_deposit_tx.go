@@ -11,6 +11,8 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
+
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // ChannelDepositTx channel deposit tx
@@ -19,8 +21,7 @@ type ChannelDepositTx struct {
 
 	// amount
 	// Required: true
-	// Minimum: 0
-	Amount *int64 `json:"amount"`
+	Amount utils.BigInt `json:"amount"`
 
 	// channel id
 	// Required: true
@@ -28,8 +29,7 @@ type ChannelDepositTx struct {
 
 	// fee
 	// Required: true
-	// Minimum: 0
-	Fee *int64 `json:"fee"`
+	Fee utils.BigInt `json:"fee"`
 
 	// from id
 	// Required: true
@@ -38,12 +38,12 @@ type ChannelDepositTx struct {
 	// nonce
 	// Required: true
 	// Minimum: 0
-	Nonce *int64 `json:"nonce"`
+	Nonce *uint64 `json:"nonce"`
 
 	// Channel's next round
 	// Required: true
 	// Minimum: 0
-	Round *int64 `json:"round"`
+	Round *uint64 `json:"round"`
 
 	// Root hash of the channel's internal state tree after the deposit had been applied to it
 	// Required: true
@@ -51,7 +51,7 @@ type ChannelDepositTx struct {
 
 	// ttl
 	// Minimum: 0
-	TTL *int64 `json:"ttl,omitempty"`
+	TTL *uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this channel deposit tx
@@ -98,11 +98,10 @@ func (m *ChannelDepositTx) Validate(formats strfmt.Registry) error {
 
 func (m *ChannelDepositTx) validateAmount(formats strfmt.Registry) error {
 
-	if err := validate.Required("amount", "body", m.Amount); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("amount", "body", int64(*m.Amount), 0, false); err != nil {
+	if err := m.Amount.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("amount")
+		}
 		return err
 	}
 
@@ -123,11 +122,10 @@ func (m *ChannelDepositTx) validateChannelID(formats strfmt.Registry) error {
 
 func (m *ChannelDepositTx) validateFee(formats strfmt.Registry) error {
 
-	if err := validate.Required("fee", "body", m.Fee); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("fee", "body", int64(*m.Fee), 0, false); err != nil {
+	if err := m.Fee.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("fee")
+		}
 		return err
 	}
 

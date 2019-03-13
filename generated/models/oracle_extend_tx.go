@@ -11,6 +11,8 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
+
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // OracleExtendTx oracle extend tx
@@ -19,10 +21,10 @@ type OracleExtendTx struct {
 
 	// fee
 	// Required: true
-	Fee *int64 `json:"fee"`
+	Fee utils.BigInt `json:"fee"`
 
 	// nonce
-	Nonce int64 `json:"nonce,omitempty"`
+	Nonce uint64 `json:"nonce,omitempty"`
 
 	// oracle id
 	// Required: true
@@ -33,7 +35,7 @@ type OracleExtendTx struct {
 	OracleTTL *RelativeTTL `json:"oracle_ttl"`
 
 	// ttl
-	TTL int64 `json:"ttl,omitempty"`
+	TTL uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this oracle extend tx
@@ -60,7 +62,10 @@ func (m *OracleExtendTx) Validate(formats strfmt.Registry) error {
 
 func (m *OracleExtendTx) validateFee(formats strfmt.Registry) error {
 
-	if err := validate.Required("fee", "body", m.Fee); err != nil {
+	if err := m.Fee.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("fee")
+		}
 		return err
 	}
 

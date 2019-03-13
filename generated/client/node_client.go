@@ -14,7 +14,7 @@ import (
 	"github.com/aeternity/aepp-sdk-go/generated/client/external"
 )
 
-// Default epoch HTTP client.
+// Default node HTTP client.
 var Default = NewHTTPClient(nil)
 
 const (
@@ -29,14 +29,14 @@ const (
 // DefaultSchemes are the default schemes found in Meta (info) section of spec file
 var DefaultSchemes = []string{"http"}
 
-// NewHTTPClient creates a new epoch HTTP client.
-func NewHTTPClient(formats strfmt.Registry) *Epoch {
+// NewHTTPClient creates a new node HTTP client.
+func NewHTTPClient(formats strfmt.Registry) *Node {
 	return NewHTTPClientWithConfig(formats, nil)
 }
 
-// NewHTTPClientWithConfig creates a new epoch HTTP client,
+// NewHTTPClientWithConfig creates a new node HTTP client,
 // using a customizable transport config.
-func NewHTTPClientWithConfig(formats strfmt.Registry, cfg *TransportConfig) *Epoch {
+func NewHTTPClientWithConfig(formats strfmt.Registry, cfg *TransportConfig) *Node {
 	// ensure nullable parameters have default
 	if cfg == nil {
 		cfg = DefaultTransportConfig()
@@ -47,14 +47,14 @@ func NewHTTPClientWithConfig(formats strfmt.Registry, cfg *TransportConfig) *Epo
 	return New(transport, formats)
 }
 
-// New creates a new epoch client
-func New(transport runtime.ClientTransport, formats strfmt.Registry) *Epoch {
+// New creates a new node client
+func New(transport runtime.ClientTransport, formats strfmt.Registry) *Node {
 	// ensure nullable parameters have default
 	if formats == nil {
 		formats = strfmt.Default
 	}
 
-	cli := new(Epoch)
+	cli := new(Node)
 	cli.Transport = transport
 
 	cli.External = external.New(transport, formats)
@@ -101,15 +101,15 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 	return cfg
 }
 
-// Epoch is a client for epoch
-type Epoch struct {
+// Node is a client for node
+type Node struct {
 	External *external.Client
 
 	Transport runtime.ClientTransport
 }
 
 // SetTransport changes the transport on the client and all its subresources
-func (c *Epoch) SetTransport(transport runtime.ClientTransport) {
+func (c *Node) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
 
 	c.External.SetTransport(transport)

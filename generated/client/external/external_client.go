@@ -53,6 +53,62 @@ func (a *Client) GetAccountByPubkey(params *GetAccountByPubkeyParams) (*GetAccou
 }
 
 /*
+GetAccountByPubkeyAndHash Get an account by public key after the block indicated by hash
+*/
+func (a *Client) GetAccountByPubkeyAndHash(params *GetAccountByPubkeyAndHashParams) (*GetAccountByPubkeyAndHashOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetAccountByPubkeyAndHashParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "GetAccountByPubkeyAndHash",
+		Method:             "GET",
+		PathPattern:        "/accounts/{pubkey}/hash/{hash}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{""},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetAccountByPubkeyAndHashReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetAccountByPubkeyAndHashOK), nil
+
+}
+
+/*
+GetAccountByPubkeyAndHeight Get an account by public key after the opening key block of the generation at height
+*/
+func (a *Client) GetAccountByPubkeyAndHeight(params *GetAccountByPubkeyAndHeightParams) (*GetAccountByPubkeyAndHeightOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetAccountByPubkeyAndHeightParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "GetAccountByPubkeyAndHeight",
+		Method:             "GET",
+		PathPattern:        "/accounts/{pubkey}/height/{height}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{""},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetAccountByPubkeyAndHeightReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetAccountByPubkeyAndHeightOK), nil
+
+}
+
+/*
 GetChannelByPubkey Get channel by public key
 */
 func (a *Client) GetChannelByPubkey(params *GetChannelByPubkeyParams) (*GetChannelByPubkeyOK, error) {

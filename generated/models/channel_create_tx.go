@@ -11,6 +11,8 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
+
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // ChannelCreateTx channel create tx
@@ -19,18 +21,15 @@ type ChannelCreateTx struct {
 
 	// channel reserve
 	// Required: true
-	// Minimum: 0
-	ChannelReserve *int64 `json:"channel_reserve"`
+	ChannelReserve utils.BigInt `json:"channel_reserve"`
 
 	// fee
 	// Required: true
-	// Minimum: 0
-	Fee *int64 `json:"fee"`
+	Fee utils.BigInt `json:"fee"`
 
 	// initiator amount
 	// Required: true
-	// Minimum: 0
-	InitiatorAmount *int64 `json:"initiator_amount"`
+	InitiatorAmount utils.BigInt `json:"initiator_amount"`
 
 	// initiator id
 	// Required: true
@@ -39,21 +38,19 @@ type ChannelCreateTx struct {
 	// lock period
 	// Required: true
 	// Minimum: 0
-	LockPeriod *int64 `json:"lock_period"`
+	LockPeriod *uint64 `json:"lock_period"`
 
 	// nonce
 	// Minimum: 0
-	Nonce *int64 `json:"nonce,omitempty"`
+	Nonce *uint64 `json:"nonce,omitempty"`
 
 	// push amount
 	// Required: true
-	// Minimum: 0
-	PushAmount *int64 `json:"push_amount"`
+	PushAmount utils.BigInt `json:"push_amount"`
 
 	// responder amount
 	// Required: true
-	// Minimum: 0
-	ResponderAmount *int64 `json:"responder_amount"`
+	ResponderAmount utils.BigInt `json:"responder_amount"`
 
 	// responder id
 	// Required: true
@@ -65,7 +62,7 @@ type ChannelCreateTx struct {
 
 	// ttl
 	// Minimum: 0
-	TTL *int64 `json:"ttl,omitempty"`
+	TTL *uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this channel create tx
@@ -124,11 +121,10 @@ func (m *ChannelCreateTx) Validate(formats strfmt.Registry) error {
 
 func (m *ChannelCreateTx) validateChannelReserve(formats strfmt.Registry) error {
 
-	if err := validate.Required("channel_reserve", "body", m.ChannelReserve); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("channel_reserve", "body", int64(*m.ChannelReserve), 0, false); err != nil {
+	if err := m.ChannelReserve.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("channel_reserve")
+		}
 		return err
 	}
 
@@ -137,11 +133,10 @@ func (m *ChannelCreateTx) validateChannelReserve(formats strfmt.Registry) error 
 
 func (m *ChannelCreateTx) validateFee(formats strfmt.Registry) error {
 
-	if err := validate.Required("fee", "body", m.Fee); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("fee", "body", int64(*m.Fee), 0, false); err != nil {
+	if err := m.Fee.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("fee")
+		}
 		return err
 	}
 
@@ -150,11 +145,10 @@ func (m *ChannelCreateTx) validateFee(formats strfmt.Registry) error {
 
 func (m *ChannelCreateTx) validateInitiatorAmount(formats strfmt.Registry) error {
 
-	if err := validate.Required("initiator_amount", "body", m.InitiatorAmount); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("initiator_amount", "body", int64(*m.InitiatorAmount), 0, false); err != nil {
+	if err := m.InitiatorAmount.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("initiator_amount")
+		}
 		return err
 	}
 
@@ -201,11 +195,10 @@ func (m *ChannelCreateTx) validateNonce(formats strfmt.Registry) error {
 
 func (m *ChannelCreateTx) validatePushAmount(formats strfmt.Registry) error {
 
-	if err := validate.Required("push_amount", "body", m.PushAmount); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("push_amount", "body", int64(*m.PushAmount), 0, false); err != nil {
+	if err := m.PushAmount.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("push_amount")
+		}
 		return err
 	}
 
@@ -214,11 +207,10 @@ func (m *ChannelCreateTx) validatePushAmount(formats strfmt.Registry) error {
 
 func (m *ChannelCreateTx) validateResponderAmount(formats strfmt.Registry) error {
 
-	if err := validate.Required("responder_amount", "body", m.ResponderAmount); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("responder_amount", "body", int64(*m.ResponderAmount), 0, false); err != nil {
+	if err := m.ResponderAmount.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("responder_amount")
+		}
 		return err
 	}
 

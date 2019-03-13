@@ -389,9 +389,7 @@ func writeRawValue(val reflect.Value, w *encbuf) error {
 
 func writeUint(val reflect.Value, w *encbuf) error {
 	i := val.Uint()
-	if i == 0 {
-		w.str = append(w.str, 0x80)
-	} else if i < 128 {
+	if i < 128 {
 		// fits single byte
 		w.str = append(w.str, byte(i))
 	} else {

@@ -29,7 +29,7 @@ type NameEntry struct {
 
 	// ttl
 	// Required: true
-	TTL *int64 `json:"ttl"`
+	TTL *uint64 `json:"ttl"`
 }
 
 // Validate validates this name entry

@@ -1,2 +1,5 @@
 dist
 vendor
+releases
+.vscode/
+docker-compose.override.yml
