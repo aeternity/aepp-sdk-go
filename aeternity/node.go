@@ -12,6 +12,7 @@ type Ae struct {
 	*Wallet
 	*Aens
 	*Contract
+	*Oracle
 }
 
 // Wallet high level abstraction for operation on a wallet
@@ -48,43 +49,20 @@ func NewCli(nodeURL string, debug bool) *Ae {
 	transport := httptransport.New(host, "/v2", schemas)
 	transport.SetDebug(debug)
 	// create the API client, with the transport
-	openAPIClinet := apiclient.New(transport, strfmt.Default)
+	openAPIClient := apiclient.New(transport, strfmt.Default)
 	aecli := &Ae{
-		Node: openAPIClinet,
+		Node: openAPIClient,
 		Wallet: &Wallet{
-			nodeCli: openAPIClinet,
+			nodeCli: openAPIClient,
 		},
 		Aens: &Aens{
-			nodeCli: openAPIClinet,
+			nodeCli: openAPIClient,
 		},
 		Contract: &Contract{
-			nodeCli: openAPIClinet,
+			nodeCli: openAPIClient,
 		},
-	}
-	return aecli
-}
-
-// NewCliW obtain a new nodeCli instance
-func NewCliW(nodeURL string, kp *Account, debug bool) *Ae {
-	// create the transport
-	host, schemas := urlComponents(nodeURL)
-	transport := httptransport.New(host, "/v2", schemas)
-	transport.SetDebug(debug)
-	// create the API client, with the transport
-	openAPIClinet := apiclient.New(transport, strfmt.Default)
-	aecli := &Ae{
-		Node: openAPIClinet,
-		Wallet: &Wallet{
-			nodeCli: openAPIClinet,
-			owner:   kp,
-		},
-		Aens: &Aens{
-			nodeCli: openAPIClinet,
-			owner:   kp,
-		},
-		Contract: &Contract{
-			nodeCli: openAPIClinet,
-			owner:   kp,
+		Oracle: &Oracle{
+			nodeCli: openAPIClient,
 		},
 	}
 	return aecli
