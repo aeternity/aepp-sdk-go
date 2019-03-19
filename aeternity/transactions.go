@@ -39,7 +39,6 @@ func createSignedTransaction(txRaw []byte, signatures [][]byte) (rlpRawMsg []byt
 }
 
 // SpendTx create a spend transaction
-// see https://github.com/aeternity/protocol/blob/epoch-v0.22.0/serializations.md
 func SpendTx(senderID, recipientID string, amount, fee utils.BigInt, payload string, ttl, nonce uint64) (rlpRawMsg []byte, err error) {
 	// build id for the sender
 	sID, err := buildIDTag(IDTagAccount, senderID)
@@ -66,7 +65,6 @@ func SpendTx(senderID, recipientID string, amount, fee utils.BigInt, payload str
 }
 
 // NamePreclaimTx build a preclaim transaction
-// see https://github.com/aeternity/protocol/blob/epoch-v0.22.0/serializations.md#name-service-preclaim-transaction
 func NamePreclaimTx(accountID, commitmentID string, fee uint64, ttl, nonce uint64) (rlpRawMsg []byte, err error) {
 	// build id for the sender
 	aID, err := buildIDTag(IDTagAccount, accountID)
@@ -91,7 +89,6 @@ func NamePreclaimTx(accountID, commitmentID string, fee uint64, ttl, nonce uint6
 }
 
 // NameClaimTx build a preclaim transaction
-// see https://github.com/aeternity/protocol/blob/epoch-v0.22.0/serializations.md#name-service-claim-transaction
 func NameClaimTx(accountID, name string, nameSalt, fee uint64, ttl, nonce uint64) (rlpRawMsg []byte, err error) {
 	// build id for the sender
 	aID, err := buildIDTag(IDTagAccount, accountID)
@@ -141,7 +138,6 @@ func buildPointers(pointers []string) (ptrs [][]uint8, err error) {
 }
 
 // NameUpdateTx build an update name transaction
-// see https://github.com/aeternity/protocol/blob/epoch-v0.22.0/serializations.md#name-service-update-transaction
 func NameUpdateTx(accountID, nameID string, pointers []string, nameTTL, clientTTL uint64, fee uint64, ttl, nonce uint64) (rlpRawMsg []byte, err error) {
 	// build id for the sender
 	aID, err := buildIDTag(IDTagAccount, accountID)
@@ -174,9 +170,8 @@ func NameUpdateTx(accountID, nameID string, pointers []string, nameTTL, clientTT
 	return
 }
 
-// OracleRegisterTx register an oracle tx
-// see https://github.com/aeternity/protocol/blob/master/serializations.md#oracles
-func OracleRegisterTx(accountID, queryFormat, responseFormat string, queryFee, expires int64) (rlpRawMsg []byte, err error) {
+// OracleRegisterTx register an oracle
+func OracleRegisterTx(accountID string, accountNonce uint64, querySpec, responseSpec string, queryFee uint64, ttlType string, ttlValue uint64, fee utils.BigInt, ttl, abiVersion uint64) (rlpRawMsg []byte, err error) {
 	// build id for the account
 	aID, err := buildIDTag(IDTagAccount, accountID)
 	if err != nil {
@@ -184,12 +179,36 @@ func OracleRegisterTx(accountID, queryFormat, responseFormat string, queryFee, e
 	}
 	// create the transaction
 	rlpRawMsg, err = buildRLPMessage(
-		ObjectTagOracle,
+		ObjectTagOracleRegisterTransaction,
 		rlpMessageVersion,
 		aID,
-		[]byte(queryFormat),
-		[]byte(responseFormat),
-		uint64(queryFee),
-		uint64(expires))
+		accountNonce,
+		[]byte(querySpec),
+		[]byte(responseSpec),
+		queryFee,
+		[]byte(ttlType),
+		ttlValue,
+		fee.Bytes(),
+		ttl,
+		abiVersion)
+	return
+}
+
+// OracleExtendTx extend an oracle's lifetime
+func OracleExtendTx(oracleID string, accountNonce, ttlType, ttlValue uint64, fee utils.BigInt, ttl uint64) (rlpRawMsg []byte, err error) {
+	aID, err := buildIDTag(IDTagOracle, oracleID)
+	if err != nil {
+		return
+	}
+
+	rlpRawMsg, err = buildRLPMessage(
+		ObjectTagOracleExtendTransaction,
+		rlpMessageVersion,
+		aID,
+		accountNonce,
+		ttlType,
+		ttlValue,
+		fee.Bytes(),
+		ttl)
 	return
 }
