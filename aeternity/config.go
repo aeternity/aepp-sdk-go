@@ -90,8 +90,8 @@ var Config = ProfileConfig{
 		TTL: 500,
 		Fee: *utils.RequireBigIntFromString("200000000000000"),
 		Names: AensConfig{
-			NameTTL:   500,
-			ClientTTL: 500,
+			NameTTL:   500, // absolute block height when the name will expire
+			ClientTTL: 500, // time in blocks until the name resolver should check again in case the name was updated
 		},
 		Contracts: ContractConfig{ // UNUSED
 			Gas:       1e9,
