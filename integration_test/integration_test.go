@@ -38,7 +38,7 @@ func TestSpendTxWithNode(t *testing.T) {
 	amount.SetInt64(10)
 	fee := utils.NewBigInt()
 	fee.SetUint64(uint64(2e13))
-	ttl, nonce, err := aeternity.GetTTLNonce(aeCli.Node, sender, aeternity.Config.Client.TTL)
+	ttl, nonce, err := aeCli.GetTTLNonce(sender, aeternity.Config.Client.TTL)
 	if err != nil {
 		t.Fatalf("Error in GetTTLNonce(): %v", err)
 	}
@@ -101,7 +101,7 @@ func TestSpendTxLargeWithNode(t *testing.T) {
 		expectedAmount.Add(&recipientAccount.Balance.Int, &amount.Int)
 	}
 
-	ttl, nonce, err := aeternity.GetTTLNonce(aeCli.Node, sender, aeternity.Config.Client.TTL)
+	ttl, nonce, err := aeCli.GetTTLNonce(sender, aeternity.Config.Client.TTL)
 	if err != nil {
 		t.Fatalf("Error in GetTTLNonce(): %v", err)
 	}
