@@ -33,24 +33,24 @@ func (ae *Ae) GetTTL(offset uint64) (height uint64, err error) {
 	return getTTL(ae.Node, offset)
 }
 
-// GetNextNonce retrieves the current nonce for an account + 1
+// GetNextNonce retrieves the current accountNonce for an account + 1
 func (ae *Ae) GetNextNonce(accountID string) (nextNonce uint64, err error) {
 	return getNextNonce(ae.Node, accountID)
 }
 
 // GetTTLNonce is a convenience function that combines GetTTL() and GetNextNonce()
-func (ae *Ae) GetTTLNonce(accountID string, offset uint64) (ttl, nonce uint64, err error) {
-	ttl, err = ae.GetTTL(offset)
+func (ae *Ae) GetTTLNonce(accountID string, offset uint64) (txTTL, accountNonce uint64, err error) {
+	txTTL, err = ae.GetTTL(offset)
 	if err != nil {
 		return 0, 0, err
 	}
 
-	nonce, err = ae.GetNextNonce(accountID)
+	accountNonce, err = ae.GetNextNonce(accountID)
 	if err != nil {
 		return 0, 0, err
 	}
 
-	return ttl, nonce, nil
+	return txTTL, accountNonce, nil
 }
 
 func getTTL(node *apiclient.Node, offset uint64) (height uint64, err error) {
@@ -102,8 +102,8 @@ func waitForTransaction(nodeClient *apiclient.Node, txHash string) (blockHeight 
 }
 
 // SpendTxStr creates an unsigned SpendTx but returns the base64 representation instead of an RLP bytestring
-func SpendTxStr(sender, recipient string, amount, fee utils.BigInt, message string, ttl, nonce uint64) (base64Tx string, err error) {
-	rlpUnsignedTx, err := SpendTx(sender, recipient, amount, fee, message, ttl, nonce)
+func SpendTxStr(sender, recipient string, amount, fee utils.BigInt, message string, txTTL, accountNonce uint64) (base64Tx string, err error) {
+	rlpUnsignedTx, err := SpendTx(sender, recipient, amount, fee, message, txTTL, accountNonce)
 	if err != nil {
 		return
 	}
@@ -129,7 +129,7 @@ func (ae *Ae) BroadcastTransaction(txSignedBase64 string) (err error) {
 }
 
 // NamePreclaimTxStr creates a name preclaim transaction and nameSalt (required for claiming)
-func (n *Aens) NamePreclaimTxStr(name string, ttl, nonce uint64) (tx string, nameSalt uint64, err error) {
+func (n *Aens) NamePreclaimTxStr(name string, txTTL, accountNonce uint64) (tx string, nameSalt uint64, err error) {
 	// calculate the commitment and get the preclaim salt
 	cm, salt, err := computeCommitmentID(name)
 	if err != nil {
@@ -139,7 +139,7 @@ func (n *Aens) NamePreclaimTxStr(name string, ttl, nonce uint64) (tx string, nam
 	nameSalt = binary.BigEndian.Uint64(salt)
 
 	// build the transaction
-	txRaw, err := NamePreclaimTx(n.owner.Address, cm, Config.Client.Names.PreClaimFee, ttl, nonce)
+	txRaw, err := NamePreclaimTx(n.owner.Address, cm, Config.Client.Names.PreClaimFee, txTTL, accountNonce)
 	if err != nil {
 		return "", 0, err
 	}
@@ -149,13 +149,13 @@ func (n *Aens) NamePreclaimTxStr(name string, ttl, nonce uint64) (tx string, nam
 }
 
 // NameClaimTxStr creates a claim transaction
-func (n *Aens) NameClaimTxStr(name string, nameSalt, ttl, nonce uint64) (tx string, err error) {
+func (n *Aens) NameClaimTxStr(name string, nameSalt, txTTL, accountNonce uint64) (tx string, err error) {
 	//TODO: do we need the encoded name here?
 	// encodedName := encodeP(PrefixNameHash, []byte(name))
 	prefix := HashPrefix(name[0:3])
 	encodedName := Encode(prefix, []byte(name))
 	// create the transaction
-	txRaw, err := NameClaimTx(n.owner.Address, encodedName, nameSalt, Config.Client.Names.ClaimFee, ttl, nonce)
+	txRaw, err := NameClaimTx(n.owner.Address, encodedName, nameSalt, Config.Client.Names.ClaimFee, txTTL, accountNonce)
 	if err != nil {
 		return "", err
 	}
@@ -165,14 +165,14 @@ func (n *Aens) NameClaimTxStr(name string, nameSalt, ttl, nonce uint64) (tx stri
 }
 
 // NameUpdateTxStr perform a name update
-func (n *Aens) NameUpdateTxStr(name string, targetAddress string, ttl, nonce uint64) (tx string, err error) {
+func (n *Aens) NameUpdateTxStr(name string, targetAddress string, txTTL, accountNonce uint64) (tx string, err error) {
 	encodedNameHash := Encode(PrefixName, namehash(name))
 	absNameTTL, err := getTTL(n.nodeClient, Config.Client.Names.NameTTL)
 	if err != nil {
 		return "", err
 	}
 	// create and sign the transaction
-	txRaw, err := NameUpdateTx(n.owner.Address, encodedNameHash, []string{targetAddress}, absNameTTL, Config.Client.Names.ClientTTL, Config.Client.Names.UpdateFee, ttl, nonce)
+	txRaw, err := NameUpdateTx(n.owner.Address, encodedNameHash, []string{targetAddress}, absNameTTL, Config.Client.Names.ClientTTL, Config.Client.Names.UpdateFee, txTTL, accountNonce)
 	if err != nil {
 		return "", err
 	}
