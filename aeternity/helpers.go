@@ -76,7 +76,7 @@ func getNextNonce(node *apiclient.Node, accountID string) (nextNonce uint64, err
 }
 
 // waitForTransaction to appear on the chain
-func waitForTransaction(nodeCli *apiclient.Node, txHash string) (blockHeight uint64, blockHash string, err error) {
+func waitForTransaction(nodeClient *apiclient.Node, txHash string) (blockHeight uint64, blockHash string, err error) {
 	// caclulate the date for the timeout
 	ctm := Config.Tuning.ChainTimeout
 	tm := time.Now().Add(time.Millisecond * time.Duration(ctm))
@@ -87,7 +87,7 @@ func waitForTransaction(nodeCli *apiclient.Node, txHash string) (blockHeight uin
 			err = fmt.Errorf("Timeout waiting for the transaction to appear")
 			break // timeout execed
 		}
-		tx, err := getTransactionByHash(nodeCli, txHash)
+		tx, err := getTransactionByHash(nodeClient, txHash)
 		if err != nil {
 			break
 		}
@@ -114,7 +114,7 @@ func SpendTxStr(sender, recipient string, amount, fee utils.BigInt, message stri
 }
 
 // BroadcastTransaction recalculates the transaction hash and sends the transaction to the node.
-func BroadcastTransaction(nodeCli *apiclient.Node, txSignedBase64 string) (err error) {
+func BroadcastTransaction(nodeClient *apiclient.Node, txSignedBase64 string) (err error) {
 	// Get back to RLP to calculate txhash
 	txRLP, _ := Decode(txSignedBase64)
 
@@ -124,7 +124,7 @@ func BroadcastTransaction(nodeCli *apiclient.Node, txSignedBase64 string) (err e
 	signedEncodedTxHash := Encode(PrefixTransactionHash, rlpTxHashRaw)
 
 	// send it to the network
-	err = postTransaction(nodeCli, txSignedBase64, signedEncodedTxHash)
+	err = postTransaction(nodeClient, txSignedBase64, signedEncodedTxHash)
 	return
 }
 
@@ -167,7 +167,7 @@ func (n *Aens) NameClaimTxStr(name string, nameSalt, ttl, nonce uint64) (tx stri
 // NameUpdateTxStr perform a name update
 func (n *Aens) NameUpdateTxStr(name string, targetAddress string, ttl, nonce uint64) (tx string, err error) {
 	encodedNameHash := Encode(PrefixName, namehash(name))
-	absNameTTL, err := getTTL(n.nodeCli, Config.Client.Names.NameTTL)
+	absNameTTL, err := getTTL(n.nodeClient, Config.Client.Names.NameTTL)
 	if err != nil {
 		return "", err
 	}
