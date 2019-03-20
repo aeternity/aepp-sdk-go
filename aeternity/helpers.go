@@ -29,8 +29,32 @@ func urlComponents(url string) (host string, schemas []string) {
 }
 
 // GetTTL returns the chain height + offset
-func GetTTL(nodeCli *apiclient.Node, offset uint64) (height uint64, err error) {
-	kb, err := getTopBlock(nodeCli)
+func (ae *Ae) GetTTL(offset uint64) (height uint64, err error) {
+	return getTTL(ae.Node, offset)
+}
+
+// GetNextNonce retrieves the current nonce for an account + 1
+func (ae *Ae) GetNextNonce(accountID string) (nextNonce uint64, err error) {
+	return getNextNonce(ae.Node, accountID)
+}
+
+// GetTTLNonce is a convenience function that combines GetTTL() and GetNextNonce()
+func (ae *Ae) GetTTLNonce(accountID string, offset uint64) (ttl, nonce uint64, err error) {
+	ttl, err = ae.GetTTL(offset)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	nonce, err = ae.GetNextNonce(accountID)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	return ttl, nonce, nil
+}
+
+func getTTL(node *apiclient.Node, offset uint64) (height uint64, err error) {
+	kb, err := getTopBlock(node)
 	if err != nil {
 		return
 	}
@@ -42,29 +66,13 @@ func GetTTL(nodeCli *apiclient.Node, offset uint64) (height uint64, err error) {
 	return
 }
 
-// GetNextNonce retrieves the current nonce for an account + 1
-func GetNextNonce(nodeCli *apiclient.Node, accountID string) (nextNonce uint64, err error) {
-	a, err := getAccount(nodeCli, accountID)
+func getNextNonce(node *apiclient.Node, accountID string) (nextNonce uint64, err error) {
+	a, err := getAccount(node, accountID)
 	if err != nil {
 		return
 	}
 	nextNonce = *a.Nonce + 1
 	return
-}
-
-// GetTTLNonce is a convenience function that combines GetTTL() and GetNextNonce()
-func GetTTLNonce(nodeCli *apiclient.Node, accountID string, offset uint64) (ttl, nonce uint64, err error) {
-	ttl, err = GetTTL(nodeCli, offset)
-	if err != nil {
-		return 0, 0, err
-	}
-
-	nonce, err = GetNextNonce(nodeCli, accountID)
-	if err != nil {
-		return 0, 0, err
-	}
-
-	return ttl, nonce, nil
 }
 
 // waitForTransaction to appear on the chain
@@ -156,10 +164,10 @@ func (n *Aens) NameClaimTxStr(name string, nameSalt, ttl, nonce uint64) (tx stri
 	return
 }
 
-// NameUpdate perform a name update
-func (n *Aens) NameUpdate(name string, targetAddress string, ttl, nonce uint64) (tx string, err error) {
+// NameUpdateTxStr perform a name update
+func (n *Aens) NameUpdateTxStr(name string, targetAddress string, ttl, nonce uint64) (tx string, err error) {
 	encodedNameHash := Encode(PrefixName, namehash(name))
-	absNameTTL, err := GetTTL(n.nodeCli, Config.Client.Names.NameTTL)
+	absNameTTL, err := getTTL(n.nodeCli, Config.Client.Names.NameTTL)
 	if err != nil {
 		return "", err
 	}
@@ -175,11 +183,11 @@ func (n *Aens) NameUpdate(name string, targetAddress string, ttl, nonce uint64) 
 
 // OracleRegister register an oracle
 // TODO: not implemented
-func (o *Oracle) OracleRegister(queryFormat, responseFormat string) (tx, txHash, signature string, ttl int64, nonce uint64, err error) {
-	// TODO: specs incomplete
-	//txOracleCreate(o.owner.Address, queryFormat, responseFormat, Config.Client.Oracles.QueryFee, Config.Client.Oracles.Expires)
-	return
-}
+// func (o *Oracle) OracleRegisterTxStr(querySpec, responseSpec string, queryFee, ttlType, ttlValue, abiVersion, ttl, nonce uint64) (txRaw []byte, err error) {
+// 	// TODO: specs incomplete
+// 	txRaw, err := OracleRegisterTx(o.owner.Address, o.owner.Nonce, querySpec, responseSpec, queryFee, ttlType, ttlValue, )
+// 	return
+// }
 
 // PrintGenerationByHeight utility function to print a generation by it's height
 func (ae *Ae) PrintGenerationByHeight(height uint64) {
