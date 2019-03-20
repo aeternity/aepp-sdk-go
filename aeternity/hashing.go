@@ -146,7 +146,7 @@ func buildIDTag(IDTag uint8, encodedHash string) (v []uint8, err error) {
 	return
 }
 
-func decodeRLPMessage(rawBytes []byte) []interface{} {
+func DecodeRLPMessage(rawBytes []byte) []interface{} {
 	res := []interface{}{}
 	rlp.DecodeBytes(rawBytes, &res)
 	return res

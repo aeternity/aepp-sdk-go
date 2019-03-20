@@ -182,8 +182,8 @@ func (n *Aens) NameUpdateTxStr(name string, targetAddress string, txTTL, account
 }
 
 // OracleRegisterTxStr register an oracle
-func (o *Oracle) OracleRegisterTxStr(querySpec, responseSpec string, queryFee utils.BigInt, txTTLType, txTTLValue, abiVersion uint64, txFee utils.BigInt, txTTL, accountNonce uint64) (tx string, err error) {
-	txRaw, err := OracleRegisterTx(o.owner.Address, accountNonce, querySpec, responseSpec, Config.Client.Oracles.QueryFee, txTTLType, txTTLValue, Config.Client.Oracles.VMVersion, txFee, txTTL)
+func (o *Oracle) OracleRegisterTxStr(accountNonce uint64, querySpec, responseSpec string, queryFee utils.BigInt, oracleTTLType, oracleTTLValue, abiVersion uint64, txFee utils.BigInt, txTTL uint64) (tx string, err error) {
+	txRaw, err := OracleRegisterTx(o.owner.Address, accountNonce, querySpec, responseSpec, Config.Client.Oracles.QueryFee, oracleTTLType, oracleTTLValue, Config.Client.Oracles.VMVersion, txFee, txTTL)
 	if err != nil {
 		return "", err
 	}
@@ -350,7 +350,7 @@ func SignEncodeTxStr(kp *Account, tx string, networkID string) (signedEncodedTx,
 // VerifySignedTx verifies a tx_ with signature
 func VerifySignedTx(accountID string, txSigned string, networkID string) (valid bool, err error) {
 	txRawSigned, _ := Decode(txSigned)
-	txRLP := decodeRLPMessage(txRawSigned)
+	txRLP := DecodeRLPMessage(txRawSigned)
 
 	// RLP format of signed signature: [[Tag], [Version], [Signatures...], [Transaction]]
 	tx := txRLP[3].([]byte)
