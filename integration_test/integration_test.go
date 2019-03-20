@@ -58,7 +58,7 @@ func TestSpendTxWithNode(t *testing.T) {
 	fmt.Println(signedBase64TxMsg)
 
 	// send the signed transaction to the node
-	err = aeternity.BroadcastTransaction(aeCli.Node, signedBase64TxMsg)
+	err = aeCli.BroadcastTransaction(signedBase64TxMsg)
 	if err != nil {
 		t.Fatalf("Error while broadcasting transaction: %v", err)
 	}
@@ -120,7 +120,7 @@ func TestSpendTxLargeWithNode(t *testing.T) {
 	fmt.Println(signedBase64TxMsg)
 
 	// send the signed transaction to the node
-	err = aeternity.BroadcastTransaction(aeCli.Node, signedBase64TxMsg)
+	err = aeCli.BroadcastTransaction(signedBase64TxMsg)
 	if err != nil {
 		t.Fatalf("Error while broadcasting transaction: %v", err)
 	}
