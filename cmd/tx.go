@@ -106,10 +106,32 @@ func txVerifyFunc(cmd *cobra.Command, args []string) (err error) {
 	return nil
 }
 
+// txDumpRawCmd implements the tx dumpraw subcommand.
+// It decodes a base58/64 input down into its RLP byte level representation.
+var txDumpRawCmd = &cobra.Command{
+	Use:   "dumpraw TRANSACTION",
+	Short: "Show the RLP byte level representation of a base58/64 encoded object",
+	Long:  ``,
+	Args:  cobra.ExactArgs(1),
+	RunE:  txDumpRawFunc,
+}
+
+func txDumpRawFunc(cmd *cobra.Command, args []string) (err error) {
+	tx := args[0]
+	txRaw, err := aeternity.Decode(tx)
+	if err != nil {
+		return err
+	}
+	res := aeternity.DecodeRLPMessage(txRaw)
+	fmt.Println(res)
+	return nil
+}
+
 func init() {
 	RootCmd.AddCommand(txCmd)
 	txCmd.AddCommand(txSpendCmd)
 	txCmd.AddCommand(txVerifyCmd)
+	txCmd.AddCommand(txDumpRawCmd)
 
 	// tx spend command
 	txSpendCmd.Flags().StringVar(&fee, "fee", aeternity.Config.Client.Fee.String(), fmt.Sprintf("Set the transaction fee (default=%s)", aeternity.Config.Client.Fee.String()))
