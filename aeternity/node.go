@@ -18,12 +18,12 @@ type Ae struct {
 // Wallet high level abstraction for operation on a wallet
 type Wallet struct {
 	nodeClient *apiclient.Node
-	owner   *Account
+	owner      *Account
 }
 
 // Aens abstractions for aens operations
 type Aens struct {
-	nodeClient      *apiclient.Node
+	nodeClient   *apiclient.Node
 	owner        *Account
 	name         string
 	preClaimSalt []byte
@@ -32,14 +32,14 @@ type Aens struct {
 // Contract abstractions for contracts
 type Contract struct {
 	nodeClient *apiclient.Node
-	owner   *Account
-	source  string
+	owner      *Account
+	source     string
 }
 
 // Oracle abstractions for oracles
 type Oracle struct {
 	nodeClient *apiclient.Node
-	owner   *Account
+	owner      *Account
 }
 
 // NewCli obtain a new nodeClient instance
@@ -73,5 +73,6 @@ func (ae *Ae) WithAccount(account *Account) *Ae {
 	ae.Wallet.owner = account
 	ae.Aens.owner = account
 	ae.Contract.owner = account
+	ae.Oracle.owner = account
 	return ae
 }
