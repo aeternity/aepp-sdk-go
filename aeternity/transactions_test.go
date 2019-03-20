@@ -11,7 +11,8 @@ import (
 func TestOracleRegisterTx(t *testing.T) {
 	sender := "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"
 	fee := utils.NewBigIntFromUint64(100)
-	txRaw, err := aeternity.OracleRegisterTx(sender, 0, "likethis", "likethat", 123456789, "delta", 1, *fee, 1, 1)
+	queryFee := utils.NewBigIntFromUint64(123456789)
+	txRaw, err := aeternity.OracleRegisterTx(sender, 0, "likethis", "likethat", *queryFee, 0, 1, 0, *fee, 1) // "delta/absolute" is represented by an integer
 	if err != nil {
 		t.Errorf("Could not create OracleRegisterTx: %s", err)
 	}

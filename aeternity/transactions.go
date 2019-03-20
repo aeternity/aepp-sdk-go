@@ -171,7 +171,7 @@ func NameUpdateTx(accountID, nameID string, pointers []string, nameTTL, clientTT
 }
 
 // OracleRegisterTx register an oracle
-func OracleRegisterTx(accountID string, accountNonce uint64, querySpec, responseSpec string, queryFee uint64, ttlType string, ttlValue uint64, fee utils.BigInt, ttl, abiVersion uint64) (rlpRawMsg []byte, err error) {
+func OracleRegisterTx(accountID string, accountNonce uint64, querySpec, responseSpec string, queryFee utils.BigInt, oracleTTLType, oracleTTLValue, abiVersion uint64, txFee utils.BigInt, txTTL uint64) (rlpRawMsg []byte, err error) {
 	// build id for the account
 	aID, err := buildIDTag(IDTagAccount, accountID)
 	if err != nil {
@@ -185,11 +185,11 @@ func OracleRegisterTx(accountID string, accountNonce uint64, querySpec, response
 		accountNonce,
 		[]byte(querySpec),
 		[]byte(responseSpec),
-		queryFee,
-		[]byte(ttlType),
-		ttlValue,
-		fee.Bytes(),
-		ttl,
+		queryFee.Bytes(),
+		oracleTTLType,
+		oracleTTLValue,
+		txFee.Bytes(),
+		txTTL,
 		abiVersion)
 	return
 }
