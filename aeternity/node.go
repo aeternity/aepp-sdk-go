@@ -17,13 +17,13 @@ type Ae struct {
 
 // Wallet high level abstraction for operation on a wallet
 type Wallet struct {
-	nodeCli *apiclient.Node
+	nodeClient *apiclient.Node
 	owner   *Account
 }
 
 // Aens abstractions for aens operations
 type Aens struct {
-	nodeCli      *apiclient.Node
+	nodeClient      *apiclient.Node
 	owner        *Account
 	name         string
 	preClaimSalt []byte
@@ -31,18 +31,18 @@ type Aens struct {
 
 // Contract abstractions for contracts
 type Contract struct {
-	nodeCli *apiclient.Node
+	nodeClient *apiclient.Node
 	owner   *Account
 	source  string
 }
 
 // Oracle abstractions for oracles
 type Oracle struct {
-	nodeCli *apiclient.Node
+	nodeClient *apiclient.Node
 	owner   *Account
 }
 
-// NewCli obtain a new nodeCli instance
+// NewCli obtain a new nodeClient instance
 func NewCli(nodeURL string, debug bool) *Ae {
 	// create the transport
 	host, schemas := urlComponents(nodeURL)
@@ -53,16 +53,16 @@ func NewCli(nodeURL string, debug bool) *Ae {
 	aecli := &Ae{
 		Node: openAPIClient,
 		Wallet: &Wallet{
-			nodeCli: openAPIClient,
+			nodeClient: openAPIClient,
 		},
 		Aens: &Aens{
-			nodeCli: openAPIClient,
+			nodeClient: openAPIClient,
 		},
 		Contract: &Contract{
-			nodeCli: openAPIClient,
+			nodeClient: openAPIClient,
 		},
 		Oracle: &Oracle{
-			nodeCli: openAPIClient,
+			nodeClient: openAPIClient,
 		},
 	}
 	return aecli
