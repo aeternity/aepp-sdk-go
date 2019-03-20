@@ -28,22 +28,22 @@ type AensConfig struct {
 
 // ContractConfig configurations for contracts
 type ContractConfig struct {
-	Gas       int64 `json:"gas" yaml:"gas" mapstructure:"gas"`
-	GasPrice  int64 `json:"gas_price" yaml:"gas_price" mapstructure:"gas_price"`
-	Deposit   int64 `json:"deposit" yaml:"deposit" mapstructure:"deposit"`
-	VMVersion int64 `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
+	Gas       uint64 `json:"gas" yaml:"gas" mapstructure:"gas"`
+	GasPrice  uint64 `json:"gas_price" yaml:"gas_price" mapstructure:"gas_price"`
+	Deposit   uint64 `json:"deposit" yaml:"deposit" mapstructure:"deposit"`
+	VMVersion uint64 `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
 }
 
 // OracleConfig configurations for contracts
 type OracleConfig struct {
-	QueryFee  int64 `json:"query_fee" yaml:"query_fee" mapstructure:"query_fee"`
-	VMVersion int64 `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
+	QueryFee  utils.BigInt `json:"query_fee" yaml:"query_fee" mapstructure:"query_fee"`
+	VMVersion uint64       `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
 }
 
 // StateChannelConfig configurations for contracts TODO: not complete
 type StateChannelConfig struct {
-	LockPeriod     int64 `json:"lock_period" yaml:"lock_period" mapstructure:"lock_period"`
-	ChannelReserve int64 `json:"channel_reserve" yaml:"channel_reserve" mapstructure:"channel_reserve"`
+	LockPeriod     uint64 `json:"lock_period" yaml:"lock_period" mapstructure:"lock_period"`
+	ChannelReserve uint64 `json:"channel_reserve" yaml:"channel_reserve" mapstructure:"channel_reserve"`
 }
 
 // ClientConfig client paramters configuration
@@ -99,8 +99,8 @@ var Config = ProfileConfig{
 			Deposit:   0,
 			VMVersion: 0,
 		},
-		Oracles: OracleConfig{ // UNUSED
-			QueryFee:  0,
+		Oracles: OracleConfig{
+			QueryFee:  *utils.NewBigIntFromUint64(0),
 			VMVersion: 0,
 		},
 		StateChannels: StateChannelConfig{ // UNUSED
