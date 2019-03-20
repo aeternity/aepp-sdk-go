@@ -181,13 +181,15 @@ func (n *Aens) NameUpdateTxStr(name string, targetAddress string, txTTL, account
 	return
 }
 
-// OracleRegister register an oracle
-// TODO: not implemented
-// func (o *Oracle) OracleRegisterTxStr(querySpec, responseSpec string, queryFee, ttlType, ttlValue, abiVersion, ttl, nonce uint64) (txRaw []byte, err error) {
-// 	// TODO: specs incomplete
-// 	txRaw, err := OracleRegisterTx(o.owner.Address, o.owner.Nonce, querySpec, responseSpec, queryFee, ttlType, ttlValue, )
-// 	return
-// }
+// OracleRegisterTxStr register an oracle
+func (o *Oracle) OracleRegisterTxStr(querySpec, responseSpec string, queryFee utils.BigInt, txTTLType, txTTLValue, abiVersion uint64, txFee utils.BigInt, txTTL, accountNonce uint64) (tx string, err error) {
+	txRaw, err := OracleRegisterTx(o.owner.Address, accountNonce, querySpec, responseSpec, Config.Client.Oracles.QueryFee, txTTLType, txTTLValue, Config.Client.Oracles.VMVersion, txFee, txTTL)
+	if err != nil {
+		return "", err
+	}
+	tx = Encode(PrefixTransaction, txRaw)
+	return
+}
 
 // PrintGenerationByHeight utility function to print a generation by it's height
 func (ae *Ae) PrintGenerationByHeight(height uint64) {
