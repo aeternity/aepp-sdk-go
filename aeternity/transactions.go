@@ -177,6 +177,7 @@ func OracleRegisterTx(accountID string, accountNonce uint64, querySpec, response
 	if err != nil {
 		return
 	}
+	qBytes := queryFee.Bytes()
 	// create the transaction
 	rlpRawMsg, err = buildRLPMessage(
 		ObjectTagOracleRegisterTransaction,
@@ -185,7 +186,7 @@ func OracleRegisterTx(accountID string, accountNonce uint64, querySpec, response
 		accountNonce,
 		[]byte(querySpec),
 		[]byte(responseSpec),
-		queryFee.Bytes(),
+		qBytes,
 		oracleTTLType,
 		oracleTTLValue,
 		txFee.Bytes(),
