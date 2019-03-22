@@ -1,15 +1,12 @@
 package aeternity
 
 import (
-	"encoding/binary"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
-
-	"github.com/aeternity/aepp-sdk-go/utils"
 
 	apiclient "github.com/aeternity/aepp-sdk-go/generated/client"
 	"github.com/aeternity/aepp-sdk-go/generated/client/external"
@@ -101,17 +98,17 @@ func waitForTransaction(nodeClient *apiclient.Node, txHash string) (blockHeight 
 	return
 }
 
-// SpendTxStr creates an unsigned SpendTx but returns the base64 representation instead of an RLP bytestring
-func SpendTxStr(sender, recipient string, amount, fee utils.BigInt, message string, txTTL, accountNonce uint64) (base64Tx string, err error) {
-	rlpUnsignedTx, err := SpendTx(sender, recipient, amount, fee, message, txTTL, accountNonce)
-	if err != nil {
-		return
-	}
+// // SpendTxStr creates an unsigned SpendTx but returns the base64 representation instead of an RLP bytestring
+// func SpendTxStr(sender, recipient string, amount, fee utils.BigInt, message string, txTTL, accountNonce uint64) (base64Tx string, err error) {
+// 	rlpUnsignedTx, err := NewSpendTx(sender, recipient, amount, fee, message, txTTL, accountNonce)
+// 	if err != nil {
+// 		return
+// 	}
 
-	base64Tx = Encode(PrefixTransaction, rlpUnsignedTx)
+// 	base64Tx = Encode(PrefixTransaction, rlpUnsignedTx)
 
-	return base64Tx, err
-}
+// 	return base64Tx, err
+// }
 
 // BroadcastTransaction recalculates the transaction hash and sends the transaction to the node.
 func (ae *Ae) BroadcastTransaction(txSignedBase64 string) (err error) {
@@ -128,68 +125,68 @@ func (ae *Ae) BroadcastTransaction(txSignedBase64 string) (err error) {
 	return
 }
 
-// NamePreclaimTxStr creates a name preclaim transaction and nameSalt (required for claiming)
-func (n *Aens) NamePreclaimTxStr(name string, txTTL, accountNonce uint64) (tx string, nameSalt uint64, err error) {
-	// calculate the commitment and get the preclaim salt
-	cm, salt, err := computeCommitmentID(name)
-	if err != nil {
-		return "", 0, err
-	}
-	// convert the salt back into uint64 from binary
-	nameSalt = binary.BigEndian.Uint64(salt)
+// // NamePreclaimTxStr creates a name preclaim transaction and nameSalt (required for claiming)
+// func (n *Aens) NamePreclaimTxStr(name string, txTTL, accountNonce uint64) (tx string, nameSalt uint64, err error) {
+// 	// calculate the commitment and get the preclaim salt
+// 	cm, salt, err := computeCommitmentID(name)
+// 	if err != nil {
+// 		return "", 0, err
+// 	}
+// 	// convert the salt back into uint64 from binary
+// 	nameSalt = binary.BigEndian.Uint64(salt)
 
-	// build the transaction
-	txRaw, err := NamePreclaimTx(n.owner.Address, cm, Config.Client.Names.PreClaimFee, txTTL, accountNonce)
-	if err != nil {
-		return "", 0, err
-	}
+// 	// build the transaction
+// 	txRaw, err := NamePreclaimTx(n.owner.Address, cm, Config.Client.Names.PreClaimFee, txTTL, accountNonce)
+// 	if err != nil {
+// 		return "", 0, err
+// 	}
 
-	tx = Encode(PrefixTransaction, txRaw)
-	return
-}
+// 	tx = Encode(PrefixTransaction, txRaw)
+// 	return
+// }
 
-// NameClaimTxStr creates a claim transaction
-func (n *Aens) NameClaimTxStr(name string, nameSalt, txTTL, accountNonce uint64) (tx string, err error) {
-	//TODO: do we need the encoded name here?
-	// encodedName := encodeP(PrefixNameHash, []byte(name))
-	prefix := HashPrefix(name[0:3])
-	encodedName := Encode(prefix, []byte(name))
-	// create the transaction
-	txRaw, err := NameClaimTx(n.owner.Address, encodedName, nameSalt, Config.Client.Names.ClaimFee, txTTL, accountNonce)
-	if err != nil {
-		return "", err
-	}
+// // NameClaimTxStr creates a claim transaction
+// func (n *Aens) NameClaimTxStr(name string, nameSalt, txTTL, accountNonce uint64) (tx string, err error) {
+// 	//TODO: do we need the encoded name here?
+// 	// encodedName := encodeP(PrefixNameHash, []byte(name))
+// 	prefix := HashPrefix(name[0:3])
+// 	encodedName := Encode(prefix, []byte(name))
+// 	// create the transaction
+// 	txRaw, err := NameClaimTx(n.owner.Address, encodedName, nameSalt, Config.Client.Names.ClaimFee, txTTL, accountNonce)
+// 	if err != nil {
+// 		return "", err
+// 	}
 
-	tx = Encode(PrefixTransaction, txRaw)
-	return
-}
+// 	tx = Encode(PrefixTransaction, txRaw)
+// 	return
+// }
 
-// NameUpdateTxStr perform a name update
-func (n *Aens) NameUpdateTxStr(name string, targetAddress string, txTTL, accountNonce uint64) (tx string, err error) {
-	encodedNameHash := Encode(PrefixName, namehash(name))
-	absNameTTL, err := getTTL(n.nodeClient, Config.Client.Names.NameTTL)
-	if err != nil {
-		return "", err
-	}
-	// create and sign the transaction
-	txRaw, err := NameUpdateTx(n.owner.Address, encodedNameHash, []string{targetAddress}, absNameTTL, Config.Client.Names.ClientTTL, Config.Client.Names.UpdateFee, txTTL, accountNonce)
-	if err != nil {
-		return "", err
-	}
+// // NameUpdateTxStr perform a name update
+// func (n *Aens) NameUpdateTxStr(name string, targetAddress string, txTTL, accountNonce uint64) (tx string, err error) {
+// 	encodedNameHash := Encode(PrefixName, namehash(name))
+// 	absNameTTL, err := getTTL(n.nodeClient, Config.Client.Names.NameTTL)
+// 	if err != nil {
+// 		return "", err
+// 	}
+// 	// create and sign the transaction
+// 	txRaw, err := NameUpdateTx(n.owner.Address, encodedNameHash, []string{targetAddress}, absNameTTL, Config.Client.Names.ClientTTL, Config.Client.Names.UpdateFee, txTTL, accountNonce)
+// 	if err != nil {
+// 		return "", err
+// 	}
 
-	tx = Encode(PrefixTransaction, txRaw)
-	return
-}
+// 	tx = Encode(PrefixTransaction, txRaw)
+// 	return
+// }
 
-// OracleRegisterTxStr register an oracle
-func (o *Oracle) OracleRegisterTxStr(accountNonce uint64, querySpec, responseSpec string, queryFee utils.BigInt, oracleTTLType, oracleTTLValue, abiVersion uint64, txFee utils.BigInt, txTTL uint64) (tx string, err error) {
-	txRaw, err := OracleRegisterTx(o.owner.Address, accountNonce, querySpec, responseSpec, Config.Client.Oracles.QueryFee, oracleTTLType, oracleTTLValue, Config.Client.Oracles.VMVersion, txFee, txTTL)
-	if err != nil {
-		return "", err
-	}
-	tx = Encode(PrefixTransaction, txRaw)
-	return
-}
+// // OracleRegisterTxStr register an oracle
+// func (o *Oracle) OracleRegisterTxStr(accountNonce uint64, querySpec, responseSpec string, queryFee utils.BigInt, oracleTTLType, oracleTTLValue, abiVersion uint64, txFee utils.BigInt, txTTL uint64) (tx string, err error) {
+// 	txRaw, err := OracleRegisterTx(o.owner.Address, accountNonce, querySpec, responseSpec, Config.Client.Oracles.QueryFee, oracleTTLType, oracleTTLValue, Config.Client.Oracles.VMVersion, txFee, txTTL)
+// 	if err != nil {
+// 		return "", err
+// 	}
+// 	tx = Encode(PrefixTransaction, txRaw)
+// 	return
+// }
 
 // PrintGenerationByHeight utility function to print a generation by it's height
 func (ae *Ae) PrintGenerationByHeight(height uint64) {
