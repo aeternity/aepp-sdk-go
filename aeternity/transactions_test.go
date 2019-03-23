@@ -160,7 +160,7 @@ func TestSpendTx_RLP(t *testing.T) {
 				tt.fields.nonce,
 			)
 			gotTxRaw, _ := tx.RLP()
-			gotTx, err := aeternity.BaseEncodeTx(tx)()
+			gotTx, err := aeternity.BaseEncodeTx(tx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("SpendTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -345,7 +345,7 @@ func TestOracleRegisterTx_RLP(t *testing.T) {
 				tt.fields.txFee,
 				tt.fields.txTTL,
 			)
-			gotTx, err := aeternity.BaseEncodeTx(tx)()
+			gotTx, err := aeternity.BaseEncodeTx(tx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("OracleRegisterTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
 				return

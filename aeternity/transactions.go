@@ -70,19 +70,14 @@ type Tx interface {
 	RLP() ([]byte, error)
 }
 
-// BaseEncoder describes the RLP() method of a Tx struct, so that one can pass these methods around (to decorators for example)
-type BaseEncoder func() (string, error)
-
-// BaseEncodeTx is a decorator that takes a Tx, runs its RLP() method, and base encodes the result.
-func BaseEncodeTx(t Tx) BaseEncoder {
-	return func() (string, error) {
-		txRaw, err := t.RLP()
-		if err != nil {
-			return "", err
-		}
-		txStr := Encode(PrefixTransaction, txRaw)
-		return txStr, nil
+// BaseEncodeTx takes a Tx, runs its RLP() method, and base encodes the result.
+func BaseEncodeTx(t Tx) (string, error) {
+	txRaw, err := t.RLP()
+	if err != nil {
+		return "", err
 	}
+	txStr := Encode(PrefixTransaction, txRaw)
+	return txStr, nil
 }
 
 // SpendTx represents a simple transaction where one party sends another AE
