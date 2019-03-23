@@ -103,16 +103,14 @@ func (t SpendTx) RLP() (rlpRawMsg []byte, err error) {
 	if err != nil {
 		return
 	}
-	amountBytes := t.amount.Bytes()
-	fmt.Print(amountBytes)
 	// create the transaction
 	rlpRawMsg, err = buildRLPMessage(
 		ObjectTagSpendTransaction,
 		rlpMessageVersion,
 		sID,
 		rID,
-		t.amount,
-		t.fee,
+		t.amount.Int,
+		t.fee.Int,
 		t.ttl,
 		t.nonce,
 		[]byte(t.payload))
@@ -273,7 +271,6 @@ func (t OracleRegisterTx) RLP() (rlpRawMsg []byte, err error) {
 	if err != nil {
 		return
 	}
-	qBytes := t.queryFee.Bytes()
 	// create the transaction
 	rlpRawMsg, err = buildRLPMessage(
 		ObjectTagOracleRegisterTransaction,
@@ -282,10 +279,10 @@ func (t OracleRegisterTx) RLP() (rlpRawMsg []byte, err error) {
 		t.accountNonce,
 		[]byte(t.querySpec),
 		[]byte(t.responseSpec),
-		qBytes,
+		t.queryFee.Int,
 		t.oracleTTLType,
 		t.oracleTTLValue,
-		t.txFee.Bytes(),
+		t.txFee.Int,
 		t.txTTL,
 		t.abiVersion)
 	return
