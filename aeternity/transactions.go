@@ -3,6 +3,7 @@ package aeternity
 import (
 	"fmt"
 
+	"github.com/aeternity/aepp-sdk-go/generated/models"
 	"github.com/aeternity/aepp-sdk-go/utils"
 )
 
@@ -115,6 +116,20 @@ func (t SpendTx) RLP() (rlpRawMsg []byte, err error) {
 		t.Nonce,
 		[]byte(t.Payload))
 	return
+}
+
+func (t SpendTx) JSON() (string, error) {
+	swaggerT := models.SpendTx{
+		Amount:      t.Amount,
+		Fee:         t.Fee,
+		Nonce:       t.Nonce,
+		Payload:     &t.Payload,
+		RecipientID: models.EncodedHash(t.RecipientID),
+		SenderID:    models.EncodedHash(t.SenderID),
+		TTL:         t.TTL,
+	}
+	output, err := swaggerT.MarshalBinary()
+	return string(output), err
 }
 
 // NewSpendTx is a constructor for a SpendTx struct
@@ -287,6 +302,52 @@ func (t OracleRegisterTx) RLP() (rlpRawMsg []byte, err error) {
 		t.TxTTL,
 		t.AbiVersion)
 	return
+}
+
+// BUG: Account Nonce won't be represented in JSON output if nonce is 0, thanks to swagger.json
+func (t OracleRegisterTx) JSON() (string, error) {
+	// # Oracles
+	// ORACLE_TTL_TYPE_DELTA = 'delta'
+	// ORACLE_TTL_TYPE_BLOCK = 'block'
+	// From reading the code, 0 is "delta", 1 is "block"
+	// # VM Identifiers
+	// # vm version specification
+	// # https://github.com/aeternity/protocol/blob/master/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain
+	// NO_VM = 0
+	// VM_SOPHIA = 1
+	// VM_SOLIDITY = 2
+	// VM_SOPHIA_IMPROVEMENTS = 3
+	// # abi
+	// NO_ABI = 0
+	// ABI_SOPHIA = 1
+	// ABI_SOLIDITY = 2
+	abiVersionCasted := int64(t.AbiVersion)
+	vmVersionCasted := int64(t.VMVersion)
+
+	var oracleTTLTypeStr string
+	if t.OracleTTLType == 0 {
+		oracleTTLTypeStr = "delta"
+	} else {
+		oracleTTLTypeStr = "block"
+	}
+
+	swaggerT := models.OracleRegisterTx{
+		AbiVersion: &abiVersionCasted,
+		AccountID:  models.EncodedHash(t.AccountID),
+		Fee:        t.TxFee,
+		Nonce:      t.AccountNonce,
+		OracleTTL: &models.TTL{
+			Type:  &oracleTTLTypeStr,
+			Value: &t.OracleTTLValue,
+		},
+		QueryFee:       t.QueryFee,
+		QueryFormat:    &t.QuerySpec,
+		ResponseFormat: &t.ResponseSpec,
+		TTL:            t.TxTTL,
+		VMVersion:      &vmVersionCasted,
+	}
+	output, err := swaggerT.MarshalBinary()
+	return string(output), err
 }
 
 // NewOracleRegisterTx is a constructor for a OracleRegisterTx struct
