@@ -82,24 +82,24 @@ func BaseEncodeTx(t Tx) (string, error) {
 
 // SpendTx represents a simple transaction where one party sends another AE
 type SpendTx struct {
-	senderID    string
-	recipientID string
-	amount      utils.BigInt
-	fee         utils.BigInt
-	payload     string
-	ttl         uint64
-	nonce       uint64
+	SenderID    string
+	RecipientID string
+	Amount      utils.BigInt
+	Fee         utils.BigInt
+	Payload     string
+	TTL         uint64
+	Nonce       uint64
 }
 
 // RLP returns a byte serialized representation
 func (t SpendTx) RLP() (rlpRawMsg []byte, err error) {
 	// build id for the sender
-	sID, err := buildIDTag(IDTagAccount, t.senderID)
+	sID, err := buildIDTag(IDTagAccount, t.SenderID)
 	if err != nil {
 		return
 	}
 	// build id for the recipient
-	rID, err := buildIDTag(IDTagAccount, t.recipientID)
+	rID, err := buildIDTag(IDTagAccount, t.RecipientID)
 	if err != nil {
 		return
 	}
@@ -109,11 +109,11 @@ func (t SpendTx) RLP() (rlpRawMsg []byte, err error) {
 		rlpMessageVersion,
 		sID,
 		rID,
-		t.amount.Int,
-		t.fee.Int,
-		t.ttl,
-		t.nonce,
-		[]byte(t.payload))
+		t.Amount.Int,
+		t.Fee.Int,
+		t.TTL,
+		t.Nonce,
+		[]byte(t.Payload))
 	return
 }
 
@@ -124,22 +124,22 @@ func NewSpendTx(senderID, recipientID string, amount, fee utils.BigInt, payload 
 
 // NamePreclaimTx represents a transaction where one reserves a name on AENS without revealing it yet
 type NamePreclaimTx struct {
-	accountID    string
-	commitmentID string
-	fee          uint64
-	ttl          uint64
-	nonce        uint64
+	AccountID    string
+	CommitmentID string
+	Fee          uint64
+	TTL          uint64
+	Nonce        uint64
 }
 
 // RLP returns a byte serialized representation
 func (t NamePreclaimTx) RLP() (rlpRawMsg []byte, err error) {
 	// build id for the sender
-	aID, err := buildIDTag(IDTagAccount, t.accountID)
+	aID, err := buildIDTag(IDTagAccount, t.AccountID)
 	if err != nil {
 		return
 	}
 	// build id for the committment
-	cID, err := buildIDTag(IDTagCommitment, t.commitmentID)
+	cID, err := buildIDTag(IDTagCommitment, t.CommitmentID)
 	if err != nil {
 		return
 	}
@@ -148,10 +148,10 @@ func (t NamePreclaimTx) RLP() (rlpRawMsg []byte, err error) {
 		ObjectTagNameServicePreclaimTransaction,
 		rlpMessageVersion,
 		aID,
-		t.nonce,
+		t.Nonce,
 		cID,
-		uint64(t.fee),
-		t.ttl)
+		uint64(t.Fee),
+		t.TTL)
 	return
 }
 
@@ -162,23 +162,23 @@ func NewNamePreclaimTx(accountID, commitmentID string, fee uint64, ttl, nonce ui
 
 // NameClaimTx represents a transaction where one claims a previously reserved name on AENS
 type NameClaimTx struct {
-	accountID string
-	name      string
-	nameSalt  uint64
-	fee       uint64
-	ttl       uint64
-	nonce     uint64
+	AccountID string
+	Name      string
+	NameSalt  uint64
+	Fee       uint64
+	TTL       uint64
+	Nonce     uint64
 }
 
 // RLP returns a byte serialized representation
 func (t NameClaimTx) RLP() (rlpRawMsg []byte, err error) {
 	// build id for the sender
-	aID, err := buildIDTag(IDTagAccount, t.accountID)
+	aID, err := buildIDTag(IDTagAccount, t.AccountID)
 	if err != nil {
 		return
 	}
 	// build id for the sender
-	nID, err := buildIDTag(IDTagName, t.name)
+	nID, err := buildIDTag(IDTagName, t.Name)
 	if err != nil {
 		return
 	}
@@ -187,11 +187,11 @@ func (t NameClaimTx) RLP() (rlpRawMsg []byte, err error) {
 		ObjectTagNameServiceClaimTransaction,
 		rlpMessageVersion,
 		aID,
-		t.nonce,
+		t.Nonce,
 		nID,
-		uint64(t.nameSalt),
-		uint64(t.fee),
-		t.ttl)
+		uint64(t.NameSalt),
+		uint64(t.Fee),
+		t.TTL)
 	return
 }
 
@@ -202,30 +202,30 @@ func NewNameClaimTx(accountID, name string, nameSalt, fee uint64, ttl, nonce uin
 
 // NameUpdateTx represents a transaction where one extends the lifetime of a reserved name on AENS
 type NameUpdateTx struct {
-	accountID string
-	nameID    string
-	pointers  []string
-	nameTTL   uint64
-	clientTTL uint64
-	fee       uint64
-	ttl       uint64
-	nonce     uint64
+	AccountID string
+	NameID    string
+	Pointers  []string
+	NameTTL   uint64
+	ClientTTL uint64
+	Fee       uint64
+	TTL       uint64
+	Nonce     uint64
 }
 
 // RLP returns a byte serialized representation
 func (t NameUpdateTx) RLP() (rlpRawMsg []byte, err error) {
 	// build id for the sender
-	aID, err := buildIDTag(IDTagAccount, t.accountID)
+	aID, err := buildIDTag(IDTagAccount, t.AccountID)
 	if err != nil {
 		return
 	}
 	// build id for the sender
-	nID, err := buildIDTag(IDTagName, t.nameID)
+	nID, err := buildIDTag(IDTagName, t.NameID)
 	if err != nil {
 		return
 	}
 	// build id for pointers
-	ptrs, err := buildPointers(t.pointers)
+	ptrs, err := buildPointers(t.Pointers)
 	if err != nil {
 		return
 	}
@@ -235,13 +235,13 @@ func (t NameUpdateTx) RLP() (rlpRawMsg []byte, err error) {
 		ObjectTagNameServiceClaimTransaction,
 		rlpMessageVersion,
 		aID,
-		t.nonce,
+		t.Nonce,
 		nID,
-		uint64(t.nameTTL),
+		uint64(t.NameTTL),
 		ptrs,
-		uint64(t.clientTTL),
-		uint64(t.fee),
-		t.ttl)
+		uint64(t.ClientTTL),
+		uint64(t.Fee),
+		t.TTL)
 	return
 }
 
@@ -252,22 +252,23 @@ func NewNameUpdateTx(accountID, nameID string, pointers []string, nameTTL, clien
 
 // OracleRegisterTx represents a transaction that registers an oracle on the blockchain's state
 type OracleRegisterTx struct {
-	accountID      string
-	accountNonce   uint64
-	querySpec      string
-	responseSpec   string
-	queryFee       utils.BigInt
-	oracleTTLType  uint64
-	oracleTTLValue uint64
-	abiVersion     uint64
-	txFee          utils.BigInt
-	txTTL          uint64
+	AccountID      string
+	AccountNonce   uint64
+	QuerySpec      string
+	ResponseSpec   string
+	QueryFee       utils.BigInt
+	OracleTTLType  uint64
+	OracleTTLValue uint64
+	AbiVersion     uint64
+	VMVersion      uint64
+	TxFee          utils.BigInt
+	TxTTL          uint64
 }
 
 // RLP returns a byte serialized representation
 func (t OracleRegisterTx) RLP() (rlpRawMsg []byte, err error) {
 	// build id for the account
-	aID, err := buildIDTag(IDTagAccount, t.accountID)
+	aID, err := buildIDTag(IDTagAccount, t.AccountID)
 	if err != nil {
 		return
 	}
@@ -276,36 +277,36 @@ func (t OracleRegisterTx) RLP() (rlpRawMsg []byte, err error) {
 		ObjectTagOracleRegisterTransaction,
 		rlpMessageVersion,
 		aID,
-		t.accountNonce,
-		[]byte(t.querySpec),
-		[]byte(t.responseSpec),
-		t.queryFee.Int,
-		t.oracleTTLType,
-		t.oracleTTLValue,
-		t.txFee.Int,
-		t.txTTL,
-		t.abiVersion)
+		t.AccountNonce,
+		[]byte(t.QuerySpec),
+		[]byte(t.ResponseSpec),
+		t.QueryFee.Int,
+		t.OracleTTLType,
+		t.OracleTTLValue,
+		t.TxFee.Int,
+		t.TxTTL,
+		t.AbiVersion)
 	return
 }
 
 // NewOracleRegisterTx is a constructor for a OracleRegisterTx struct
-func NewOracleRegisterTx(accountID string, accountNonce uint64, querySpec, responseSpec string, queryFee utils.BigInt, oracleTTLType, oracleTTLValue, abiVersion uint64, txFee utils.BigInt, txTTL uint64) OracleRegisterTx {
-	return OracleRegisterTx{accountID, accountNonce, querySpec, responseSpec, queryFee, oracleTTLType, oracleTTLValue, abiVersion, txFee, txTTL}
+func NewOracleRegisterTx(accountID string, accountNonce uint64, querySpec, responseSpec string, queryFee utils.BigInt, oracleTTLType, oracleTTLValue, abiVersion uint64, vmVersion uint64, txFee utils.BigInt, txTTL uint64) OracleRegisterTx {
+	return OracleRegisterTx{accountID, accountNonce, querySpec, responseSpec, queryFee, oracleTTLType, oracleTTLValue, abiVersion, vmVersion, txFee, txTTL}
 }
 
 // OracleExtendTx represents a transaction that extends the lifetime of an oracle
 type OracleExtendTx struct {
-	oracleID     string
-	accountNonce uint64
-	ttlType      uint64
-	ttlValue     uint64
-	fee          utils.BigInt
-	ttl          uint64
+	OracleID     string
+	AccountNonce uint64
+	TTLType      uint64
+	TTLValue     uint64
+	Fee          utils.BigInt
+	TTL          uint64
 }
 
 // RLP returns a byte serialized representation
 func (t OracleExtendTx) RLP() (rlpRawMsg []byte, err error) {
-	aID, err := buildIDTag(IDTagOracle, t.oracleID)
+	aID, err := buildIDTag(IDTagOracle, t.OracleID)
 	if err != nil {
 		return
 	}
@@ -314,11 +315,11 @@ func (t OracleExtendTx) RLP() (rlpRawMsg []byte, err error) {
 		ObjectTagOracleExtendTransaction,
 		rlpMessageVersion,
 		aID,
-		t.accountNonce,
-		t.ttlType,
-		t.ttlValue,
-		t.fee.Bytes(),
-		t.ttl)
+		t.AccountNonce,
+		t.TTLType,
+		t.TTLValue,
+		t.Fee.Bytes(),
+		t.TTL)
 	return
 }
 
