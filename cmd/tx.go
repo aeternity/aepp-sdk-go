@@ -61,7 +61,7 @@ func txSpendFunc(cmd *cobra.Command, args []string) (err error) {
 	if err != nil {
 		return err
 	}
-	base64Tx, err := aeternity.BaseEncodeTx(tx)()
+	base64Tx, err := aeternity.BaseEncodeTx(tx)
 	if err != nil {
 		return err
 	}
