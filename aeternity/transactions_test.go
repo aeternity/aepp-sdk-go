@@ -74,7 +74,7 @@ func TestSpendTx_RLP(t *testing.T) {
 			txJson, err := tx.JSON()
 			fmt.Println(txJson)
 
-			gotTx, err := aeternity.BaseEncodeTx(tx)
+			gotTx, err := aeternity.BaseEncodeTx(&tx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("SpendTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -85,7 +85,6 @@ func TestSpendTx_RLP(t *testing.T) {
 			}
 		})
 	}
-	t.Error()
 }
 
 func TestOracleRegisterTx_RLP(t *testing.T) {
@@ -163,7 +162,7 @@ func TestOracleRegisterTx_RLP(t *testing.T) {
 			txJson, _ := tx.JSON()
 			fmt.Println(txJson)
 
-			gotTx, err := aeternity.BaseEncodeTx(tx)
+			gotTx, err := aeternity.BaseEncodeTx(&tx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("OracleRegisterTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
 				return

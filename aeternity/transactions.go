@@ -93,7 +93,7 @@ type SpendTx struct {
 }
 
 // RLP returns a byte serialized representation
-func (t SpendTx) RLP() (rlpRawMsg []byte, err error) {
+func (t *SpendTx) RLP() (rlpRawMsg []byte, err error) {
 	// build id for the sender
 	sID, err := buildIDTag(IDTagAccount, t.SenderID)
 	if err != nil {
@@ -118,7 +118,7 @@ func (t SpendTx) RLP() (rlpRawMsg []byte, err error) {
 	return
 }
 
-func (t SpendTx) JSON() (string, error) {
+func (t *SpendTx) JSON() (string, error) {
 	swaggerT := models.SpendTx{
 		Amount:      t.Amount,
 		Fee:         t.Fee,
@@ -147,7 +147,7 @@ type NamePreclaimTx struct {
 }
 
 // RLP returns a byte serialized representation
-func (t NamePreclaimTx) RLP() (rlpRawMsg []byte, err error) {
+func (t *NamePreclaimTx) RLP() (rlpRawMsg []byte, err error) {
 	// build id for the sender
 	aID, err := buildIDTag(IDTagAccount, t.AccountID)
 	if err != nil {
@@ -186,7 +186,7 @@ type NameClaimTx struct {
 }
 
 // RLP returns a byte serialized representation
-func (t NameClaimTx) RLP() (rlpRawMsg []byte, err error) {
+func (t *NameClaimTx) RLP() (rlpRawMsg []byte, err error) {
 	// build id for the sender
 	aID, err := buildIDTag(IDTagAccount, t.AccountID)
 	if err != nil {
@@ -228,7 +228,7 @@ type NameUpdateTx struct {
 }
 
 // RLP returns a byte serialized representation
-func (t NameUpdateTx) RLP() (rlpRawMsg []byte, err error) {
+func (t *NameUpdateTx) RLP() (rlpRawMsg []byte, err error) {
 	// build id for the sender
 	aID, err := buildIDTag(IDTagAccount, t.AccountID)
 	if err != nil {
@@ -281,7 +281,7 @@ type OracleRegisterTx struct {
 }
 
 // RLP returns a byte serialized representation
-func (t OracleRegisterTx) RLP() (rlpRawMsg []byte, err error) {
+func (t *OracleRegisterTx) RLP() (rlpRawMsg []byte, err error) {
 	// build id for the account
 	aID, err := buildIDTag(IDTagAccount, t.AccountID)
 	if err != nil {
@@ -305,7 +305,7 @@ func (t OracleRegisterTx) RLP() (rlpRawMsg []byte, err error) {
 }
 
 // BUG: Account Nonce won't be represented in JSON output if nonce is 0, thanks to swagger.json
-func (t OracleRegisterTx) JSON() (string, error) {
+func (t *OracleRegisterTx) JSON() (string, error) {
 	// # Oracles
 	// ORACLE_TTL_TYPE_DELTA = 'delta'
 	// ORACLE_TTL_TYPE_BLOCK = 'block'
@@ -366,7 +366,7 @@ type OracleExtendTx struct {
 }
 
 // RLP returns a byte serialized representation
-func (t OracleExtendTx) RLP() (rlpRawMsg []byte, err error) {
+func (t *OracleExtendTx) RLP() (rlpRawMsg []byte, err error) {
 	aID, err := buildIDTag(IDTagOracle, t.OracleID)
 	if err != nil {
 		return
