@@ -138,30 +138,30 @@ func AskPassword(question string) (password string, err error) {
 // BigInt is composed of a big.Int, but includes a Validate() method for swagger and other convenience functions.
 // Once created, it can be used just like a big.Int.
 type BigInt struct {
-	big.Int
+	*big.Int
 }
 
 // Validate ensures that the BigInt's value is >= 0.
 // The actual check does not need 'formats' from swagger, which is why Validate() wraps that function.
-func (b BigInt) Validate(formats strfmt.Registry) error {
+func (b *BigInt) Validate(formats strfmt.Registry) error {
 	return b.LargerOrEqualToZero()
 }
 
 // LargerThanZero checks that the number is >=0
-func (b BigInt) LargerThanZero() error {
+func (b *BigInt) LargerThanZero() error {
 	zero := NewBigInt()
 
-	if b.Cmp(&zero.Int) != 1 {
+	if b.Cmp(zero.Int) != 1 {
 		return fmt.Errorf("%v was not larger than 0", b.Int.String())
 	}
 	return nil
 }
 
 // LargerOrEqualToZero checks that the number is >=0
-func (b BigInt) LargerOrEqualToZero() error {
+func (b *BigInt) LargerOrEqualToZero() error {
 	zero := NewBigInt()
 
-	if b.Cmp(&zero.Int) == -1 {
+	if b.Cmp(zero.Int) == -1 {
 		return fmt.Errorf("%v was negative", b.Int.String())
 	}
 	return nil
@@ -169,12 +169,12 @@ func (b BigInt) LargerOrEqualToZero() error {
 
 // NewBigInt returns a new BigInt with its Int struct field initialized
 func NewBigInt() (i *BigInt) {
-	return &BigInt{Int: big.Int{}}
+	return &BigInt{new(big.Int)}
 }
 
 // NewBigIntFromString returns a new BigInt from a string representation
 func NewBigIntFromString(number string) (i *BigInt, err error) {
-	i = &BigInt{Int: big.Int{}}
+	i = &BigInt{new(big.Int)}
 	_, success := i.SetString(number, 10)
 	if success == false {
 		return nil, errors.New("Could not parse string as a number")
@@ -193,7 +193,7 @@ func RequireBigIntFromString(number string) *BigInt {
 
 // NewBigIntFromUint64 returns a new BigInt from a uint64 representation
 func NewBigIntFromUint64(number uint64) (i *BigInt) {
-	i = &BigInt{Int: big.Int{}}
+	i = &BigInt{new(big.Int)}
 	i.SetUint64(number)
 	return i
 }
