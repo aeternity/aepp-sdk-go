@@ -44,9 +44,10 @@ func TestSpendTxWithNode(t *testing.T) {
 	}
 
 	// create the SpendTransaction
-	base64TxMsg, err := aeternity.SpendTxStr(sender, recipient, *amount, *fee, message, ttl, nonce)
+	tx := aeternity.NewSpendTx(sender, recipient, *amount, *fee, message, ttl, nonce)
+	base64TxMsg, err := aeternity.BaseEncodeTx(tx)
 	if err != nil {
-		t.Fatalf("SpendTx errored out: %v", err)
+		t.Fatalf("Base64 encoding errored out: %v", err)
 	}
 	fmt.Println(base64TxMsg)
 
@@ -106,9 +107,11 @@ func TestSpendTxLargeWithNode(t *testing.T) {
 		t.Fatalf("Error in GetTTLNonce(): %v", err)
 	}
 
-	base64TxMsg, err := aeternity.SpendTxStr(sender, recipient, *amount, *fee, message, ttl, nonce)
+	// create the SpendTransaction
+	tx := aeternity.NewSpendTx(sender, recipient, *amount, *fee, message, ttl, nonce)
+	base64TxMsg, err := aeternity.BaseEncodeTx(tx)
 	if err != nil {
-		t.Fatalf("SpendTx errored out: %v", err)
+		t.Fatalf("Base64 encoding errored out: %v", err)
 	}
 	fmt.Println(base64TxMsg)
 
