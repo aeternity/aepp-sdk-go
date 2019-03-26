@@ -384,6 +384,29 @@ func (t *OracleExtendTx) RLP() (rlpRawMsg []byte, err error) {
 	return
 }
 
+func (t *OracleExtendTx) JSON() (string, error) {
+	var oracleTTLTypeStr string
+	if t.TTLType == 0 {
+		oracleTTLTypeStr = "delta"
+	} else {
+		oracleTTLTypeStr = "block"
+	}
+
+	swaggerT := models.OracleExtendTx{
+		Fee:      t.Fee,
+		Nonce:    t.AccountNonce,
+		OracleID: models.EncodedHash(t.OracleID),
+		OracleTTL: &models.RelativeTTL{
+			Type:  &oracleTTLTypeStr,
+			Value: &t.TTLValue,
+		},
+		TTL: t.TTL,
+	}
+
+	output, err := swaggerT.MarshalBinary()
+	return string(output), err
+}
+
 // NewOracleExtendTx is a constructor for a OracleExtendTx struct
 func NewOracleExtendTx(oracleID string, accountNonce, ttlType, ttlValue uint64, fee utils.BigInt, ttl uint64) OracleExtendTx {
 	return OracleExtendTx{oracleID, accountNonce, ttlType, ttlValue, fee, ttl}

@@ -2,6 +2,7 @@ package aeternity_test
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
@@ -87,6 +88,125 @@ func TestSpendTx_RLP(t *testing.T) {
 	}
 }
 
+// func TestNamePreclaimTx_RLP(t *testing.T) {
+// 	type fields struct {
+// 		AccountID    string
+// 		CommitmentID string
+// 		Fee          uint64
+// 		TTL          uint64
+// 		Nonce        uint64
+// 	}
+// 	tests := []struct {
+// 		name          string
+// 		fields        fields
+// 		wantRlpRawMsg []byte
+// 		wantErr       bool
+// 	}{
+// 		// TODO: Add test cases.
+// 	}
+// 	for _, tt := range tests {
+// 		t.Run(tt.name, func(t *testing.T) {
+// 			t := &NamePreclaimTx{
+// 				AccountID:    tt.fields.AccountID,
+// 				CommitmentID: tt.fields.CommitmentID,
+// 				Fee:          tt.fields.Fee,
+// 				TTL:          tt.fields.TTL,
+// 				Nonce:        tt.fields.Nonce,
+// 			}
+// 			gotRlpRawMsg, err := t.RLP()
+// 			if (err != nil) != tt.wantErr {
+// 				t.Errorf("NamePreclaimTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
+// 				return
+// 			}
+// 			if !reflect.DeepEqual(gotRlpRawMsg, tt.wantRlpRawMsg) {
+// 				t.Errorf("NamePreclaimTx.RLP() = %v, want %v", gotRlpRawMsg, tt.wantRlpRawMsg)
+// 			}
+// 		})
+// 	}
+// }
+
+// func TestNameClaimTx_RLP(t *testing.T) {
+// 	type fields struct {
+// 		AccountID string
+// 		Name      string
+// 		NameSalt  uint64
+// 		Fee       uint64
+// 		TTL       uint64
+// 		Nonce     uint64
+// 	}
+// 	tests := []struct {
+// 		name          string
+// 		fields        fields
+// 		wantRlpRawMsg []byte
+// 		wantErr       bool
+// 	}{
+// 		// TODO: Add test cases.
+// 	}
+// 	for _, tt := range tests {
+// 		t.Run(tt.name, func(t *testing.T) {
+// 			t := &NameClaimTx{
+// 				AccountID: tt.fields.AccountID,
+// 				Name:      tt.fields.Name,
+// 				NameSalt:  tt.fields.NameSalt,
+// 				Fee:       tt.fields.Fee,
+// 				TTL:       tt.fields.TTL,
+// 				Nonce:     tt.fields.Nonce,
+// 			}
+// 			gotRlpRawMsg, err := t.RLP()
+// 			if (err != nil) != tt.wantErr {
+// 				t.Errorf("NameClaimTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
+// 				return
+// 			}
+// 			if !reflect.DeepEqual(gotRlpRawMsg, tt.wantRlpRawMsg) {
+// 				t.Errorf("NameClaimTx.RLP() = %v, want %v", gotRlpRawMsg, tt.wantRlpRawMsg)
+// 			}
+// 		})
+// 	}
+// }
+
+// func TestNameUpdateTx_RLP(t *testing.T) {
+// 	type fields struct {
+// 		AccountID string
+// 		NameID    string
+// 		Pointers  []string
+// 		NameTTL   uint64
+// 		ClientTTL uint64
+// 		Fee       uint64
+// 		TTL       uint64
+// 		Nonce     uint64
+// 	}
+// 	tests := []struct {
+// 		name          string
+// 		fields        fields
+// 		wantRlpRawMsg []byte
+// 		wantErr       bool
+// 	}{
+// 		// TODO: Add test cases.
+// 	}
+// 	for _, tt := range tests {
+// 		t.Run(tt.name, func(t *testing.T) {
+// 			t := &NameUpdateTx{
+// 				AccountID: tt.fields.AccountID,
+// 				NameID:    tt.fields.NameID,
+// 				Pointers:  tt.fields.Pointers,
+// 				NameTTL:   tt.fields.NameTTL,
+// 				ClientTTL: tt.fields.ClientTTL,
+// 				Fee:       tt.fields.Fee,
+// 				TTL:       tt.fields.TTL,
+// 				Nonce:     tt.fields.Nonce,
+// 			}
+// 			gotRlpRawMsg, err := t.RLP()
+// 			if (err != nil) != tt.wantErr {
+// 				t.Errorf("NameUpdateTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
+// 				return
+// 			}
+// 			if !reflect.DeepEqual(gotRlpRawMsg, tt.wantRlpRawMsg) {
+// 				t.Errorf("NameUpdateTx.RLP() = %v, want %v", gotRlpRawMsg, tt.wantRlpRawMsg)
+// 			}
+// 		})
+// 	}
+// }
+
 func TestOracleRegisterTx_RLP(t *testing.T) {
 	type fields struct {
 		accountID      string
@@ -170,6 +290,60 @@ func TestOracleRegisterTx_RLP(t *testing.T) {
 			if gotTx != tt.wantTx {
 				gotTxRawBytes, wantTxRawBytes := getRLPSerialized(gotTx, tt.wantTx)
 				t.Errorf("OracleRegisterTx.RLP() = \n%v\n%v, want \n%v\n%v", gotTx, gotTxRawBytes, tt.wantTx, wantTxRawBytes)
+			}
+		})
+	}
+}
+
+func TestOracleExtendTx_RLP(t *testing.T) {
+	type fields struct {
+		OracleID     string
+		AccountNonce uint64
+		TTLType      uint64
+		TTLValue     uint64
+		Fee          utils.BigInt
+		TTL          uint64
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		wantTx  string
+		wantErr bool
+	}{
+		{
+			name: "Extend by 300 blocks, delta",
+			fields: fields{
+				OracleID:     "ok_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+				AccountNonce: 1,
+				TTLType:      0,
+				TTLValue:     300,
+				Fee:          *utils.NewBigIntFromUint64(10),
+			},
+			wantTx:  "tx_6xkBoQTOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+8wEAggEsCgDoA8Ab",
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tx := aeternity.NewOracleExtendTx(
+				tt.fields.OracleID,
+				tt.fields.AccountNonce,
+				tt.fields.TTLType,
+				tt.fields.TTLValue,
+				tt.fields.Fee,
+				tt.fields.TTL,
+			)
+			txJson, _ := tx.JSON()
+			fmt.Println(txJson)
+
+			gotTx, err := aeternity.BaseEncodeTx(&tx)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("OracleExtendTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(gotTx, tt.wantTx) {
+				t.Errorf("OracleExtendTx.RLP() = %v, want %v", gotTx, tt.wantTx)
 			}
 		})
 	}
