@@ -30,7 +30,7 @@ func TestSpendTxWithNode(t *testing.T) {
 	if err != nil {
 		expectedAmount.SetInt64(10)
 	} else {
-		expectedAmount.Add(&recipientAccount.Balance.Int, big.NewInt(10))
+		expectedAmount.Add(recipientAccount.Balance.Int, big.NewInt(10))
 		fmt.Printf("Recipient already exists with balance %v, expectedAmount after test is %s\n", recipientAccount.Balance.String(), expectedAmount.String())
 	}
 
@@ -45,7 +45,7 @@ func TestSpendTxWithNode(t *testing.T) {
 
 	// create the SpendTransaction
 	tx := aeternity.NewSpendTx(sender, recipient, *amount, *fee, message, ttl, nonce)
-	base64TxMsg, err := aeternity.BaseEncodeTx(tx)
+	base64TxMsg, err := aeternity.BaseEncodeTx(&tx)
 	if err != nil {
 		t.Fatalf("Base64 encoding errored out: %v", err)
 	}
@@ -97,9 +97,9 @@ func TestSpendTxLargeWithNode(t *testing.T) {
 	// In case the recipient account already has funds, get recipient's account info. If it exists, expectedAmount = existing balance + amount + fee
 	recipientAccount, err := aeCli.APIGetAccount(recipient)
 	if err != nil {
-		expectedAmount.Set(&amount.Int)
+		expectedAmount.Set(amount.Int)
 	} else {
-		expectedAmount.Add(&recipientAccount.Balance.Int, &amount.Int)
+		expectedAmount.Add(recipientAccount.Balance.Int, amount.Int)
 	}
 
 	ttl, nonce, err := aeCli.GetTTLNonce(sender, aeternity.Config.Client.TTL)
@@ -109,7 +109,7 @@ func TestSpendTxLargeWithNode(t *testing.T) {
 
 	// create the SpendTransaction
 	tx := aeternity.NewSpendTx(sender, recipient, *amount, *fee, message, ttl, nonce)
-	base64TxMsg, err := aeternity.BaseEncodeTx(tx)
+	base64TxMsg, err := aeternity.BaseEncodeTx(&tx)
 	if err != nil {
 		t.Fatalf("Base64 encoding errored out: %v", err)
 	}
@@ -134,7 +134,7 @@ func TestSpendTxLargeWithNode(t *testing.T) {
 		t.Fatalf("Couldn't get recipient's account data: %v", err)
 	}
 
-	if recipientAccount.Balance.Cmp(&expectedAmount.Int) != 0 {
+	if recipientAccount.Balance.Cmp(expectedAmount.Int) != 0 {
 		t.Fatalf("Recipient should have %v, but has %v instead", expectedAmount.String(), recipientAccount.Balance.String())
 	}
 }
