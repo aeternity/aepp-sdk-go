@@ -69,6 +69,7 @@ func buildPointers(pointers []string) (ptrs [][]uint8, err error) {
 // See https://tour.golang.org/methods/4 or https://dave.cheney.net/2016/03/19/should-methods-be-declared-on-t-or-t
 type Tx interface {
 	RLP() ([]byte, error)
+	JSON() (string, error)
 }
 
 // BaseEncodeTx takes a Tx, runs its RLP() method, and base encodes the result.
@@ -141,7 +142,7 @@ func NewSpendTx(senderID, recipientID string, amount, fee utils.BigInt, payload 
 type NamePreclaimTx struct {
 	AccountID    string
 	CommitmentID string
-	Fee          uint64
+	Fee          utils.BigInt
 	TTL          uint64
 	Nonce        uint64
 }
@@ -165,13 +166,25 @@ func (t *NamePreclaimTx) RLP() (rlpRawMsg []byte, err error) {
 		aID,
 		t.Nonce,
 		cID,
-		uint64(t.Fee),
+		t.Fee.Int,
 		t.TTL)
 	return
 }
 
+func (t *NamePreclaimTx) JSON() (string, error) {
+	swaggerT := models.NamePreclaimTx{
+		AccountID:    models.EncodedHash(t.AccountID),
+		CommitmentID: models.EncodedHash(t.CommitmentID),
+		Fee:          t.Fee,
+		Nonce:        t.Nonce,
+		TTL:          t.TTL,
+	}
+	output, err := swaggerT.MarshalBinary()
+	return string(output), err
+}
+
 // NewNamePreclaimTx is a constructor for a NamePreclaimTx struct
-func NewNamePreclaimTx(accountID, commitmentID string, fee uint64, ttl, nonce uint64) NamePreclaimTx {
+func NewNamePreclaimTx(accountID, commitmentID string, fee utils.BigInt, ttl, nonce uint64) NamePreclaimTx {
 	return NamePreclaimTx{accountID, commitmentID, fee, ttl, nonce}
 }
 
@@ -180,7 +193,7 @@ type NameClaimTx struct {
 	AccountID string
 	Name      string
 	NameSalt  uint64
-	Fee       uint64
+	Fee       utils.BigInt
 	TTL       uint64
 	Nonce     uint64
 }
@@ -204,14 +217,28 @@ func (t *NameClaimTx) RLP() (rlpRawMsg []byte, err error) {
 		aID,
 		t.Nonce,
 		nID,
-		uint64(t.NameSalt),
-		uint64(t.Fee),
+		t.NameSalt,
+		t.Fee.Int,
 		t.TTL)
 	return
 }
 
+func (t *NameClaimTx) JSON() (string, error) {
+	swaggerT := models.NameClaimTx{
+		AccountID: models.EncodedHash(t.AccountID),
+		Fee:       t.Fee,
+		Name:      &t.Name,
+		NameSalt:  &t.NameSalt,
+		Nonce:     t.Nonce,
+		TTL:       t.TTL,
+	}
+
+	output, err := swaggerT.MarshalBinary()
+	return string(output), err
+}
+
 // NewNameClaimTx is a constructor for a NameClaimTx struct
-func NewNameClaimTx(accountID, name string, nameSalt, fee uint64, ttl, nonce uint64) NameClaimTx {
+func NewNameClaimTx(accountID, name string, nameSalt uint64, fee utils.BigInt, ttl, nonce uint64) NameClaimTx {
 	return NameClaimTx{accountID, name, nameSalt, fee, ttl, nonce}
 }
 
@@ -222,7 +249,7 @@ type NameUpdateTx struct {
 	Pointers  []string
 	NameTTL   uint64
 	ClientTTL uint64
-	Fee       uint64
+	Fee       utils.BigInt
 	TTL       uint64
 	Nonce     uint64
 }
@@ -255,13 +282,17 @@ func (t *NameUpdateTx) RLP() (rlpRawMsg []byte, err error) {
 		uint64(t.NameTTL),
 		ptrs,
 		uint64(t.ClientTTL),
-		uint64(t.Fee),
+		t.Fee.Int,
 		t.TTL)
 	return
 }
 
+func (t *NameUpdateTx) JSON() (string, error) {
+	return "unimplemented", nil
+}
+
 // NewNameUpdateTx is a constructor for a NameUpdateTx struct
-func NewNameUpdateTx(accountID, nameID string, pointers []string, nameTTL, clientTTL uint64, fee uint64, ttl, nonce uint64) NameUpdateTx {
+func NewNameUpdateTx(accountID, nameID string, pointers []string, nameTTL, clientTTL uint64, fee utils.BigInt, ttl, nonce uint64) NameUpdateTx {
 	return NameUpdateTx{accountID, nameID, pointers, nameTTL, clientTTL, fee, ttl, nonce}
 }
 
