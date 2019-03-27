@@ -415,7 +415,7 @@ func (t *OracleExtendTx) RLP() (rlpRawMsg []byte, err error) {
 		t.AccountNonce,
 		t.TTLType,
 		t.TTLValue,
-		t.Fee.Bytes(),
+		t.Fee.Int,
 		t.TTL)
 	return
 }
