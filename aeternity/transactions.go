@@ -119,6 +119,7 @@ func (t *SpendTx) RLP() (rlpRawMsg []byte, err error) {
 	return
 }
 
+// JSON representation of a Tx is useful for querying the node's debug endpoint
 func (t *SpendTx) JSON() (string, error) {
 	swaggerT := models.SpendTx{
 		Amount:      t.Amount,
@@ -171,6 +172,7 @@ func (t *NamePreclaimTx) RLP() (rlpRawMsg []byte, err error) {
 	return
 }
 
+// JSON representation of a Tx is useful for querying the node's debug endpoint
 func (t *NamePreclaimTx) JSON() (string, error) {
 	swaggerT := models.NamePreclaimTx{
 		AccountID:    models.EncodedHash(t.AccountID),
@@ -223,6 +225,7 @@ func (t *NameClaimTx) RLP() (rlpRawMsg []byte, err error) {
 	return
 }
 
+// JSON representation of a Tx is useful for querying the node's debug endpoints
 func (t *NameClaimTx) JSON() (string, error) {
 	swaggerT := models.NameClaimTx{
 		AccountID: models.EncodedHash(t.AccountID),
@@ -287,6 +290,7 @@ func (t *NameUpdateTx) RLP() (rlpRawMsg []byte, err error) {
 	return
 }
 
+// JSON representation of a Tx is useful for querying the node's debug endpoint
 func (t *NameUpdateTx) JSON() (string, error) {
 	return "unimplemented", nil
 }
@@ -335,6 +339,7 @@ func (t *OracleRegisterTx) RLP() (rlpRawMsg []byte, err error) {
 	return
 }
 
+// JSON representation of a Tx is useful for querying the node's debug endpoint
 // BUG: Account Nonce won't be represented in JSON output if nonce is 0, thanks to swagger.json
 func (t *OracleRegisterTx) JSON() (string, error) {
 	// # Oracles
@@ -415,6 +420,7 @@ func (t *OracleExtendTx) RLP() (rlpRawMsg []byte, err error) {
 	return
 }
 
+// JSON representation of a Tx is useful for querying the node's debug endpoint
 func (t *OracleExtendTx) JSON() (string, error) {
 	var oracleTTLTypeStr string
 	if t.TTLType == 0 {
