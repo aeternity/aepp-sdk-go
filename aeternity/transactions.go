@@ -39,6 +39,16 @@ func createSignedTransaction(txRaw []byte, signatures [][]byte) (rlpRawMsg []byt
 	return
 }
 
+func ttlTypeIntToStr(i uint64) string {
+	var oracleTTLTypeStr string
+	if i == 0 {
+		oracleTTLTypeStr = "delta"
+	} else {
+		oracleTTLTypeStr = "block"
+	}
+	return oracleTTLTypeStr
+}
+
 func buildPointers(pointers []string) (ptrs [][]uint8, err error) {
 	// TODO: handle errors
 	ptrs = make([][]uint8, len(pointers))
@@ -360,12 +370,7 @@ func (t *OracleRegisterTx) JSON() (string, error) {
 	abiVersionCasted := int64(t.AbiVersion)
 	vmVersionCasted := int64(t.VMVersion)
 
-	var oracleTTLTypeStr string
-	if t.OracleTTLType == 0 {
-		oracleTTLTypeStr = "delta"
-	} else {
-		oracleTTLTypeStr = "block"
-	}
+	ttlTypeStr := ttlTypeIntToStr(t.OracleTTLType)
 
 	swaggerT := models.OracleRegisterTx{
 		AbiVersion: &abiVersionCasted,
@@ -373,7 +378,7 @@ func (t *OracleRegisterTx) JSON() (string, error) {
 		Fee:        t.TxFee,
 		Nonce:      t.AccountNonce,
 		OracleTTL: &models.TTL{
-			Type:  &oracleTTLTypeStr,
+			Type:  &ttlTypeStr,
 			Value: &t.OracleTTLValue,
 		},
 		QueryFee:       t.QueryFee,
@@ -422,12 +427,7 @@ func (t *OracleExtendTx) RLP() (rlpRawMsg []byte, err error) {
 
 // JSON representation of a Tx is useful for querying the node's debug endpoint
 func (t *OracleExtendTx) JSON() (string, error) {
-	var oracleTTLTypeStr string
-	if t.TTLType == 0 {
-		oracleTTLTypeStr = "delta"
-	} else {
-		oracleTTLTypeStr = "block"
-	}
+	oracleTTLTypeStr := ttlTypeIntToStr(t.TTLType)
 
 	swaggerT := models.OracleExtendTx{
 		Fee:      t.Fee,
@@ -451,21 +451,71 @@ func NewOracleExtendTx(oracleID string, accountNonce, ttlType, ttlValue uint64, 
 
 // OracleQueryTx represents a transaction that a program sends to query an oracle
 type OracleQueryTx struct {
-	SenderID     string
-	AccountNonce uint64
-	OracleID     string
-	Query        string
-	QueryFee     utils.BigInt
-	QueryTTL     uint64
-	TTLType      uint64
-	TTLValue     uint64
-	TxFee        utils.BigInt
-	TxTTL        uint64
+	SenderID         string
+	AccountNonce     uint64
+	OracleID         string
+	Query            string
+	QueryFee         utils.BigInt
+	QueryTTLType     uint64
+	QueryTTLValue    uint64
+	ResponseTTLType  uint64
+	ResponseTTLValue uint64
+	TxFee            utils.BigInt
+	TxTTL            uint64
+}
+
+// RLP returns a byte serialized representation
+func (t *OracleQueryTx) RLP() (rlpRawMsg []byte, err error) {
+	aID, err := buildIDTag(IDTagOracle, t.SenderID)
+	if err != nil {
+		return
+	}
+
+	rlpRawMsg, err = buildRLPMessage(
+		ObjectTagOracleQueryTransaction,
+		rlpMessageVersion,
+		aID,
+		[]byte(t.Query),
+		t.QueryFee.Int,
+		t.QueryTTLType,
+		t.QueryTTLValue,
+		t.ResponseTTLType,
+		t.ResponseTTLValue,
+		t.TxFee.Int,
+		t.TxTTL,
+		t.AccountNonce)
+	return
+}
+
+func (t *OracleQueryTx) JSON() (string, error) {
+	responseTTLTypeStr := ttlTypeIntToStr(t.ResponseTTLType)
+	queryTTLTypeStr := ttlTypeIntToStr(t.QueryTTLType)
+
+	swaggerT := models.OracleQueryTx{
+		Fee:      t.TxFee,
+		Nonce:    t.AccountNonce,
+		OracleID: models.EncodedHash(t.OracleID),
+		Query:    &t.Query,
+		QueryFee: t.QueryFee,
+		QueryTTL: &models.TTL{
+			Type:  &queryTTLTypeStr,
+			Value: &t.QueryTTLValue,
+		},
+		ResponseTTL: &models.RelativeTTL{
+			Type:  &responseTTLTypeStr,
+			Value: &t.ResponseTTLValue,
+		},
+		SenderID: models.EncodedHash(t.SenderID),
+		TTL:      t.TxTTL,
+	}
+
+	output, err := swaggerT.MarshalBinary()
+	return string(output), err
 }
 
 // NewOracleQueryTx is a constructor for a OracleQueryTx struct
-func NewOracleQueryTx(SenderID string, AccountNonce uint64, OracleID, Query string, QueryFee utils.BigInt, QueryTTL, TTLType, TTLValue uint64, TxFee utils.BigInt, TxTTL uint64) OracleQueryTx {
-	return OracleQueryTx{SenderID, AccountNonce, OracleID, Query, QueryFee, QueryTTL, TTLType, TTLValue, TxFee, TxTTL}
+func NewOracleQueryTx(SenderID string, AccountNonce uint64, OracleID, Query string, QueryFee utils.BigInt, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64, TxFee utils.BigInt, TxTTL uint64) OracleQueryTx {
+	return OracleQueryTx{SenderID, AccountNonce, OracleID, Query, QueryFee, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue, TxFee, TxTTL}
 }
 
 // OracleRespondTx represents a transaction that an oracle sends to respond to an incoming query

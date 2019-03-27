@@ -36,8 +36,12 @@ type ContractConfig struct {
 
 // OracleConfig configurations for contracts
 type OracleConfig struct {
-	QueryFee  utils.BigInt `json:"query_fee" yaml:"query_fee" mapstructure:"query_fee"`
-	VMVersion uint64       `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
+	QueryFee         utils.BigInt `json:"query_fee" yaml:"query_fee" mapstructure:"query_fee"`
+	QueryTTLType     uint64       `json:"query_ttl_type" yaml:"query_ttl_type" mapstructure:"query_ttl_type"`
+	QueryTTLValue    uint64       `json:"query_ttl_value" yaml:"query_ttl_value" mapstructure:"query_ttl_value"`
+	ResponseTTLType  uint64       `json:"response_ttl_type" yaml:"response_ttl_type" mapstructure:"response_ttl_type"`
+	ResponseTTLValue uint64       `json:"response_ttl_value" yaml:"response_ttl_value" mapstructure:"response_ttl_value"`
+	VMVersion        uint64       `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
 }
 
 // StateChannelConfig configurations for contracts TODO: not complete
@@ -100,8 +104,12 @@ var Config = ProfileConfig{
 			VMVersion: 0,
 		},
 		Oracles: OracleConfig{
-			QueryFee:  *utils.NewBigIntFromUint64(0),
-			VMVersion: 0,
+			QueryFee:         *utils.NewBigIntFromUint64(0),
+			QueryTTLType:     0,
+			QueryTTLValue:    300,
+			ResponseTTLType:  0,
+			ResponseTTLValue: 300,
+			VMVersion:        0,
 		},
 		StateChannels: StateChannelConfig{ // UNUSED
 			LockPeriod:     0,

@@ -351,6 +351,7 @@ func TestOracleExtendTx_RLP(t *testing.T) {
 				TTLType:      0,
 				TTLValue:     300,
 				Fee:          *utils.NewBigIntFromUint64(10),
+				TTL:          0,
 			},
 			wantTx:  "tx_6xkBoQTOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+8wEAggEsCgDoA8Ab",
 			wantErr: false,
@@ -376,7 +377,78 @@ func TestOracleExtendTx_RLP(t *testing.T) {
 				return
 			}
 			if !reflect.DeepEqual(gotTx, tt.wantTx) {
-				t.Errorf("OracleExtendTx.RLP() = %v, want %v", gotTx, tt.wantTx)
+				gotTxRawBytes, wantTxRawBytes := getRLPSerialized(gotTx, tt.wantTx)
+				t.Errorf("OracleExtendTx.RLP() = \n%v\n%v, want \n%v\n%v", gotTx, gotTxRawBytes, tt.wantTx, wantTxRawBytes)
+			}
+		})
+	}
+}
+
+func TestOracleQueryTx_RLP(t *testing.T) {
+	type fields struct {
+		SenderID         string
+		AccountNonce     uint64
+		OracleID         string
+		Query            string
+		QueryFee         utils.BigInt
+		QueryTTLType     uint64
+		QueryTTLValue    uint64
+		ResponseTTLType  uint64
+		ResponseTTLValue uint64
+		TxFee            utils.BigInt
+		TxTTL            uint64
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		wantTx  string
+		wantErr bool
+	}{
+		{
+			name: "Normal query to an Oracle",
+			fields: fields{
+				SenderID:         "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
+				AccountNonce:     uint64(1),
+				OracleID:         "ok_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+				Query:            "Are you okay?",
+				QueryFee:         aeternity.Config.Client.Oracles.QueryFee,
+				QueryTTLType:     aeternity.Config.Client.Oracles.QueryTTLType,
+				QueryTTLValue:    aeternity.Config.Client.Oracles.QueryTTLValue,
+				ResponseTTLType:  aeternity.Config.Client.Oracles.ResponseTTLType,
+				ResponseTTLValue: aeternity.Config.Client.Oracles.ResponseTTLValue,
+				TxFee:            aeternity.Config.Client.Fee,
+				TxTTL:            aeternity.Config.Client.TTL,
+			},
+			wantTx:  "I don't know you tell me",
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tx := aeternity.OracleQueryTx{
+				SenderID:         tt.fields.SenderID,
+				AccountNonce:     tt.fields.AccountNonce,
+				OracleID:         tt.fields.OracleID,
+				Query:            tt.fields.Query,
+				QueryFee:         tt.fields.QueryFee,
+				QueryTTLType:     tt.fields.QueryTTLType,
+				QueryTTLValue:    tt.fields.QueryTTLValue,
+				ResponseTTLType:  tt.fields.ResponseTTLType,
+				ResponseTTLValue: tt.fields.ResponseTTLValue,
+				TxFee:            tt.fields.TxFee,
+				TxTTL:            tt.fields.TxTTL,
+			}
+			txJson, _ := tx.JSON()
+			fmt.Println(txJson)
+
+			gotTx, err := aeternity.BaseEncodeTx(&tx)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("OracleQueryTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(gotTx, tt.wantTx) {
+				gotTxRawBytes, wantTxRawBytes := getRLPSerialized(gotTx, tt.wantTx)
+				t.Errorf("OracleQueryTx.RLP() = \n%v\n%v, want \n%v\n%v", gotTx, gotTxRawBytes, tt.wantTx, wantTxRawBytes)
 			}
 		})
 	}
