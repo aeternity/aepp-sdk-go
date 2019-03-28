@@ -1,19 +1,18 @@
-package aeternity_test
+package aeternity
 
 import (
 	"fmt"
 	"reflect"
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/aeternity"
 	"github.com/aeternity/aepp-sdk-go/utils"
 )
 
 func getRLPSerialized(tx1 string, tx2 string) ([]interface{}, []interface{}) {
-	tx1Bytes, _ := aeternity.Decode(tx1)
-	tx1RLP := aeternity.DecodeRLPMessage(tx1Bytes)
-	tx2Bytes, _ := aeternity.Decode(tx2)
-	tx2RLP := aeternity.DecodeRLPMessage(tx2Bytes)
+	tx1Bytes, _ := Decode(tx1)
+	tx1RLP := DecodeRLPMessage(tx1Bytes)
+	tx2Bytes, _ := Decode(tx2)
+	tx2RLP := DecodeRLPMessage(tx2Bytes)
 	return tx1RLP, tx2RLP
 }
 
@@ -64,7 +63,7 @@ func TestSpendTx_RLP(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tx := aeternity.NewSpendTx(tt.fields.senderID, tt.fields.recipientID,
+			tx := NewSpendTx(tt.fields.senderID, tt.fields.recipientID,
 				tt.fields.amount,
 				tt.fields.fee,
 				tt.fields.payload,
@@ -72,10 +71,10 @@ func TestSpendTx_RLP(t *testing.T) {
 				tt.fields.nonce,
 			)
 
-			txJson, err := tx.JSON()
-			fmt.Println(txJson)
+			txJSON, err := tx.JSON()
+			fmt.Println(txJSON)
 
-			gotTx, err := aeternity.BaseEncodeTx(&tx)
+			gotTx, err := BaseEncodeTx(&tx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("SpendTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -109,7 +108,7 @@ func TestNamePreclaimTx_RLP(t *testing.T) {
 				CommitmentID: "cm_2jrPGyFKCEFFrsVvQsUzfnSURV5igr2WxvMR679S5DnuFEjet4", // name: fdsa.test, salt: 12345
 				Fee:          *utils.NewBigIntFromUint64(10),
 				TTL:          uint64(10),
-				Nonce:        uint64(1),
+				Nonce:        uint64(1),a
 			},
 			wantTx:  "tx_+EkhAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vMBoQPk/tyQN11szXxmy4KFOFRzfzopJGCmg7cv5B9SwaJs0goKoCk0Qg==",
 			wantErr: false,
@@ -117,7 +116,7 @@ func TestNamePreclaimTx_RLP(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tx := aeternity.NewNamePreclaimTx(
+			tx := NewNamePreclaimTx(
 				tt.fields.AccountID,
 				tt.fields.CommitmentID,
 				tt.fields.Fee,
@@ -125,9 +124,9 @@ func TestNamePreclaimTx_RLP(t *testing.T) {
 				tt.fields.Nonce,
 			)
 
-			txJson, err := tx.JSON()
-			fmt.Println(txJson)
-			gotTx, err := aeternity.BaseEncodeTx(&tx)
+			txJSON, err := tx.JSON()
+			fmt.Println(txJSON)
+			gotTx, err := BaseEncodeTx(&tx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NamePreclaimTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -159,7 +158,7 @@ func TestNameClaimTx_RLP(t *testing.T) {
 			name: "Normal operation: claim a reserved name",
 			fields: fields{
 				AccountID: "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
-				Name:      "nm_ie148R2qZYBfo1Ek3sZpfTLwBhkkqCRKi2Ce8JJ7yyWVRw2Sb",
+				Name:      "fdsa.test",
 				NameSalt:  12345,
 				Fee:       *utils.NewBigIntFromUint64(10),
 				TTL:       uint64(10),
@@ -171,7 +170,7 @@ func TestNameClaimTx_RLP(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tx := aeternity.NewNameClaimTx(
+			tx := NewNameClaimTx(
 				tt.fields.AccountID,
 				tt.fields.Name,
 				tt.fields.NameSalt,
@@ -180,10 +179,10 @@ func TestNameClaimTx_RLP(t *testing.T) {
 				tt.fields.Nonce,
 			)
 
-			txJson, err := tx.JSON()
-			fmt.Println(txJson)
+			txJSON, err := tx.JSON()
+			fmt.Println(txJSON)
 
-			gotTx, err := aeternity.BaseEncodeTx(&tx)
+			gotTx, err := BaseEncodeTx(&tx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NameClaimTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -217,7 +216,7 @@ func TestNameUpdateTx_RLP(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tx := aeternity.NewNameUpdateTx(
+			tx := NewNameUpdateTx(
 				tt.fields.AccountID,
 				tt.fields.NameID,
 				tt.fields.Pointers,
@@ -227,7 +226,7 @@ func TestNameUpdateTx_RLP(t *testing.T) {
 				tt.fields.TTL,
 				tt.fields.Nonce,
 			)
-			gotTx, err := aeternity.BaseEncodeTx(&tx)
+			gotTx, err := BaseEncodeTx(&tx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NameUpdateTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -273,7 +272,7 @@ func TestOracleRegisterTx_RLP(t *testing.T) {
 				abiVersion:     uint64(0),
 				vmVersion:      uint64(0),
 				txFee:          *utils.NewBigIntFromUint64(0),
-				txTTL:          aeternity.Config.Client.TTL,
+				txTTL:          Config.Client.TTL,
 			},
 			wantTx:  "tx_+FgWAaEBHxOjsIvwAUAGYqaLadh194A87EwIZH9u1dhMeJe9UKMAk3F1ZXJ5IFNwZWNpZmljYXRpb26WcmVzcG9uc2UgU3BlY2lmaWNhdGlvbgAAZACCAfQA5kqYWQ==",
 			wantErr: false,
@@ -281,25 +280,45 @@ func TestOracleRegisterTx_RLP(t *testing.T) {
 		{
 			name: "A 'normal' OracleRegisterTx",
 			fields: fields{
-				accountID:      "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
-				accountNonce:   uint64(0),
+				accountID:      "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+				accountNonce:   uint64(1),
 				querySpec:      "query Specification",
 				responseSpec:   "response Specification",
-				queryFee:       *utils.NewBigIntFromUint64(3000),
-				oracleTTLType:  uint64(0),
+				queryFee:       Config.Client.Oracles.QueryFee,
+				oracleTTLType:  0,
 				oracleTTLValue: uint64(100),
 				abiVersion:     uint64(1),
 				vmVersion:      uint64(0),
-				txFee:          aeternity.Config.Client.Fee,
-				txTTL:          aeternity.Config.Client.TTL,
+				txFee:          Config.Client.Fee,
+				txTTL:          Config.Client.TTL,
 			},
-			wantTx:  "tx_+GAWAaEBHxOjsIvwAUAGYqaLadh194A87EwIZH9u1dhMeJe9UKMAk3F1ZXJ5IFNwZWNpZmljYXRpb26WcmVzcG9uc2UgU3BlY2lmaWNhdGlvboILuABkhrXmIPSAAIIB9AErxxDN",
+			// from the node's debug endpoint
+			wantTx:  "tx_+F4WAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vMBk3F1ZXJ5IFNwZWNpZmljYXRpb26WcmVzcG9uc2UgU3BlY2lmaWNhdGlvbgAAZIa15iD0gACCAfQB0ylR9Q==",
+			wantErr: false,
+		},
+		{
+			name: "Should be valid to post to a private testnet",
+			fields: fields{
+				accountID:      "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+				accountNonce:   uint64(17),
+				querySpec:      "query Specification",
+				responseSpec:   "response Specification",
+				queryFee:       Config.Client.Oracles.QueryFee,
+				oracleTTLType:  0,
+				oracleTTLValue: uint64(100),
+				abiVersion:     uint64(1),
+				vmVersion:      uint64(0),
+				txFee:          Config.Client.Fee,
+				txTTL:          uint64(50000),
+			},
+			// from the node's debug endpoint
+			wantTx:  "tx_+F4WAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vMRk3F1ZXJ5IFNwZWNpZmljYXRpb26WcmVzcG9uc2UgU3BlY2lmaWNhdGlvbgAAZIa15iD0gACCw1AAwIXVNw==",
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tx := aeternity.NewOracleRegisterTx(
+			tx := NewOracleRegisterTx(
 				tt.fields.accountID,
 				tt.fields.accountNonce,
 				tt.fields.querySpec,
@@ -312,10 +331,10 @@ func TestOracleRegisterTx_RLP(t *testing.T) {
 				tt.fields.txFee,
 				tt.fields.txTTL,
 			)
-			txJson, _ := tx.JSON()
-			fmt.Println(txJson)
+			txJSON, _ := tx.JSON()
+			fmt.Println(txJSON)
 
-			gotTx, err := aeternity.BaseEncodeTx(&tx)
+			gotTx, err := BaseEncodeTx(&tx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("OracleRegisterTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -353,13 +372,14 @@ func TestOracleExtendTx_RLP(t *testing.T) {
 				Fee:          *utils.NewBigIntFromUint64(10),
 				TTL:          0,
 			},
+			// from the node's debug endpoint2
 			wantTx:  "tx_6xkBoQTOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+8wEAggEsCgDoA8Ab",
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tx := aeternity.NewOracleExtendTx(
+			tx := NewOracleExtendTx(
 				tt.fields.OracleID,
 				tt.fields.AccountNonce,
 				tt.fields.TTLType,
@@ -367,10 +387,10 @@ func TestOracleExtendTx_RLP(t *testing.T) {
 				tt.fields.Fee,
 				tt.fields.TTL,
 			)
-			txJson, _ := tx.JSON()
-			fmt.Println(txJson)
+			txJSON, _ := tx.JSON()
+			fmt.Println(txJSON)
 
-			gotTx, err := aeternity.BaseEncodeTx(&tx)
+			gotTx, err := BaseEncodeTx(&tx)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("OracleExtendTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
@@ -410,22 +430,22 @@ func TestOracleQueryTx_RLP(t *testing.T) {
 				SenderID:         "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
 				AccountNonce:     uint64(1),
 				OracleID:         "ok_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
-				Query:            "Are you okay?",
-				QueryFee:         aeternity.Config.Client.Oracles.QueryFee,
-				QueryTTLType:     aeternity.Config.Client.Oracles.QueryTTLType,
-				QueryTTLValue:    aeternity.Config.Client.Oracles.QueryTTLValue,
-				ResponseTTLType:  aeternity.Config.Client.Oracles.ResponseTTLType,
-				ResponseTTLValue: aeternity.Config.Client.Oracles.ResponseTTLValue,
-				TxFee:            aeternity.Config.Client.Fee,
-				TxTTL:            aeternity.Config.Client.TTL,
+				Query:            "abcd",
+				QueryFee:         Config.Client.Oracles.QueryFee,
+				QueryTTLType:     Config.Client.Oracles.QueryTTLType,
+				QueryTTLValue:    Config.Client.Oracles.QueryTTLValue,
+				ResponseTTLType:  Config.Client.Oracles.ResponseTTLType,
+				ResponseTTLValue: Config.Client.Oracles.ResponseTTLValue,
+				TxFee:            Config.Client.Fee,
+				TxTTL:            Config.Client.TTL,
 			},
-			wantTx:  "I don't know you tell me",
+			wantTx:  "tx_+GEXAaEBHxOjsIvwAUAGYqaLadh194A87EwIZH9u1dhMeJe9UKMBoQTOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+84RhYmNkAAGCASwBggEsiAAAAAAAAAAAggH06n1crw==", // painstakingly won from aepp-sdk-python
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tx := aeternity.OracleQueryTx{
+			tx := OracleQueryTx{
 				SenderID:         tt.fields.SenderID,
 				AccountNonce:     tt.fields.AccountNonce,
 				OracleID:         tt.fields.OracleID,
@@ -438,10 +458,10 @@ func TestOracleQueryTx_RLP(t *testing.T) {
 				TxFee:            tt.fields.TxFee,
 				TxTTL:            tt.fields.TxTTL,
 			}
-			txJson, _ := tx.JSON()
-			fmt.Println(txJson)
+			txJSON, _ := tx.JSON()
+			fmt.Println(txJSON)
 
-			gotTx, err := aeternity.BaseEncodeTx(&tx)
+			gotTx, err := BaseEncodeTx(&tx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("OracleQueryTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
 				return
