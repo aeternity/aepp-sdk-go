@@ -466,7 +466,12 @@ type OracleQueryTx struct {
 
 // RLP returns a byte serialized representation
 func (t *OracleQueryTx) RLP() (rlpRawMsg []byte, err error) {
-	aID, err := buildIDTag(IDTagOracle, t.SenderID)
+	accountID, err := buildIDTag(IDTagAccount, t.SenderID)
+	if err != nil {
+		return
+	}
+
+	oracleID, err := buildIDTag(IDTagOracle, t.OracleID)
 	if err != nil {
 		return
 	}
@@ -474,7 +479,9 @@ func (t *OracleQueryTx) RLP() (rlpRawMsg []byte, err error) {
 	rlpRawMsg, err = buildRLPMessage(
 		ObjectTagOracleQueryTransaction,
 		rlpMessageVersion,
-		aID,
+		accountID,
+		t.AccountNonce,
+		oracleID,
 		[]byte(t.Query),
 		t.QueryFee.Int,
 		t.QueryTTLType,
@@ -482,8 +489,7 @@ func (t *OracleQueryTx) RLP() (rlpRawMsg []byte, err error) {
 		t.ResponseTTLType,
 		t.ResponseTTLValue,
 		t.TxFee.Int,
-		t.TxTTL,
-		t.AccountNonce)
+		t.TxTTL)
 	return
 }
 
@@ -520,14 +526,14 @@ func NewOracleQueryTx(SenderID string, AccountNonce uint64, OracleID, Query stri
 
 // OracleRespondTx represents a transaction that an oracle sends to respond to an incoming query
 type OracleRespondTx struct {
-	OracleID     string
-	AccountNonce uint64
-	QueryID      string
-	Response     string
-	TTLType      uint64
-	TTLValue     uint64
-	TxFee        utils.BigInt
-	TxTTL        uint64
+	OracleID         string
+	AccountNonce     uint64
+	QueryID          string
+	Response         string
+	ResponseTTLType  uint64
+	ResponseTTLValue uint64
+	TxFee            utils.BigInt
+	TxTTL            uint64
 }
 
 // NewOracleRespondTx is a constructor for a OracleRespondTx struct
