@@ -24,6 +24,15 @@ func TestChainTop(t *testing.T) {
 	}
 }
 
+func TestChainBroadcast(t *testing.T) {
+	setConfigTestParams()
+	emptyCmd := cobra.Command{}
+	err := broadcastFunc(&emptyCmd, []string{"tx_+KgLAfhCuEAPX1l3BdFOcLeduH3PPwPV25mETXZE8IBDe6PGuasSEKJeB/cDDm+kW05Cdp38+mpvVSTTPMx7trL/7qxfUr8IuGD4XhYBoQHOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+8wGTcXVlcnkgU3BlY2lmaWNhdGlvbpZyZXNwb25zZSBTcGVjaWZpY2F0aW9uAABkhrXmIPSAAIIB9AHdGxXf"})
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 func TestChainStatus(t *testing.T) {
 	setConfigTestParams()
 	emptyCmd := cobra.Command{}
