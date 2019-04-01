@@ -81,6 +81,8 @@ func TestBigIntLargerThanZero(t *testing.T) {
 	}
 }
 
+// Code using BigInt.UnmarshalJSON should not need to know that it has to initialize
+// the big.Int inside BigInt.
 func TestBigIntUnmarshalJSON(t *testing.T) {
 	maxuint64AsString := []byte("18446744073709551615")
 	maxuint64AsBigInt := RequireBigIntFromString("18446744073709551615")
@@ -91,7 +93,9 @@ func TestBigIntUnmarshalJSON(t *testing.T) {
 	negBigIntAsString := []byte("-1")
 	negBigIntAsBigInt := RequireBigIntFromString("-1")
 
-	var amount = BigInt{new(big.Int)}
+	realLifeBalanceString := []byte("966370000100000000000001")
+	realLifeBalanceBigInt := RequireBigIntFromString("966370000100000000000001")
+	var amount = BigInt{} // leave Int uninitialized, to ensure that UnmarshalJSON will initialize it.
 	var tests = []struct {
 		input    []byte
 		expected *BigInt
@@ -100,6 +104,7 @@ func TestBigIntUnmarshalJSON(t *testing.T) {
 		{maxuint64AsString, maxuint64AsBigInt},
 		{overuint64AsString, overuint64AsBigInt},
 		{negBigIntAsString, negBigIntAsBigInt},
+		{realLifeBalanceString, realLifeBalanceBigInt},
 	}
 
 	for _, test := range tests {

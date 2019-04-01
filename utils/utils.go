@@ -166,6 +166,13 @@ func (b *BigInt) LargerOrEqualToZero() error {
 	}
 	return nil
 }
+func (b *BigInt) UnmarshalJSON(text []byte) error {
+	if b.Int == nil {
+		b.Int = &big.Int{}
+	}
+
+	return b.Int.UnmarshalJSON(text)
+}
 
 // NewBigInt returns a new BigInt with its Int struct field initialized
 func NewBigInt() (i *BigInt) {
