@@ -19,11 +19,11 @@ type NodeConfig struct {
 
 // AensConfig configurations for Aens
 type AensConfig struct {
-	NameTTL     uint64 `json:"name_ttl" yaml:"name_ttl" mapstructure:"name_ttl"`
-	ClientTTL   uint64 `json:"client_ttl" yaml:"client_ttl" mapstructure:"client_ttl"`
-	PreClaimFee uint64 `json:"preclaim_fee" yaml:"preclaim_fee" mapstructure:"preclaim_fee"`
-	ClaimFee    uint64 `json:"claim_fee" yaml:"claim_fee" mapstructure:"claim_fee"`
-	UpdateFee   uint64 `json:"update_fee" yaml:"update_fee" mapstructure:"update_fee"`
+	NameTTL     uint64       `json:"name_ttl" yaml:"name_ttl" mapstructure:"name_ttl"`
+	ClientTTL   uint64       `json:"client_ttl" yaml:"client_ttl" mapstructure:"client_ttl"`
+	PreClaimFee utils.BigInt `json:"preclaim_fee" yaml:"preclaim_fee" mapstructure:"preclaim_fee"`
+	ClaimFee    utils.BigInt `json:"claim_fee" yaml:"claim_fee" mapstructure:"claim_fee"`
+	UpdateFee   uint64       `json:"update_fee" yaml:"update_fee" mapstructure:"update_fee"`
 }
 
 // ContractConfig configurations for contracts
@@ -94,8 +94,10 @@ var Config = ProfileConfig{
 		TTL: 500,
 		Fee: *utils.RequireBigIntFromString("200000000000000"),
 		Names: AensConfig{
-			NameTTL:   500, // absolute block height when the name will expire
-			ClientTTL: 500, // time in blocks until the name resolver should check again in case the name was updated
+			NameTTL:     500, // absolute block height when the name will expire
+			ClientTTL:   500, // time in blocks until the name resolver should check again in case the name was updated
+			PreClaimFee: *utils.NewBigIntFromUint64(0),
+			ClaimFee:    *utils.NewBigIntFromUint64(0),
 		},
 		Contracts: ContractConfig{ // UNUSED
 			Gas:       1e9,
