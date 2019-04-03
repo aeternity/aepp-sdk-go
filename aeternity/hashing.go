@@ -80,9 +80,9 @@ func hash(in []byte) (out []byte, err error) {
 	return
 }
 
-// namehash calculate the namehash of a string
+// Namehash calculate the Namehash of a string
 // TODO: link to the
-func namehash(name string) []byte {
+func Namehash(name string) []byte {
 	buf := make([]byte, 32)
 	for _, s := range strings.Split(name, ".") {
 		sh, _ := hash([]byte(s))
@@ -117,7 +117,7 @@ func computeCommitmentID(name string) (ch string, salt []byte, err error) {
 		return
 	}
 	// TODO: this is done using the api (concatenating )
-	nh := append(namehash(name), salt...)
+	nh := append(Namehash(name), salt...)
 	nh, _ = hash(nh)
 	// nh := namehash(name)
 	ch = Encode(PrefixCommitment, nh)

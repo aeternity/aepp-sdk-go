@@ -102,7 +102,7 @@ func Test_Decode(t *testing.T) {
 	}
 }
 
-func Test_namehash(t *testing.T) {
+func Test_Namehash(t *testing.T) {
 	// ('welghmolql.aet') == 'nm_2KrC4asc6fdv82uhXDwfiqB1TY2htjhnzwzJJKLxidyMymJRUQ'
 	type args struct {
 		name string
@@ -114,13 +114,14 @@ func Test_namehash(t *testing.T) {
 	}{
 		{"ok", args{"welghmolql.aet"}, "nm_2KrC4asc6fdv82uhXDwfiqB1TY2htjhnzwzJJKLxidyMymJRUQ"},
 		{"ok", args{"welghmolql"}, "nm_2nLRBu1FyukEvJuMANjFzx8mubMFeyG2mJ2QpQoYKymYe1d2sr"},
+		{"ok", args{"fdsa.test"}, "nm_ie148R2qZYBfo1Ek3sZpfTLwBhkkqCRKi2Ce8JJ7yyWVRw2Sb"},
 		{"ok", args{""}, "nm_2q1DrgEuxRNCWRp5nTs6FyA7moSEzrPVUSTEpkpFsM4hRL4Dkb"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := Encode(PrefixName, namehash(tt.args.name))
+			got := Encode(PrefixName, Namehash(tt.args.name))
 			if got != tt.want {
-				t.Errorf("namehash() = %v, want %v", got, tt.want)
+				t.Errorf("Namehash() = %v, want %v", got, tt.want)
 			}
 		})
 	}
