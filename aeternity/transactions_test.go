@@ -212,7 +212,36 @@ func TestNameUpdateTx_RLP(t *testing.T) {
 		wantTx  string
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "update 1 pointer",
+			fields: fields{
+				AccountID: "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+				NameID:    "nm_ie148R2qZYBfo1Ek3sZpfTLwBhkkqCRKi2Ce8JJ7yyWVRw2Sb", // fdsa.test
+				Pointers:  []string{"ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"},
+				NameTTL:   uint64(0),
+				ClientTTL: uint64(6),
+				Fee:       *utils.NewBigIntFromUint64(1),
+				TTL:       5,
+				Nonce:     5,
+			},
+			wantTx:  "tx_+H4iAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vMFoQJei0cGdDWb3EfrY0mtZADF0LoQ4yL6z10I/3ETJ0fpKADy8Y5hY2NvdW50X3B1YmtleaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vMGAQXLBNnv",
+			wantErr: false,
+		},
+		{
+			name: "update 3 pointers",
+			fields: fields{
+				AccountID: "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+				NameID:    "nm_ie148R2qZYBfo1Ek3sZpfTLwBhkkqCRKi2Ce8JJ7yyWVRw2Sb", // fdsa.test
+				Pointers:  []string{"ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi", "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v", "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt"},
+				NameTTL:   uint64(0),
+				ClientTTL: uint64(6),
+				Fee:       *utils.NewBigIntFromUint64(1),
+				TTL:       5,
+				Nonce:     5,
+			},
+			wantTx:  "tx_+OMiAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vMFoQJei0cGdDWb3EfrY0mtZADF0LoQ4yL6z10I/3ETJ0fpKAD4lvGOYWNjb3VudF9wdWJrZXmhAQkzfmKK/9rguLQf6vv/O43g1vpP+B727TdTmYbwitiB8Y5hY2NvdW50X3B1YmtleaEBHxOjsIvwAUAGYqaLadh194A87EwIZH9u1dhMeJe9UKPxjmFjY291bnRfcHVia2V5oQHOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+8wYBBYpSjmc=",
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -226,6 +255,10 @@ func TestNameUpdateTx_RLP(t *testing.T) {
 				tt.fields.TTL,
 				tt.fields.Nonce,
 			)
+
+			txJSON, err := tx.JSON()
+			fmt.Println(txJSON)
+
 			gotTx, err := BaseEncodeTx(&tx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NameUpdateTx.RLP() error = %v, wantErr %v", err, tt.wantErr)

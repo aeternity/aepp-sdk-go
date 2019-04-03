@@ -49,20 +49,22 @@ func ttlTypeIntToStr(i uint64) string {
 	return oracleTTLTypeStr
 }
 
-func buildPointers(pointers []string) (ptrs [][]uint8, err error) {
+func buildPointers(pointers []string) (ptrs []*models.NamePointer, err error) {
 	// TODO: handle errors
-	ptrs = make([][]uint8, len(pointers))
+	ptrs = make([]*models.NamePointer, len(pointers))
 	for i, p := range pointers {
 		switch GetHashPrefix(p) {
 		case PrefixAccountPubkey:
-			pID, err := buildIDTag(IDTagName, p)
-			ptrs[i] = pID
+			// pID, err := buildIDTag(IDTagAccount, p)
+			key := "account_pubkey"
+			ptrs[i] = &models.NamePointer{ID: models.EncodedHash(p), Key: &key}
 			if err != nil {
 				break
 			}
 		case PrefixOraclePubkey:
-			pID, err := buildIDTag(IDTagOracle, p)
-			ptrs[i] = pID
+			// pID, err := buildIDTag(IDTagOracle, p)
+			key := "oracle_pubkey"
+			ptrs[i] = &models.NamePointer{ID: models.EncodedHash(p), Key: &key}
 			if err != nil {
 				break
 			}
@@ -257,10 +259,11 @@ func NewNameClaimTx(accountID, name string, nameSalt uint64, fee utils.BigInt, t
 }
 
 // NameUpdateTx represents a transaction where one extends the lifetime of a reserved name on AENS
+
 type NameUpdateTx struct {
 	AccountID string
 	NameID    string
-	Pointers  []string
+	Pointers  []*models.NamePointer
 	NameTTL   uint64
 	ClientTTL uint64
 	Fee       utils.BigInt
@@ -275,27 +278,22 @@ func (t *NameUpdateTx) RLP() (rlpRawMsg []byte, err error) {
 	if err != nil {
 		return
 	}
-	// build id for the sender
+	// build id for the name
 	nID, err := buildIDTag(IDTagName, t.NameID)
-	if err != nil {
-		return
-	}
-	// build id for pointers
-	ptrs, err := buildPointers(t.Pointers)
 	if err != nil {
 		return
 	}
 
 	// create the transaction
 	rlpRawMsg, err = buildRLPMessage(
-		ObjectTagNameServiceClaimTransaction,
+		ObjectTagNameServiceUpdateTransaction,
 		rlpMessageVersion,
 		aID,
 		t.Nonce,
 		nID,
-		uint64(t.NameTTL),
-		ptrs,
-		uint64(t.ClientTTL),
+		t.NameTTL,
+		t.Pointers,
+		t.ClientTTL,
 		t.Fee.Int,
 		t.TTL)
 	return
@@ -303,12 +301,28 @@ func (t *NameUpdateTx) RLP() (rlpRawMsg []byte, err error) {
 
 // JSON representation of a Tx is useful for querying the node's debug endpoint
 func (t *NameUpdateTx) JSON() (string, error) {
-	return "unimplemented", nil
+	swaggerT := models.NameUpdateTx{
+		AccountID: models.EncodedHash(t.AccountID),
+		ClientTTL: &t.ClientTTL,
+		Fee:       t.Fee,
+		NameID:    models.EncodedHash(t.NameID),
+		NameTTL:   &t.NameTTL,
+		Nonce:     t.Nonce,
+		Pointers:  t.Pointers,
+		TTL:       t.TTL,
+	}
+
+	output, err := swaggerT.MarshalBinary()
+	return string(output), err
 }
 
 // NewNameUpdateTx is a constructor for a NameUpdateTx struct
 func NewNameUpdateTx(accountID, nameID string, pointers []string, nameTTL, clientTTL uint64, fee utils.BigInt, ttl, nonce uint64) NameUpdateTx {
-	return NameUpdateTx{accountID, nameID, pointers, nameTTL, clientTTL, fee, ttl, nonce}
+	parsedPointers, err := buildPointers(pointers)
+	if err != nil {
+		panic(err)
+	}
+	return NameUpdateTx{accountID, nameID, parsedPointers, nameTTL, clientTTL, fee, ttl, nonce}
 }
 
 // OracleRegisterTx represents a transaction that registers an oracle on the blockchain's state
