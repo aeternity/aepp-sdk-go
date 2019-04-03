@@ -164,10 +164,8 @@ func (n *Aens) NameClaimTx(name string, nameSalt uint64, fee utils.BigInt) (tx N
 		return
 	}
 
-	prefix := HashPrefix(name[0:3])
-	encodedName := Encode(prefix, []byte(name))
 	// create the transaction
-	tx = NewNameClaimTx(n.owner.Address, encodedName, nameSalt, fee, txTTL, accountNonce)
+	tx = NewNameClaimTx(n.owner.Address, name, nameSalt, fee, txTTL, accountNonce)
 
 	return tx, err
 }
