@@ -201,6 +201,8 @@ func NewNamePreclaimTx(accountID, commitmentID string, fee utils.BigInt, ttl, no
 }
 
 // NameClaimTx represents a transaction where one claims a previously reserved name on AENS
+// The revealed name is simply sent in plaintext in RLP, while in JSON representation
+// it is base58 encoded.
 type NameClaimTx struct {
 	AccountID string
 	Name      string
@@ -217,18 +219,14 @@ func (t *NameClaimTx) RLP() (rlpRawMsg []byte, err error) {
 	if err != nil {
 		return
 	}
-	// build id for the sender
-	nID, err := buildIDTag(IDTagName, t.Name)
-	if err != nil {
-		return
-	}
+
 	// create the transaction
 	rlpRawMsg, err = buildRLPMessage(
 		ObjectTagNameServiceClaimTransaction,
 		rlpMessageVersion,
 		aID,
 		t.Nonce,
-		nID,
+		t.Name,
 		t.NameSalt,
 		t.Fee.Int,
 		t.TTL)
@@ -237,10 +235,13 @@ func (t *NameClaimTx) RLP() (rlpRawMsg []byte, err error) {
 
 // JSON representation of a Tx is useful for querying the node's debug endpoints
 func (t *NameClaimTx) JSON() (string, error) {
+	// When talking JSON to the node, the name should be 'API encoded'
+	// (base58), not namehash-ed.
+	nameAPIEncoded := Encode(PrefixName, []byte(t.Name))
 	swaggerT := models.NameClaimTx{
 		AccountID: models.EncodedHash(t.AccountID),
 		Fee:       t.Fee,
-		Name:      &t.Name,
+		Name:      &nameAPIEncoded,
 		NameSalt:  &t.NameSalt,
 		Nonce:     t.Nonce,
 		TTL:       t.TTL,

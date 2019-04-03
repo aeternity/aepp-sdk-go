@@ -108,7 +108,7 @@ func TestNamePreclaimTx_RLP(t *testing.T) {
 				CommitmentID: "cm_2jrPGyFKCEFFrsVvQsUzfnSURV5igr2WxvMR679S5DnuFEjet4", // name: fdsa.test, salt: 12345
 				Fee:          *utils.NewBigIntFromUint64(10),
 				TTL:          uint64(10),
-				Nonce:        uint64(1),a
+				Nonce:        uint64(1),
 			},
 			wantTx:  "tx_+EkhAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vMBoQPk/tyQN11szXxmy4KFOFRzfzopJGCmg7cv5B9SwaJs0goKoCk0Qg==",
 			wantErr: false,
@@ -164,7 +164,7 @@ func TestNameClaimTx_RLP(t *testing.T) {
 				TTL:       uint64(10),
 				Nonce:     uint64(1),
 			},
-			wantTx:  "who knows",
+			wantTx:  "tx_9CABoQHOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+8wGJZmRzYS50ZXN0gjA5CgplC94E",
 			wantErr: false,
 		},
 	}
