@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/aeternity/aepp-sdk-go/rlp"
+	"github.com/aeternity/aepp-sdk-go/utils"
 	"github.com/btcsuite/btcutil/base58"
 	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/blake2b"
@@ -113,13 +114,17 @@ func uuidV4() (u string) {
 // since the salt is a uint256, which Erlang handles well, but Go has nothing similar to it,
 // it is imperative that the salt be kept as a bytearray unless you really have to convert it
 // into an integer. Which you usually don't, because it's a salt.
-func generateCommitmentID(name string) (ch string, salt []byte, err error) {
-	salt, err = randomBytes(32)
+func generateCommitmentID(name string) (ch string, salt *utils.BigInt, err error) {
+	saltBytes, err := randomBytes(32)
 	if err != nil {
 		return
 	}
 
-	ch, err = computeCommitmentID(name, salt)
+	ch, err = computeCommitmentID(name, saltBytes)
+
+	salt = utils.NewBigInt()
+	salt.SetBytes(saltBytes)
+
 	return ch, salt, err
 }
 

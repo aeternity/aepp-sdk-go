@@ -1,7 +1,6 @@
 package aeternity
 
 import (
-	"encoding/binary"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -132,33 +131,32 @@ func (ae *Ae) BroadcastTransaction(txSignedBase64 string) (err error) {
 	return
 }
 
-// NamePreclaimTx creates a name preclaim transaction and nameSalt (required for claiming)
+// NamePreclaimTx creates a name preclaim transaction and salt (required for claiming)
 // It should return the Tx struct, not the base64 encoded RLP, to ease subsequent inspection.
-func (n *Aens) NamePreclaimTx(name string, fee utils.BigInt) (tx NamePreclaimTx, nameSalt uint64, err error) {
+func (n *Aens) NamePreclaimTx(name string, fee utils.BigInt) (tx NamePreclaimTx, nameSalt *utils.BigInt, err error) {
 	txTTL, accountNonce, err := getTTLNonce(n.nodeClient, n.owner.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
 
 	// calculate the commitment and get the preclaim salt
-	cm, salt, err := computeCommitmentID(name)
+	// since the salt is 32 bytes long, you must use a big.Int to convert it into an integer
+	cm, nameSalt, err := generateCommitmentID(name)
 	if err != nil {
-		return NamePreclaimTx{}, 0, err
+		return NamePreclaimTx{}, utils.NewBigInt(), err
 	}
-	// convert the salt back into uint64 from binary
-	nameSalt = binary.BigEndian.Uint64(salt)
 
 	// build the transaction
 	tx = NewNamePreclaimTx(n.owner.Address, cm, fee, txTTL, accountNonce)
 	if err != nil {
-		return NamePreclaimTx{}, 0, err
+		return NamePreclaimTx{}, utils.NewBigInt(), err
 	}
 
 	return
 }
 
 // NameClaimTx creates a claim transaction
-func (n *Aens) NameClaimTx(name string, nameSalt uint64, fee utils.BigInt) (tx NameClaimTx, err error) {
+func (n *Aens) NameClaimTx(name string, nameSalt utils.BigInt, fee utils.BigInt) (tx NameClaimTx, err error) {
 	txTTL, accountNonce, err := getTTLNonce(n.nodeClient, n.owner.Address, Config.Client.TTL)
 	if err != nil {
 		return

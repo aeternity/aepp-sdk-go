@@ -143,7 +143,7 @@ func TestNameClaimTx_RLP(t *testing.T) {
 	type fields struct {
 		AccountID string
 		Name      string
-		NameSalt  uint64
+		NameSalt  utils.BigInt
 		Fee       utils.BigInt
 		TTL       uint64
 		Nonce     uint64
@@ -159,12 +159,12 @@ func TestNameClaimTx_RLP(t *testing.T) {
 			fields: fields{
 				AccountID: "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
 				Name:      "fdsa.test",
-				NameSalt:  12345,
+				NameSalt:  *utils.RequireBigIntFromString("9795159241593061970"),
 				Fee:       *utils.NewBigIntFromUint64(10),
 				TTL:       uint64(10),
 				Nonce:     uint64(1),
 			},
-			wantTx:  "tx_9CABoQHOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+8wGJZmRzYS50ZXN0gjA5CgplC94E",
+			wantTx:  "tx_+DogAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vMBiWZkc2EudGVzdIiH72Vu6YoCUgoKx4dL6Q==",
 			wantErr: false,
 		},
 	}

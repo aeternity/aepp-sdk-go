@@ -208,7 +208,7 @@ func NewNamePreclaimTx(accountID, commitmentID string, fee utils.BigInt, ttl, no
 type NameClaimTx struct {
 	AccountID string
 	Name      string
-	NameSalt  uint64
+	NameSalt  utils.BigInt
 	Fee       utils.BigInt
 	TTL       uint64
 	Nonce     uint64
@@ -229,7 +229,7 @@ func (t *NameClaimTx) RLP() (rlpRawMsg []byte, err error) {
 		aID,
 		t.Nonce,
 		t.Name,
-		t.NameSalt,
+		t.NameSalt.Int,
 		t.Fee.Int,
 		t.TTL)
 	return
@@ -244,7 +244,7 @@ func (t *NameClaimTx) JSON() (string, error) {
 		AccountID: models.EncodedHash(t.AccountID),
 		Fee:       t.Fee,
 		Name:      &nameAPIEncoded,
-		NameSalt:  &t.NameSalt,
+		NameSalt:  t.NameSalt,
 		Nonce:     t.Nonce,
 		TTL:       t.TTL,
 	}
@@ -254,7 +254,7 @@ func (t *NameClaimTx) JSON() (string, error) {
 }
 
 // NewNameClaimTx is a constructor for a NameClaimTx struct
-func NewNameClaimTx(accountID, name string, nameSalt uint64, fee utils.BigInt, ttl, nonce uint64) NameClaimTx {
+func NewNameClaimTx(accountID, name string, nameSalt utils.BigInt, fee utils.BigInt, ttl, nonce uint64) NameClaimTx {
 	return NameClaimTx{accountID, name, nameSalt, fee, ttl, nonce}
 }
 
