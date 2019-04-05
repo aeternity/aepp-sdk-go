@@ -186,3 +186,58 @@ func TestGenerate(t *testing.T) {
 		})
 	}
 }
+
+func Test_computeCommitmentID(t *testing.T) {
+	type args struct {
+		name string
+		salt []byte
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantCh  string
+		wantErr bool
+	}{
+		{
+			name: "fdsa.test, 0",
+			args: args{
+				name: "fdsa.test",
+				salt: []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			},
+			wantCh:  "cm_2jJov6dn121oKkHo6TuWaAAL4ZEMonnCjpo8jatkCixrLG8Uc4",
+			wantErr: false,
+		},
+		{
+			name: "fdsa.test, 255",
+			args: args{
+				name: "fdsa.test",
+				salt: []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255},
+			},
+			wantCh:  "cm_sa8UUjorPzCTLfYp6YftR4jwF4kPaZVsoP5bKVAqRw9zm43EE",
+			wantErr: false,
+		},
+		{
+			// erlang Eshell: rp(<<9795159241593061970:256>>).
+			name: "fdsa.test, 9795159241593061970 (do not use Golang to convert salt integers)",
+			args: args{
+				name: "fdsa.test",
+				salt: []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 135, 239, 101, 110, 233, 138, 2, 82},
+			},
+			wantCh:  "cm_QhtcYow8krP3xQSTsAhFihfBstTjQMiApaPCgZuciDHZmMNtZ",
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// fmt.Println(saltBytes)
+			gotCh, err := computeCommitmentID(tt.args.name, tt.args.salt)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("computeCommitmentID() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if gotCh != tt.wantCh {
+				t.Errorf("computeCommitmentID() = %v, want %v", gotCh, tt.wantCh)
+			}
+		})
+	}
+}

@@ -110,16 +110,22 @@ func uuidV4() (u string) {
 	return fmt.Sprint(uuid.NewV4())
 }
 
-// naming
-func computeCommitmentID(name string) (ch string, salt []byte, err error) {
+// since the salt is a uint256, which Erlang handles well, but Go has nothing similar to it,
+// it is imperative that the salt be kept as a bytearray unless you really have to convert it
+// into an integer. Which you usually don't, because it's a salt.
+func generateCommitmentID(name string) (ch string, salt []byte, err error) {
 	salt, err = randomBytes(32)
 	if err != nil {
 		return
 	}
-	// TODO: this is done using the api (concatenating )
+
+	ch, err = computeCommitmentID(name, salt)
+	return ch, salt, err
+}
+
+func computeCommitmentID(name string, salt []byte) (ch string, err error) {
 	nh := append(Namehash(name), salt...)
 	nh, _ = hash(nh)
-	// nh := namehash(name)
 	ch = Encode(PrefixCommitment, nh)
 	return
 }
