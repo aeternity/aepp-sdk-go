@@ -437,7 +437,7 @@ func TestOracleExtendTx_RLP(t *testing.T) {
 	}
 }
 
-func TestOracleQueryTx_RLP(t *testing.T) {
+func OracleQueryTxRLP(t *testing.T) {
 	type fields struct {
 		SenderID         string
 		AccountNonce     uint64
@@ -463,7 +463,7 @@ func TestOracleQueryTx_RLP(t *testing.T) {
 				SenderID:         "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
 				AccountNonce:     uint64(1),
 				OracleID:         "ok_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
-				Query:            "abcd",
+				Query:            "Are you okay?",
 				QueryFee:         Config.Client.Oracles.QueryFee,
 				QueryTTLType:     Config.Client.Oracles.QueryTTLType,
 				QueryTTLValue:    Config.Client.Oracles.QueryTTLValue,
@@ -472,7 +472,8 @@ func TestOracleQueryTx_RLP(t *testing.T) {
 				TxFee:            Config.Client.Fee,
 				TxTTL:            Config.Client.TTL,
 			},
-			wantTx:  "tx_+GEXAaEBHxOjsIvwAUAGYqaLadh194A87EwIZH9u1dhMeJe9UKMBoQTOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+84RhYmNkAAGCASwBggEsiAAAAAAAAAAAggH06n1crw==", // painstakingly won from aepp-sdk-python
+			// from aepp-sdk-js
+			wantTx:  "tx_+GgXAaEBHxOjsIvwAUAGYqaLadh194A87EwIZH9u1dhMeJe9UKMBoQTOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+841BcmUgeW91IG9rYXk/AACCASwAggEshrXmIPSAAILEzIsypOc=",
 			wantErr: false,
 		},
 	}
