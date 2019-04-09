@@ -27,3 +27,13 @@ func TestTxVerify(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestTxDumpRaw(t *testing.T) {
+	tx := "tx_+H4iAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vMFoQJei0cGdDWb3EfrY0mtZADF0LoQ4yL6z10I/3ETJ0fpKADy8Y5hY2NvdW50X3B1YmtleaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vMGAQXLBNnv"
+	emptyCmd := cobra.Command{}
+
+	err := txDumpRawFunc(&emptyCmd, []string{tx})
+	if err != nil {
+		t.Error(err)
+	}
+}

@@ -102,7 +102,7 @@ func Test_Decode(t *testing.T) {
 	}
 }
 
-func Test_namehash(t *testing.T) {
+func Test_Namehash(t *testing.T) {
 	// ('welghmolql.aet') == 'nm_2KrC4asc6fdv82uhXDwfiqB1TY2htjhnzwzJJKLxidyMymJRUQ'
 	type args struct {
 		name string
@@ -114,13 +114,14 @@ func Test_namehash(t *testing.T) {
 	}{
 		{"ok", args{"welghmolql.aet"}, "nm_2KrC4asc6fdv82uhXDwfiqB1TY2htjhnzwzJJKLxidyMymJRUQ"},
 		{"ok", args{"welghmolql"}, "nm_2nLRBu1FyukEvJuMANjFzx8mubMFeyG2mJ2QpQoYKymYe1d2sr"},
+		{"ok", args{"fdsa.test"}, "nm_ie148R2qZYBfo1Ek3sZpfTLwBhkkqCRKi2Ce8JJ7yyWVRw2Sb"},
 		{"ok", args{""}, "nm_2q1DrgEuxRNCWRp5nTs6FyA7moSEzrPVUSTEpkpFsM4hRL4Dkb"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := Encode(PrefixName, namehash(tt.args.name))
+			got := Encode(PrefixName, Namehash(tt.args.name))
 			if got != tt.want {
-				t.Errorf("namehash() = %v, want %v", got, tt.want)
+				t.Errorf("Namehash() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -181,6 +182,61 @@ func TestGenerate(t *testing.T) {
 			if !strings.HasPrefix(gotKp.Address, "ak_") {
 				t.Errorf("Generate() error = %v", gotKp.Address)
 				return
+			}
+		})
+	}
+}
+
+func Test_computeCommitmentID(t *testing.T) {
+	type args struct {
+		name string
+		salt []byte
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantCh  string
+		wantErr bool
+	}{
+		{
+			name: "fdsa.test, 0",
+			args: args{
+				name: "fdsa.test",
+				salt: []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			},
+			wantCh:  "cm_2jJov6dn121oKkHo6TuWaAAL4ZEMonnCjpo8jatkCixrLG8Uc4",
+			wantErr: false,
+		},
+		{
+			name: "fdsa.test, 255",
+			args: args{
+				name: "fdsa.test",
+				salt: []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255},
+			},
+			wantCh:  "cm_sa8UUjorPzCTLfYp6YftR4jwF4kPaZVsoP5bKVAqRw9zm43EE",
+			wantErr: false,
+		},
+		{
+			// erlang Eshell: rp(<<9795159241593061970:256>>).
+			name: "fdsa.test, 9795159241593061970 (do not use Golang to convert salt integers)",
+			args: args{
+				name: "fdsa.test",
+				salt: []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 135, 239, 101, 110, 233, 138, 2, 82},
+			},
+			wantCh:  "cm_QhtcYow8krP3xQSTsAhFihfBstTjQMiApaPCgZuciDHZmMNtZ",
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// fmt.Println(saltBytes)
+			gotCh, err := computeCommitmentID(tt.args.name, tt.args.salt)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("computeCommitmentID() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if gotCh != tt.wantCh {
+				t.Errorf("computeCommitmentID() = %v, want %v", gotCh, tt.wantCh)
 			}
 		})
 	}

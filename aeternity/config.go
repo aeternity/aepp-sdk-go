@@ -19,11 +19,11 @@ type NodeConfig struct {
 
 // AensConfig configurations for Aens
 type AensConfig struct {
-	NameTTL     uint64 `json:"name_ttl" yaml:"name_ttl" mapstructure:"name_ttl"`
-	ClientTTL   uint64 `json:"client_ttl" yaml:"client_ttl" mapstructure:"client_ttl"`
-	PreClaimFee uint64 `json:"preclaim_fee" yaml:"preclaim_fee" mapstructure:"preclaim_fee"`
-	ClaimFee    uint64 `json:"claim_fee" yaml:"claim_fee" mapstructure:"claim_fee"`
-	UpdateFee   uint64 `json:"update_fee" yaml:"update_fee" mapstructure:"update_fee"`
+	NameTTL     uint64       `json:"name_ttl" yaml:"name_ttl" mapstructure:"name_ttl"`
+	ClientTTL   uint64       `json:"client_ttl" yaml:"client_ttl" mapstructure:"client_ttl"`
+	PreClaimFee utils.BigInt `json:"preclaim_fee" yaml:"preclaim_fee" mapstructure:"preclaim_fee"`
+	ClaimFee    utils.BigInt `json:"claim_fee" yaml:"claim_fee" mapstructure:"claim_fee"`
+	UpdateFee   utils.BigInt `json:"update_fee" yaml:"update_fee" mapstructure:"update_fee"`
 }
 
 // ContractConfig configurations for contracts
@@ -36,8 +36,12 @@ type ContractConfig struct {
 
 // OracleConfig configurations for contracts
 type OracleConfig struct {
-	QueryFee  utils.BigInt `json:"query_fee" yaml:"query_fee" mapstructure:"query_fee"`
-	VMVersion uint64       `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
+	QueryFee         utils.BigInt `json:"query_fee" yaml:"query_fee" mapstructure:"query_fee"`
+	QueryTTLType     uint64       `json:"query_ttl_type" yaml:"query_ttl_type" mapstructure:"query_ttl_type"`
+	QueryTTLValue    uint64       `json:"query_ttl_value" yaml:"query_ttl_value" mapstructure:"query_ttl_value"`
+	ResponseTTLType  uint64       `json:"response_ttl_type" yaml:"response_ttl_type" mapstructure:"response_ttl_type"`
+	ResponseTTLValue uint64       `json:"response_ttl_value" yaml:"response_ttl_value" mapstructure:"response_ttl_value"`
+	VMVersion        uint64       `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
 }
 
 // StateChannelConfig configurations for contracts TODO: not complete
@@ -90,8 +94,11 @@ var Config = ProfileConfig{
 		TTL: 500,
 		Fee: *utils.RequireBigIntFromString("200000000000000"),
 		Names: AensConfig{
-			NameTTL:   500,
-			ClientTTL: 500,
+			NameTTL:     500, // absolute block height when the name will expire
+			ClientTTL:   500, // time in blocks until the name resolver should check again in case the name was updated
+			PreClaimFee: *utils.RequireBigIntFromString("100000000000000"),
+			ClaimFee:    *utils.RequireBigIntFromString("100000000000000"),
+			UpdateFee:   *utils.RequireBigIntFromString("100000000000000"),
 		},
 		Contracts: ContractConfig{ // UNUSED
 			Gas:       1e9,
@@ -100,8 +107,12 @@ var Config = ProfileConfig{
 			VMVersion: 0,
 		},
 		Oracles: OracleConfig{
-			QueryFee:  *utils.NewBigIntFromUint64(0),
-			VMVersion: 0,
+			QueryFee:         *utils.NewBigIntFromUint64(0),
+			QueryTTLType:     0,
+			QueryTTLValue:    300,
+			ResponseTTLType:  0,
+			ResponseTTLValue: 300,
+			VMVersion:        0,
 		},
 		StateChannels: StateChannelConfig{ // UNUSED
 			LockPeriod:     0,

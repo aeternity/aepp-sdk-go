@@ -33,7 +33,7 @@ type NameClaimTx struct {
 
 	// name salt
 	// Required: true
-	NameSalt *uint64 `json:"name_salt"`
+	NameSalt utils.BigInt `json:"name_salt"`
 
 	// nonce
 	Nonce uint64 `json:"nonce,omitempty"`
@@ -103,7 +103,10 @@ func (m *NameClaimTx) validateName(formats strfmt.Registry) error {
 
 func (m *NameClaimTx) validateNameSalt(formats strfmt.Registry) error {
 
-	if err := validate.Required("name_salt", "body", m.NameSalt); err != nil {
+	if err := m.NameSalt.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("name_salt")
+		}
 		return err
 	}
 

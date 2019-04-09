@@ -40,7 +40,11 @@ def traverse(data):
                 v["$ref"] = "#/definitions/Amount"
             elif "block_height" == key:
                 v["format"] = "uint64"
-
+            elif "name_salt" == key:
+                v.pop("type", None)
+                v.pop("format", None)
+                v["$ref"] = "#/definitions/NameSalt"
+                
             traverse(v)
     except TypeError:
         pass
@@ -70,6 +74,17 @@ def add_definitions(data):
     }
 
     data["definitions"]["Fee"] = {
+      "type": "integer",
+      "minimum": 0,
+      "x-go-type": {
+        "import": {
+          "package": "github.com/aeternity/aepp-sdk-go/utils"
+        },
+        "type": "BigInt"
+      }
+    }
+
+    data["definitions"]["NameSalt"] = {
       "type": "integer",
       "minimum": 0,
       "x-go-type": {

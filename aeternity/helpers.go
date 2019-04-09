@@ -1,7 +1,6 @@
 package aeternity
 
 import (
-	"encoding/binary"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -9,11 +8,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/aeternity/aepp-sdk-go/utils"
-
 	apiclient "github.com/aeternity/aepp-sdk-go/generated/client"
 	"github.com/aeternity/aepp-sdk-go/generated/client/external"
 	"github.com/aeternity/aepp-sdk-go/generated/models"
+	"github.com/aeternity/aepp-sdk-go/utils"
 )
 
 func urlComponents(url string) (host string, schemas []string) {
@@ -40,17 +38,7 @@ func (ae *Ae) GetNextNonce(accountID string) (nextNonce uint64, err error) {
 
 // GetTTLNonce is a convenience function that combines GetTTL() and GetNextNonce()
 func (ae *Ae) GetTTLNonce(accountID string, offset uint64) (txTTL, accountNonce uint64, err error) {
-	txTTL, err = ae.GetTTL(offset)
-	if err != nil {
-		return 0, 0, err
-	}
-
-	accountNonce, err = ae.GetNextNonce(accountID)
-	if err != nil {
-		return 0, 0, err
-	}
-
-	return txTTL, accountNonce, nil
+	return getTTLNonce(ae.Node, accountID, offset)
 }
 
 func getTTL(node *apiclient.Node, offset uint64) (height uint64, err error) {
@@ -61,6 +49,8 @@ func getTTL(node *apiclient.Node, offset uint64) (height uint64, err error) {
 
 	if kb.KeyBlock == nil {
 		height = *kb.MicroBlock.Height + offset
+	} else {
+		height = *kb.KeyBlock.Height + offset
 	}
 
 	return
@@ -72,6 +62,19 @@ func getNextNonce(node *apiclient.Node, accountID string) (nextNonce uint64, err
 		return
 	}
 	nextNonce = *a.Nonce + 1
+	return
+}
+
+func getTTLNonce(node *apiclient.Node, accountID string, offset uint64) (height uint64, nonce uint64, err error) {
+	height, err = getTTL(node, offset)
+	if err != nil {
+		return
+	}
+
+	nonce, err = getNextNonce(node, accountID)
+	if err != nil {
+		return
+	}
 	return
 }
 
@@ -101,17 +104,17 @@ func waitForTransaction(nodeClient *apiclient.Node, txHash string) (blockHeight 
 	return
 }
 
-// SpendTxStr creates an unsigned SpendTx but returns the base64 representation instead of an RLP bytestring
-func SpendTxStr(sender, recipient string, amount, fee utils.BigInt, message string, txTTL, accountNonce uint64) (base64Tx string, err error) {
-	rlpUnsignedTx, err := SpendTx(sender, recipient, amount, fee, message, txTTL, accountNonce)
-	if err != nil {
-		return
-	}
+// // SpendTxStr creates an unsigned SpendTx but returns the base64 representation instead of an RLP bytestring
+// func SpendTxStr(sender, recipient string, amount, fee utils.BigInt, message string, txTTL, accountNonce uint64) (base64Tx string, err error) {
+// 	rlpUnsignedTx, err := NewSpendTx(sender, recipient, amount, fee, message, txTTL, accountNonce)
+// 	if err != nil {
+// 		return
+// 	}
 
-	base64Tx = Encode(PrefixTransaction, rlpUnsignedTx)
+// 	base64Tx = Encode(PrefixTransaction, rlpUnsignedTx)
 
-	return base64Tx, err
-}
+// 	return base64Tx, err
+// }
 
 // BroadcastTransaction recalculates the transaction hash and sends the transaction to the node.
 func (ae *Ae) BroadcastTransaction(txSignedBase64 string) (err error) {
@@ -128,68 +131,70 @@ func (ae *Ae) BroadcastTransaction(txSignedBase64 string) (err error) {
 	return
 }
 
-// NamePreclaimTxStr creates a name preclaim transaction and nameSalt (required for claiming)
-func (n *Aens) NamePreclaimTxStr(name string, txTTL, accountNonce uint64) (tx string, nameSalt uint64, err error) {
-	// calculate the commitment and get the preclaim salt
-	cm, salt, err := computeCommitmentID(name)
+// NamePreclaimTx creates a name preclaim transaction and salt (required for claiming)
+// It should return the Tx struct, not the base64 encoded RLP, to ease subsequent inspection.
+func (n *Aens) NamePreclaimTx(name string, fee utils.BigInt) (tx NamePreclaimTx, nameSalt *utils.BigInt, err error) {
+	txTTL, accountNonce, err := getTTLNonce(n.nodeClient, n.owner.Address, Config.Client.TTL)
 	if err != nil {
-		return "", 0, err
+		return
 	}
-	// convert the salt back into uint64 from binary
-	nameSalt = binary.BigEndian.Uint64(salt)
+
+	// calculate the commitment and get the preclaim salt
+	// since the salt is 32 bytes long, you must use a big.Int to convert it into an integer
+	cm, nameSalt, err := generateCommitmentID(name)
+	if err != nil {
+		return NamePreclaimTx{}, utils.NewBigInt(), err
+	}
 
 	// build the transaction
-	txRaw, err := NamePreclaimTx(n.owner.Address, cm, Config.Client.Names.PreClaimFee, txTTL, accountNonce)
+	tx = NewNamePreclaimTx(n.owner.Address, cm, fee, txTTL, accountNonce)
 	if err != nil {
-		return "", 0, err
+		return NamePreclaimTx{}, utils.NewBigInt(), err
 	}
 
-	tx = Encode(PrefixTransaction, txRaw)
 	return
 }
 
-// NameClaimTxStr creates a claim transaction
-func (n *Aens) NameClaimTxStr(name string, nameSalt, txTTL, accountNonce uint64) (tx string, err error) {
-	//TODO: do we need the encoded name here?
-	// encodedName := encodeP(PrefixNameHash, []byte(name))
-	prefix := HashPrefix(name[0:3])
-	encodedName := Encode(prefix, []byte(name))
+// NameClaimTx creates a claim transaction
+func (n *Aens) NameClaimTx(name string, nameSalt utils.BigInt, fee utils.BigInt) (tx NameClaimTx, err error) {
+	txTTL, accountNonce, err := getTTLNonce(n.nodeClient, n.owner.Address, Config.Client.TTL)
+	if err != nil {
+		return
+	}
+
 	// create the transaction
-	txRaw, err := NameClaimTx(n.owner.Address, encodedName, nameSalt, Config.Client.Names.ClaimFee, txTTL, accountNonce)
-	if err != nil {
-		return "", err
-	}
+	tx = NewNameClaimTx(n.owner.Address, name, nameSalt, fee, txTTL, accountNonce)
 
-	tx = Encode(PrefixTransaction, txRaw)
-	return
+	return tx, err
 }
 
-// NameUpdateTxStr perform a name update
-func (n *Aens) NameUpdateTxStr(name string, targetAddress string, txTTL, accountNonce uint64) (tx string, err error) {
-	encodedNameHash := Encode(PrefixName, namehash(name))
+// NameUpdateTx perform a name update
+func (n *Aens) NameUpdateTx(name string, targetAddress string) (tx NameUpdateTx, err error) {
+	txTTL, accountNonce, err := getTTLNonce(n.nodeClient, n.owner.Address, Config.Client.TTL)
+	if err != nil {
+		return
+	}
+
+	encodedNameHash := Encode(PrefixName, Namehash(name))
 	absNameTTL, err := getTTL(n.nodeClient, Config.Client.Names.NameTTL)
 	if err != nil {
-		return "", err
+		return NameUpdateTx{}, err
 	}
 	// create and sign the transaction
-	txRaw, err := NameUpdateTx(n.owner.Address, encodedNameHash, []string{targetAddress}, absNameTTL, Config.Client.Names.ClientTTL, Config.Client.Names.UpdateFee, txTTL, accountNonce)
-	if err != nil {
-		return "", err
-	}
+	tx = NewNameUpdateTx(n.owner.Address, encodedNameHash, []string{targetAddress}, absNameTTL, Config.Client.Names.ClientTTL, Config.Client.Names.UpdateFee, txTTL, accountNonce)
 
-	tx = Encode(PrefixTransaction, txRaw)
 	return
 }
 
-// OracleRegisterTxStr register an oracle
-func (o *Oracle) OracleRegisterTxStr(querySpec, responseSpec string, queryFee utils.BigInt, txTTLType, txTTLValue, abiVersion uint64, txFee utils.BigInt, txTTL, accountNonce uint64) (tx string, err error) {
-	txRaw, err := OracleRegisterTx(o.owner.Address, accountNonce, querySpec, responseSpec, Config.Client.Oracles.QueryFee, txTTLType, txTTLValue, Config.Client.Oracles.VMVersion, txFee, txTTL)
-	if err != nil {
-		return "", err
-	}
-	tx = Encode(PrefixTransaction, txRaw)
-	return
-}
+// // OracleRegisterTxStr register an oracle
+// func (o *Oracle) OracleRegisterTxStr(accountNonce uint64, querySpec, responseSpec string, queryFee utils.BigInt, oracleTTLType, oracleTTLValue, abiVersion uint64, txFee utils.BigInt, txTTL uint64) (tx string, err error) {
+// 	txRaw, err := OracleRegisterTx(o.owner.Address, accountNonce, querySpec, responseSpec, Config.Client.Oracles.QueryFee, oracleTTLType, oracleTTLValue, Config.Client.Oracles.VMVersion, txFee, txTTL)
+// 	if err != nil {
+// 		return "", err
+// 	}
+// 	tx = Encode(PrefixTransaction, txRaw)
+// 	return
+// }
 
 // PrintGenerationByHeight utility function to print a generation by it's height
 func (ae *Ae) PrintGenerationByHeight(height uint64) {
@@ -350,7 +355,7 @@ func SignEncodeTxStr(kp *Account, tx string, networkID string) (signedEncodedTx,
 // VerifySignedTx verifies a tx_ with signature
 func VerifySignedTx(accountID string, txSigned string, networkID string) (valid bool, err error) {
 	txRawSigned, _ := Decode(txSigned)
-	txRLP := decodeRLPMessage(txRawSigned)
+	txRLP := DecodeRLPMessage(txRawSigned)
 
 	// RLP format of signed signature: [[Tag], [Version], [Signatures...], [Transaction]]
 	tx := txRLP[3].([]byte)

@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/aeternity/aepp-sdk-go/rlp"
+	"github.com/aeternity/aepp-sdk-go/utils"
 	"github.com/btcsuite/btcutil/base58"
 	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/blake2b"
@@ -80,9 +81,9 @@ func hash(in []byte) (out []byte, err error) {
 	return
 }
 
-// namehash calculate the namehash of a string
+// Namehash calculate the Namehash of a string
 // TODO: link to the
-func namehash(name string) []byte {
+func Namehash(name string) []byte {
 	buf := make([]byte, 32)
 	for _, s := range strings.Split(name, ".") {
 		sh, _ := hash([]byte(s))
@@ -110,16 +111,26 @@ func uuidV4() (u string) {
 	return fmt.Sprint(uuid.NewV4())
 }
 
-// naming
-func computeCommitmentID(name string) (ch string, salt []byte, err error) {
-	salt, err = randomBytes(32)
+// since the salt is a uint256, which Erlang handles well, but Go has nothing similar to it,
+// it is imperative that the salt be kept as a bytearray unless you really have to convert it
+// into an integer. Which you usually don't, because it's a salt.
+func generateCommitmentID(name string) (ch string, salt *utils.BigInt, err error) {
+	saltBytes, err := randomBytes(32)
 	if err != nil {
 		return
 	}
-	// TODO: this is done using the api (concatenating )
-	nh := append(namehash(name), salt...)
+
+	ch, err = computeCommitmentID(name, saltBytes)
+
+	salt = utils.NewBigInt()
+	salt.SetBytes(saltBytes)
+
+	return ch, salt, err
+}
+
+func computeCommitmentID(name string, salt []byte) (ch string, err error) {
+	nh := append(Namehash(name), salt...)
 	nh, _ = hash(nh)
-	// nh := namehash(name)
 	ch = Encode(PrefixCommitment, nh)
 	return
 }
@@ -146,7 +157,7 @@ func buildIDTag(IDTag uint8, encodedHash string) (v []uint8, err error) {
 	return
 }
 
-func decodeRLPMessage(rawBytes []byte) []interface{} {
+func DecodeRLPMessage(rawBytes []byte) []interface{} {
 	res := []interface{}{}
 	rlp.DecodeBytes(rawBytes, &res)
 	return res

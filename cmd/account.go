@@ -15,6 +15,11 @@
 package cmd
 
 import (
+	"fmt"
+	"regexp"
+	"runtime"
+	"sync"
+
 	"github.com/aeternity/aepp-sdk-go/aeternity"
 	"github.com/aeternity/aepp-sdk-go/utils"
 
@@ -200,6 +205,41 @@ func saveFunc(cmd *cobra.Command, args []string) (err error) {
 	return nil
 }
 
+var vanityCmd = &cobra.Command{
+	Use:   "vanity",
+	Short: "find the account you like",
+	Long:  ``,
+	Args:  cobra.MinimumNArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+
+		prefix := fmt.Sprintf("^%s", args[0])
+		r, err := regexp.Compile(prefix)
+		if err != nil {
+			fmt.Println("Ouch! The search input ", prefix, "is not a valid regexp")
+			return
+		}
+		fmt.Println("The search for your account matching", prefix, "has begun")
+
+		var wg sync.WaitGroup
+		wg.Add(runtime.NumCPU())
+		for i := 0; i < runtime.NumCPU(); i++ {
+			go func() {
+				for {
+					a, _ := aeternity.NewAccount()
+
+					if r.MatchString(a.Address[3:]) {
+						fmt.Println("FOUND!")
+						fmt.Println("Secret: ", a.SigningKeyToHexString())
+						fmt.Println("Address", a.Address)
+					}
+				}
+			}()
+		}
+		wg.Wait()
+
+	},
+}
+
 func init() {
 	RootCmd.AddCommand(accountCmd)
 	accountCmd.AddCommand(addressCmd)
@@ -207,6 +247,7 @@ func init() {
 	accountCmd.AddCommand(saveCmd)
 	accountCmd.AddCommand(balanceCmd)
 	accountCmd.AddCommand(signCmd)
+	accountCmd.AddCommand(vanityCmd)
 	accountCmd.PersistentFlags().StringVar(&password, "password", "", "Read account password from stdin [WARN: this method is not secure]")
 	// account address flags
 	addressCmd.Flags().BoolVar(&printPrivateKey, "private-key", false, "Print the private key as hex string")
