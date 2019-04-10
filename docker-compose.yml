@@ -22,6 +22,7 @@ services:
     command: -aecore expected_mine_rate ${EPOCH_MINE_RATE:-15000}
     volumes:
       - ${PWD}/build/docker/aeternity_node_mean16.yaml:/home/aeternity/aeternity.yaml
+      - ${PWD}/build/docker/accounts.json:/home/aeternity/node/data/aecore/.genesis/accounts_test.json
       - ${PWD}/build/docker/keys/node:/home/aeternity/node/keys
       - node_db:/home/aeternity/node/data/mnesia
       - node_keys:/home/aeternity/node/keys
