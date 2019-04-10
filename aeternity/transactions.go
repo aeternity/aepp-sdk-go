@@ -259,7 +259,6 @@ func NewNameClaimTx(accountID, name string, nameSalt utils.BigInt, fee utils.Big
 }
 
 // NameUpdateTx represents a transaction where one extends the lifetime of a reserved name on AENS
-
 type NameUpdateTx struct {
 	AccountID string
 	NameID    string
@@ -508,6 +507,7 @@ func (t *OracleQueryTx) RLP() (rlpRawMsg []byte, err error) {
 	return
 }
 
+// JSON representation of a Tx is useful for querying the node's debug endpoint
 func (t *OracleQueryTx) JSON() (string, error) {
 	responseTTLTypeStr := ttlTypeIntToStr(t.ResponseTTLType)
 	queryTTLTypeStr := ttlTypeIntToStr(t.QueryTTLType)
