@@ -157,6 +157,7 @@ func buildIDTag(IDTag uint8, encodedHash string) (v []uint8, err error) {
 	return
 }
 
+// DecodeRLPMessage transforms a plain stream of bytes into a structure of bytes that represents the object that was serialized
 func DecodeRLPMessage(rawBytes []byte) []interface{} {
 	res := []interface{}{}
 	rlp.DecodeBytes(rawBytes, &res)
