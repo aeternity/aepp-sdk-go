@@ -1,6 +1,7 @@
 package integration_test
 
 import (
+	"bufio"
 	"fmt"
 	"math/big"
 	"os"
@@ -10,9 +11,10 @@ import (
 	"github.com/aeternity/aepp-sdk-go/utils"
 )
 
+var sender = "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"
+var senderPrivateKey = os.Getenv("INTEGRATION_TEST_SENDER_PRIVATE_KEY")
+
 func TestSpendTxWithNode(t *testing.T) {
-	sender := "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"
-	senderPrivateKey := os.Getenv("INTEGRATION_TEST_SENDER_PRIVATE_KEY")
 	senderAccount, err := aeternity.AccountFromHexString(senderPrivateKey)
 	if err != nil {
 		t.Fatal(err)
@@ -77,8 +79,6 @@ func TestSpendTxWithNode(t *testing.T) {
 
 func TestSpendTxLargeWithNode(t *testing.T) {
 	// This is a separate test because the account may not have enough funds for this test when the node has just started.
-	sender := "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"
-	senderPrivateKey := os.Getenv("INTEGRATION_TEST_SENDER_PRIVATE_KEY")
 	senderAccount, err := aeternity.AccountFromHexString(senderPrivateKey)
 	if err != nil {
 		t.Fatal(err)
@@ -137,4 +137,106 @@ func TestSpendTxLargeWithNode(t *testing.T) {
 	if recipientAccount.Balance.Cmp(expectedAmount.Int) != 0 {
 		t.Fatalf("Recipient should have %v, but has %v instead", expectedAmount.String(), recipientAccount.Balance.String())
 	}
+}
+
+func signBroadcast(tx string, acc *aeternity.Account, aeClient *aeternity.Ae) (hash string, err error) {
+	signedTxStr, hash, _, err := aeternity.SignEncodeTxStr(acc, tx, "ae_docker")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	err = aeClient.BroadcastTransaction(signedTxStr)
+	if err != nil {
+		panic(err)
+	}
+
+	return hash, nil
+
+}
+
+func printHeight(aeClient *aeternity.Ae) {
+	h, err := aeClient.APIGetHeight()
+	if err != nil {
+		fmt.Println("Could not retrieve chain height")
+		return
+	}
+	fmt.Println("Current Height:", h)
+}
+
+func promptContinue() {
+	fmt.Print("Continue?")
+	reader := bufio.NewReader(os.Stdin)
+	_, _, _ = reader.ReadRune()
+}
+
+func TestAENSWorkflow(t *testing.T) {
+	acc, err := aeternity.AccountFromHexString(senderPrivateKey)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	aeClient := aeternity.NewCli("http://localhost:3013", false).WithAccount(acc)
+	aeternity.Config.Client.Fee = *utils.RequireBigIntFromString("100000000000000")
+
+	// Preclaim the name
+	fmt.Println("PreclaimTx")
+	preclaimTx, salt, err := aeClient.Aens.NamePreclaimTx("fdsa.test", aeternity.Config.Client.Fee)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	preclaimTxStr, _ := aeternity.BaseEncodeTx(&preclaimTx)
+	fmt.Println("PreclaimTx and Salt:", preclaimTxStr, salt)
+
+	hash, err := signBroadcast(preclaimTxStr, acc, aeClient)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("Signed & Broadcasted NamePreclaimTx", hash)
+	printHeight(aeClient)
+
+	// Claim the name
+	promptContinue()
+	fmt.Println("NameClaimTx")
+	claimTx, err := aeClient.Aens.NameClaimTx("fdsa.test", *salt, aeternity.Config.Client.Fee)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	claimTxStr, _ := aeternity.BaseEncodeTx(&claimTx)
+	fmt.Println("ClaimTx:", claimTxStr)
+
+	_, err = signBroadcast(claimTxStr, acc, aeClient)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("Signed & Broadcasted NameClaimTx")
+	printHeight(aeClient)
+
+	// Verify that the name exists
+	nameEntry, err := aeClient.APIGetNameEntryByName("fdsa.test")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	nameEntryJSON, _ := nameEntry.MarshalBinary()
+	fmt.Println(string(nameEntryJSON))
+
+	// Update the name, make it point to something
+	promptContinue()
+	fmt.Println("NameUpdateTx")
+	updateTx, err := aeClient.Aens.NameUpdateTx("fdsa.test", acc.Address)
+	updateTxStr, _ := aeternity.BaseEncodeTx(&updateTx)
+	fmt.Println("UpdateTx:", updateTxStr)
+
+	_, err = signBroadcast(updateTxStr, acc, aeClient)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("Signed & Broadcasted NameUpdateTx")
+
 }
