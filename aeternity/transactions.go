@@ -265,6 +265,7 @@ type NamePointer struct {
 	*models.NamePointer
 }
 
+// EncodeRLP implements rlp.Encoder interface.
 func (t *NamePointer) EncodeRLP(w io.Writer) (err error) {
 	accountID, err := buildIDTag(IDTagAccount, string(t.NamePointer.ID))
 	if err != nil {
