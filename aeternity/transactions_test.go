@@ -517,7 +517,7 @@ func TestNamePointer_EncodeRLP(t *testing.T) {
 	tests := []struct {
 		name    string
 		fields  fields
-		wantW   string
+		wantW   []byte
 		wantErr bool
 	}{
 		{
@@ -526,24 +526,23 @@ func TestNamePointer_EncodeRLP(t *testing.T) {
 				Key: "account_pubkey",
 				ID:  "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
 			},
-			wantW:   "I dunno",
+			// the reference value of wantW is taken from a correct serialization of NameUpdateTx.
+			// Unfortunately there is no way to get the node to serialize just the NamePointer.
+			wantW:   []byte{241, 142, 97, 99, 99, 111, 117, 110, 116, 95, 112, 117, 98, 107, 101, 121, 161, 1, 31, 19, 163, 176, 139, 240, 1, 64, 6, 98, 166, 139, 105, 216, 117, 247, 128, 60, 236, 76, 8, 100, 127, 110, 213, 216, 76, 120, 151, 189, 80, 163},
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := &NamePointer{
-				ID:  tt.fields.ID,
-				Key: tt.fields.Key,
-			}
+			p := NewNamePointer(tt.fields.Key, tt.fields.ID)
 			w := &bytes.Buffer{}
 			if err := p.EncodeRLP(w); (err != nil) != tt.wantErr {
 				t.Errorf("NamePointer.EncodeRLP() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if gotW := w.String(); gotW != tt.wantW {
+			if gotW := w.Bytes(); !bytes.Equal(gotW, tt.wantW) {
 				t.Errorf("NamePointer.EncodeRLP() = %v, want %v", gotW, tt.wantW)
-				fmt.Println(DecodeRLPMessage(w.Bytes()))
+				fmt.Println(DecodeRLPMessage(gotW))
 			}
 		})
 	}
