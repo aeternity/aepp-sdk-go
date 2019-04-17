@@ -261,6 +261,7 @@ func TestNameUpdateTx_RLP(t *testing.T) {
 			fmt.Println(txJSON)
 
 			gotTx, err := BaseEncodeTx(&tx)
+
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NameUpdateTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
 				return
