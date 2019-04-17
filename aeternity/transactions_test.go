@@ -1,6 +1,7 @@
 package aeternity
 
 import (
+	"bytes"
 	"fmt"
 	"reflect"
 	"testing"
@@ -503,6 +504,46 @@ func OracleQueryTxRLP(t *testing.T) {
 			if !reflect.DeepEqual(gotTx, tt.wantTx) {
 				gotTxRawBytes, wantTxRawBytes := getRLPSerialized(gotTx, tt.wantTx)
 				t.Errorf("OracleQueryTx.RLP() = \n%v\n%v, want \n%v\n%v", gotTx, gotTxRawBytes, tt.wantTx, wantTxRawBytes)
+			}
+		})
+	}
+}
+
+func TestNamePointer_EncodeRLP(t *testing.T) {
+	type fields struct {
+		ID  string
+		Key string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		wantW   string
+		wantErr bool
+	}{
+		{
+			name: "1 pointer to a normal ak_ account",
+			fields: fields{
+				Key: "account_pubkey",
+				ID:  "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
+			},
+			wantW:   "I dunno",
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p := &NamePointer{
+				ID:  tt.fields.ID,
+				Key: tt.fields.Key,
+			}
+			w := &bytes.Buffer{}
+			if err := p.EncodeRLP(w); (err != nil) != tt.wantErr {
+				t.Errorf("NamePointer.EncodeRLP() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if gotW := w.String(); gotW != tt.wantW {
+				t.Errorf("NamePointer.EncodeRLP() = %v, want %v", gotW, tt.wantW)
+				fmt.Println(DecodeRLPMessage(w.Bytes()))
 			}
 		})
 	}

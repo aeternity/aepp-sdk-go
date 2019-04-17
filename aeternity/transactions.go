@@ -2,8 +2,10 @@ package aeternity
 
 import (
 	"fmt"
+	"io"
 
 	"github.com/aeternity/aepp-sdk-go/generated/models"
+	"github.com/aeternity/aepp-sdk-go/rlp"
 	"github.com/aeternity/aepp-sdk-go/utils"
 )
 
@@ -49,22 +51,22 @@ func ttlTypeIntToStr(i uint64) string {
 	return oracleTTLTypeStr
 }
 
-func buildPointers(pointers []string) (ptrs []*models.NamePointer, err error) {
+func buildPointers(pointers []string) (ptrs []*NamePointer, err error) {
 	// TODO: handle errors
-	ptrs = make([]*models.NamePointer, len(pointers))
+	ptrs = make([]*NamePointer, len(pointers))
 	for i, p := range pointers {
 		switch GetHashPrefix(p) {
 		case PrefixAccountPubkey:
 			// pID, err := buildIDTag(IDTagAccount, p)
 			key := "account_pubkey"
-			ptrs[i] = &models.NamePointer{ID: models.EncodedHash(p), Key: &key}
+			ptrs[i] = NewNamePointer(key, p)
 			if err != nil {
 				break
 			}
 		case PrefixOraclePubkey:
 			// pID, err := buildIDTag(IDTagOracle, p)
 			key := "oracle_pubkey"
-			ptrs[i] = &models.NamePointer{ID: models.EncodedHash(p), Key: &key}
+			ptrs[i] = NewNamePointer(key, p)
 			if err != nil {
 				break
 			}
@@ -258,11 +260,40 @@ func NewNameClaimTx(accountID, name string, nameSalt utils.BigInt, fee utils.Big
 	return NameClaimTx{accountID, name, nameSalt, fee, ttl, nonce}
 }
 
+// NamePointer extends the swagger gener ated models.NamePointer to provide RLP serialization
+type NamePointer struct {
+	ID  string
+	Key string
+}
+
+func (t *NamePointer) RLP() (rlpRawMsg []byte, err error) {
+	return []byte{}, nil
+}
+
+func (t *NamePointer) EncodeRLP(w io.Writer) (err error) {
+	accountID, err := buildIDTag(IDTagAccount, t.ID)
+	if err != nil {
+		return
+	}
+
+	err = rlp.Encode(w, []interface{}{t.Key, accountID})
+	if err != nil {
+		return
+	}
+	return err
+}
+
+// NewNamePointer is a constructor for a swagger generated NamePointer struct.
+// It returns a pointer because
+func NewNamePointer(key string, id string) *NamePointer {
+	return &NamePointer{ID: id, Key: key}
+}
+
 // NameUpdateTx represents a transaction where one extends the lifetime of a reserved name on AENS
 type NameUpdateTx struct {
 	AccountID string
 	NameID    string
-	Pointers  []*models.NamePointer
+	Pointers  []*NamePointer
 	NameTTL   uint64
 	ClientTTL uint64
 	Fee       utils.BigInt
@@ -307,7 +338,7 @@ func (t *NameUpdateTx) JSON() (string, error) {
 		NameID:    models.EncodedHash(t.NameID),
 		NameTTL:   &t.NameTTL,
 		Nonce:     t.Nonce,
-		Pointers:  t.Pointers,
+		Pointers:  []*models.NamePointer{},
 		TTL:       t.TTL,
 	}
 
