@@ -312,6 +312,16 @@ func (t *NameUpdateTx) RLP() (rlpRawMsg []byte, err error) {
 		return
 	}
 
+	// reverse the NamePointer order as compared to the JSON serialization, because the node seems to want it that way
+	i := 0
+	j := len(t.Pointers) - 1
+	reversedPointers := make([]*NamePointer, len(t.Pointers))
+	for i <= len(t.Pointers)-1 {
+		reversedPointers[i] = t.Pointers[j]
+		i++
+		j--
+	}
+
 	// create the transaction
 	rlpRawMsg, err = buildRLPMessage(
 		ObjectTagNameServiceUpdateTransaction,
@@ -320,7 +330,7 @@ func (t *NameUpdateTx) RLP() (rlpRawMsg []byte, err error) {
 		t.Nonce,
 		nID,
 		t.NameTTL,
-		t.Pointers,
+		reversedPointers,
 		t.ClientTTL,
 		t.Fee.Int,
 		t.TTL)
