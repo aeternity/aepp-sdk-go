@@ -262,16 +262,11 @@ func NewNameClaimTx(accountID, name string, nameSalt utils.BigInt, fee utils.Big
 
 // NamePointer extends the swagger gener ated models.NamePointer to provide RLP serialization
 type NamePointer struct {
-	ID  string
-	Key string
-}
-
-func (t *NamePointer) RLP() (rlpRawMsg []byte, err error) {
-	return []byte{}, nil
+	*models.NamePointer
 }
 
 func (t *NamePointer) EncodeRLP(w io.Writer) (err error) {
-	accountID, err := buildIDTag(IDTagAccount, t.ID)
+	accountID, err := buildIDTag(IDTagAccount, string(t.NamePointer.ID))
 	if err != nil {
 		return
 	}
@@ -286,7 +281,10 @@ func (t *NamePointer) EncodeRLP(w io.Writer) (err error) {
 // NewNamePointer is a constructor for a swagger generated NamePointer struct.
 // It returns a pointer because
 func NewNamePointer(key string, id string) *NamePointer {
-	return &NamePointer{ID: id, Key: key}
+	np := models.NamePointer{ID: models.EncodedHash(id), Key: &key}
+	return &NamePointer{
+		NamePointer: &np,
+	}
 }
 
 // NameUpdateTx represents a transaction where one extends the lifetime of a reserved name on AENS
@@ -331,6 +329,11 @@ func (t *NameUpdateTx) RLP() (rlpRawMsg []byte, err error) {
 
 // JSON representation of a Tx is useful for querying the node's debug endpoint
 func (t *NameUpdateTx) JSON() (string, error) {
+	swaggerNamePointers := []*models.NamePointer{}
+	for _, np := range t.Pointers {
+		swaggerNamePointers = append(swaggerNamePointers, np.NamePointer)
+	}
+
 	swaggerT := models.NameUpdateTx{
 		AccountID: models.EncodedHash(t.AccountID),
 		ClientTTL: &t.ClientTTL,
@@ -338,7 +341,7 @@ func (t *NameUpdateTx) JSON() (string, error) {
 		NameID:    models.EncodedHash(t.NameID),
 		NameTTL:   &t.NameTTL,
 		Nonce:     t.Nonce,
-		Pointers:  []*models.NamePointer{},
+		Pointers:  swaggerNamePointers,
 		TTL:       t.TTL,
 	}
 
