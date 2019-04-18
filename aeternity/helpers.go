@@ -239,6 +239,7 @@ Main:
 			p := external.NewGetMicroBlockTransactionsByHashParams().WithHash(mbhs)
 			r, mErr := ae.External.GetMicroBlockTransactionsByHash(p)
 			if mErr != nil {
+				// TODO: err will still be nil outside this scope. Consider refactoring whole function.
 				err = mErr
 				break Main
 			}
