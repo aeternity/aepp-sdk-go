@@ -1,6 +1,8 @@
 """
+The node's swagger.json cannot be used out of the box.
 1. Manually replace all int64s with uint64s in swagger.json except for time (because go's time.Unix() accepts int64, not uint64)
-2. Run this to add Fee/Balance/Amount BigInt in definitions and replace where necessary
+2. Run this to add Fee/Balance/Amount/NameSalt BigInt in definitions and replace where necessary
+3. generic_tx.go unmarshalGenericTx(): case "ChannelCloseMutualTxJSON": add "ChannelCloseMutualTx" etc for other Tx types
 
 CAVEATS
 /generations/height/{height} cannot be targeted, have to replace by hand
