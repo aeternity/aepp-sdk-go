@@ -26,7 +26,7 @@ type ChannelCloseSoloTxJSON struct {
 
 // Type gets the type of this subtype
 func (m *ChannelCloseSoloTxJSON) Type() string {
-	return "ChannelCloseSoloTxJSON"
+	return "ChannelCloseSoloTx"
 }
 
 // SetType sets the type of this subtype
