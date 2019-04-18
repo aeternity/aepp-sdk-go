@@ -1,7 +1,6 @@
 package integration_test
 
 import (
-	"bufio"
 	"fmt"
 	"math/big"
 	"os"
@@ -54,11 +53,11 @@ func TestSpendTxWithNode(t *testing.T) {
 	fmt.Println(base64TxMsg)
 
 	// sign the transaction, output params for debugging
-	signedBase64TxMsg, _, _, err := aeternity.SignEncodeTxStr(senderAccount, base64TxMsg, aeternity.Config.Node.NetworkID)
+	signedBase64TxMsg, hash, signature, err := aeternity.SignEncodeTxStr(senderAccount, base64TxMsg, aeternity.Config.Node.NetworkID)
 	if err != nil {
 		t.Error(err)
 	}
-	fmt.Println(signedBase64TxMsg)
+	fmt.Println(signedBase64TxMsg, hash, signature)
 
 	// send the signed transaction to the node
 	err = aeCli.BroadcastTransaction(signedBase64TxMsg)
@@ -155,22 +154,23 @@ func signBroadcast(tx string, acc *aeternity.Account, aeClient *aeternity.Ae) (h
 
 }
 
-func printHeight(aeClient *aeternity.Ae) {
+func getHeight(aeClient *aeternity.Ae) (h uint64) {
 	h, err := aeClient.APIGetHeight()
 	if err != nil {
 		fmt.Println("Could not retrieve chain height")
 		return
 	}
 	fmt.Println("Current Height:", h)
+	return
 }
 
-func promptContinue() {
-	fmt.Print("Continue?")
-	reader := bufio.NewReader(os.Stdin)
-	_, _, _ = reader.ReadRune()
+func waitForTransaction(aeClient *aeternity.Ae, height uint64, hash string) {
+	height, blockHash, microBlockHash, _, err := aeClient.WaitForTransactionUntilHeight(height+10, hash)
+	fmt.Println("Transaction was found at", height, "blockhash", blockHash, "microBlockHash", microBlockHash, "err", err)
 }
 
 func TestAENSWorkflow(t *testing.T) {
+	name := "fdsa.test"
 	acc, err := aeternity.AccountFromHexString(senderPrivateKey)
 	if err != nil {
 		fmt.Println(err)
@@ -181,7 +181,7 @@ func TestAENSWorkflow(t *testing.T) {
 
 	// Preclaim the name
 	fmt.Println("PreclaimTx")
-	preclaimTx, salt, err := aeClient.Aens.NamePreclaimTx("fdsa.test", aeternity.Config.Client.Fee)
+	preclaimTx, salt, err := aeClient.Aens.NamePreclaimTx(name, aeternity.Config.Client.Fee)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -195,12 +195,14 @@ func TestAENSWorkflow(t *testing.T) {
 		return
 	}
 	fmt.Println("Signed & Broadcasted NamePreclaimTx", hash)
-	printHeight(aeClient)
+	height := getHeight(aeClient)
+
+	// Wait for a bit
+	waitForTransaction(aeClient, height, hash)
 
 	// Claim the name
-	promptContinue()
 	fmt.Println("NameClaimTx")
-	claimTx, err := aeClient.Aens.NameClaimTx("fdsa.test", *salt, aeternity.Config.Client.Fee)
+	claimTx, err := aeClient.Aens.NameClaimTx(name, *salt, aeternity.Config.Client.Fee)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -208,16 +210,19 @@ func TestAENSWorkflow(t *testing.T) {
 	claimTxStr, _ := aeternity.BaseEncodeTx(&claimTx)
 	fmt.Println("ClaimTx:", claimTxStr)
 
-	_, err = signBroadcast(claimTxStr, acc, aeClient)
+	hash, err = signBroadcast(claimTxStr, acc, aeClient)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	fmt.Println("Signed & Broadcasted NameClaimTx")
-	printHeight(aeClient)
+	height = getHeight(aeClient)
+
+	// Wait for a bit
+	waitForTransaction(aeClient, height, hash)
 
 	// Verify that the name exists
-	nameEntry, err := aeClient.APIGetNameEntryByName("fdsa.test")
+	nameEntry, err := aeClient.APIGetNameEntryByName(name)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -226,9 +231,8 @@ func TestAENSWorkflow(t *testing.T) {
 	fmt.Println(string(nameEntryJSON))
 
 	// Update the name, make it point to something
-	promptContinue()
 	fmt.Println("NameUpdateTx")
-	updateTx, err := aeClient.Aens.NameUpdateTx("fdsa.test", acc.Address)
+	updateTx, err := aeClient.Aens.NameUpdateTx(name, acc.Address)
 	updateTxStr, _ := aeternity.BaseEncodeTx(&updateTx)
 	fmt.Println("UpdateTx:", updateTxStr)
 
