@@ -104,18 +104,6 @@ func waitForTransaction(nodeClient *apiclient.Node, txHash string) (blockHeight 
 	return
 }
 
-// // SpendTxStr creates an unsigned SpendTx but returns the base64 representation instead of an RLP bytestring
-// func SpendTxStr(sender, recipient string, amount, fee utils.BigInt, message string, txTTL, accountNonce uint64) (base64Tx string, err error) {
-// 	rlpUnsignedTx, err := NewSpendTx(sender, recipient, amount, fee, message, txTTL, accountNonce)
-// 	if err != nil {
-// 		return
-// 	}
-
-// 	base64Tx = Encode(PrefixTransaction, rlpUnsignedTx)
-
-// 	return base64Tx, err
-// }
-
 // BroadcastTransaction recalculates the transaction hash and sends the transaction to the node.
 func (ae *Ae) BroadcastTransaction(txSignedBase64 string) (err error) {
 	// Get back to RLP to calculate txhash
@@ -185,16 +173,6 @@ func (n *Aens) NameUpdateTx(name string, targetAddress string) (tx NameUpdateTx,
 
 	return
 }
-
-// // OracleRegisterTxStr register an oracle
-// func (o *Oracle) OracleRegisterTxStr(accountNonce uint64, querySpec, responseSpec string, queryFee utils.BigInt, oracleTTLType, oracleTTLValue, abiVersion uint64, txFee utils.BigInt, txTTL uint64) (tx string, err error) {
-// 	txRaw, err := OracleRegisterTx(o.owner.Address, accountNonce, querySpec, responseSpec, Config.Client.Oracles.QueryFee, oracleTTLType, oracleTTLValue, Config.Client.Oracles.VMVersion, txFee, txTTL)
-// 	if err != nil {
-// 		return "", err
-// 	}
-// 	tx = Encode(PrefixTransaction, txRaw)
-// 	return
-// }
 
 // PrintGenerationByHeight utility function to print a generation by it's height
 func (ae *Ae) PrintGenerationByHeight(height uint64) {
