@@ -79,7 +79,9 @@ func addressFunc(cmd *cobra.Command, args []string) error {
 
 	aeternity.Pp("Account address", account.Address)
 	if printPrivateKey {
-		aeternity.Pp("Account private key", account.SigningKeyToHexString())
+		if utils.AskYes("Are you sure you want to print your private key? This could be insecure.", false) {
+			aeternity.Pp("Account private key", account.SigningKeyToHexString())
+		}
 	}
 
 	return nil
