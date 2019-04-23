@@ -35,6 +35,7 @@ var (
 	fee             string // leave it as a string because viper cannot parse it directly into a BigInt
 	ttl             uint64
 	nonce           uint64
+	regex           bool
 )
 
 // accountCmd implements the account command
@@ -207,37 +208,43 @@ func saveFunc(cmd *cobra.Command, args []string) (err error) {
 
 var vanityCmd = &cobra.Command{
 	Use:   "vanity",
-	Short: "find the account you like",
+	Short: "Find an account that starts with or contains the user-specified text",
 	Long:  ``,
 	Args:  cobra.MinimumNArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
+	Run:   vanityFunc,
+}
 
-		prefix := fmt.Sprintf("^%s", args[0])
-		r, err := regexp.Compile(prefix)
-		if err != nil {
-			fmt.Println("Ouch! The search input ", prefix, "is not a valid regexp")
-			return
-		}
-		fmt.Println("The search for your account matching", prefix, "has begun")
+func vanityFunc(cmd *cobra.Command, args []string) {
+	var searchString string
+	if regex {
+		searchString = args[0]
+	} else {
+		searchString = fmt.Sprintf("^%s", args[0])
+	}
+	r, err := regexp.Compile(searchString)
+	if err != nil {
+		fmt.Println("Ouch! The search input ", searchString, "is not a valid regexp")
+		return
+	}
+	fmt.Println("The search for your account matching", searchString, "has begun")
 
-		var wg sync.WaitGroup
-		wg.Add(runtime.NumCPU())
-		for i := 0; i < runtime.NumCPU(); i++ {
-			go func() {
-				for {
-					a, _ := aeternity.NewAccount()
+	var wg sync.WaitGroup
+	wg.Add(runtime.NumCPU())
+	for i := 0; i < runtime.NumCPU(); i++ {
+		go func() {
+			for {
+				a, _ := aeternity.NewAccount()
 
-					if r.MatchString(a.Address[3:]) {
-						fmt.Println("FOUND!")
-						fmt.Println("Secret: ", a.SigningKeyToHexString())
-						fmt.Println("Address", a.Address)
-					}
+				if r.MatchString(a.Address[3:]) {
+					fmt.Println("FOUND!")
+					fmt.Println("Secret: ", a.SigningKeyToHexString())
+					fmt.Println("Address", a.Address)
 				}
-			}()
-		}
-		wg.Wait()
+			}
+		}()
+	}
+	wg.Wait()
 
-	},
 }
 
 func init() {
@@ -251,4 +258,5 @@ func init() {
 	accountCmd.PersistentFlags().StringVar(&password, "password", "", "Read account password from stdin [WARN: this method is not secure]")
 	// account address flags
 	addressCmd.Flags().BoolVar(&printPrivateKey, "private-key", false, "Print the private key as hex string")
+	vanityCmd.Flags().BoolVar(&regex, "regex", false, "Search using a regular expression that can match anywhere within the address instead of a string that matches at the beginning")
 }
