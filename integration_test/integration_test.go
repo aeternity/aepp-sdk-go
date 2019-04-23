@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"math/big"
 	"os"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
 	"github.com/aeternity/aepp-sdk-go/utils"
@@ -165,8 +167,20 @@ func getHeight(aeClient *aeternity.Ae) (h uint64) {
 }
 
 func waitForTransaction(aeClient *aeternity.Ae, height uint64, hash string) {
+	fmt.Println("Waiting for Transaction...")
 	height, blockHash, microBlockHash, _, err := aeClient.WaitForTransactionUntilHeight(height+10, hash)
 	fmt.Println("Transaction was found at", height, "blockhash", blockHash, "microBlockHash", microBlockHash, "err", err)
+}
+
+func getNameEntry(aeClient *aeternity.Ae, name string) (responseJSON string, err error) {
+	response, err := aeClient.APIGetNameEntryByName(name)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	r, _ := response.MarshalBinary()
+	responseJSON = string(r)
+	return responseJSON, nil
 }
 
 func TestAENSWorkflow(t *testing.T) {
@@ -222,13 +236,8 @@ func TestAENSWorkflow(t *testing.T) {
 	waitForTransaction(aeClient, height, hash)
 
 	// Verify that the name exists
-	nameEntry, err := aeClient.APIGetNameEntryByName(name)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	nameEntryJSON, _ := nameEntry.MarshalBinary()
-	fmt.Println(string(nameEntryJSON))
+	entryAfterNameClaim, err := getNameEntry(aeClient, name)
+	fmt.Println(entryAfterNameClaim)
 
 	// Update the name, make it point to something
 	fmt.Println("NameUpdateTx")
@@ -242,5 +251,16 @@ func TestAENSWorkflow(t *testing.T) {
 		return
 	}
 	fmt.Println("Signed & Broadcasted NameUpdateTx")
+
+	// Verify that the name was updated
+	// Sleep a little, it takes time for the entry update to show up
+	fmt.Printf("Sleeping a bit before querying /names/%s...\n", name)
+	time.Sleep(1000 * time.Millisecond)
+	entryAfterNameUpdate, _ := getNameEntry(aeClient, name)
+	fmt.Println(entryAfterNameUpdate)
+
+	if !strings.Contains(entryAfterNameUpdate, acc.Address) {
+		t.Errorf("The AENS entry should now point to %s but doesn't: %s", acc.Address, entryAfterNameUpdate)
+	}
 
 }
