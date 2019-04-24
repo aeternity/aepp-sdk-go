@@ -26,21 +26,6 @@ func urlComponents(url string) (host string, schemas []string) {
 	return
 }
 
-// GetTTL returns the chain height + offset
-func (ae *Ae) GetTTL(offset uint64) (height uint64, err error) {
-	return getTTL(ae.Node, offset)
-}
-
-// GetNextNonce retrieves the current accountNonce for an account + 1
-func (ae *Ae) GetNextNonce(accountID string) (nextNonce uint64, err error) {
-	return getNextNonce(ae.Node, accountID)
-}
-
-// GetTTLNonce is a convenience function that combines GetTTL() and GetNextNonce()
-func (ae *Ae) GetTTLNonce(accountID string, offset uint64) (txTTL, accountNonce uint64, err error) {
-	return getTTLNonce(ae.Node, accountID, offset)
-}
-
 func getTTL(node *apiclient.Node, offset uint64) (height uint64, err error) {
 	kb, err := getTopBlock(node)
 	if err != nil {
@@ -119,59 +104,14 @@ func (ae *Ae) BroadcastTransaction(txSignedBase64 string) (err error) {
 	return
 }
 
-// NamePreclaimTx creates a name preclaim transaction and salt (required for claiming)
-// It should return the Tx struct, not the base64 encoded RLP, to ease subsequent inspection.
-func (n *Aens) NamePreclaimTx(name string, fee utils.BigInt) (tx NamePreclaimTx, nameSalt *utils.BigInt, err error) {
-	txTTL, accountNonce, err := getTTLNonce(n.nodeClient, n.owner.Address, Config.Client.TTL)
-	if err != nil {
-		return
-	}
-
-	// calculate the commitment and get the preclaim salt
-	// since the salt is 32 bytes long, you must use a big.Int to convert it into an integer
-	cm, nameSalt, err := generateCommitmentID(name)
-	if err != nil {
-		return NamePreclaimTx{}, utils.NewBigInt(), err
-	}
-
-	// build the transaction
-	tx = NewNamePreclaimTx(n.owner.Address, cm, fee, txTTL, accountNonce)
-	if err != nil {
-		return NamePreclaimTx{}, utils.NewBigInt(), err
-	}
-
-	return
+// GetTTL returns the chain height + offset
+func (ae *Ae) GetTTL(offset uint64) (height uint64, err error) {
+	return getTTL(ae.Node, offset)
 }
 
-// NameClaimTx creates a claim transaction
-func (n *Aens) NameClaimTx(name string, nameSalt utils.BigInt, fee utils.BigInt) (tx NameClaimTx, err error) {
-	txTTL, accountNonce, err := getTTLNonce(n.nodeClient, n.owner.Address, Config.Client.TTL)
-	if err != nil {
-		return
-	}
-
-	// create the transaction
-	tx = NewNameClaimTx(n.owner.Address, name, nameSalt, fee, txTTL, accountNonce)
-
-	return tx, err
-}
-
-// NameUpdateTx perform a name update
-func (n *Aens) NameUpdateTx(name string, targetAddress string) (tx NameUpdateTx, err error) {
-	txTTL, accountNonce, err := getTTLNonce(n.nodeClient, n.owner.Address, Config.Client.TTL)
-	if err != nil {
-		return
-	}
-
-	encodedNameHash := Encode(PrefixName, Namehash(name))
-	absNameTTL, err := getTTL(n.nodeClient, Config.Client.Names.NameTTL)
-	if err != nil {
-		return NameUpdateTx{}, err
-	}
-	// create and sign the transaction
-	tx = NewNameUpdateTx(n.owner.Address, encodedNameHash, []string{targetAddress}, absNameTTL, Config.Client.Names.ClientTTL, Config.Client.Names.UpdateFee, txTTL, accountNonce)
-
-	return
+// GetNextNonce retrieves the current accountNonce for an account + 1
+func (ae *Ae) GetNextNonce(accountID string) (nextNonce uint64, err error) {
+	return getNextNonce(ae.Node, accountID)
 }
 
 // PrintGenerationByHeight utility function to print a generation by it's height
@@ -270,6 +210,86 @@ Main:
 	}
 
 	return
+}
+
+// GetTTLNonce is a convenience function that combines GetTTL() and GetNextNonce()
+func (ae *Ae) GetTTLNonce(accountID string, offset uint64) (txTTL, accountNonce uint64, err error) {
+	return getTTLNonce(ae.Node, accountID, offset)
+}
+
+// NamePreclaimTx creates a name preclaim transaction and salt (required for claiming)
+// It should return the Tx struct, not the base64 encoded RLP, to ease subsequent inspection.
+func (n *Aens) NamePreclaimTx(name string, fee utils.BigInt) (tx NamePreclaimTx, nameSalt *utils.BigInt, err error) {
+	txTTL, accountNonce, err := getTTLNonce(n.nodeClient, n.owner.Address, Config.Client.TTL)
+	if err != nil {
+		return
+	}
+
+	// calculate the commitment and get the preclaim salt
+	// since the salt is 32 bytes long, you must use a big.Int to convert it into an integer
+	cm, nameSalt, err := generateCommitmentID(name)
+	if err != nil {
+		return NamePreclaimTx{}, utils.NewBigInt(), err
+	}
+
+	// build the transaction
+	tx = NewNamePreclaimTx(n.owner.Address, cm, fee, txTTL, accountNonce)
+	if err != nil {
+		return NamePreclaimTx{}, utils.NewBigInt(), err
+	}
+
+	return
+}
+
+// NameClaimTx creates a claim transaction
+func (n *Aens) NameClaimTx(name string, nameSalt utils.BigInt, fee utils.BigInt) (tx NameClaimTx, err error) {
+	txTTL, accountNonce, err := getTTLNonce(n.nodeClient, n.owner.Address, Config.Client.TTL)
+	if err != nil {
+		return
+	}
+
+	// create the transaction
+	tx = NewNameClaimTx(n.owner.Address, name, nameSalt, fee, txTTL, accountNonce)
+
+	return tx, err
+}
+
+// NameUpdateTx perform a name update
+func (n *Aens) NameUpdateTx(name string, targetAddress string) (tx NameUpdateTx, err error) {
+	txTTL, accountNonce, err := getTTLNonce(n.nodeClient, n.owner.Address, Config.Client.TTL)
+	if err != nil {
+		return
+	}
+
+	encodedNameHash := Encode(PrefixName, Namehash(name))
+	absNameTTL, err := getTTL(n.nodeClient, Config.Client.Names.NameTTL)
+	if err != nil {
+		return NameUpdateTx{}, err
+	}
+	// create and sign the transaction
+	tx = NewNameUpdateTx(n.owner.Address, encodedNameHash, []string{targetAddress}, absNameTTL, Config.Client.Names.ClientTTL, Config.Client.Names.UpdateFee, txTTL, accountNonce)
+
+	return
+}
+
+func (o *Oracle) OracleRegisterTx(querySpec, responseSpec string, queryFee utils.BigInt, oracleTTLType, oracleTTLValue, abiVersion uint64, vmVersion uint64) (tx OracleRegisterTx, err error) {
+	ttl, nonce, err := getTTLNonce(o.nodeClient, o.owner.Address, Config.Client.TTL)
+	if err != nil {
+		return OracleRegisterTx{}, err
+	}
+
+	tx = NewOracleRegisterTx(o.owner.Address, nonce, querySpec, responseSpec, queryFee, oracleTTLType, oracleTTLValue, abiVersion, vmVersion, Config.Client.Fee, ttl)
+	return tx, nil
+}
+
+func (o *Oracle) OracleExtendTx(oracleID string, ttlType, ttlValue uint64) (tx OracleExtendTx, err error) {
+	ttl, nonce, err := getTTLNonce(o.nodeClient, o.owner.Address, Config.Client.TTL)
+	if err != nil {
+		return OracleExtendTx{}, err
+	}
+
+	tx = NewOracleExtendTx(oracleID, nonce, ttlType, ttlValue, Config.Client.Fee, ttl)
+	return tx, nil
 }
 
 // StoreAccountToKeyStoreFile store an account to a json file
