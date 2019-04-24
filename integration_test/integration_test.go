@@ -14,6 +14,8 @@ import (
 
 var sender = "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"
 var senderPrivateKey = os.Getenv("INTEGRATION_TEST_SENDER_PRIVATE_KEY")
+var nodeURL = "http://localhost:3013"
+var networkID = "ae_docker"
 
 func TestSpendTxWithNode(t *testing.T) {
 	senderAccount, err := aeternity.AccountFromHexString(senderPrivateKey)
@@ -23,8 +25,8 @@ func TestSpendTxWithNode(t *testing.T) {
 	recipient := "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v"
 	message := "Hello World"
 
-	aeternity.Config.Node.URL = "http://localhost:3013"
-	aeternity.Config.Node.NetworkID = "ae_docker"
+	aeternity.Config.Node.URL = nodeURL
+	aeternity.Config.Node.NetworkID = networkID
 	aeCli := aeternity.NewCli(aeternity.Config.Node.URL, false)
 
 	// In case this test has been run before, get recipient's account info. If it exists, expectedAmount = amount + 10
@@ -87,7 +89,7 @@ func TestSpendTxLargeWithNode(t *testing.T) {
 	recipient := "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v"
 	message := "Hello World"
 
-	aeternity.Config.Node.URL = "http://localhost:3013"
+	aeternity.Config.Node.URL = nodeURL
 	aeternity.Config.Node.NetworkID = "ae_docker"
 	aeCli := aeternity.NewCli(aeternity.Config.Node.URL, false)
 
@@ -141,7 +143,7 @@ func TestSpendTxLargeWithNode(t *testing.T) {
 }
 
 func signBroadcast(tx string, acc *aeternity.Account, aeClient *aeternity.Ae) (hash string, err error) {
-	signedTxStr, hash, _, err := aeternity.SignEncodeTxStr(acc, tx, "ae_docker")
+	signedTxStr, hash, _, err := aeternity.SignEncodeTxStr(acc, tx, aeternity.Config.Node.NetworkID)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -166,7 +168,8 @@ func getHeight(aeClient *aeternity.Ae) (h uint64) {
 	return
 }
 
-func waitForTransaction(aeClient *aeternity.Ae, height uint64, hash string) {
+func waitForTransaction(aeClient *aeternity.Ae, hash string) {
+	height := getHeight(aeClient)
 	fmt.Println("Waiting for Transaction...")
 	height, blockHash, microBlockHash, _, err := aeClient.WaitForTransactionUntilHeight(height+10, hash)
 	fmt.Println("Transaction was found at", height, "blockhash", blockHash, "microBlockHash", microBlockHash, "err", err)
@@ -190,7 +193,8 @@ func TestAENSWorkflow(t *testing.T) {
 		fmt.Println(err)
 		return
 	}
-	aeClient := aeternity.NewCli("http://localhost:3013", false).WithAccount(acc)
+	aeClient := aeternity.NewCli(nodeURL, false).WithAccount(acc)
+	aeternity.Config.Node.NetworkID = networkID
 	aeternity.Config.Client.Fee = *utils.RequireBigIntFromString("100000000000000")
 
 	// Preclaim the name
@@ -209,10 +213,9 @@ func TestAENSWorkflow(t *testing.T) {
 		return
 	}
 	fmt.Println("Signed & Broadcasted NamePreclaimTx", hash)
-	height := getHeight(aeClient)
 
 	// Wait for a bit
-	waitForTransaction(aeClient, height, hash)
+	waitForTransaction(aeClient, hash)
 
 	// Claim the name
 	fmt.Println("NameClaimTx")
@@ -230,10 +233,9 @@ func TestAENSWorkflow(t *testing.T) {
 		return
 	}
 	fmt.Println("Signed & Broadcasted NameClaimTx")
-	height = getHeight(aeClient)
 
 	// Wait for a bit
-	waitForTransaction(aeClient, height, hash)
+	waitForTransaction(aeClient, hash)
 
 	// Verify that the name exists
 	entryAfterNameClaim, err := getNameEntry(aeClient, name)
@@ -261,6 +263,60 @@ func TestAENSWorkflow(t *testing.T) {
 
 	if !strings.Contains(entryAfterNameUpdate, acc.Address) {
 		t.Errorf("The AENS entry should now point to %s but doesn't: %s", acc.Address, entryAfterNameUpdate)
+	}
+
+}
+
+func TestOracleWorkflow(t *testing.T) {
+	acc, err := aeternity.AccountFromHexString(senderPrivateKey)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	aeternity.Config.Node.NetworkID = networkID
+	aeClient := aeternity.NewCli(nodeURL, false).WithAccount(acc)
+
+	fmt.Println("OracleRegisterTx")
+	queryFee := utils.NewBigIntFromUint64(1000)
+	oracleRegisterTx, err := aeClient.Oracle.OracleRegisterTx("hello", "helloback", *queryFee, 0, 100, 0, 0)
+	if err != nil {
+		t.Error(err)
+	}
+	oracleRegisterTxStr, _ := aeternity.BaseEncodeTx(&oracleRegisterTx)
+	oracleRegisterTxHash, err := signBroadcast(oracleRegisterTxStr, acc, aeClient)
+	if err != nil {
+		t.Error(err)
+	}
+
+	waitForTransaction(aeClient, oracleRegisterTxHash)
+
+	// Confirm that the oracle exists
+	oraclePubKey := strings.Replace(acc.Address, "ak_", "ok_", 1)
+	oracle, err := aeClient.APIGetOracleByPubkey(oraclePubKey)
+	if err != nil {
+		t.Errorf("APIGetOracleByPubkey: %s", err)
+	}
+
+	fmt.Println("OracleExtendTx")
+	// save the oracle's initial TTL so we can compare it with after OracleExtendTx
+	oracleTTL := *oracle.TTL
+	oracleExtendTx, err := aeClient.Oracle.OracleExtendTx(oraclePubKey, 0, 1000)
+	if err != nil {
+		t.Error(err)
+	}
+	oracleExtendTxStr, _ := aeternity.BaseEncodeTx(&oracleExtendTx)
+	oracleExtendTxHash, err := signBroadcast(oracleExtendTxStr, acc, aeClient)
+	if err != nil {
+		t.Error(err)
+	}
+	waitForTransaction(aeClient, oracleExtendTxHash)
+
+	oracle, err = aeClient.APIGetOracleByPubkey(oraclePubKey)
+	if err != nil {
+		t.Errorf("APIGetOracleByPubkey: %s", err)
+	}
+	if *oracle.TTL == oracleTTL {
+		t.Errorf("The Oracle's TTL did not change after OracleExtendTx. Got %v but expected %v", *oracle.TTL, oracleTTL)
 	}
 
 }
