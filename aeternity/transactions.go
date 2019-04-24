@@ -83,7 +83,6 @@ func buildPointers(pointers []string) (ptrs []*NamePointer, err error) {
 // See https://tour.golang.org/methods/4 or https://dave.cheney.net/2016/03/19/should-methods-be-declared-on-t-or-t
 type Tx interface {
 	RLP() ([]byte, error)
-	JSON() (string, error)
 }
 
 // BaseEncodeTx takes a Tx, runs its RLP() method, and base encodes the result.
