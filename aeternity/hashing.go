@@ -81,6 +81,39 @@ func hash(in []byte) (out []byte, err error) {
 	return
 }
 
+func leftPadByteSlice(length int, data []byte) []byte {
+	dataLen := len(data)
+	t := make([]byte, length-dataLen)
+	paddedSlice := append(t, data...)
+	return paddedSlice
+}
+
+func buildOracleQueryID(sender string, senderNonce uint64, recipient string) (id string, err error) {
+	queryIDBin := []byte{}
+	senderBin, err := Decode(sender)
+	if err != nil {
+		return
+	}
+	queryIDBin = append(queryIDBin, senderBin...)
+
+	senderNonceBytes := utils.NewBigIntFromUint64(senderNonce).Bytes()
+	senderNonceBytesPadded := leftPadByteSlice(32, senderNonceBytes)
+	queryIDBin = append(queryIDBin, senderNonceBytesPadded...)
+
+	recipientBin, err := Decode(recipient)
+	if err != nil {
+		return
+	}
+	queryIDBin = append(queryIDBin, recipientBin...)
+
+	hashedQueryID, err := hash(queryIDBin)
+	if err != nil {
+		return
+	}
+	id = Encode(PrefixOracleQueryID, hashedQueryID)
+	return
+}
+
 // Namehash calculate the Namehash of a string
 // TODO: link to the
 func Namehash(name string) []byte {

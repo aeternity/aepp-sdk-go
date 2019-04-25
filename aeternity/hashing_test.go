@@ -241,3 +241,88 @@ func Test_computeCommitmentID(t *testing.T) {
 		})
 	}
 }
+
+func Test_buildOracleQueryID(t *testing.T) {
+	type args struct {
+		sender      string
+		senderNonce uint64
+		recipient   string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantId  string
+		wantErr bool
+	}{
+		{
+			name: "a simple oracle query id",
+			args: args{
+				sender:      "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+				senderNonce: uint64(3),
+				recipient:   "ok_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+			},
+			wantId:  "oq_2NhMjBdKHJYnQjDbAxanmxoXiSiWDoG9bqDgk2MfK2X6AB9Bwx",
+			wantErr: false,
+		},
+		{
+			name: "this test case copied from aepp-middleware",
+			args: args{
+				sender:      "ak_2ZjpYpJbzq8xbzjgPuEpdq9ahZE7iJRcAYC1weq3xdrNbzRiP4",
+				senderNonce: uint64(1),
+				recipient:   "ok_2iqfJjbhGgJFRezjX6Q6DrvokkTM5niGEHBEJZ7uAG5fSGJAw1",
+			},
+			wantId:  "oq_2YvZnoohcSvbQCsPKSMxc98i5HZ1sU5mR6xwJUZC3SvkuSynMj",
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotId, err := buildOracleQueryID(tt.args.sender, tt.args.senderNonce, tt.args.recipient)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("buildOracleQueryID() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if gotId != tt.wantId {
+				gotIdBytes, _ := Decode(gotId)
+				wantIdBytes, _ := Decode(tt.wantId)
+				t.Errorf("buildOracleQueryID() = \n%v\n%v, want \n%v\n%v", gotId, gotIdBytes, tt.wantId, wantIdBytes)
+			}
+		})
+	}
+}
+
+func Test_leftPadByteSlice(t *testing.T) {
+	type args struct {
+		length int
+		data   []byte
+	}
+	tests := []struct {
+		name string
+		args args
+		want []byte
+	}{
+		{
+			name: "Left pad a nonce of 3 to 32 bytes",
+			args: args{
+				length: 32,
+				data:   []byte{3},
+			},
+			want: []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3},
+		},
+		{
+			name: "Left pad a multi-byte value to 32 bytes",
+			args: args{
+				length: 32,
+				data:   []byte{1, 2, 3, 4, 3},
+			},
+			want: []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 3},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := leftPadByteSlice(tt.args.length, tt.args.data); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("leftPadByteSlice() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
