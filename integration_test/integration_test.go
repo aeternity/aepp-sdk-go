@@ -331,4 +331,19 @@ func TestOracleWorkflow(t *testing.T) {
 	}
 	waitForTransaction(aeClient, oracleQueryTxHash)
 
+	fmt.Println("OracleRespondTx")
+	// Find the Oracle Query ID to reply to
+	oracleQueries, err := aeClient.APIGetOracleQueriesByPubkey(oraclePubKey)
+	if err != nil {
+		t.Errorf("APIGetOracleQueriesByPubkey: %s", err)
+	}
+	oqID := string(oracleQueries.OracleQueries[0].ID)
+	oracleRespondTx, err := aeClient.Oracle.OracleRespondTx(oraclePubKey, oqID, "My day was fine thank you", 0, 100)
+	oracleRespondTxStr, _ := aeternity.BaseEncodeTx(&oracleRespondTx)
+	oracleRespondTxHash, err := signBroadcast(oracleRespondTxStr, acc, aeClient)
+	if err != nil {
+		t.Error(err)
+	}
+	waitForTransaction(aeClient, oracleRespondTxHash)
+
 }
