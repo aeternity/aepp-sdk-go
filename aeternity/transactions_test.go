@@ -439,7 +439,7 @@ func TestOracleExtendTx_RLP(t *testing.T) {
 	}
 }
 
-func TestOracleQueryTxRLP(t *testing.T) {
+func TestOracleQueryTx_RLP(t *testing.T) {
 	type fields struct {
 		SenderID         string
 		AccountNonce     uint64
@@ -544,6 +544,67 @@ func TestNamePointer_EncodeRLP(t *testing.T) {
 			if gotW := w.Bytes(); !bytes.Equal(gotW, tt.wantW) {
 				t.Errorf("NamePointer.EncodeRLP() = %v, want %v", gotW, tt.wantW)
 				fmt.Println(DecodeRLPMessage(gotW))
+			}
+		})
+	}
+}
+
+func TestOracleRespondTx_RLP(t *testing.T) {
+	type fields struct {
+		OracleID         string
+		AccountNonce     uint64
+		QueryID          string
+		Response         string
+		ResponseTTLType  uint64
+		ResponseTTLValue uint64
+		TxFee            utils.BigInt
+		TxTTL            uint64
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		wantTx  string
+		wantErr bool
+	}{
+		{
+			name: "A normal oracle response",
+			fields: fields{
+				OracleID:         "ok_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+				AccountNonce:     uint64(1),
+				QueryID:          "oq_2NhMjBdKHJYnQjDbAxanmxoXiSiWDoG9bqDgk2MfK2X6AB9Bwx",
+				Response:         "Hello back",
+				ResponseTTLType:  0,
+				ResponseTTLValue: 100,
+				TxFee:            Config.Client.Fee,
+				TxTTL:            Config.Client.TTL,
+			},
+			wantTx:  "tx_+F0YAaEEzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vMBoLT1h6fjQDFn1a7j+6wVQ886V47xiFwvkbL+x2yR3J9cikhlbGxvIGJhY2sAZIa15iD0gACCAfQC7+L+",
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tx := NewOracleRespondTx(
+				tt.fields.OracleID,
+				tt.fields.AccountNonce,
+				tt.fields.QueryID,
+				tt.fields.Response,
+				tt.fields.ResponseTTLType,
+				tt.fields.ResponseTTLValue,
+				tt.fields.TxFee,
+				tt.fields.TxTTL,
+			)
+			gotTx, err := BaseEncodeTx(&tx)
+
+			txJSON, _ := tx.JSON()
+			fmt.Println(txJSON)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("OracleRespondTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(gotTx, tt.wantTx) {
+				gotTxRawBytes, wantTxRawBytes := getRLPSerialized(gotTx, tt.wantTx)
+				t.Errorf("OracleRespondTx.RLP() = \n%v\n%v, want \n%v\n%v", gotTx, gotTxRawBytes, tt.wantTx, wantTxRawBytes)
 			}
 		})
 	}
