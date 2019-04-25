@@ -302,6 +302,16 @@ func (o *Oracle) OracleQueryTx(OracleID, Query string, QueryFee utils.BigInt, Qu
 	return tx, nil
 }
 
+func (o *Oracle) OracleRespondTx(OracleID string, QueryID string, Response string, TTLType uint64, TTLValue uint64) (tx OracleRespondTx, err error) {
+	ttl, nonce, err := getTTLNonce(o.nodeClient, o.owner.Address, Config.Client.TTL)
+	if err != nil {
+		return OracleRespondTx{}, err
+	}
+
+	tx = NewOracleRespondTx(OracleID, nonce, QueryID, Response, TTLType, TTLValue, Config.Client.Fee, ttl)
+	return tx, nil
+}
+
 // StoreAccountToKeyStoreFile store an account to a json file
 func StoreAccountToKeyStoreFile(account *Account, password, walletName string) (filePath string, err error) {
 	// keystore will be saved in current directory
