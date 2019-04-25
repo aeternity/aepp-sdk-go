@@ -466,7 +466,7 @@ type OracleExtendTx struct {
 
 // RLP returns a byte serialized representation
 func (t *OracleExtendTx) RLP() (rlpRawMsg []byte, err error) {
-	aID, err := buildIDTag(IDTagOracle, t.OracleID)
+	oID, err := buildIDTag(IDTagOracle, t.OracleID)
 	if err != nil {
 		return
 	}
@@ -474,7 +474,7 @@ func (t *OracleExtendTx) RLP() (rlpRawMsg []byte, err error) {
 	rlpRawMsg, err = buildRLPMessage(
 		ObjectTagOracleExtendTransaction,
 		rlpMessageVersion,
-		aID,
+		oID,
 		t.AccountNonce,
 		t.TTLType,
 		t.TTLValue,
@@ -593,6 +593,50 @@ type OracleRespondTx struct {
 	ResponseTTLValue uint64
 	TxFee            utils.BigInt
 	TxTTL            uint64
+}
+
+func (t *OracleRespondTx) RLP() (rlpRawMsg []byte, err error) {
+	oID, err := buildIDTag(IDTagOracle, t.OracleID)
+	if err != nil {
+		return
+	}
+	queryIDBytes, err := Decode(t.QueryID)
+	if err != nil {
+		return
+	}
+
+	rlpRawMsg, err = buildRLPMessage(
+		ObjectTagOracleResponseTransaction,
+		rlpMessageVersion,
+		oID,
+		t.AccountNonce,
+		queryIDBytes,
+		t.Response,
+		t.ResponseTTLType,
+		t.ResponseTTLValue,
+		t.TxFee.Int,
+		t.TxTTL)
+	return
+}
+
+func (t *OracleRespondTx) JSON() (string, error) {
+	responseTTLTypeStr := ttlTypeIntToStr(t.ResponseTTLType)
+
+	swaggerT := models.OracleRespondTx{
+		Fee:      t.TxFee,
+		Nonce:    t.AccountNonce,
+		OracleID: models.EncodedHash(t.OracleID),
+		QueryID:  models.EncodedHash(t.QueryID),
+		Response: &t.Response,
+		ResponseTTL: &models.RelativeTTL{
+			Type:  &responseTTLTypeStr,
+			Value: &t.ResponseTTLValue,
+		},
+		TTL: t.TxTTL,
+	}
+	output, err := swaggerT.MarshalBinary()
+	return string(output), err
+
 }
 
 // NewOracleRespondTx is a constructor for a OracleRespondTx struct
