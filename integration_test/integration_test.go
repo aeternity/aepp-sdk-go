@@ -319,4 +319,16 @@ func TestOracleWorkflow(t *testing.T) {
 		t.Errorf("The Oracle's TTL did not change after OracleExtendTx. Got %v but expected %v", *oracle.TTL, oracleTTL)
 	}
 
+	fmt.Println("OracleQueryTx")
+	oracleQueryTx, err := aeClient.Oracle.OracleQueryTx(oraclePubKey, "How was your day?", *queryFee, 0, 100, 0, 100)
+	if err != nil {
+		t.Error(err)
+	}
+	oracleQueryTxStr, _ := aeternity.BaseEncodeTx(&oracleQueryTx)
+	oracleQueryTxHash, err := signBroadcast(oracleQueryTxStr, acc, aeClient)
+	if err != nil {
+		t.Error(err)
+	}
+	waitForTransaction(aeClient, oracleQueryTxHash)
+
 }

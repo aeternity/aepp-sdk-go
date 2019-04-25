@@ -439,7 +439,7 @@ func TestOracleExtendTx_RLP(t *testing.T) {
 	}
 }
 
-func OracleQueryTxRLP(t *testing.T) {
+func TestOracleQueryTxRLP(t *testing.T) {
 	type fields struct {
 		SenderID         string
 		AccountNonce     uint64
@@ -474,8 +474,8 @@ func OracleQueryTxRLP(t *testing.T) {
 				TxFee:            Config.Client.Fee,
 				TxTTL:            Config.Client.TTL,
 			},
-			// from aepp-sdk-js
-			wantTx:  "tx_+GgXAaEBHxOjsIvwAUAGYqaLadh194A87EwIZH9u1dhMeJe9UKMBoQTOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+841BcmUgeW91IG9rYXk/AACCASwAggEshrXmIPSAAILEzIsypOc=",
+			// from the node
+			wantTx:  "tx_+GgXAaEBHxOjsIvwAUAGYqaLadh194A87EwIZH9u1dhMeJe9UKMBoQTOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+841BcmUgeW91IG9rYXk/AACCASwAggEshrXmIPSAAIIB9GPfFkA=",
 			wantErr: false,
 		},
 	}
