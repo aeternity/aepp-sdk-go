@@ -208,3 +208,20 @@ func getOracleByPubkey(node *apiclient.Node, pubkey string) (oracle *models.Regi
 	oracle = r.Payload
 	return
 }
+
+// APIGetOracleQueriesByPubkey get a list of queries made to a particular oracle
+func (ae *Ae) APIGetOracleQueriesByPubkey(pubkey string) (oracleQueries *models.OracleQueries, err error) {
+	return getOracleQueriesByPubkey(ae.Node, pubkey)
+}
+
+// getOracleQueriesByPubkey get a list of queries made to a particular oracle
+func getOracleQueriesByPubkey(node *apiclient.Node, pubkey string) (oracleQueries *models.OracleQueries, err error) {
+	p := external.NewGetOracleQueriesByPubkeyParams().WithPubkey(pubkey)
+	r, err := node.External.GetOracleQueriesByPubkey(p)
+	if err != nil {
+		err = fmt.Errorf("Error: %v", getErrorReason(err))
+		return
+	}
+	oracleQueries = r.Payload
+	return
+}
