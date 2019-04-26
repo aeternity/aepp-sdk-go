@@ -251,7 +251,7 @@ func Test_buildOracleQueryID(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		wantId  string
+		wantID  string
 		wantErr bool
 	}{
 		{
@@ -261,7 +261,7 @@ func Test_buildOracleQueryID(t *testing.T) {
 				senderNonce: uint64(3),
 				recipient:   "ok_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
 			},
-			wantId:  "oq_2NhMjBdKHJYnQjDbAxanmxoXiSiWDoG9bqDgk2MfK2X6AB9Bwx",
+			wantID:  "oq_2NhMjBdKHJYnQjDbAxanmxoXiSiWDoG9bqDgk2MfK2X6AB9Bwx",
 			wantErr: false,
 		},
 		{
@@ -271,21 +271,21 @@ func Test_buildOracleQueryID(t *testing.T) {
 				senderNonce: uint64(1),
 				recipient:   "ok_2iqfJjbhGgJFRezjX6Q6DrvokkTM5niGEHBEJZ7uAG5fSGJAw1",
 			},
-			wantId:  "oq_2YvZnoohcSvbQCsPKSMxc98i5HZ1sU5mR6xwJUZC3SvkuSynMj",
+			wantID:  "oq_2YvZnoohcSvbQCsPKSMxc98i5HZ1sU5mR6xwJUZC3SvkuSynMj",
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotId, err := buildOracleQueryID(tt.args.sender, tt.args.senderNonce, tt.args.recipient)
+			gotID, err := buildOracleQueryID(tt.args.sender, tt.args.senderNonce, tt.args.recipient)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("buildOracleQueryID() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if gotId != tt.wantId {
-				gotIdBytes, _ := Decode(gotId)
-				wantIdBytes, _ := Decode(tt.wantId)
-				t.Errorf("buildOracleQueryID() = \n%v\n%v, want \n%v\n%v", gotId, gotIdBytes, tt.wantId, wantIdBytes)
+			if gotID != tt.wantID {
+				gotIDBytes, _ := Decode(gotID)
+				wantIDBytes, _ := Decode(tt.wantID)
+				t.Errorf("buildOracleQueryID() = \n%v\n%v, want \n%v\n%v", gotID, gotIDBytes, tt.wantID, wantIDBytes)
 			}
 		})
 	}
