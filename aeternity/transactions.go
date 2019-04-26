@@ -158,7 +158,7 @@ type NamePreclaimTx struct {
 	CommitmentID string
 	Fee          utils.BigInt
 	TTL          uint64
-	Nonce        uint64
+	AccountNonce uint64
 }
 
 // RLP returns a byte serialized representation
@@ -178,7 +178,7 @@ func (t *NamePreclaimTx) RLP() (rlpRawMsg []byte, err error) {
 		ObjectTagNameServicePreclaimTransaction,
 		rlpMessageVersion,
 		aID,
-		t.Nonce,
+		t.AccountNonce,
 		cID,
 		t.Fee.Int,
 		t.TTL)
@@ -191,7 +191,7 @@ func (t *NamePreclaimTx) JSON() (string, error) {
 		AccountID:    models.EncodedHash(t.AccountID),
 		CommitmentID: models.EncodedHash(t.CommitmentID),
 		Fee:          t.Fee,
-		Nonce:        t.Nonce,
+		Nonce:        t.AccountNonce,
 		TTL:          t.TTL,
 	}
 	output, err := swaggerT.MarshalBinary()
@@ -199,20 +199,20 @@ func (t *NamePreclaimTx) JSON() (string, error) {
 }
 
 // NewNamePreclaimTx is a constructor for a NamePreclaimTx struct
-func NewNamePreclaimTx(accountID, commitmentID string, fee utils.BigInt, ttl, nonce uint64) NamePreclaimTx {
-	return NamePreclaimTx{accountID, commitmentID, fee, ttl, nonce}
+func NewNamePreclaimTx(accountID, commitmentID string, fee utils.BigInt, ttl, accountNonce uint64) NamePreclaimTx {
+	return NamePreclaimTx{accountID, commitmentID, fee, ttl, accountNonce}
 }
 
 // NameClaimTx represents a transaction where one claims a previously reserved name on AENS
 // The revealed name is simply sent in plaintext in RLP, while in JSON representation
 // it is base58 encoded.
 type NameClaimTx struct {
-	AccountID string
-	Name      string
-	NameSalt  utils.BigInt
-	Fee       utils.BigInt
-	TTL       uint64
-	Nonce     uint64
+	AccountID    string
+	Name         string
+	NameSalt     utils.BigInt
+	Fee          utils.BigInt
+	TTL          uint64
+	AccountNonce uint64
 }
 
 // RLP returns a byte serialized representation
@@ -228,7 +228,7 @@ func (t *NameClaimTx) RLP() (rlpRawMsg []byte, err error) {
 		ObjectTagNameServiceClaimTransaction,
 		rlpMessageVersion,
 		aID,
-		t.Nonce,
+		t.AccountNonce,
 		t.Name,
 		t.NameSalt.Int,
 		t.Fee.Int,
@@ -246,7 +246,7 @@ func (t *NameClaimTx) JSON() (string, error) {
 		Fee:       t.Fee,
 		Name:      &nameAPIEncoded,
 		NameSalt:  t.NameSalt,
-		Nonce:     t.Nonce,
+		Nonce:     t.AccountNonce,
 		TTL:       t.TTL,
 	}
 
@@ -255,8 +255,8 @@ func (t *NameClaimTx) JSON() (string, error) {
 }
 
 // NewNameClaimTx is a constructor for a NameClaimTx struct
-func NewNameClaimTx(accountID, name string, nameSalt utils.BigInt, fee utils.BigInt, ttl, nonce uint64) NameClaimTx {
-	return NameClaimTx{accountID, name, nameSalt, fee, ttl, nonce}
+func NewNameClaimTx(accountID, name string, nameSalt utils.BigInt, fee utils.BigInt, ttl, accountNonce uint64) NameClaimTx {
+	return NameClaimTx{accountID, name, nameSalt, fee, ttl, accountNonce}
 }
 
 // NamePointer extends the swagger gener ated models.NamePointer to provide RLP serialization
@@ -289,14 +289,14 @@ func NewNamePointer(key string, id string) *NamePointer {
 
 // NameUpdateTx represents a transaction where one extends the lifetime of a reserved name on AENS
 type NameUpdateTx struct {
-	AccountID string
-	NameID    string
-	Pointers  []*NamePointer
-	NameTTL   uint64
-	ClientTTL uint64
-	Fee       utils.BigInt
-	TTL       uint64
-	Nonce     uint64
+	AccountID    string
+	NameID       string
+	Pointers     []*NamePointer
+	NameTTL      uint64
+	ClientTTL    uint64
+	Fee          utils.BigInt
+	TTL          uint64
+	AccountNonce uint64
 }
 
 // RLP returns a byte serialized representation
@@ -327,7 +327,7 @@ func (t *NameUpdateTx) RLP() (rlpRawMsg []byte, err error) {
 		ObjectTagNameServiceUpdateTransaction,
 		rlpMessageVersion,
 		aID,
-		t.Nonce,
+		t.AccountNonce,
 		nID,
 		t.NameTTL,
 		reversedPointers,
@@ -350,7 +350,7 @@ func (t *NameUpdateTx) JSON() (string, error) {
 		Fee:       t.Fee,
 		NameID:    models.EncodedHash(t.NameID),
 		NameTTL:   &t.NameTTL,
-		Nonce:     t.Nonce,
+		Nonce:     t.AccountNonce,
 		Pointers:  swaggerNamePointers,
 		TTL:       t.TTL,
 	}
@@ -360,12 +360,12 @@ func (t *NameUpdateTx) JSON() (string, error) {
 }
 
 // NewNameUpdateTx is a constructor for a NameUpdateTx struct
-func NewNameUpdateTx(accountID, nameID string, pointers []string, nameTTL, clientTTL uint64, fee utils.BigInt, ttl, nonce uint64) NameUpdateTx {
+func NewNameUpdateTx(accountID, nameID string, pointers []string, nameTTL, clientTTL uint64, fee utils.BigInt, ttl, accountNonce uint64) NameUpdateTx {
 	parsedPointers, err := buildPointers(pointers)
 	if err != nil {
 		panic(err)
 	}
-	return NameUpdateTx{accountID, nameID, parsedPointers, nameTTL, clientTTL, fee, ttl, nonce}
+	return NameUpdateTx{accountID, nameID, parsedPointers, nameTTL, clientTTL, fee, ttl, accountNonce}
 }
 
 // OracleRegisterTx represents a transaction that registers an oracle on the blockchain's state
@@ -456,12 +456,12 @@ func NewOracleRegisterTx(accountID string, accountNonce uint64, querySpec, respo
 
 // OracleExtendTx represents a transaction that extends the lifetime of an oracle
 type OracleExtendTx struct {
-	OracleID     string
-	AccountNonce uint64
-	TTLType      uint64
-	TTLValue     uint64
-	Fee          utils.BigInt
-	TTL          uint64
+	OracleID       string
+	AccountNonce   uint64
+	OracleTTLType  uint64
+	OracleTTLValue uint64
+	TxFee          utils.BigInt
+	TxTTL          uint64
 }
 
 // RLP returns a byte serialized representation
@@ -476,26 +476,26 @@ func (t *OracleExtendTx) RLP() (rlpRawMsg []byte, err error) {
 		rlpMessageVersion,
 		oID,
 		t.AccountNonce,
-		t.TTLType,
-		t.TTLValue,
-		t.Fee.Int,
-		t.TTL)
+		t.OracleTTLType,
+		t.OracleTTLValue,
+		t.TxFee.Int,
+		t.TxTTL)
 	return
 }
 
 // JSON representation of a Tx is useful for querying the node's debug endpoint
 func (t *OracleExtendTx) JSON() (string, error) {
-	oracleTTLTypeStr := ttlTypeIntToStr(t.TTLType)
+	oracleTTLTypeStr := ttlTypeIntToStr(t.OracleTTLType)
 
 	swaggerT := models.OracleExtendTx{
-		Fee:      t.Fee,
+		Fee:      t.TxFee,
 		Nonce:    t.AccountNonce,
 		OracleID: models.EncodedHash(t.OracleID),
 		OracleTTL: &models.RelativeTTL{
 			Type:  &oracleTTLTypeStr,
-			Value: &t.TTLValue,
+			Value: &t.OracleTTLValue,
 		},
-		TTL: t.TTL,
+		TTL: t.TxTTL,
 	}
 
 	output, err := swaggerT.MarshalBinary()
@@ -503,8 +503,8 @@ func (t *OracleExtendTx) JSON() (string, error) {
 }
 
 // NewOracleExtendTx is a constructor for a OracleExtendTx struct
-func NewOracleExtendTx(oracleID string, accountNonce, ttlType, ttlValue uint64, fee utils.BigInt, ttl uint64) OracleExtendTx {
-	return OracleExtendTx{oracleID, accountNonce, ttlType, ttlValue, fee, ttl}
+func NewOracleExtendTx(oracleID string, accountNonce, oracleTTLType, oracleTTLValue uint64, TxFee utils.BigInt, TxTTL uint64) OracleExtendTx {
+	return OracleExtendTx{oracleID, accountNonce, oracleTTLType, oracleTTLValue, TxFee, TxTTL}
 }
 
 // OracleQueryTx represents a transaction that a program sends to query an oracle
