@@ -595,6 +595,7 @@ type OracleRespondTx struct {
 	TxTTL            uint64
 }
 
+// RLP returns a byte serialized representation
 func (t *OracleRespondTx) RLP() (rlpRawMsg []byte, err error) {
 	oID, err := buildIDTag(IDTagOracle, t.OracleID)
 	if err != nil {
@@ -619,6 +620,7 @@ func (t *OracleRespondTx) RLP() (rlpRawMsg []byte, err error) {
 	return
 }
 
+// JSON representation of a Tx is useful for querying the node's debug endpoint
 func (t *OracleRespondTx) JSON() (string, error) {
 	responseTTLTypeStr := ttlTypeIntToStr(t.ResponseTTLType)
 
