@@ -272,6 +272,7 @@ func (n *Aens) NameUpdateTx(name string, targetAddress string) (tx NameUpdateTx,
 	return
 }
 
+// OracleRegisterTx create a new oracle
 func (o *Oracle) OracleRegisterTx(querySpec, responseSpec string, queryFee utils.BigInt, oracleTTLType, oracleTTLValue, abiVersion uint64, vmVersion uint64) (tx OracleRegisterTx, err error) {
 	ttl, nonce, err := getTTLNonce(o.nodeClient, o.owner.Address, Config.Client.TTL)
 	if err != nil {
@@ -282,6 +283,7 @@ func (o *Oracle) OracleRegisterTx(querySpec, responseSpec string, queryFee utils
 	return tx, nil
 }
 
+// OracleExtendTx extend the lifetime of an existing oracle
 func (o *Oracle) OracleExtendTx(oracleID string, ttlType, ttlValue uint64) (tx OracleExtendTx, err error) {
 	ttl, nonce, err := getTTLNonce(o.nodeClient, o.owner.Address, Config.Client.TTL)
 	if err != nil {
@@ -292,6 +294,7 @@ func (o *Oracle) OracleExtendTx(oracleID string, ttlType, ttlValue uint64) (tx O
 	return tx, nil
 }
 
+// OracleQueryTx ask something of an oracle
 func (o *Oracle) OracleQueryTx(OracleID, Query string, QueryFee utils.BigInt, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64) (tx OracleQueryTx, err error) {
 	ttl, nonce, err := getTTLNonce(o.nodeClient, o.owner.Address, Config.Client.TTL)
 	if err != nil {
@@ -302,6 +305,7 @@ func (o *Oracle) OracleQueryTx(OracleID, Query string, QueryFee utils.BigInt, Qu
 	return tx, nil
 }
 
+// OracleRespondTx the oracle responds by sending this transaction
 func (o *Oracle) OracleRespondTx(OracleID string, QueryID string, Response string, TTLType uint64, TTLValue uint64) (tx OracleRespondTx, err error) {
 	ttl, nonce, err := getTTLNonce(o.nodeClient, o.owner.Address, Config.Client.TTL)
 	if err != nil {
