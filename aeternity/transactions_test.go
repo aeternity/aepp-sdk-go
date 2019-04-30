@@ -312,6 +312,113 @@ func TestNameUpdateTx_RLP(t *testing.T) {
 	}
 }
 
+func TestNameRevokeTx_RLP(t *testing.T) {
+	type fields struct {
+		AccountID    string
+		NameID       string
+		Fee          utils.BigInt
+		TTL          uint64
+		AccountNonce uint64
+	}
+	testCases := []struct {
+		name    string
+		fields  fields
+		wantTx  string
+		wantErr bool
+	}{
+		{
+			name: "normal revoke one name",
+			fields: fields{
+				AccountID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+				NameID:       "nm_ie148R2qZYBfo1Ek3sZpfTLwBhkkqCRKi2Ce8JJ7yyWVRw2Sb", // fdsa.test
+				Fee:          *utils.NewBigIntFromUint64(1),
+				TTL:          5,
+				AccountNonce: 5,
+			},
+			wantTx:  "tx_+EkjAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vMFoQJei0cGdDWb3EfrY0mtZADF0LoQ4yL6z10I/3ETJ0fpKAEFCjOeGw==",
+			wantErr: false,
+		},
+	}
+	for _, tt := range testCases {
+		t.Run(tt.name, func(t *testing.T) {
+			tx := NewNameRevokeTx(
+				tt.fields.AccountID,
+				tt.fields.NameID,
+				tt.fields.Fee,
+				tt.fields.TTL,
+				tt.fields.AccountNonce,
+			)
+			txJSON, _ := tx.JSON()
+			fmt.Println(txJSON)
+
+			gotTx, err := BaseEncodeTx(&tx)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("NameRevokeTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(gotTx, tt.wantTx) {
+				gotTxRawBytes, wantTxRawBytes := getRLPSerialized(gotTx, tt.wantTx)
+				t.Errorf("NameRevokeTx.RLP() = \n%v\n%v, want \n%v\n%v", gotTx, gotTxRawBytes, tt.wantTx, wantTxRawBytes)
+			}
+		})
+	}
+}
+
+func TestNameTransferTx_RLP(t *testing.T) {
+	type fields struct {
+		AccountID    string
+		NameID       string
+		RecipientID  string
+		Fee          utils.BigInt
+		TTL          uint64
+		AccountNonce uint64
+	}
+	testCases := []struct {
+		name    string
+		fields  fields
+		wantTx  string
+		wantErr bool
+	}{
+		{
+			name: "normal name transfer transaction",
+			fields: fields{
+				AccountID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+				NameID:       "nm_ie148R2qZYBfo1Ek3sZpfTLwBhkkqCRKi2Ce8JJ7yyWVRw2Sb", // fdsa.test
+				RecipientID:  "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
+				Fee:          *utils.NewBigIntFromUint64(1),
+				TTL:          5,
+				AccountNonce: 5,
+			},
+			wantTx:  "tx_+GskAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vMFoQJei0cGdDWb3EfrY0mtZADF0LoQ4yL6z10I/3ETJ0fpKKEBHxOjsIvwAUAGYqaLadh194A87EwIZH9u1dhMeJe9UKMBBeUht+4=",
+			wantErr: false,
+		},
+	}
+	for _, tt := range testCases {
+		t.Run(tt.name, func(t *testing.T) {
+			tx := NewNameTransferTx(
+				tt.fields.AccountID,
+				tt.fields.NameID,
+				tt.fields.RecipientID,
+				tt.fields.Fee,
+				tt.fields.TTL,
+				tt.fields.AccountNonce,
+			)
+			txJSON, _ := tx.JSON()
+			fmt.Println(txJSON)
+
+			gotTx, err := BaseEncodeTx(&tx)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("NameTransferTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(gotTx, tt.wantTx) {
+				gotTxRawBytes, wantTxRawBytes := getRLPSerialized(gotTx, tt.wantTx)
+				t.Errorf("NameTransferTx.RLP() = \n%v\n%v, want \n%v\n%v", gotTx, gotTxRawBytes, tt.wantTx, wantTxRawBytes)
+			}
+		})
+	}
+}
+
 func TestOracleRegisterTx_RLP(t *testing.T) {
 	type fields struct {
 		accountID      string

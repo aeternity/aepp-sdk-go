@@ -368,6 +368,122 @@ func NewNameUpdateTx(accountID, nameID string, pointers []string, nameTTL, clien
 	return NameUpdateTx{accountID, nameID, parsedPointers, nameTTL, clientTTL, fee, ttl, accountNonce}
 }
 
+// NameRevokeTx represents a transaction that revokes the name, i.e. has the same effect as waiting for the Name's TTL to expire.
+type NameRevokeTx struct {
+	AccountID    string
+	NameID       string
+	Fee          utils.BigInt
+	TTL          uint64
+	AccountNonce uint64
+}
+
+// RLP returns a byte serialized representation
+func (t *NameRevokeTx) RLP() (rlpRawMsg []byte, err error) {
+	// build id for the sender
+	aID, err := buildIDTag(IDTagAccount, t.AccountID)
+	if err != nil {
+		return
+	}
+	// build id for the name
+	nID, err := buildIDTag(IDTagName, t.NameID)
+	if err != nil {
+		return
+	}
+
+	rlpRawMsg, err = buildRLPMessage(
+		ObjectTagNameServiceRevokeTransaction,
+		rlpMessageVersion,
+		aID,
+		t.AccountNonce,
+		nID,
+		t.Fee.Int,
+		t.TTL)
+	return
+}
+
+// JSON representation of a Tx is useful for querying the node's debug endpoint
+func (t *NameRevokeTx) JSON() (string, error) {
+	swaggerT := models.NameRevokeTx{
+		AccountID: models.EncodedHash(t.AccountID),
+		Fee:       t.Fee,
+		NameID:    models.EncodedHash(t.NameID),
+		Nonce:     t.AccountNonce,
+		TTL:       t.TTL,
+	}
+
+	output, err := swaggerT.MarshalBinary()
+	return string(output), err
+}
+
+// NewNameRevokeTx is a constructor for a NameRevokeTx struct
+func NewNameRevokeTx(accountID, name string, fee utils.BigInt, ttl, accountNonce uint64) NameRevokeTx {
+	return NameRevokeTx{accountID, name, fee, ttl, accountNonce}
+}
+
+// NameTransferTx represents a transaction that transfers ownership of one name to another account.
+type NameTransferTx struct {
+	AccountID    string
+	NameID       string
+	RecipientID  string
+	Fee          utils.BigInt
+	TTL          uint64
+	AccountNonce uint64
+}
+
+// RLP returns a byte serialized representation
+func (t *NameTransferTx) RLP() (rlpRawMsg []byte, err error) {
+	// build id for the sender
+	aID, err := buildIDTag(IDTagAccount, t.AccountID)
+	if err != nil {
+		return
+	}
+
+	// build id for the recipient
+	rID, err := buildIDTag(IDTagAccount, t.RecipientID)
+	if err != nil {
+		return
+	}
+
+	// build id for the name
+	nID, err := buildIDTag(IDTagName, t.NameID)
+	if err != nil {
+		return
+	}
+
+	// create the transaction
+	rlpRawMsg, err = buildRLPMessage(
+		ObjectTagNameServiceTransferTransaction,
+		rlpMessageVersion,
+		aID,
+		t.AccountNonce,
+		nID,
+		rID,
+		t.Fee.Int,
+		t.TTL,
+	)
+	return
+}
+
+// JSON representation of a Tx is useful for querying the node's debug endpoint
+func (t *NameTransferTx) JSON() (string, error) {
+	swaggerT := models.NameTransferTx{
+		AccountID:   models.EncodedHash(t.AccountID),
+		Fee:         t.Fee,
+		NameID:      models.EncodedHash(t.NameID),
+		Nonce:       t.AccountNonce,
+		RecipientID: models.EncodedHash(t.RecipientID),
+		TTL:         t.TTL,
+	}
+
+	output, err := swaggerT.MarshalBinary()
+	return string(output), err
+}
+
+// NewNameTransferTx is a constructor for a NameTransferTx struct
+func NewNameTransferTx(AccountID, NameID, RecipientID string, Fee utils.BigInt, TTL, AccountNonce uint64) NameTransferTx {
+	return NameTransferTx{AccountID, NameID, RecipientID, Fee, TTL, AccountNonce}
+}
+
 // OracleRegisterTx represents a transaction that registers an oracle on the blockchain's state
 type OracleRegisterTx struct {
 	AccountID      string
