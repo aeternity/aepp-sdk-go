@@ -29,7 +29,7 @@ def no_implicit_int64(data):
         n = swaggerD[l]
         if n.get("type") == "integer" and n.get("format") is None:
             n.format = "uint64"
-            # print(l, n)
+            print(l, n)
     
     return swaggerD.to_python()
 
