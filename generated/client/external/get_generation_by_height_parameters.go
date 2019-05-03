@@ -66,7 +66,7 @@ type GetGenerationByHeightParams struct {
 	  The height of the generation
 
 	*/
-	Height uint64
+	Height int64
 
 	timeout    time.Duration
 	Context    context.Context
@@ -107,13 +107,13 @@ func (o *GetGenerationByHeightParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithHeight adds the height to the get generation by height params
-func (o *GetGenerationByHeightParams) WithHeight(height uint64) *GetGenerationByHeightParams {
+func (o *GetGenerationByHeightParams) WithHeight(height int64) *GetGenerationByHeightParams {
 	o.SetHeight(height)
 	return o
 }
 
 // SetHeight adds the height to the get generation by height params
-func (o *GetGenerationByHeightParams) SetHeight(height uint64) {
+func (o *GetGenerationByHeightParams) SetHeight(height int64) {
 	o.Height = height
 }
 
@@ -126,7 +126,7 @@ func (o *GetGenerationByHeightParams) WriteToRequest(r runtime.ClientRequest, re
 	var res []error
 
 	// path param height
-	if err := r.SetPathParam("height", swag.FormatUint64(o.Height)); err != nil {
+	if err := r.SetPathParam("height", swag.FormatInt64(o.Height)); err != nil {
 		return err
 	}
 

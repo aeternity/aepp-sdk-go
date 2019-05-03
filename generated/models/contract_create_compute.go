@@ -22,9 +22,9 @@ type ContractCreateCompute struct {
 	// ABI version
 	// Maximum: 65535
 	// Minimum: 0
-	AbiVersion *int64 `json:"abi_version,omitempty"`
+	AbiVersion *uint64 `json:"abi_version,omitempty"`
 
-	// Amount
+	// amount
 	// Required: true
 	Amount utils.BigInt `json:"amount"`
 
@@ -41,24 +41,24 @@ type ContractCreateCompute struct {
 	// Deposit
 	// Required: true
 	// Minimum: 0
-	Deposit *int64 `json:"deposit"`
+	Deposit *uint64 `json:"deposit"`
 
-	// Transaction fee
+	// fee
 	// Required: true
 	Fee utils.BigInt `json:"fee"`
 
 	// Contract gas
 	// Required: true
 	// Minimum: 0
-	Gas *int64 `json:"gas"`
+	Gas *uint64 `json:"gas"`
 
 	// Gas price
 	// Required: true
 	// Minimum: 0
-	GasPrice *int64 `json:"gas_price"`
+	GasPrice *uint64 `json:"gas_price"`
 
 	// Owner's nonce
-	Nonce int64 `json:"nonce,omitempty"`
+	Nonce uint64 `json:"nonce,omitempty"`
 
 	// Contract owner pub_key
 	// Required: true
@@ -66,13 +66,13 @@ type ContractCreateCompute struct {
 
 	// Transaction TTL
 	// Minimum: 0
-	TTL *int64 `json:"ttl,omitempty"`
+	TTL *uint64 `json:"ttl,omitempty"`
 
 	// Virtual machine's version
 	// Required: true
 	// Maximum: 65535
 	// Minimum: 0
-	VMVersion *int64 `json:"vm_version"`
+	VMVersion *uint64 `json:"vm_version"`
 }
 
 // Validate validates this contract create compute

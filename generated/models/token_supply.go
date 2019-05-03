@@ -16,28 +16,28 @@ import (
 type TokenSupply struct {
 
 	// Tokens in account balances
-	Accounts int64 `json:"accounts,omitempty"`
+	Accounts uint64 `json:"accounts,omitempty"`
 
 	// Tokens in contracts registered as oracles
-	ContractOracles int64 `json:"contract_oracles,omitempty"`
+	ContractOracles uint64 `json:"contract_oracles,omitempty"`
 
 	// Tokens in contracts
-	Contracts int64 `json:"contracts,omitempty"`
+	Contracts uint64 `json:"contracts,omitempty"`
 
 	// Tokens locked (not owned by anyone)
-	Locked int64 `json:"locked,omitempty"`
+	Locked uint64 `json:"locked,omitempty"`
 
 	// Tokens in pending oracle queries
-	OracleQueries int64 `json:"oracle_queries,omitempty"`
+	OracleQueries uint64 `json:"oracle_queries,omitempty"`
 
 	// Tokens in accounts registered as oracles
-	Oracles int64 `json:"oracles,omitempty"`
+	Oracles uint64 `json:"oracles,omitempty"`
 
 	// Tokens from fees and coinbase pending in the beneficiary reward delay
-	PendingRewards int64 `json:"pending_rewards,omitempty"`
+	PendingRewards uint64 `json:"pending_rewards,omitempty"`
 
 	// Sum of all tokens from other fields
-	Total int64 `json:"total,omitempty"`
+	Total uint64 `json:"total,omitempty"`
 }
 
 // Validate validates this token supply

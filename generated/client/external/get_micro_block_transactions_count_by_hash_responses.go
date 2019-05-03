@@ -9,7 +9,10 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 
 	strfmt "github.com/go-openapi/strfmt"
 
@@ -61,7 +64,7 @@ func NewGetMicroBlockTransactionsCountByHashOK() *GetMicroBlockTransactionsCount
 Successful operation
 */
 type GetMicroBlockTransactionsCountByHashOK struct {
-	Payload *models.InlineResponse2002
+	Payload *GetMicroBlockTransactionsCountByHashOKBody
 }
 
 func (o *GetMicroBlockTransactionsCountByHashOK) Error() string {
@@ -70,7 +73,7 @@ func (o *GetMicroBlockTransactionsCountByHashOK) Error() string {
 
 func (o *GetMicroBlockTransactionsCountByHashOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.InlineResponse2002)
+	o.Payload = new(GetMicroBlockTransactionsCountByHashOKBody)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -135,5 +138,60 @@ func (o *GetMicroBlockTransactionsCountByHashNotFound) readResponse(response run
 		return err
 	}
 
+	return nil
+}
+
+/*GetMicroBlockTransactionsCountByHashOKBody get micro block transactions count by hash o k body
+swagger:model GetMicroBlockTransactionsCountByHashOKBody
+*/
+type GetMicroBlockTransactionsCountByHashOKBody struct {
+
+	// Count
+	// Minimum: 1
+	Count uint64 `json:"count,omitempty"`
+}
+
+// Validate validates this get micro block transactions count by hash o k body
+func (o *GetMicroBlockTransactionsCountByHashOKBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateCount(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *GetMicroBlockTransactionsCountByHashOKBody) validateCount(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.Count) { // not required
+		return nil
+	}
+
+	if err := validate.MinimumInt("getMicroBlockTransactionsCountByHashOK"+"."+"count", "body", int64(o.Count), 1, false); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *GetMicroBlockTransactionsCountByHashOKBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *GetMicroBlockTransactionsCountByHashOKBody) UnmarshalBinary(b []byte) error {
+	var res GetMicroBlockTransactionsCountByHashOKBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
 	return nil
 }

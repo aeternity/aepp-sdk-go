@@ -6,6 +6,8 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"strconv"
+
 	strfmt "github.com/go-openapi/strfmt"
 
 	"github.com/go-openapi/errors"
@@ -23,7 +25,7 @@ type ContractCallObject struct {
 
 	// caller nonce
 	// Required: true
-	CallerNonce *int64 `json:"caller_nonce"`
+	CallerNonce *uint64 `json:"caller_nonce"`
 
 	// contract id
 	// Required: true
@@ -31,15 +33,19 @@ type ContractCallObject struct {
 
 	// gas price
 	// Required: true
-	GasPrice *int64 `json:"gas_price"`
+	GasPrice *uint64 `json:"gas_price"`
 
 	// gas used
 	// Required: true
-	GasUsed *int64 `json:"gas_used"`
+	GasUsed *uint64 `json:"gas_used"`
 
 	// height
 	// Required: true
-	Height *int64 `json:"height"`
+	Height *uint64 `json:"height"`
+
+	// log
+	// Required: true
+	Log []*Event `json:"log"`
 
 	// The status of the call 'ok | error | revert'.
 	// Required: true
@@ -75,6 +81,10 @@ func (m *ContractCallObject) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateHeight(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateLog(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -147,6 +157,31 @@ func (m *ContractCallObject) validateHeight(formats strfmt.Registry) error {
 
 	if err := validate.Required("height", "body", m.Height); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (m *ContractCallObject) validateLog(formats strfmt.Registry) error {
+
+	if err := validate.Required("log", "body", m.Log); err != nil {
+		return err
+	}
+
+	for i := 0; i < len(m.Log); i++ {
+		if swag.IsZero(m.Log[i]) { // not required
+			continue
+		}
+
+		if m.Log[i] != nil {
+			if err := m.Log[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("log" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil

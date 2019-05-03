@@ -22,7 +22,7 @@ type OracleRegisterTx struct {
 	// abi version
 	// Maximum: 65535
 	// Minimum: 0
-	AbiVersion *int64 `json:"abi_version,omitempty"`
+	AbiVersion *uint64 `json:"abi_version,omitempty"`
 
 	// account id
 	// Required: true
@@ -57,7 +57,7 @@ type OracleRegisterTx struct {
 	// vm version
 	// Maximum: 65535
 	// Minimum: 0
-	VMVersion *int64 `json:"vm_version,omitempty"`
+	VMVersion *uint64 `json:"vm_version,omitempty"`
 }
 
 // Validate validates this oracle register tx
