@@ -14,6 +14,7 @@ import (
 
 var sender = "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"
 var senderPrivateKey = os.Getenv("INTEGRATION_TEST_SENDER_PRIVATE_KEY")
+var recipientPrivateKey = os.Getenv("INTEGRATION_TEST_RECEIVER_PRIVATE_KEY")
 var nodeURL = "http://localhost:3013"
 var networkID = "ae_docker"
 
@@ -168,11 +169,16 @@ func getHeight(aeClient *aeternity.Ae) (h uint64) {
 	return
 }
 
-func waitForTransaction(aeClient *aeternity.Ae, hash string) {
+func waitForTransaction(aeClient *aeternity.Ae, hash string) (err error) {
 	height := getHeight(aeClient)
 	fmt.Println("Waiting for Transaction...")
 	height, blockHash, microBlockHash, _, err := aeClient.WaitForTransactionUntilHeight(height+10, hash)
+	if err != nil {
+		// Sometimes, the tests want the tx to fail. Return the err to let them know.
+		return err
+	}
 	fmt.Println("Transaction was found at", height, "blockhash", blockHash, "microBlockHash", microBlockHash, "err", err)
+	return nil
 }
 
 func getNameEntry(aeClient *aeternity.Ae, name string) (responseJSON string, err error) {
@@ -215,7 +221,7 @@ func TestAENSWorkflow(t *testing.T) {
 	fmt.Println("Signed & Broadcasted NamePreclaimTx", hash)
 
 	// Wait for a bit
-	waitForTransaction(aeClient, hash)
+	_ = waitForTransaction(aeClient, hash)
 
 	// Claim the name
 	fmt.Println("NameClaimTx")
@@ -235,7 +241,7 @@ func TestAENSWorkflow(t *testing.T) {
 	fmt.Println("Signed & Broadcasted NameClaimTx")
 
 	// Wait for a bit
-	waitForTransaction(aeClient, hash)
+	_ = waitForTransaction(aeClient, hash)
 
 	// Verify that the name exists
 	entryAfterNameClaim, err := getNameEntry(aeClient, name)
@@ -265,6 +271,71 @@ func TestAENSWorkflow(t *testing.T) {
 		t.Errorf("The AENS entry should now point to %s but doesn't: %s", acc.Address, entryAfterNameUpdate)
 	}
 
+	// Transfer the name to a recipient
+	fmt.Println("NameTransferTx")
+	acc2, err := aeternity.AccountFromHexString(recipientPrivateKey)
+	if err != nil {
+		t.Error(err)
+	}
+	transferTx, err := aeClient.Aens.NameTransferTx(name, acc2.Address)
+	transferTxStr, _ := aeternity.BaseEncodeTx(&transferTx)
+	fmt.Println("TransferTx:", transferTxStr)
+	hash, err = signBroadcast(transferTxStr, acc, aeClient)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("Signed & Broadcasted NameTransferTx")
+	// Wait for a bit
+	_ = waitForTransaction(aeClient, hash)
+
+	// Receiver updates the name, makes it point to himself
+	aeClient2 := aeternity.NewCli(nodeURL, false).WithAccount(acc2)
+	fmt.Println("NameUpdateTx Signed By Recipient")
+	updateTx2, err := aeClient2.Aens.NameUpdateTx(name, acc2.Address)
+	updateTx2Str, _ := aeternity.BaseEncodeTx(&updateTx2)
+	fmt.Println("UpdateTx:", updateTx2Str)
+
+	_, err = signBroadcast(updateTx2Str, acc2, aeClient2)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("Signed & Broadcasted NameUpdateTx Signed By Recipient")
+
+	// Revoke the name - shouldn't work because it is signed by the sender, who no longer owns the address
+	fmt.Println("NameRevokeTx")
+	revokeTx, err := aeClient.Aens.NameRevokeTx(name, acc.Address)
+	revokeTxStr, _ := aeternity.BaseEncodeTx(&revokeTx)
+	fmt.Println("RevokeTx:", revokeTxStr)
+	hash, err = signBroadcast(revokeTxStr, acc, aeClient)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("Signed & Broadcasted NameRevokeTx")
+	// Wait for a bit
+	revokeTxShouldHaveFailed := waitForTransaction(aeClient, hash)
+	if revokeTxShouldHaveFailed == nil {
+		t.Error("After transferring the name to Recipient, the Sender should not have been able to revoke the name")
+	} else {
+		fmt.Println(revokeTxShouldHaveFailed)
+	}
+
+	// Revoke the name - signed by the recipient
+	fmt.Println("NameRevokeTx Signed By Recipient")
+	revokeTx2, err := aeClient2.Aens.NameRevokeTx(name, acc2.Address)
+	revokeTx2Str, _ := aeternity.BaseEncodeTx(&revokeTx2)
+	fmt.Println("RevokeTx Signed By Recipient:", revokeTx2Str)
+	hash, err = signBroadcast(revokeTx2Str, acc2, aeClient)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("Signed & Broadcasted NameRevokeTx Signed By Recipient")
+	// Wait for a bit
+	_ = waitForTransaction(aeClient, hash)
+
 }
 
 func TestOracleWorkflow(t *testing.T) {
@@ -288,7 +359,7 @@ func TestOracleWorkflow(t *testing.T) {
 		t.Error(err)
 	}
 
-	waitForTransaction(aeClient, oracleRegisterTxHash)
+	_ = waitForTransaction(aeClient, oracleRegisterTxHash)
 
 	// Confirm that the oracle exists
 	oraclePubKey := strings.Replace(acc.Address, "ak_", "ok_", 1)
@@ -309,7 +380,7 @@ func TestOracleWorkflow(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	waitForTransaction(aeClient, oracleExtendTxHash)
+	_ = waitForTransaction(aeClient, oracleExtendTxHash)
 
 	oracle, err = aeClient.APIGetOracleByPubkey(oraclePubKey)
 	if err != nil {
@@ -329,7 +400,7 @@ func TestOracleWorkflow(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	waitForTransaction(aeClient, oracleQueryTxHash)
+	_ = waitForTransaction(aeClient, oracleQueryTxHash)
 
 	fmt.Println("OracleRespondTx")
 	// Find the Oracle Query ID to reply to
@@ -344,6 +415,6 @@ func TestOracleWorkflow(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	waitForTransaction(aeClient, oracleRespondTxHash)
+	_ = waitForTransaction(aeClient, oracleRespondTxHash)
 
 }
