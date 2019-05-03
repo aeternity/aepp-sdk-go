@@ -10,6 +10,7 @@ import (
 	"io"
 
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/swag"
 
 	strfmt "github.com/go-openapi/strfmt"
 
@@ -54,7 +55,7 @@ func NewGetCurrentKeyBlockHeightOK() *GetCurrentKeyBlockHeightOK {
 Successful operation
 */
 type GetCurrentKeyBlockHeightOK struct {
-	Payload *models.InlineResponse2001
+	Payload *GetCurrentKeyBlockHeightOKBody
 }
 
 func (o *GetCurrentKeyBlockHeightOK) Error() string {
@@ -63,7 +64,7 @@ func (o *GetCurrentKeyBlockHeightOK) Error() string {
 
 func (o *GetCurrentKeyBlockHeightOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.InlineResponse2001)
+	o.Payload = new(GetCurrentKeyBlockHeightOKBody)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -99,5 +100,37 @@ func (o *GetCurrentKeyBlockHeightNotFound) readResponse(response runtime.ClientR
 		return err
 	}
 
+	return nil
+}
+
+/*GetCurrentKeyBlockHeightOKBody get current key block height o k body
+swagger:model GetCurrentKeyBlockHeightOKBody
+*/
+type GetCurrentKeyBlockHeightOKBody struct {
+
+	// Height
+	Height uint64 `json:"height,omitempty"`
+}
+
+// Validate validates this get current key block height o k body
+func (o *GetCurrentKeyBlockHeightOKBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *GetCurrentKeyBlockHeightOKBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *GetCurrentKeyBlockHeightOKBody) UnmarshalBinary(b []byte) error {
+	var res GetCurrentKeyBlockHeightOKBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
 	return nil
 }

@@ -62,6 +62,11 @@ type Status struct {
 	// Minimum: 0
 	Solutions *uint64 `json:"solutions"`
 
+	// sync progress
+	// Maximum: 100
+	// Minimum: 0
+	SyncProgress *float32 `json:"sync_progress,omitempty"`
+
 	// syncing
 	// Required: true
 	Syncing *bool `json:"syncing"`
@@ -108,6 +113,10 @@ func (m *Status) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateSolutions(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateSyncProgress(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -236,6 +245,23 @@ func (m *Status) validateSolutions(formats strfmt.Registry) error {
 	}
 
 	if err := validate.MinimumInt("solutions", "body", int64(*m.Solutions), 0, false); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Status) validateSyncProgress(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.SyncProgress) { // not required
+		return nil
+	}
+
+	if err := validate.Minimum("sync_progress", "body", float64(*m.SyncProgress), 0, false); err != nil {
+		return err
+	}
+
+	if err := validate.Maximum("sync_progress", "body", float64(*m.SyncProgress), 100, false); err != nil {
 		return err
 	}
 
