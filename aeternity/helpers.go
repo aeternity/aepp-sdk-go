@@ -266,9 +266,35 @@ func (n *Aens) NameUpdateTx(name string, targetAddress string) (tx NameUpdateTx,
 	if err != nil {
 		return NameUpdateTx{}, err
 	}
-	// create and sign the transaction
+	// create the transaction
 	tx = NewNameUpdateTx(n.owner.Address, encodedNameHash, []string{targetAddress}, absNameTTL, Config.Client.Names.ClientTTL, Config.Client.Names.UpdateFee, txTTL, accountNonce)
 
+	return
+}
+
+// NameTransferTx transfer a name to another owner
+func (n *Aens) NameTransferTx(name string, recipientAddress string) (tx NameTransferTx, err error) {
+	txTTL, accountNonce, err := getTTLNonce(n.nodeClient, n.owner.Address, Config.Client.TTL)
+	if err != nil {
+		return
+	}
+
+	encodedNameHash := Encode(PrefixName, Namehash(name))
+
+	tx = NewNameTransferTx(n.owner.Address, encodedNameHash, recipientAddress, Config.Client.Fee, txTTL, accountNonce)
+	return
+}
+
+// NameRevokeTx revoke a name
+func (n *Aens) NameRevokeTx(name string, recipientAddress string) (tx NameRevokeTx, err error) {
+	txTTL, accountNonce, err := getTTLNonce(n.nodeClient, n.owner.Address, Config.Client.TTL)
+	if err != nil {
+		return
+	}
+
+	encodedNameHash := Encode(PrefixName, Namehash(name))
+
+	tx = NewNameRevokeTx(n.owner.Address, encodedNameHash, Config.Client.Fee, txTTL, accountNonce)
 	return
 }
 
