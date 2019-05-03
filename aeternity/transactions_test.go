@@ -281,6 +281,21 @@ func TestNameUpdateTx_RLP(t *testing.T) {
 			wantTx:  "tx_+OMiAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vMFoQJei0cGdDWb3EfrY0mtZADF0LoQ4yL6z10I/3ETJ0fpKAD4lvGOYWNjb3VudF9wdWJrZXmhAQkzfmKK/9rguLQf6vv/O43g1vpP+B727TdTmYbwitiB8Y5hY2NvdW50X3B1YmtleaEBHxOjsIvwAUAGYqaLadh194A87EwIZH9u1dhMeJe9UKPxjmFjY291bnRfcHVia2V5oQHOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+8wYBBYpSjmc=",
 			wantErr: false,
 		},
+		{
+			name: "update 4 pointers",
+			fields: fields{
+				AccountID: "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+				NameID:    "nm_ie148R2qZYBfo1Ek3sZpfTLwBhkkqCRKi2Ce8JJ7yyWVRw2Sb", // fdsa.test
+				Pointers:  []string{"ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi", "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v", "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt", "ak_rHQAmJsLKC2u7Tr1htTGYxy2ga71AESM611tjGGfyUJmLbDYP"},
+				NameTTL:   uint64(0),
+				ClientTTL: uint64(6),
+				Fee:       *utils.NewBigIntFromUint64(1),
+				TTL:       5,
+				Nonce:     5,
+			},
+			wantTx:  "tx_+QEVIgGhAc6nreRwyfmdnU5ACICobx1Ju0RLYvEanrtku8/rc/7zBaECXotHBnQ1m9xH62NJrWQAxdC6EOMi+s9dCP9xEydH6SgA+MjxjmFjY291bnRfcHVia2V5oQFv5wr11P3EEyoB8Vv8AoWK140cojJEja4CeC3rE+gY5/GOYWNjb3VudF9wdWJrZXmhAQkzfmKK/9rguLQf6vv/O43g1vpP+B727TdTmYbwitiB8Y5hY2NvdW50X3B1YmtleaEBHxOjsIvwAUAGYqaLadh194A87EwIZH9u1dhMeJe9UKPxjmFjY291bnRfcHVia2V5oQHOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+8wYBBaPTgbo=",
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
