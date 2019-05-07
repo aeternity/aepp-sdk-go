@@ -541,13 +541,11 @@ func (t *OracleRegisterTx) JSON() (string, error) {
 	// NO_ABI = 0
 	// ABI_SOPHIA = 1
 	// ABI_SOLIDITY = 2
-	abiVersionCasted := int64(t.AbiVersion)
-	vmVersionCasted := int64(t.VMVersion)
 
 	ttlTypeStr := ttlTypeIntToStr(t.OracleTTLType)
 
 	swaggerT := models.OracleRegisterTx{
-		AbiVersion: &abiVersionCasted,
+		AbiVersion: &t.AbiVersion,
 		AccountID:  models.EncodedHash(t.AccountID),
 		Fee:        t.TxFee,
 		Nonce:      t.AccountNonce,
@@ -559,7 +557,7 @@ func (t *OracleRegisterTx) JSON() (string, error) {
 		QueryFormat:    &t.QuerySpec,
 		ResponseFormat: &t.ResponseSpec,
 		TTL:            t.TxTTL,
-		VMVersion:      &vmVersionCasted,
+		VMVersion:      &t.VMVersion,
 	}
 	output, err := swaggerT.MarshalBinary()
 	return string(output), err
@@ -760,4 +758,87 @@ func (t *OracleRespondTx) JSON() (string, error) {
 // NewOracleRespondTx is a constructor for a OracleRespondTx struct
 func NewOracleRespondTx(OracleID string, AccountNonce uint64, QueryID string, Response string, TTLType uint64, TTLValue uint64, TxFee utils.BigInt, TxTTL uint64) OracleRespondTx {
 	return OracleRespondTx{OracleID, AccountNonce, QueryID, Response, TTLType, TTLValue, TxFee, TxTTL}
+}
+
+type ContractCreateTx struct {
+	OwnerID      string
+	AccountNonce uint64
+	Code         string
+	VMVersion    uint64
+	AbiVersion   uint64
+	Deposit      uint64
+	Amount       utils.BigInt
+	Gas          uint64
+	GasPrice     uint64
+	TxFee        utils.BigInt
+	TxTTL        uint64
+	CallData     string
+}
+
+func (tx *ContractCreateTx) RLP() (rlpRawMsg []byte, err error) {
+	aID, err := buildIDTag(IDTagAccount, tx.OwnerID)
+	if err != nil {
+		return
+	}
+	codeBinary, err := Decode(tx.Code)
+	if err != nil {
+		return
+	}
+	callDataBinary, err := Decode(tx.CallData)
+	if err != nil {
+		return
+	}
+
+	rlpRawMsg, err = buildRLPMessage(
+		ObjectTagContractCreateTransaction,
+		rlpMessageVersion,
+		aID,
+		tx.AccountNonce,
+		codeBinary,
+		tx.VMVersion+tx.AbiVersion, // TODO: AbiVersion should default to 2 if not specified, but the constructor always forces it to be specified anyway!@!
+		tx.TxFee.Int,
+		tx.TxTTL,
+		tx.Deposit,
+		tx.Amount.Int,
+		tx.Gas,
+		tx.GasPrice,
+		callDataBinary,
+	)
+	return
+}
+
+func (tx *ContractCreateTx) JSON() (string, error) {
+	swaggerT := models.ContractCreateTx{
+		OwnerID:    models.EncodedHash(tx.OwnerID),
+		Nonce:      tx.AccountNonce,
+		Code:       &tx.Code,
+		VMVersion:  &tx.VMVersion,
+		AbiVersion: &tx.AbiVersion,
+		Deposit:    &tx.Deposit,
+		Amount:     tx.Amount,
+		Gas:        &tx.Gas,
+		GasPrice:   &tx.GasPrice,
+		Fee:        tx.TxFee,
+		TTL:        &tx.TxTTL,
+		CallData:   models.EncodedByteArray(tx.CallData),
+	}
+	output, err := swaggerT.MarshalBinary()
+	return string(output), err
+}
+
+func NewContractCreateTx(OwnerID string, AccountNonce uint64, Code string, VMVersion, AbiVersion, Deposit uint64, Amount utils.BigInt, Gas, GasPrice uint64, TxFee utils.BigInt, TxTTL uint64, CallData string) ContractCreateTx {
+	return ContractCreateTx{
+		OwnerID:      OwnerID,
+		AccountNonce: AccountNonce,
+		Code:         Code,
+		VMVersion:    VMVersion,
+		AbiVersion:   AbiVersion,
+		Deposit:      Deposit,
+		Amount:       Amount,
+		Gas:          Gas,
+		GasPrice:     GasPrice,
+		TxFee:        TxFee,
+		TxTTL:        TxTTL,
+		CallData:     CallData,
+	}
 }
