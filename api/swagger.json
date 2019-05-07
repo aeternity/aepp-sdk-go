@@ -612,6 +612,7 @@
             "description": "The height of the generation",
             "required": true,
             "type": "integer",
+            "format": "uint64",
             "minimum": 0
           }
         ],
