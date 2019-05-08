@@ -571,8 +571,8 @@ type OracleRegisterTx struct {
 	OracleTTLValue uint64
 	AbiVersion     uint64
 	VMVersion      uint64
-	TxFee          utils.BigInt
-	TxTTL          uint64
+	Fee            utils.BigInt
+	TTL            uint64
 }
 
 // RLP returns a byte serialized representation
@@ -593,8 +593,8 @@ func (tx *OracleRegisterTx) RLP() (rlpRawMsg []byte, err error) {
 		tx.QueryFee.Int,
 		tx.OracleTTLType,
 		tx.OracleTTLValue,
-		tx.TxFee.Int,
-		tx.TxTTL,
+		tx.Fee.Int,
+		tx.TTL,
 		tx.AbiVersion)
 	return
 }
@@ -623,7 +623,7 @@ func (tx *OracleRegisterTx) JSON() (string, error) {
 	swaggerT := models.OracleRegisterTx{
 		AbiVersion: &tx.AbiVersion,
 		AccountID:  models.EncodedHash(tx.AccountID),
-		Fee:        tx.TxFee,
+		Fee:        tx.Fee,
 		Nonce:      tx.AccountNonce,
 		OracleTTL: &models.TTL{
 			Type:  &ttlTypeStr,
@@ -632,7 +632,7 @@ func (tx *OracleRegisterTx) JSON() (string, error) {
 		QueryFee:       tx.QueryFee,
 		QueryFormat:    &tx.QuerySpec,
 		ResponseFormat: &tx.ResponseSpec,
-		TTL:            tx.TxTTL,
+		TTL:            tx.TTL,
 		VMVersion:      &tx.VMVersion,
 	}
 	output, err := swaggerT.MarshalBinary()
@@ -650,8 +650,8 @@ type OracleExtendTx struct {
 	AccountNonce   uint64
 	OracleTTLType  uint64
 	OracleTTLValue uint64
-	TxFee          utils.BigInt
-	TxTTL          uint64
+	Fee            utils.BigInt
+	TTL            uint64
 }
 
 // RLP returns a byte serialized representation
@@ -668,8 +668,8 @@ func (tx *OracleExtendTx) RLP() (rlpRawMsg []byte, err error) {
 		tx.AccountNonce,
 		tx.OracleTTLType,
 		tx.OracleTTLValue,
-		tx.TxFee.Int,
-		tx.TxTTL)
+		tx.Fee.Int,
+		tx.TTL)
 	return
 }
 
@@ -678,14 +678,14 @@ func (tx *OracleExtendTx) JSON() (string, error) {
 	oracleTTLTypeStr := ttlTypeIntToStr(tx.OracleTTLType)
 
 	swaggerT := models.OracleExtendTx{
-		Fee:      tx.TxFee,
+		Fee:      tx.Fee,
 		Nonce:    tx.AccountNonce,
 		OracleID: models.EncodedHash(tx.OracleID),
 		OracleTTL: &models.RelativeTTL{
 			Type:  &oracleTTLTypeStr,
 			Value: &tx.OracleTTLValue,
 		},
-		TTL: tx.TxTTL,
+		TTL: tx.TTL,
 	}
 
 	output, err := swaggerT.MarshalBinary()
@@ -693,8 +693,8 @@ func (tx *OracleExtendTx) JSON() (string, error) {
 }
 
 // NewOracleExtendTx is a constructor for a OracleExtendTx struct
-func NewOracleExtendTx(oracleID string, accountNonce, oracleTTLType, oracleTTLValue uint64, TxFee utils.BigInt, TxTTL uint64) OracleExtendTx {
-	return OracleExtendTx{oracleID, accountNonce, oracleTTLType, oracleTTLValue, TxFee, TxTTL}
+func NewOracleExtendTx(oracleID string, accountNonce, oracleTTLType, oracleTTLValue uint64, Fee utils.BigInt, TTL uint64) OracleExtendTx {
+	return OracleExtendTx{oracleID, accountNonce, oracleTTLType, oracleTTLValue, Fee, TTL}
 }
 
 // OracleQueryTx represents a transaction that a program sends to query an oracle
@@ -708,8 +708,8 @@ type OracleQueryTx struct {
 	QueryTTLValue    uint64
 	ResponseTTLType  uint64
 	ResponseTTLValue uint64
-	TxFee            utils.BigInt
-	TxTTL            uint64
+	Fee              utils.BigInt
+	TTL              uint64
 }
 
 // RLP returns a byte serialized representation
@@ -736,8 +736,8 @@ func (tx *OracleQueryTx) RLP() (rlpRawMsg []byte, err error) {
 		tx.QueryTTLValue,
 		tx.ResponseTTLType,
 		tx.ResponseTTLValue,
-		tx.TxFee.Int,
-		tx.TxTTL)
+		tx.Fee.Int,
+		tx.TTL)
 	return
 }
 
@@ -747,7 +747,7 @@ func (tx *OracleQueryTx) JSON() (string, error) {
 	queryTTLTypeStr := ttlTypeIntToStr(tx.QueryTTLType)
 
 	swaggerT := models.OracleQueryTx{
-		Fee:      tx.TxFee,
+		Fee:      tx.Fee,
 		Nonce:    tx.AccountNonce,
 		OracleID: models.EncodedHash(tx.OracleID),
 		Query:    &tx.Query,
@@ -761,7 +761,7 @@ func (tx *OracleQueryTx) JSON() (string, error) {
 			Value: &tx.ResponseTTLValue,
 		},
 		SenderID: models.EncodedHash(tx.SenderID),
-		TTL:      tx.TxTTL,
+		TTL:      tx.TTL,
 	}
 
 	output, err := swaggerT.MarshalBinary()
@@ -769,8 +769,8 @@ func (tx *OracleQueryTx) JSON() (string, error) {
 }
 
 // NewOracleQueryTx is a constructor for a OracleQueryTx struct
-func NewOracleQueryTx(SenderID string, AccountNonce uint64, OracleID, Query string, QueryFee utils.BigInt, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64, TxFee utils.BigInt, TxTTL uint64) OracleQueryTx {
-	return OracleQueryTx{SenderID, AccountNonce, OracleID, Query, QueryFee, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue, TxFee, TxTTL}
+func NewOracleQueryTx(SenderID string, AccountNonce uint64, OracleID, Query string, QueryFee utils.BigInt, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64, Fee utils.BigInt, TTL uint64) OracleQueryTx {
+	return OracleQueryTx{SenderID, AccountNonce, OracleID, Query, QueryFee, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue, Fee, TTL}
 }
 
 // OracleRespondTx represents a transaction that an oracle sends to respond to an incoming query
@@ -781,8 +781,8 @@ type OracleRespondTx struct {
 	Response         string
 	ResponseTTLType  uint64
 	ResponseTTLValue uint64
-	TxFee            utils.BigInt
-	TxTTL            uint64
+	Fee              utils.BigInt
+	TTL              uint64
 }
 
 // RLP returns a byte serialized representation
@@ -805,8 +805,8 @@ func (tx *OracleRespondTx) RLP() (rlpRawMsg []byte, err error) {
 		tx.Response,
 		tx.ResponseTTLType,
 		tx.ResponseTTLValue,
-		tx.TxFee.Int,
-		tx.TxTTL)
+		tx.Fee.Int,
+		tx.TTL)
 	return
 }
 
@@ -815,7 +815,7 @@ func (tx *OracleRespondTx) JSON() (string, error) {
 	responseTTLTypeStr := ttlTypeIntToStr(tx.ResponseTTLType)
 
 	swaggerT := models.OracleRespondTx{
-		Fee:      tx.TxFee,
+		Fee:      tx.Fee,
 		Nonce:    tx.AccountNonce,
 		OracleID: models.EncodedHash(tx.OracleID),
 		QueryID:  models.EncodedHash(tx.QueryID),
@@ -824,7 +824,7 @@ func (tx *OracleRespondTx) JSON() (string, error) {
 			Type:  &responseTTLTypeStr,
 			Value: &tx.ResponseTTLValue,
 		},
-		TTL: tx.TxTTL,
+		TTL: tx.TTL,
 	}
 	output, err := swaggerT.MarshalBinary()
 	return string(output), err
@@ -832,8 +832,8 @@ func (tx *OracleRespondTx) JSON() (string, error) {
 }
 
 // NewOracleRespondTx is a constructor for a OracleRespondTx struct
-func NewOracleRespondTx(OracleID string, AccountNonce uint64, QueryID string, Response string, TTLType uint64, TTLValue uint64, TxFee utils.BigInt, TxTTL uint64) OracleRespondTx {
-	return OracleRespondTx{OracleID, AccountNonce, QueryID, Response, TTLType, TTLValue, TxFee, TxTTL}
+func NewOracleRespondTx(OracleID string, AccountNonce uint64, QueryID string, Response string, TTLType uint64, TTLValue uint64, Fee utils.BigInt, TTL uint64) OracleRespondTx {
+	return OracleRespondTx{OracleID, AccountNonce, QueryID, Response, TTLType, TTLValue, Fee, TTL}
 }
 
 type ContractCreateTx struct {
@@ -846,8 +846,8 @@ type ContractCreateTx struct {
 	Amount       utils.BigInt
 	Gas          uint64
 	GasPrice     uint64
-	TxFee        utils.BigInt
-	TxTTL        uint64
+	Fee          utils.BigInt
+	TTL          uint64
 	CallData     string
 }
 
@@ -872,8 +872,8 @@ func (tx *ContractCreateTx) RLP() (rlpRawMsg []byte, err error) {
 		tx.AccountNonce,
 		codeBinary,
 		tx.VMVersion+tx.AbiVersion, // TODO: AbiVersion should default to 2 if not specified, but the constructor always forces it to be specified anyway!@!
-		tx.TxFee.Int,
-		tx.TxTTL,
+		tx.Fee.Int,
+		tx.TTL,
 		tx.Deposit,
 		tx.Amount.Int,
 		tx.Gas,
@@ -894,15 +894,15 @@ func (tx *ContractCreateTx) JSON() (string, error) {
 		Amount:     tx.Amount,
 		Gas:        &tx.Gas,
 		GasPrice:   &tx.GasPrice,
-		Fee:        tx.TxFee,
-		TTL:        &tx.TxTTL,
+		Fee:        tx.Fee,
+		TTL:        &tx.TTL,
 		CallData:   models.EncodedByteArray(tx.CallData),
 	}
 	output, err := swaggerT.MarshalBinary()
 	return string(output), err
 }
 
-func NewContractCreateTx(OwnerID string, AccountNonce uint64, Code string, VMVersion, AbiVersion, Deposit uint64, Amount utils.BigInt, Gas, GasPrice uint64, TxFee utils.BigInt, TxTTL uint64, CallData string) ContractCreateTx {
+func NewContractCreateTx(OwnerID string, AccountNonce uint64, Code string, VMVersion, AbiVersion, Deposit uint64, Amount utils.BigInt, Gas, GasPrice uint64, Fee utils.BigInt, TTL uint64, CallData string) ContractCreateTx {
 	return ContractCreateTx{
 		OwnerID:      OwnerID,
 		AccountNonce: AccountNonce,
@@ -913,8 +913,8 @@ func NewContractCreateTx(OwnerID string, AccountNonce uint64, Code string, VMVer
 		Amount:       Amount,
 		Gas:          Gas,
 		GasPrice:     GasPrice,
-		TxFee:        TxFee,
-		TxTTL:        TxTTL,
+		Fee:          Fee,
+		TTL:          TTL,
 		CallData:     CallData,
 	}
 }
@@ -929,8 +929,8 @@ type ContractCallTx struct {
 	AbiVersion   uint64
 	VMVersion    uint64
 	CallData     string
-	TxFee        utils.BigInt
-	TxTTL        uint64
+	Fee          utils.BigInt
+	TTL          uint64
 }
 
 func (tx *ContractCallTx) JSON() (string, error) {
@@ -944,8 +944,8 @@ func (tx *ContractCallTx) JSON() (string, error) {
 		AbiVersion: &tx.AbiVersion,
 		VMVersion:  &tx.VMVersion,
 		CallData:   models.EncodedByteArray(tx.CallData),
-		Fee:        tx.TxFee,
-		TTL:        &tx.TxTTL,
+		Fee:        tx.Fee,
+		TTL:        &tx.TTL,
 	}
 	output, err := swaggerT.MarshalBinary()
 	return string(output), err
@@ -971,8 +971,8 @@ func (tx *ContractCallTx) RLP() (rlpRawMsg []byte, err error) {
 		cID,
 		tx.AccountNonce,
 		ctID,
-		tx.TxFee.Int,
-		tx.TxTTL,
+		tx.Fee.Int,
+		tx.TTL,
 		tx.Amount,
 		tx.Gas,
 		tx.GasPrice,

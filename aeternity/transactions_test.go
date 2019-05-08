@@ -610,8 +610,8 @@ func TestOracleQueryTx_RLP(t *testing.T) {
 		QueryTTLValue    uint64
 		ResponseTTLType  uint64
 		ResponseTTLValue uint64
-		TxFee            utils.BigInt
-		TxTTL            uint64
+		Fee            utils.BigInt
+		TTL            uint64
 	}
 	tests := []struct {
 		name    string
@@ -631,8 +631,8 @@ func TestOracleQueryTx_RLP(t *testing.T) {
 				QueryTTLValue:    Config.Client.Oracles.QueryTTLValue,
 				ResponseTTLType:  Config.Client.Oracles.ResponseTTLType,
 				ResponseTTLValue: Config.Client.Oracles.ResponseTTLValue,
-				TxFee:            Config.Client.Fee,
-				TxTTL:            Config.Client.TTL,
+				Fee:            Config.Client.Fee,
+				TTL:            Config.Client.TTL,
 			},
 			// from the node
 			wantTx:  "tx_+GgXAaEBHxOjsIvwAUAGYqaLadh194A87EwIZH9u1dhMeJe9UKMBoQTOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+841BcmUgeW91IG9rYXk/AACCASwAggEshrXmIPSAAIIB9GPfFkA=",
@@ -651,8 +651,8 @@ func TestOracleQueryTx_RLP(t *testing.T) {
 				QueryTTLValue:    tt.fields.QueryTTLValue,
 				ResponseTTLType:  tt.fields.ResponseTTLType,
 				ResponseTTLValue: tt.fields.ResponseTTLValue,
-				TxFee:            tt.fields.TxFee,
-				TxTTL:            tt.fields.TxTTL,
+				Fee:            tt.fields.Fee,
+				TTL:            tt.fields.TTL,
 			}
 			txJSON, _ := tx.JSON()
 			fmt.Println(txJSON)
@@ -678,8 +678,8 @@ func TestOracleRespondTx_RLP(t *testing.T) {
 		Response         string
 		ResponseTTLType  uint64
 		ResponseTTLValue uint64
-		TxFee            utils.BigInt
-		TxTTL            uint64
+		Fee            utils.BigInt
+		TTL            uint64
 	}
 	tests := []struct {
 		name    string
@@ -696,8 +696,8 @@ func TestOracleRespondTx_RLP(t *testing.T) {
 				Response:         "Hello back",
 				ResponseTTLType:  0,
 				ResponseTTLValue: 100,
-				TxFee:            Config.Client.Fee,
-				TxTTL:            Config.Client.TTL,
+				Fee:            Config.Client.Fee,
+				TTL:            Config.Client.TTL,
 			},
 			wantTx:  "tx_+F0YAaEEzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vMBoLT1h6fjQDFn1a7j+6wVQ886V47xiFwvkbL+x2yR3J9cikhlbGxvIGJhY2sAZIa15iD0gACCAfQC7+L+",
 			wantErr: false,
@@ -712,8 +712,8 @@ func TestOracleRespondTx_RLP(t *testing.T) {
 				tt.fields.Response,
 				tt.fields.ResponseTTLType,
 				tt.fields.ResponseTTLValue,
-				tt.fields.TxFee,
-				tt.fields.TxTTL,
+				tt.fields.Fee,
+				tt.fields.TTL,
 			)
 			gotTx, err := BaseEncodeTx(&tx)
 
@@ -742,8 +742,8 @@ func TestContractCreateTx_RLP(t *testing.T) {
 		Amount       utils.BigInt
 		Gas          uint64
 		GasPrice     uint64
-		TxFee        utils.BigInt
-		TxTTL        uint64
+		Fee        utils.BigInt
+		TTL        uint64
 		CallData     string
 	}
 	testCases := []struct {
@@ -765,8 +765,8 @@ func TestContractCreateTx_RLP(t *testing.T) {
 				Amount:     *utils.NewBigIntFromUint64(1),
 				Gas:        10000,
 				GasPrice:   1,
-				TxFee:      Config.Client.Fee,
-				TxTTL:      Config.Client.TTL,
+				Fee:      Config.Client.Fee,
+				TTL:      Config.Client.TTL,
 				CallData:   "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACBo8mdjOP9QiDmrpHdJ7/qL6H7yhPIH+z2ZmHAc1TiHxQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACo7dbVl",
 			},
 			wantTx:  "tx_+QbYKgGhAc6nreRwyfmdnU5ACICobx1Ju0RLYvEanrtku8/rc/7zAbkGG/kGGEYCoH+hsu1Z0V8nLGEohRgFB4TLPjnoPkSb5j8wkgJ8ZPC0+QSl+QFJoDqFlC17RzoH9dBO4dnBalzqsWt5HOqSiWEaRMP55boHg3NldLjAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKD//////////////////////////////////////////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD///////////////////////////////////////////4yaBJ7EkHbAIDcSakMwPq3OQ7LiwylFexE8UKfiLciYCUt4NnZXS4YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//////////////////////////////////////////7hAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPkCi6DiIx1s38k5Ft5Ms6mFe/Zc9A/CVvShSYs/fnyYDBmTRIRpbml0uMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoP//////////////////////////////////////////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC5AaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAP//////////////////////////////////////////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGA//////////////////////////////////////////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALkBRGIAAI9iAADCkYCAgFF/SexJB2wCA3EmpDMD6tzkOy4sMpRXsRPFCn4i3ImAlLcUYgABOVdQgIBRf+IjHWzfyTkW3kyzqYV79lz0D8JW9KFJiz9+fJgMGZNEFGIAANFXUIBRfzqFlC17RzoH9dBO4dnBalzqsWt5HOqSiWEaRMP55boHFGIAARtXUGABGVEAW2AAGVlgIAGQgVJgIJADYABZkIFSgVJZYCABkIFSYCCQA2ADgVKQWWAAUVlSYABSYADzW2AAgFJgAPNbYABRUZBWW2AgAVFRkFCDklCAkVBQgFmQgVJZYCABkIFSYCCQA2AAGVlgIAGQgVJgIJADYABZkIFSgVJZYCABkIFSYCCQA2ADgVKBUpBQkFZbYCABUVFZUICRUFBgAFGBWZCBUpBQYABSWZBQkFZbUFBZUFBiAADKVoUyLjEuMACGteYg9IAAggH0gicQAYInEAG4gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgaPJnYzj/UIg5q6R3Se/6i+h+8oTyB/s9mZhwHNU4h8UAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAqtMHI5Q==",
@@ -785,8 +785,8 @@ func TestContractCreateTx_RLP(t *testing.T) {
 				tt.fields.Amount,
 				tt.fields.Gas,
 				tt.fields.GasPrice,
-				tt.fields.TxFee,
-				tt.fields.TxTTL,
+				tt.fields.Fee,
+				tt.fields.TTL,
 				tt.fields.CallData,
 			)
 			txJSON, _ := tx.JSON()
@@ -816,8 +816,8 @@ func TestContractCallTx_RLP(t *testing.T) {
 		AbiVersion   uint64
 		VMVersion    uint64
 		CallData     string
-		TxFee        utils.BigInt
-		TxTTL        uint64
+		Fee        utils.BigInt
+		TTL        uint64
 	}
 	testCases := []struct {
 		name    string
@@ -837,8 +837,8 @@ func TestContractCallTx_RLP(t *testing.T) {
 				AbiVersion:   uint64(0),
 				VMVersion:    uint64(0),
 				CallData:     "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACDiIx1s38k5Ft5Ms6mFe/Zc9A/CVvShSYs/fnyYDBmTRAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACo7j+li",
-				TxFee:        Config.Client.Fee,
-				TxTTL:        Config.Client.TTL,
+				Fee:        Config.Client.Fee,
+				TTL:        Config.Client.TTL,
 			},
 			wantTx:  "you tell me",
 			wantErr: false,
@@ -856,8 +856,8 @@ func TestContractCallTx_RLP(t *testing.T) {
 				AbiVersion:   tt.fields.AbiVersion,
 				VMVersion:    tt.fields.VMVersion,
 				CallData:     tt.fields.CallData,
-				TxFee:        tt.fields.TxFee,
-				TxTTL:        tt.fields.TxTTL,
+				Fee:        tt.fields.Fee,
+				TTL:        tt.fields.TTL,
 			}
 			txJSON, _ := tx.JSON()
 			fmt.Println(txJSON)
