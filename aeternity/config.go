@@ -28,10 +28,11 @@ type AensConfig struct {
 
 // ContractConfig configurations for contracts
 type ContractConfig struct {
-	Gas       uint64 `json:"gas" yaml:"gas" mapstructure:"gas"`
-	GasPrice  uint64 `json:"gas_price" yaml:"gas_price" mapstructure:"gas_price"`
-	Deposit   uint64 `json:"deposit" yaml:"deposit" mapstructure:"deposit"`
-	VMVersion uint64 `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
+	Gas        uint64 `json:"gas" yaml:"gas" mapstructure:"gas"`
+	GasPrice   uint64 `json:"gas_price" yaml:"gas_price" mapstructure:"gas_price"`
+	Deposit    uint64 `json:"deposit" yaml:"deposit" mapstructure:"deposit"`
+	VMVersion  uint64 `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
+	ABIVersion uint64 `json:"abi_version" yaml:"abi_version" mapstructure:"abi_version"`
 }
 
 // OracleConfig configurations for contracts
@@ -100,11 +101,12 @@ var Config = ProfileConfig{
 			ClaimFee:    *utils.RequireBigIntFromString("100000000000000"),
 			UpdateFee:   *utils.RequireBigIntFromString("100000000000000"),
 		},
-		Contracts: ContractConfig{ // UNUSED
-			Gas:       1e9,
-			GasPrice:  1,
-			Deposit:   0,
-			VMVersion: 0,
+		Contracts: ContractConfig{
+			Gas:        1e9,
+			GasPrice:   1e9,
+			Deposit:    0,
+			VMVersion:  0,
+			ABIVersion: 2,
 		},
 		Oracles: OracleConfig{
 			QueryFee:         *utils.NewBigIntFromUint64(0),
