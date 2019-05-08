@@ -51,8 +51,11 @@ type StateChannelConfig struct {
 	ChannelReserve uint64 `json:"channel_reserve" yaml:"channel_reserve" mapstructure:"channel_reserve"`
 }
 
-// ClientConfig client paramters configuration
+// ClientConfig client parameters configuration
 type ClientConfig struct {
+	BaseGas            utils.BigInt
+	GasPerByte         utils.BigInt
+	GasPrice           utils.BigInt
 	TTL                uint64             `json:"ttl" yaml:"ttl" mapstructure:"ttl"`
 	Fee                utils.BigInt       `json:"fee" yaml:"fee" mapstructure:"fee"`
 	DefaultKey         string             `json:"default_key_name" yaml:"default_key_name" mapstructure:"default_key_name"`
@@ -92,8 +95,11 @@ var Config = ProfileConfig{
 		NetworkID:   "ae_mainnet",
 	},
 	Client: ClientConfig{
-		TTL: 500,
-		Fee: *utils.RequireBigIntFromString("200000000000000"),
+		BaseGas:    *utils.NewBigIntFromUint64(15000),
+		GasPerByte: *utils.NewBigIntFromUint64(20),
+		GasPrice:   *utils.NewBigIntFromUint64(1000000000),
+		TTL:        500,
+		Fee:        *utils.RequireBigIntFromString("200000000000000"),
 		Names: AensConfig{
 			NameTTL:     500, // absolute block height when the name will expire
 			ClientTTL:   500, // time in blocks until the name resolver should check again in case the name was updated
