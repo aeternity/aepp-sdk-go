@@ -842,3 +842,65 @@ func NewContractCreateTx(OwnerID string, AccountNonce uint64, Code string, VMVer
 		CallData:     CallData,
 	}
 }
+
+type ContractCallTx struct {
+	CallerID     string
+	AccountNonce uint64
+	ContractID   string
+	Amount       utils.BigInt
+	Gas          uint64
+	GasPrice     uint64
+	AbiVersion   uint64
+	VMVersion    uint64
+	CallData     string
+	TxFee        utils.BigInt
+	TxTTL        uint64
+}
+
+func (tx *ContractCallTx) JSON() (string, error) {
+	swaggerT := models.ContractCallTx{
+		CallerID:   models.EncodedHash(tx.CallerID),
+		Nonce:      tx.AccountNonce,
+		ContractID: models.EncodedHash(tx.ContractID),
+		Amount:     tx.Amount,
+		Gas:        &tx.Gas,
+		GasPrice:   &tx.GasPrice,
+		AbiVersion: &tx.AbiVersion,
+		VMVersion:  &tx.VMVersion,
+		CallData:   models.EncodedByteArray(tx.CallData),
+		Fee:        tx.TxFee,
+		TTL:        &tx.TxTTL,
+	}
+	output, err := swaggerT.MarshalBinary()
+	return string(output), err
+}
+
+func (tx *ContractCallTx) RLP() (rlpRawMsg []byte, err error) {
+	cID, err := buildIDTag(IDTagAccount, tx.CallerID)
+	if err != nil {
+		return
+	}
+	ctID, err := buildIDTag(IDTagContract, tx.ContractID)
+	if err != nil {
+		return
+	}
+	callDataBinary, err := Decode(tx.CallData)
+	if err != nil {
+		return
+	}
+
+	rlpRawMsg, err = buildRLPMessage(
+		ObjectTagContractCallTransaction,
+		rlpMessageVersion,
+		cID,
+		tx.AccountNonce,
+		ctID,
+		tx.TxFee.Int,
+		tx.TxTTL,
+		tx.Amount,
+		tx.Gas,
+		tx.GasPrice,
+		callDataBinary,
+	)
+	return
+}
