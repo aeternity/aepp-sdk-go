@@ -610,8 +610,8 @@ func TestOracleQueryTx_RLP(t *testing.T) {
 		QueryTTLValue    uint64
 		ResponseTTLType  uint64
 		ResponseTTLValue uint64
-		Fee            utils.BigInt
-		TTL            uint64
+		Fee              utils.BigInt
+		TTL              uint64
 	}
 	tests := []struct {
 		name    string
@@ -631,8 +631,8 @@ func TestOracleQueryTx_RLP(t *testing.T) {
 				QueryTTLValue:    Config.Client.Oracles.QueryTTLValue,
 				ResponseTTLType:  Config.Client.Oracles.ResponseTTLType,
 				ResponseTTLValue: Config.Client.Oracles.ResponseTTLValue,
-				Fee:            Config.Client.Fee,
-				TTL:            Config.Client.TTL,
+				Fee:              Config.Client.Fee,
+				TTL:              Config.Client.TTL,
 			},
 			// from the node
 			wantTx:  "tx_+GgXAaEBHxOjsIvwAUAGYqaLadh194A87EwIZH9u1dhMeJe9UKMBoQTOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+841BcmUgeW91IG9rYXk/AACCASwAggEshrXmIPSAAIIB9GPfFkA=",
@@ -651,8 +651,8 @@ func TestOracleQueryTx_RLP(t *testing.T) {
 				QueryTTLValue:    tt.fields.QueryTTLValue,
 				ResponseTTLType:  tt.fields.ResponseTTLType,
 				ResponseTTLValue: tt.fields.ResponseTTLValue,
-				Fee:            tt.fields.Fee,
-				TTL:            tt.fields.TTL,
+				Fee:              tt.fields.Fee,
+				TTL:              tt.fields.TTL,
 			}
 			txJSON, _ := tx.JSON()
 			fmt.Println(txJSON)
@@ -678,8 +678,8 @@ func TestOracleRespondTx_RLP(t *testing.T) {
 		Response         string
 		ResponseTTLType  uint64
 		ResponseTTLValue uint64
-		Fee            utils.BigInt
-		TTL            uint64
+		Fee              utils.BigInt
+		TTL              uint64
 	}
 	tests := []struct {
 		name    string
@@ -696,8 +696,8 @@ func TestOracleRespondTx_RLP(t *testing.T) {
 				Response:         "Hello back",
 				ResponseTTLType:  0,
 				ResponseTTLValue: 100,
-				Fee:            Config.Client.Fee,
-				TTL:            Config.Client.TTL,
+				Fee:              Config.Client.Fee,
+				TTL:              Config.Client.TTL,
 			},
 			wantTx:  "tx_+F0YAaEEzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vMBoLT1h6fjQDFn1a7j+6wVQ886V47xiFwvkbL+x2yR3J9cikhlbGxvIGJhY2sAZIa15iD0gACCAfQC7+L+",
 			wantErr: false,
@@ -740,10 +740,10 @@ func TestContractCreateTx_RLP(t *testing.T) {
 		AbiVersion   uint64
 		Deposit      uint64
 		Amount       utils.BigInt
-		Gas          uint64
-		GasPrice     uint64
-		Fee        utils.BigInt
-		TTL        uint64
+		Gas          utils.BigInt
+		GasPrice     utils.BigInt
+		Fee          utils.BigInt
+		TTL          uint64
 		CallData     string
 	}
 	testCases := []struct {
@@ -763,10 +763,10 @@ func TestContractCreateTx_RLP(t *testing.T) {
 				AbiVersion: 0,
 				Deposit:    10000,
 				Amount:     *utils.NewBigIntFromUint64(1),
-				Gas:        10000,
-				GasPrice:   1,
-				Fee:      Config.Client.Fee,
-				TTL:      Config.Client.TTL,
+				Gas:        *utils.NewBigIntFromUint64(10000),
+				GasPrice:   *utils.NewBigIntFromUint64(1),
+				Fee:        Config.Client.Fee,
+				TTL:        Config.Client.TTL,
 				CallData:   "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACBo8mdjOP9QiDmrpHdJ7/qL6H7yhPIH+z2ZmHAc1TiHxQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACo7dbVl",
 			},
 			wantTx:  "tx_+QbYKgGhAc6nreRwyfmdnU5ACICobx1Ju0RLYvEanrtku8/rc/7zAbkGG/kGGEYCoH+hsu1Z0V8nLGEohRgFB4TLPjnoPkSb5j8wkgJ8ZPC0+QSl+QFJoDqFlC17RzoH9dBO4dnBalzqsWt5HOqSiWEaRMP55boHg3NldLjAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKD//////////////////////////////////////////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD///////////////////////////////////////////4yaBJ7EkHbAIDcSakMwPq3OQ7LiwylFexE8UKfiLciYCUt4NnZXS4YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//////////////////////////////////////////7hAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPkCi6DiIx1s38k5Ft5Ms6mFe/Zc9A/CVvShSYs/fnyYDBmTRIRpbml0uMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoP//////////////////////////////////////////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC5AaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAP//////////////////////////////////////////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGA//////////////////////////////////////////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALkBRGIAAI9iAADCkYCAgFF/SexJB2wCA3EmpDMD6tzkOy4sMpRXsRPFCn4i3ImAlLcUYgABOVdQgIBRf+IjHWzfyTkW3kyzqYV79lz0D8JW9KFJiz9+fJgMGZNEFGIAANFXUIBRfzqFlC17RzoH9dBO4dnBalzqsWt5HOqSiWEaRMP55boHFGIAARtXUGABGVEAW2AAGVlgIAGQgVJgIJADYABZkIFSgVJZYCABkIFSYCCQA2ADgVKQWWAAUVlSYABSYADzW2AAgFJgAPNbYABRUZBWW2AgAVFRkFCDklCAkVBQgFmQgVJZYCABkIFSYCCQA2AAGVlgIAGQgVJgIJADYABZkIFSgVJZYCABkIFSYCCQA2ADgVKBUpBQkFZbYCABUVFZUICRUFBgAFGBWZCBUpBQYABSWZBQkFZbUFBZUFBiAADKVoUyLjEuMACGteYg9IAAggH0gicQAYInEAG4gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgaPJnYzj/UIg5q6R3Se/6i+h+8oTyB/s9mZhwHNU4h8UAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAqtMHI5Q==",
@@ -805,19 +805,89 @@ func TestContractCreateTx_RLP(t *testing.T) {
 	}
 }
 
+func TestContractCreateTx_FeeEstimate(t *testing.T) {
+	type fields struct {
+		OwnerID      string
+		AccountNonce uint64
+		Code         string
+		VMVersion    uint64
+		AbiVersion   uint64
+		Deposit      uint64
+		Amount       utils.BigInt
+		Gas          utils.BigInt
+		GasPrice     utils.BigInt
+		Fee          utils.BigInt
+		TTL          uint64
+		CallData     string
+	}
+	testCases := []struct {
+		name    string
+		fields  fields
+		want    *utils.BigInt
+		wantErr bool
+	}{
+		{
+			name: "Basic contract creation",
+			fields: fields{
+				OwnerID:      "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+				AccountNonce: 1,
+				// encoded "contract SimpleStorage =\n  record state = { data : int }\n  function init(value : int) : state = { data = value }\n  function get() : int = state.data\n  function set(value : int) = put(state{data = value})"
+				Code:       `cb_+QYYRgKgf6Gy7VnRXycsYSiFGAUHhMs+Oeg+RJvmPzCSAnxk8LT5BKX5AUmgOoWULXtHOgf10E7h2cFqXOqxa3kc6pKJYRpEw/nlugeDc2V0uMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoP//////////////////////////////////////////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC4YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///////////////////////////////////////////jJoEnsSQdsAgNxJqQzA+rc5DsuLDKUV7ETxQp+ItyJgJS3g2dldLhgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA///////////////////////////////////////////uEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+QKLoOIjHWzfyTkW3kyzqYV79lz0D8JW9KFJiz9+fJgMGZNEhGluaXS4wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACg//////////////////////////////////////////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALkBoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEA//////////////////////////////////////////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYD//////////////////////////////////////////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuQFEYgAAj2IAAMKRgICAUX9J7EkHbAIDcSakMwPq3OQ7LiwylFexE8UKfiLciYCUtxRiAAE5V1CAgFF/4iMdbN/JORbeTLOphXv2XPQPwlb0oUmLP358mAwZk0QUYgAA0VdQgFF/OoWULXtHOgf10E7h2cFqXOqxa3kc6pKJYRpEw/nlugcUYgABG1dQYAEZUQBbYAAZWWAgAZCBUmAgkANgAFmQgVKBUllgIAGQgVJgIJADYAOBUpBZYABRWVJgAFJgAPNbYACAUmAA81tgAFFRkFZbYCABUVGQUIOSUICRUFCAWZCBUllgIAGQgVJgIJADYAAZWWAgAZCBUmAgkANgAFmQgVKBUllgIAGQgVJgIJADYAOBUoFSkFCQVltgIAFRUVlQgJFQUGAAUYFZkIFSkFBgAFJZkFCQVltQUFlQUGIAAMpWhTIuMS4w4SWVhA==`,
+				VMVersion:  0,
+				AbiVersion: 0,
+				Deposit:    10000,
+				Amount:     *utils.NewBigIntFromUint64(1),
+				Gas:        *utils.NewBigIntFromUint64(10000),
+				GasPrice:   *utils.NewBigIntFromUint64(1),
+				Fee:        Config.Client.Fee,
+				TTL:        Config.Client.TTL,
+				CallData:   "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACBo8mdjOP9QiDmrpHdJ7/qL6H7yhPIH+z2ZmHAc1TiHxQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACo7dbVl",
+			},
+			want:    utils.NewBigIntFromUint64(120140000000000),
+			wantErr: false,
+		},
+	}
+	for _, tt := range testCases {
+		t.Run(tt.name, func(t *testing.T) {
+			tx := &ContractCreateTx{
+				OwnerID:      tt.fields.OwnerID,
+				AccountNonce: tt.fields.AccountNonce,
+				Code:         tt.fields.Code,
+				VMVersion:    tt.fields.VMVersion,
+				AbiVersion:   tt.fields.AbiVersion,
+				Deposit:      tt.fields.Deposit,
+				Amount:       tt.fields.Amount,
+				Gas:          tt.fields.Gas,
+				GasPrice:     tt.fields.GasPrice,
+				Fee:          tt.fields.Fee,
+				TTL:          tt.fields.TTL,
+				CallData:     tt.fields.CallData,
+			}
+			got, err := tx.FeeEstimate()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ContractCreateTx.FeeEstimate() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ContractCreateTx.FeeEstimate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestContractCallTx_RLP(t *testing.T) {
 	type fields struct {
 		CallerID     string
 		AccountNonce uint64
 		ContractID   string
 		Amount       utils.BigInt
-		Gas          uint64
-		GasPrice     uint64
+		Gas          utils.BigInt
+		GasPrice     utils.BigInt
 		AbiVersion   uint64
 		VMVersion    uint64
 		CallData     string
-		Fee        utils.BigInt
-		TTL        uint64
+		Fee          utils.BigInt
+		TTL          uint64
 	}
 	testCases := []struct {
 		name    string
@@ -832,13 +902,13 @@ func TestContractCallTx_RLP(t *testing.T) {
 				AccountNonce: uint64(1),
 				ContractID:   "ct_2pfWWzeRzWSdm68HXZJn61KhxdsBA46wzYgvo1swkdJZij1rKm",
 				Amount:       *utils.NewBigIntFromUint64(10),
-				Gas:          uint64(10),
-				GasPrice:     uint64(10),
+				Gas:          *utils.NewBigIntFromUint64(10),
+				GasPrice:     *utils.NewBigIntFromUint64(10),
 				AbiVersion:   uint64(0),
 				VMVersion:    uint64(0),
 				CallData:     "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACDiIx1s38k5Ft5Ms6mFe/Zc9A/CVvShSYs/fnyYDBmTRAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACo7j+li",
-				Fee:        Config.Client.Fee,
-				TTL:        Config.Client.TTL,
+				Fee:          Config.Client.Fee,
+				TTL:          Config.Client.TTL,
 			},
 			wantTx:  "you tell me",
 			wantErr: false,
@@ -856,8 +926,8 @@ func TestContractCallTx_RLP(t *testing.T) {
 				AbiVersion:   tt.fields.AbiVersion,
 				VMVersion:    tt.fields.VMVersion,
 				CallData:     tt.fields.CallData,
-				Fee:        tt.fields.Fee,
-				TTL:        tt.fields.TTL,
+				Fee:          tt.fields.Fee,
+				TTL:          tt.fields.TTL,
 			}
 			txJSON, _ := tx.JSON()
 			fmt.Println(txJSON)
