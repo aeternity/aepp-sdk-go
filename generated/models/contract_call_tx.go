@@ -44,15 +44,13 @@ type ContractCallTx struct {
 	// Required: true
 	Fee utils.BigInt `json:"fee"`
 
-	// Contract gas
+	// gas
 	// Required: true
-	// Minimum: 0
-	Gas *uint64 `json:"gas"`
+	Gas utils.BigInt `json:"gas"`
 
-	// Gas price
+	// gas price
 	// Required: true
-	// Minimum: 0
-	GasPrice *uint64 `json:"gas_price"`
+	GasPrice utils.BigInt `json:"gas_price"`
 
 	// Caller's nonce
 	Nonce uint64 `json:"nonce,omitempty"`
@@ -196,11 +194,10 @@ func (m *ContractCallTx) validateFee(formats strfmt.Registry) error {
 
 func (m *ContractCallTx) validateGas(formats strfmt.Registry) error {
 
-	if err := validate.Required("gas", "body", m.Gas); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("gas", "body", int64(*m.Gas), 0, false); err != nil {
+	if err := m.Gas.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("gas")
+		}
 		return err
 	}
 
@@ -209,11 +206,10 @@ func (m *ContractCallTx) validateGas(formats strfmt.Registry) error {
 
 func (m *ContractCallTx) validateGasPrice(formats strfmt.Registry) error {
 
-	if err := validate.Required("gas_price", "body", m.GasPrice); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("gas_price", "body", int64(*m.GasPrice), 0, false); err != nil {
+	if err := m.GasPrice.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("gas_price")
+		}
 		return err
 	}
 
