@@ -4612,8 +4612,7 @@
           "$ref": "#/definitions/EncodedHash"
         },
         "gas_price": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/GasPrice"
         },
         "gas_used": {
           "type": "integer",
@@ -5195,16 +5194,10 @@
           "$ref": "#/definitions/Amount"
         },
         "gas": {
-          "type": "integer",
-          "description": "Contract gas",
-          "minimum": 0,
-          "format": "uint64"
+          "$ref": "#/definitions/Gas"
         },
         "gas_price": {
-          "type": "integer",
-          "description": "Gas price",
-          "minimum": 0,
-          "format": "uint64"
+          "$ref": "#/definitions/GasPrice"
         },
         "fee": {
           "$ref": "#/definitions/Fee"
@@ -5285,16 +5278,10 @@
           "$ref": "#/definitions/Amount"
         },
         "gas": {
-          "type": "integer",
-          "description": "Contract gas",
-          "minimum": 0,
-          "format": "uint64"
+          "$ref": "#/definitions/Gas"
         },
         "gas_price": {
-          "type": "integer",
-          "description": "Gas price",
-          "minimum": 0,
-          "format": "uint64"
+          "$ref": "#/definitions/GasPrice"
         },
         "fee": {
           "$ref": "#/definitions/Fee"
@@ -5382,16 +5369,10 @@
           "$ref": "#/definitions/Amount"
         },
         "gas": {
-          "type": "integer",
-          "description": "Contract gas",
-          "minimum": 0,
-          "format": "uint64"
+          "$ref": "#/definitions/Gas"
         },
         "gas_price": {
-          "type": "integer",
-          "description": "Gas price",
-          "minimum": 0,
-          "format": "uint64"
+          "$ref": "#/definitions/GasPrice"
         },
         "call_data": {
           "description": "Contract call data",
@@ -5462,16 +5443,10 @@
           "$ref": "#/definitions/Amount"
         },
         "gas": {
-          "type": "integer",
-          "description": "Contract gas",
-          "minimum": 0,
-          "format": "uint64"
+          "$ref": "#/definitions/Gas"
         },
         "gas_price": {
-          "type": "integer",
-          "description": "Gas price",
-          "minimum": 0,
-          "format": "uint64"
+          "$ref": "#/definitions/GasPrice"
         },
         "function": {
           "type": "string",
@@ -5943,6 +5918,26 @@
       }
     },
     "NameSalt": {
+      "type": "integer",
+      "minimum": 0,
+      "x-go-type": {
+        "import": {
+          "package": "github.com/aeternity/aepp-sdk-go/utils"
+        },
+        "type": "BigInt"
+      }
+    },
+    "Gas": {
+      "type": "integer",
+      "minimum": 0,
+      "x-go-type": {
+        "import": {
+          "package": "github.com/aeternity/aepp-sdk-go/utils"
+        },
+        "type": "BigInt"
+      }
+    },
+    "GasPrice": {
       "type": "integer",
       "minimum": 0,
       "x-go-type": {

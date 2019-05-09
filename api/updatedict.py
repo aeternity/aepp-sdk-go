@@ -48,23 +48,29 @@ def add_definitions(data):
     data["definitions"]["Balance"] = bigint
     data["definitions"]["Fee"] = bigint
     data["definitions"]["NameSalt"] = bigint
+    data["definitions"]["Gas"] = bigint
+    data["definitions"]["GasPrice"] = bigint
     return data
 
 def add_references_to_definitions(data):
     swaggerD = DottedDict(data)
     for l in json_objects:
+        l_last_key = l.split('.')[-1]
         swaggerD_old = swaggerD[l]
-        if 'fee' in l:
+        if 'fee' == l_last_key:
             swaggerD[l] = {"$ref": "#/definitions/Fee"}
-        elif "balance" in l:
+        elif "balance" == l_last_key:
             swaggerD[l] = {"$ref": "#/definitions/Balance"}
-        elif "amount" in l:
+        elif "amount" == l_last_key:
             swaggerD[l] = {"$ref": "#/definitions/Amount"}
-        elif "channel_reserve" in l:
+        elif "channel_reserve" == l_last_key:
             swaggerD[l] = {"$ref": "#/definitions/Amount"}
-        elif "name_salt" in l:
+        elif "name_salt" == l_last_key:
             swaggerD[l] = {"$ref": "#/definitions/NameSalt"}
-        
+        elif "gas" == l_last_key:
+            swaggerD[l] = {"$ref": "#/definitions/Gas"}
+        elif "gas_price" == l_last_key:
+            swaggerD[l] = {"$ref": "#/definitions/GasPrice"}
         # I want to see what was changed.
         if swaggerD[l] != swaggerD_old:
             print(l, swaggerD[l])
