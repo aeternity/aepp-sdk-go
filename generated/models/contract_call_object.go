@@ -13,6 +13,8 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
+
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // ContractCallObject contract call object
@@ -33,7 +35,7 @@ type ContractCallObject struct {
 
 	// gas price
 	// Required: true
-	GasPrice *uint64 `json:"gas_price"`
+	GasPrice utils.BigInt `json:"gas_price"`
 
 	// gas used
 	// Required: true
@@ -137,7 +139,10 @@ func (m *ContractCallObject) validateContractID(formats strfmt.Registry) error {
 
 func (m *ContractCallObject) validateGasPrice(formats strfmt.Registry) error {
 
-	if err := validate.Required("gas_price", "body", m.GasPrice); err != nil {
+	if err := m.GasPrice.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("gas_price")
+		}
 		return err
 	}
 
