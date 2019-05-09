@@ -3,6 +3,7 @@ package aeternity
 import (
 	"fmt"
 	"io"
+	"math/big"
 
 	"github.com/aeternity/aepp-sdk-go/generated/models"
 	"github.com/aeternity/aepp-sdk-go/rlp"
@@ -79,15 +80,32 @@ func buildPointers(pointers []string) (ptrs []*NamePointer, err error) {
 
 func calcFeeStd(tx Tx, txLen int) *utils.BigInt {
 	// (Config.Client.BaseGas + len(txRLP) * Config.Client.GasPerByte) * Config.Client.GasPrice
-	txLenBig := utils.NewBigIntFromUint64(uint64(txLen))
-	txLenGasPerByte := utils.NewBigInt()
-	totalGas := utils.NewBigInt()
+	//                                   txLenGasPerByte
 	fee := utils.NewBigInt()
+	txLenGasPerByte := utils.NewBigInt()
 
-	txLenGasPerByte.Mul(txLenBig.Int, Config.Client.GasPerByte.Int)
-	totalGas.Add(Config.Client.BaseGas.Int, txLenGasPerByte.Int)
-	fee.Mul(totalGas.Int, Config.Client.GasPrice.Int)
+	txLenGasPerByte.Mul(utils.NewBigIntFromUint64(uint64(txLen)).Int, Config.Client.GasPerByte.Int)
+	fee.Add(Config.Client.BaseGas.Int, txLenGasPerByte.Int)
+	fee.Mul(fee.Int, Config.Client.GasPrice.Int)
 	return fee
+}
+
+func calcFeeContract(gas *utils.BigInt, baseGasMultiplier int, length int) *utils.BigInt {
+	// (Config.Client.BaseGas * 5) + gaslimit + (len(txRLP) * Config.Client.GasPerByte) * Config.Client.GasPrice
+	//           baseGas5                                txLenGasPerByte
+	baseGas5 := utils.NewBigInt()
+	txLenBig := utils.NewBigInt()
+	answer := utils.NewBigInt()
+
+	baseGas5.Mul(Config.Client.BaseGas.Int, new(big.Int).SetInt64(5))
+	txLenBig.SetUint64(uint64(length))
+	txLenGasPerByte := utils.NewBigInt()
+	txLenGasPerByte.Mul(txLenBig.Int, Config.Client.GasPerByte.Int)
+
+	answer.Add(baseGas5.Int, gas.Int)
+	answer.Add(answer.Int, txLenGasPerByte.Int)
+	answer.Mul(answer.Int, Config.Client.GasPrice.Int)
+	return answer
 }
 
 // sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
@@ -876,6 +894,7 @@ func NewOracleRespondTx(OracleID string, AccountNonce uint64, QueryID string, Re
 	return OracleRespondTx{OracleID, AccountNonce, QueryID, Response, TTLType, TTLValue, Fee, TTL}
 }
 
+// ContractCreateTx represents a transaction that creates a smart contract
 type ContractCreateTx struct {
 	OwnerID      string
 	AccountNonce uint64
@@ -884,13 +903,14 @@ type ContractCreateTx struct {
 	AbiVersion   uint64
 	Deposit      uint64
 	Amount       utils.BigInt
-	Gas          uint64
-	GasPrice     uint64
+	Gas          utils.BigInt
+	GasPrice     utils.BigInt
 	Fee          utils.BigInt
 	TTL          uint64
 	CallData     string
 }
 
+// RLP returns a byte serialized representation
 func (tx *ContractCreateTx) RLP() (rlpRawMsg []byte, err error) {
 	aID, err := buildIDTag(IDTagAccount, tx.OwnerID)
 	if err != nil {
@@ -923,6 +943,7 @@ func (tx *ContractCreateTx) RLP() (rlpRawMsg []byte, err error) {
 	return
 }
 
+// JSON representation of a Tx is useful for querying the node's debug endpoint
 func (tx *ContractCreateTx) JSON() (string, error) {
 	swaggerT := models.ContractCreateTx{
 		OwnerID:    models.EncodedHash(tx.OwnerID),
@@ -932,8 +953,8 @@ func (tx *ContractCreateTx) JSON() (string, error) {
 		AbiVersion: &tx.AbiVersion,
 		Deposit:    &tx.Deposit,
 		Amount:     tx.Amount,
-		Gas:        &tx.Gas,
-		GasPrice:   &tx.GasPrice,
+		Gas:        tx.Gas,
+		GasPrice:   tx.GasPrice,
 		Fee:        tx.Fee,
 		TTL:        &tx.TTL,
 		CallData:   models.EncodedByteArray(tx.CallData),
@@ -942,7 +963,23 @@ func (tx *ContractCreateTx) JSON() (string, error) {
 	return string(output), err
 }
 
-func NewContractCreateTx(OwnerID string, AccountNonce uint64, Code string, VMVersion, AbiVersion, Deposit uint64, Amount utils.BigInt, Gas, GasPrice uint64, Fee utils.BigInt, TTL uint64, CallData string) ContractCreateTx {
+// sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
+func (tx *ContractCreateTx) sizeEstimate() (int, error) {
+	return calcSizeEstimate(tx, &tx.Fee)
+}
+
+// FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
+func (tx *ContractCreateTx) FeeEstimate() (*utils.BigInt, error) {
+	txLenEstimated, err := tx.sizeEstimate()
+	if err != nil {
+		return utils.NewBigInt(), err
+	}
+	estimatedFee := calcFeeContract(&tx.Gas, 5, txLenEstimated)
+	return estimatedFee, nil
+}
+
+// NewContractCreateTx is a constructor for a ContractCreateTx struct
+func NewContractCreateTx(OwnerID string, AccountNonce uint64, Code string, VMVersion, AbiVersion, Deposit uint64, Amount, Gas, GasPrice, Fee utils.BigInt, TTL uint64, CallData string) ContractCreateTx {
 	return ContractCreateTx{
 		OwnerID:      OwnerID,
 		AccountNonce: AccountNonce,
@@ -959,13 +996,14 @@ func NewContractCreateTx(OwnerID string, AccountNonce uint64, Code string, VMVer
 	}
 }
 
+// ContractCallTx represents calling an existing smart contract
 type ContractCallTx struct {
 	CallerID     string
 	AccountNonce uint64
 	ContractID   string
 	Amount       utils.BigInt
-	Gas          uint64
-	GasPrice     uint64
+	Gas          utils.BigInt
+	GasPrice     utils.BigInt
 	AbiVersion   uint64
 	VMVersion    uint64
 	CallData     string
@@ -973,14 +1011,15 @@ type ContractCallTx struct {
 	TTL          uint64
 }
 
+// JSON representation of a Tx is useful for querying the node's debug endpoint
 func (tx *ContractCallTx) JSON() (string, error) {
 	swaggerT := models.ContractCallTx{
 		CallerID:   models.EncodedHash(tx.CallerID),
 		Nonce:      tx.AccountNonce,
 		ContractID: models.EncodedHash(tx.ContractID),
 		Amount:     tx.Amount,
-		Gas:        &tx.Gas,
-		GasPrice:   &tx.GasPrice,
+		Gas:        tx.Gas,
+		GasPrice:   tx.GasPrice,
 		AbiVersion: &tx.AbiVersion,
 		VMVersion:  &tx.VMVersion,
 		CallData:   models.EncodedByteArray(tx.CallData),
@@ -991,6 +1030,7 @@ func (tx *ContractCallTx) JSON() (string, error) {
 	return string(output), err
 }
 
+// RLP returns a byte serialized representation
 func (tx *ContractCallTx) RLP() (rlpRawMsg []byte, err error) {
 	cID, err := buildIDTag(IDTagAccount, tx.CallerID)
 	if err != nil {
@@ -1019,4 +1059,19 @@ func (tx *ContractCallTx) RLP() (rlpRawMsg []byte, err error) {
 		callDataBinary,
 	)
 	return
+}
+
+// sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
+func (tx *ContractCallTx) sizeEstimate() (int, error) {
+	return calcSizeEstimate(tx, &tx.Fee)
+}
+
+// FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
+func (tx *ContractCallTx) FeeEstimate() (*utils.BigInt, error) {
+	txLenEstimated, err := tx.sizeEstimate()
+	if err != nil {
+		return utils.NewBigInt(), err
+	}
+	estimatedFee := calcFeeContract(&tx.Gas, 30, txLenEstimated)
+	return estimatedFee, nil
 }
