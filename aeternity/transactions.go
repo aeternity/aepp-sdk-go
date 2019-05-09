@@ -77,32 +77,36 @@ func buildPointers(pointers []string) (ptrs []*NamePointer, err error) {
 	return
 }
 
-func calcFeeStd(tx Tx, feeRlpLen int) (*utils.BigInt, error) {
-	rlpRawMsg, err := tx.RLP()
-	if err != nil {
-		return utils.NewBigInt(), err
-	}
-
-	// Since deepcopy doesn'tx copy Amount and Fee (why?), need to exclude Fee by subtracting it out.
-	txLenMod := uint64(len(rlpRawMsg) - feeRlpLen + 8)
-
-	// (Config.Client.BaseGas + len(rlpRawMsg) * Config.Client.GasPerByte) * Config.Client.GasPrice
-	txLen := utils.NewBigIntFromUint64(txLenMod)
-
+func calcFeeStd(tx Tx, txLen int) *utils.BigInt {
+	// (Config.Client.BaseGas + len(txRLP) * Config.Client.GasPerByte) * Config.Client.GasPrice
+	txLenBig := utils.NewBigIntFromUint64(uint64(txLen))
 	txLenGasPerByte := utils.NewBigInt()
 	totalGas := utils.NewBigInt()
 	fee := utils.NewBigInt()
 
-	txLenGasPerByte.Mul(txLen.Int, Config.Client.GasPerByte.Int)
+	txLenGasPerByte.Mul(txLenBig.Int, Config.Client.GasPerByte.Int)
 	totalGas.Add(Config.Client.BaseGas.Int, txLenGasPerByte.Int)
 	fee.Mul(totalGas.Int, Config.Client.GasPrice.Int)
-	return fee, nil
+	return fee
+}
+
+// sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
+func calcSizeEstimate(tx Tx, fee *utils.BigInt) (int, error) {
+	feeRlp, err := rlp.EncodeToBytes(fee)
+	if err != nil {
+		return 0, err
+	}
+	feeRlpLen := len(feeRlp)
+
+	rlpRawMsg, err := tx.RLP()
+	if err != nil {
+		return 0, err
+	}
+
+	return len(rlpRawMsg) - feeRlpLen + 8, nil
 }
 
 // Tx interface guarantees that code using Tx can rely on these functions being present
-// Since the methods to Tx-like structs do not modify the Tx themselves - they simply generate values
-// from the Tx's values - Tx methods should not have a pointer receiver.
-// See https://tour.golang.org/methods/4 or https://dave.cheney.net/2016/03/19/should-methods-be-declared-on-t-or-t
 type Tx interface {
 	RLP() ([]byte, error)
 }
@@ -169,13 +173,19 @@ func (tx *SpendTx) JSON() (string, error) {
 	return string(output), err
 }
 
-// EstimateFee estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
-func (tx *SpendTx) EstimateFee() (*utils.BigInt, error) {
-	feeRlp, err := rlp.EncodeToBytes(tx.Fee)
+// sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
+func (tx *SpendTx) sizeEstimate() (int, error) {
+	return calcSizeEstimate(tx, &tx.Fee)
+}
+
+// FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
+func (tx *SpendTx) FeeEstimate() (*utils.BigInt, error) {
+	txLenEstimated, err := tx.sizeEstimate()
 	if err != nil {
 		return utils.NewBigInt(), err
 	}
-	return calcFeeStd(tx, len(feeRlp))
+	estimatedFee := calcFeeStd(tx, txLenEstimated)
+	return estimatedFee, nil
 }
 
 // NewSpendTx is a constructor for a SpendTx struct
@@ -229,13 +239,19 @@ func (tx *NamePreclaimTx) JSON() (string, error) {
 	return string(output), err
 }
 
-// EstimateFee estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
-func (tx *NamePreclaimTx) EstimateFee() (*utils.BigInt, error) {
-	feeRlp, err := rlp.EncodeToBytes(tx.Fee)
+// sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
+func (tx *NamePreclaimTx) sizeEstimate() (int, error) {
+	return calcSizeEstimate(tx, &tx.Fee)
+}
+
+// FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
+func (tx *NamePreclaimTx) FeeEstimate() (*utils.BigInt, error) {
+	txLenEstimated, err := tx.sizeEstimate()
 	if err != nil {
 		return utils.NewBigInt(), err
 	}
-	return calcFeeStd(tx, len(feeRlp))
+	estimatedFee := calcFeeStd(tx, txLenEstimated)
+	return estimatedFee, nil
 }
 
 // NewNamePreclaimTx is a constructor for a NamePreclaimTx struct
@@ -294,13 +310,19 @@ func (tx *NameClaimTx) JSON() (string, error) {
 	return string(output), err
 }
 
-// EstimateFee estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
-func (tx *NameClaimTx) EstimateFee() (*utils.BigInt, error) {
-	feeRlp, err := rlp.EncodeToBytes(tx.Fee)
+// sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
+func (tx *NameClaimTx) sizeEstimate() (int, error) {
+	return calcSizeEstimate(tx, &tx.Fee)
+}
+
+// FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
+func (tx *NameClaimTx) FeeEstimate() (*utils.BigInt, error) {
+	txLenEstimated, err := tx.sizeEstimate()
 	if err != nil {
 		return utils.NewBigInt(), err
 	}
-	return calcFeeStd(tx, len(feeRlp))
+	estimatedFee := calcFeeStd(tx, txLenEstimated)
+	return estimatedFee, nil
 }
 
 // NewNameClaimTx is a constructor for a NameClaimTx struct
@@ -408,13 +430,19 @@ func (tx *NameUpdateTx) JSON() (string, error) {
 	return string(output), err
 }
 
-// EstimateFee estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
-func (tx *NameUpdateTx) EstimateFee() (*utils.BigInt, error) {
-	feeRlp, err := rlp.EncodeToBytes(tx.Fee)
+// sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
+func (tx *NameUpdateTx) sizeEstimate() (int, error) {
+	return calcSizeEstimate(tx, &tx.Fee)
+}
+
+// FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
+func (tx *NameUpdateTx) FeeEstimate() (*utils.BigInt, error) {
+	txLenEstimated, err := tx.sizeEstimate()
 	if err != nil {
 		return utils.NewBigInt(), err
 	}
-	return calcFeeStd(tx, len(feeRlp))
+	estimatedFee := calcFeeStd(tx, txLenEstimated)
+	return estimatedFee, nil
 }
 
 // NewNameUpdateTx is a constructor for a NameUpdateTx struct
@@ -473,13 +501,19 @@ func (tx *NameRevokeTx) JSON() (string, error) {
 	return string(output), err
 }
 
-// EstimateFee estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
-func (tx *NameRevokeTx) EstimateFee() (*utils.BigInt, error) {
-	feeRlp, err := rlp.EncodeToBytes(tx.Fee)
+// sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
+func (tx *NameRevokeTx) sizeEstimate() (int, error) {
+	return calcSizeEstimate(tx, &tx.Fee)
+}
+
+// FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
+func (tx *NameRevokeTx) FeeEstimate() (*utils.BigInt, error) {
+	txLenEstimated, err := tx.sizeEstimate()
 	if err != nil {
 		return utils.NewBigInt(), err
 	}
-	return calcFeeStd(tx, len(feeRlp))
+	estimatedFee := calcFeeStd(tx, txLenEstimated)
+	return estimatedFee, nil
 }
 
 // NewNameRevokeTx is a constructor for a NameRevokeTx struct
@@ -546,13 +580,19 @@ func (tx *NameTransferTx) JSON() (string, error) {
 	return string(output), err
 }
 
-// EstimateFee estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
-func (tx *NameTransferTx) EstimateFee() (*utils.BigInt, error) {
-	feeRlp, err := rlp.EncodeToBytes(tx.Fee)
+// sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
+func (tx *NameTransferTx) sizeEstimate() (int, error) {
+	return calcSizeEstimate(tx, &tx.Fee)
+}
+
+// FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
+func (tx *NameTransferTx) FeeEstimate() (*utils.BigInt, error) {
+	txLenEstimated, err := tx.sizeEstimate()
 	if err != nil {
 		return utils.NewBigInt(), err
 	}
-	return calcFeeStd(tx, len(feeRlp))
+	estimatedFee := calcFeeStd(tx, txLenEstimated)
+	return estimatedFee, nil
 }
 
 // NewNameTransferTx is a constructor for a NameTransferTx struct
