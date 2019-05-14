@@ -28,11 +28,12 @@ type AensConfig struct {
 
 // ContractConfig configurations for contracts
 type ContractConfig struct {
-	Gas        uint64 `json:"gas" yaml:"gas" mapstructure:"gas"`
-	GasPrice   uint64 `json:"gas_price" yaml:"gas_price" mapstructure:"gas_price"`
-	Deposit    uint64 `json:"deposit" yaml:"deposit" mapstructure:"deposit"`
-	VMVersion  uint64 `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
-	ABIVersion uint64 `json:"abi_version" yaml:"abi_version" mapstructure:"abi_version"`
+	Gas        utils.BigInt `json:"gas" yaml:"gas" mapstructure:"gas"`
+	GasPrice   utils.BigInt `json:"gas_price" yaml:"gas_price" mapstructure:"gas_price"`
+	Amount     utils.BigInt `json:"amount" yaml:"amount" mapstructure:"amount"`
+	Deposit    uint64       `json:"deposit" yaml:"deposit" mapstructure:"deposit"`
+	VMVersion  uint64       `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
+	ABIVersion uint64       `json:"abi_version" yaml:"abi_version" mapstructure:"abi_version"`
 }
 
 // OracleConfig configurations for contracts
@@ -108,11 +109,12 @@ var Config = ProfileConfig{
 			UpdateFee:   *utils.RequireBigIntFromString("100000000000000"),
 		},
 		Contracts: ContractConfig{
-			Gas:        1e9,
-			GasPrice:   1e9,
+			Gas:        *utils.NewBigIntFromUint64(1e9),
+			GasPrice:   *utils.NewBigIntFromUint64(1e9),
+			Amount:     *utils.NewBigInt(),
 			Deposit:    0,
-			VMVersion:  0,
-			ABIVersion: 2,
+			VMVersion:  3,
+			ABIVersion: 1,
 		},
 		Oracles: OracleConfig{
 			QueryFee:         *utils.NewBigIntFromUint64(0),
