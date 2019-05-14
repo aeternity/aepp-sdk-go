@@ -910,6 +910,15 @@ type ContractCreateTx struct {
 	CallData     string
 }
 
+func encodeVMABI(VMVersion, ABIVersion uint64) []byte {
+	vmBytes := utils.NewBigIntFromUint64(VMVersion).Bytes()
+	abiBytes := utils.NewBigIntFromUint64(ABIVersion).Bytes()
+	vmAbiBytes := []byte{}
+	vmAbiBytes = append(vmAbiBytes, vmBytes...)
+	vmAbiBytes = append(vmAbiBytes, leftPadByteSlice(2, abiBytes)...)
+	return vmAbiBytes
+}
+
 // RLP returns a byte serialized representation
 func (tx *ContractCreateTx) RLP() (rlpRawMsg []byte, err error) {
 	aID, err := buildIDTag(IDTagAccount, tx.OwnerID)
@@ -931,13 +940,13 @@ func (tx *ContractCreateTx) RLP() (rlpRawMsg []byte, err error) {
 		aID,
 		tx.AccountNonce,
 		codeBinary,
-		tx.VMVersion+tx.AbiVersion, // TODO: AbiVersion should default to 2 if not specified, but the constructor always forces it to be specified anyway!@!
+		encodeVMABI(tx.VMVersion, tx.AbiVersion),
 		tx.Fee.Int,
 		tx.TTL,
 		tx.Deposit,
 		tx.Amount.Int,
-		tx.Gas,
-		tx.GasPrice,
+		tx.Gas.Int,
+		tx.GasPrice.Int,
 		callDataBinary,
 	)
 	return
@@ -976,6 +985,11 @@ func (tx *ContractCreateTx) FeeEstimate() (*utils.BigInt, error) {
 	}
 	estimatedFee := calcFeeContract(&tx.Gas, 5, txLenEstimated)
 	return estimatedFee, nil
+}
+
+// ContractID returns the ct_ ID that this transaction would produce, which depends on the OwnerID and AccountNonce.
+func (tx *ContractCreateTx) ContractID() (string, error) {
+	return buildContractID(tx.OwnerID, tx.AccountNonce)
 }
 
 // NewContractCreateTx is a constructor for a ContractCreateTx struct
@@ -1053,9 +1067,9 @@ func (tx *ContractCallTx) RLP() (rlpRawMsg []byte, err error) {
 		ctID,
 		tx.Fee.Int,
 		tx.TTL,
-		tx.Amount,
-		tx.Gas,
-		tx.GasPrice,
+		tx.Amount.Int,
+		tx.Gas.Int,
+		tx.GasPrice.Int,
 		callDataBinary,
 	)
 	return
