@@ -326,3 +326,65 @@ func Test_leftPadByteSlice(t *testing.T) {
 		})
 	}
 }
+
+func Test_buildContractID(t *testing.T) {
+	type args struct {
+		sender      string
+		senderNonce uint64
+	}
+	tests := []struct {
+		name     string
+		args     args
+		wantCtID string
+		wantErr  bool
+	}{
+		{
+			name: "Genesis address, nonce 1",
+			args: args{
+				sender:      "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+				senderNonce: uint64(1),
+			},
+			wantCtID: "ct_2pfWWzeRzWSdm68HXZJn61KhxdsBA46wzYgvo1swkdJZij1rKm",
+			wantErr:  false,
+		},
+		{
+			name: "Genesis address, nonce 5",
+			args: args{
+				sender:      "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+				senderNonce: uint64(5),
+			},
+			wantCtID: "ct_223vybq7Ljr2VKaVhRyveFoSJMBZ8CyBCpPAFZ1BxgvMXggAA",
+			wantErr:  false,
+		},
+		{
+			name: "Genesis address, nonce 256",
+			args: args{
+				sender:      "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+				senderNonce: uint64(256),
+			},
+			wantCtID: "ct_FT6XgwatDufGJ2RUaLkMmnebfVHNju5YK7cbjnbtby8LwdcJB",
+			wantErr:  false,
+		},
+		{
+			name: "Genesis address, nonce 65536",
+			args: args{
+				sender:      "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+				senderNonce: uint64(65536),
+			},
+			wantCtID: "ct_vuq6dPXiAgMuGfVvFveL6j3kEPJC32orJmaG5zL1oHgT3WCLB",
+			wantErr:  false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotCtID, err := buildContractID(tt.args.sender, tt.args.senderNonce)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("buildContractID() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if gotCtID != tt.wantCtID {
+				t.Errorf("buildContractID() = %v, want %v", gotCtID, tt.wantCtID)
+			}
+		})
+	}
+}
