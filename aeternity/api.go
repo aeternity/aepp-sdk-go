@@ -225,3 +225,20 @@ func getOracleQueriesByPubkey(node *apiclient.Node, pubkey string) (oracleQuerie
 	oracleQueries = r.Payload
 	return
 }
+
+// APIGetContractByID gets a contract by ct_ ID
+func (ae *Ae) APIGetContractByID(ctID string) (contract *models.ContractObject, err error) {
+	return getContractByID(ae.Node, ctID)
+}
+
+// getContractByID get a contract by ct_ ID
+func getContractByID(node *apiclient.Node, ctID string) (contract *models.ContractObject, err error) {
+	p := external.NewGetContractParams().WithPubkey(ctID)
+	r, err := node.External.GetContract(p)
+	if err != nil {
+		err = fmt.Errorf("Error: %v", getErrorReason(err))
+		return
+	}
+	contract = r.Payload
+	return
+}
