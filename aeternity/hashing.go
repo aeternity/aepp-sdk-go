@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
+	"math/big"
 	"strings"
 
 	"github.com/aeternity/aepp-sdk-go/rlp"
@@ -112,6 +113,25 @@ func buildOracleQueryID(sender string, senderNonce uint64, recipient string) (id
 	}
 	id = Encode(PrefixOracleQueryID, hashedQueryID)
 	return
+}
+
+func buildContractID(sender string, senderNonce uint64) (ctID string, err error) {
+	senderBin, err := Decode(sender)
+	if err != nil {
+		return ctID, err
+	}
+
+	l := big.Int{}
+	l.SetUint64(senderNonce)
+
+	ctIDUnhashed := append(senderBin, l.Bytes()...)
+	ctIDHashed, err := hash(ctIDUnhashed)
+	if err != nil {
+		return ctID, err
+	}
+
+	ctID = Encode(PrefixContractPubkey, ctIDHashed)
+	return ctID, err
 }
 
 // Namehash calculate the Namehash of a string
