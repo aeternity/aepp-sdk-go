@@ -29,7 +29,7 @@ func TestSpendTxWithNode(t *testing.T) {
 
 	aeternity.Config.Node.URL = nodeURL
 	aeternity.Config.Node.NetworkID = networkID
-	aeCli := aeternity.NewCli(aeternity.Config.Node.URL, false)
+	aeCli := aeternity.NewClient(aeternity.Config.Node.URL, false)
 
 	amount := utils.RequireBigIntFromString("18446744073709551615") // max uint64
 	fee := utils.NewBigIntFromUint64(uint64(2e13))
@@ -85,7 +85,7 @@ func TestSpendTxWithNode(t *testing.T) {
 	}
 }
 
-func signBroadcast(tx string, acc *aeternity.Account, aeClient *aeternity.Ae) (hash string, err error) {
+func signBroadcast(tx string, acc *aeternity.Account, aeClient *aeternity.Client) (hash string, err error) {
 	signedTxStr, hash, _, err := aeternity.SignEncodeTxStr(acc, tx, aeternity.Config.Node.NetworkID)
 	if err != nil {
 		fmt.Println(err)
@@ -101,7 +101,7 @@ func signBroadcast(tx string, acc *aeternity.Account, aeClient *aeternity.Ae) (h
 
 }
 
-func getHeight(aeClient *aeternity.Ae) (h uint64) {
+func getHeight(aeClient *aeternity.Client) (h uint64) {
 	h, err := aeClient.APIGetHeight()
 	if err != nil {
 		fmt.Println("Could not retrieve chain height")
@@ -111,7 +111,7 @@ func getHeight(aeClient *aeternity.Ae) (h uint64) {
 	return
 }
 
-func waitForTransaction(aeClient *aeternity.Ae, hash string) (err error) {
+func waitForTransaction(aeClient *aeternity.Client, hash string) (err error) {
 	height := getHeight(aeClient)
 	fmt.Println("Waiting for Transaction...")
 	height, blockHash, microBlockHash, _, err := aeClient.WaitForTransactionUntilHeight(height+10, hash)
@@ -123,7 +123,7 @@ func waitForTransaction(aeClient *aeternity.Ae, hash string) (err error) {
 	return nil
 }
 
-func getNameEntry(aeClient *aeternity.Ae, name string) (responseJSON string, err error) {
+func getNameEntry(aeClient *aeternity.Client, name string) (responseJSON string, err error) {
 	response, err := aeClient.APIGetNameEntryByName(name)
 	if err != nil {
 		fmt.Println(err)
@@ -141,7 +141,7 @@ func TestAENSWorkflow(t *testing.T) {
 		fmt.Println(err)
 		return
 	}
-	aeClient := aeternity.NewCli(nodeURL, false).WithAccount(acc)
+	aeClient := aeternity.NewClient(nodeURL, false).WithAccount(acc)
 	aeternity.Config.Node.NetworkID = networkID
 	aeternity.Config.Client.Fee = *utils.RequireBigIntFromString("100000000000000")
 
@@ -232,7 +232,7 @@ func TestAENSWorkflow(t *testing.T) {
 	_ = waitForTransaction(aeClient, hash)
 
 	// Receiver updates the name, makes it point to himself
-	aeClient2 := aeternity.NewCli(nodeURL, false).WithAccount(acc2)
+	aeClient2 := aeternity.NewClient(nodeURL, false).WithAccount(acc2)
 	fmt.Println("NameUpdateTx Signed By Recipient")
 	updateTx2, err := aeClient2.Aens.NameUpdateTx(name, acc2.Address)
 	updateTx2Str, _ := aeternity.BaseEncodeTx(&updateTx2)
@@ -287,7 +287,7 @@ func TestOracleWorkflow(t *testing.T) {
 		return
 	}
 	aeternity.Config.Node.NetworkID = networkID
-	aeClient := aeternity.NewCli(nodeURL, false).WithAccount(acc)
+	aeClient := aeternity.NewClient(nodeURL, false).WithAccount(acc)
 
 	fmt.Println("OracleRegisterTx")
 	queryFee := utils.NewBigIntFromUint64(1000)
@@ -368,7 +368,7 @@ func TestContracts(t *testing.T) {
 		return
 	}
 	aeternity.Config.Node.NetworkID = networkID
-	aeClient := aeternity.NewCli(nodeURL, false).WithAccount(acc)
+	aeClient := aeternity.NewClient(nodeURL, false).WithAccount(acc)
 
 	ttl, nonce, _ := aeClient.GetTTLNonce(acc.Address, aeternity.Config.Client.TTL)
 	code := "cb_+QP1RgKgpVq1Ib2r2ug+UktHvfWSQ8P35HJQHM6qikqBu1DwgtT5Avv5ASqgaPJnYzj/UIg5q6R3Se/6i+h+8oTyB/s9mZhwHNU4h8WEbWFpbrjAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKD//////////////////////////////////////////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+QHLoLnJVvKLMUmp9Zh6pQXz2hsiCcxXOSNABiu2wb2fn5nqhGluaXS4YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//////////////////////////////////////////7kBQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEA//////////////////////////////////////////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA///////////////////////////////////////////uMxiAABkYgAAhJGAgIBRf7nJVvKLMUmp9Zh6pQXz2hsiCcxXOSNABiu2wb2fn5nqFGIAAMBXUIBRf2jyZ2M4/1CIOaukd0nv+ovofvKE8gf7PZmYcBzVOIfFFGIAAK9XUGABGVEAW2AAGVlgIAGQgVJgIJADYAOBUpBZYABRWVJgAFJgAPNbYACAUmAA81tZWWAgAZCBUmAgkANgABlZYCABkIFSYCCQA2ADgVKBUpBWW2AgAVFRWVCAkVBQgJBQkFZbUFCCkVBQYgAAjFaFMi4xLjBJtQib"

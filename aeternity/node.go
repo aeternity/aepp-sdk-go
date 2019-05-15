@@ -6,8 +6,8 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// Ae the aeternity client
-type Ae struct {
+// Client the aeternity client
+type Client struct {
 	*apiclient.Node
 	*Wallet
 	*Aens
@@ -17,13 +17,13 @@ type Ae struct {
 
 // Wallet high level abstraction for operation on a wallet
 type Wallet struct {
-	nodeClient *apiclient.Node
-	owner      *Account
+	Client *apiclient.Node
+	owner  *Account
 }
 
 // Aens abstractions for aens operations
 type Aens struct {
-	nodeClient   *apiclient.Node
+	Client       *apiclient.Node
 	owner        *Account
 	name         string
 	preClaimSalt []byte
@@ -31,45 +31,45 @@ type Aens struct {
 
 // Contract abstractions for contracts
 type Contract struct {
-	nodeClient *apiclient.Node
-	owner      *Account
-	source     string
+	Client *apiclient.Node
+	owner  *Account
+	source string
 }
 
 // Oracle abstractions for oracles
 type Oracle struct {
-	nodeClient *apiclient.Node
-	owner      *Account
+	Client *apiclient.Node
+	owner  *Account
 }
 
-// NewCli obtain a new nodeClient instance
-func NewCli(nodeURL string, debug bool) *Ae {
+// NewClient obtain a new nodeClient instance
+func NewClient(nodeURL string, debug bool) *Client {
 	// create the transport
 	host, schemas := urlComponents(nodeURL)
 	transport := httptransport.New(host, "/v2", schemas)
 	transport.SetDebug(debug)
 	// create the API client, with the transport
 	openAPIClient := apiclient.New(transport, strfmt.Default)
-	aecli := &Ae{
+	aecli := &Client{
 		Node: openAPIClient,
 		Wallet: &Wallet{
-			nodeClient: openAPIClient,
+			Client: openAPIClient,
 		},
 		Aens: &Aens{
-			nodeClient: openAPIClient,
+			Client: openAPIClient,
 		},
 		Contract: &Contract{
-			nodeClient: openAPIClient,
+			Client: openAPIClient,
 		},
 		Oracle: &Oracle{
-			nodeClient: openAPIClient,
+			Client: openAPIClient,
 		},
 	}
 	return aecli
 }
 
 // WithAccount associate a Account with the client
-func (ae *Ae) WithAccount(account *Account) *Ae {
+func (ae *Client) WithAccount(account *Account) *Client {
 	ae.Wallet.owner = account
 	ae.Aens.owner = account
 	ae.Contract.owner = account

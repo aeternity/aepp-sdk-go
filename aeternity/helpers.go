@@ -90,7 +90,7 @@ func waitForTransaction(nodeClient *apiclient.Node, txHash string) (blockHeight 
 }
 
 // BroadcastTransaction recalculates the transaction hash and sends the transaction to the node.
-func (ae *Ae) BroadcastTransaction(txSignedBase64 string) (err error) {
+func (ae *Client) BroadcastTransaction(txSignedBase64 string) (err error) {
 	// Get back to RLP to calculate txhash
 	txRLP, _ := Decode(txSignedBase64)
 
@@ -105,17 +105,17 @@ func (ae *Ae) BroadcastTransaction(txSignedBase64 string) (err error) {
 }
 
 // GetTTL returns the chain height + offset
-func (ae *Ae) GetTTL(offset uint64) (height uint64, err error) {
+func (ae *Client) GetTTL(offset uint64) (height uint64, err error) {
 	return getTTL(ae.Node, offset)
 }
 
 // GetNextNonce retrieves the current accountNonce for an account + 1
-func (ae *Ae) GetNextNonce(accountID string) (nextNonce uint64, err error) {
+func (ae *Client) GetNextNonce(accountID string) (nextNonce uint64, err error) {
 	return getNextNonce(ae.Node, accountID)
 }
 
 // PrintGenerationByHeight utility function to print a generation by it's height
-func (ae *Ae) PrintGenerationByHeight(height uint64) {
+func (ae *Client) PrintGenerationByHeight(height uint64) {
 	p := external.NewGetGenerationByHeightParams().WithHeight(height)
 	if r, err := ae.External.GetGenerationByHeight(p); err == nil {
 		PrintObject("generation", r.Payload)
@@ -147,7 +147,7 @@ func (ae *Ae) PrintGenerationByHeight(height uint64) {
 }
 
 // WaitForTransactionUntilHeight waits for a transaction until heightLimit (inclusive) is reached
-func (ae *Ae) WaitForTransactionUntilHeight(height uint64, txHash string) (blockHeight uint64, blockHash, microBlockHash string, tx *models.GenericSignedTx, err error) {
+func (ae *Client) WaitForTransactionUntilHeight(height uint64, txHash string) (blockHeight uint64, blockHash, microBlockHash string, tx *models.GenericSignedTx, err error) {
 	kb, err := getCurrentKeyBlock(ae.Node)
 	if err != nil {
 		return
@@ -213,14 +213,14 @@ Main:
 }
 
 // GetTTLNonce is a convenience function that combines GetTTL() and GetNextNonce()
-func (ae *Ae) GetTTLNonce(accountID string, offset uint64) (txTTL, accountNonce uint64, err error) {
+func (ae *Client) GetTTLNonce(accountID string, offset uint64) (txTTL, accountNonce uint64, err error) {
 	return getTTLNonce(ae.Node, accountID, offset)
 }
 
 // NamePreclaimTx creates a name preclaim transaction and salt (required for claiming)
 // It should return the Tx struct, not the base64 encoded RLP, to ease subsequent inspection.
 func (n *Aens) NamePreclaimTx(name string, fee utils.BigInt) (tx NamePreclaimTx, nameSalt *utils.BigInt, err error) {
-	txTTL, accountNonce, err := getTTLNonce(n.nodeClient, n.owner.Address, Config.Client.TTL)
+	txTTL, accountNonce, err := getTTLNonce(n.Client, n.owner.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -243,7 +243,7 @@ func (n *Aens) NamePreclaimTx(name string, fee utils.BigInt) (tx NamePreclaimTx,
 
 // NameClaimTx creates a claim transaction
 func (n *Aens) NameClaimTx(name string, nameSalt utils.BigInt, fee utils.BigInt) (tx NameClaimTx, err error) {
-	txTTL, accountNonce, err := getTTLNonce(n.nodeClient, n.owner.Address, Config.Client.TTL)
+	txTTL, accountNonce, err := getTTLNonce(n.Client, n.owner.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -256,13 +256,13 @@ func (n *Aens) NameClaimTx(name string, nameSalt utils.BigInt, fee utils.BigInt)
 
 // NameUpdateTx perform a name update
 func (n *Aens) NameUpdateTx(name string, targetAddress string) (tx NameUpdateTx, err error) {
-	txTTL, accountNonce, err := getTTLNonce(n.nodeClient, n.owner.Address, Config.Client.TTL)
+	txTTL, accountNonce, err := getTTLNonce(n.Client, n.owner.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
 
 	encodedNameHash := Encode(PrefixName, Namehash(name))
-	absNameTTL, err := getTTL(n.nodeClient, Config.Client.Names.NameTTL)
+	absNameTTL, err := getTTL(n.Client, Config.Client.Names.NameTTL)
 	if err != nil {
 		return NameUpdateTx{}, err
 	}
@@ -274,7 +274,7 @@ func (n *Aens) NameUpdateTx(name string, targetAddress string) (tx NameUpdateTx,
 
 // NameTransferTx transfer a name to another owner
 func (n *Aens) NameTransferTx(name string, recipientAddress string) (tx NameTransferTx, err error) {
-	txTTL, accountNonce, err := getTTLNonce(n.nodeClient, n.owner.Address, Config.Client.TTL)
+	txTTL, accountNonce, err := getTTLNonce(n.Client, n.owner.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -287,7 +287,7 @@ func (n *Aens) NameTransferTx(name string, recipientAddress string) (tx NameTran
 
 // NameRevokeTx revoke a name
 func (n *Aens) NameRevokeTx(name string, recipientAddress string) (tx NameRevokeTx, err error) {
-	txTTL, accountNonce, err := getTTLNonce(n.nodeClient, n.owner.Address, Config.Client.TTL)
+	txTTL, accountNonce, err := getTTLNonce(n.Client, n.owner.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -300,7 +300,7 @@ func (n *Aens) NameRevokeTx(name string, recipientAddress string) (tx NameRevoke
 
 // OracleRegisterTx create a new oracle
 func (o *Oracle) OracleRegisterTx(querySpec, responseSpec string, queryFee utils.BigInt, oracleTTLType, oracleTTLValue, abiVersion uint64, vmVersion uint64) (tx OracleRegisterTx, err error) {
-	ttl, nonce, err := getTTLNonce(o.nodeClient, o.owner.Address, Config.Client.TTL)
+	ttl, nonce, err := getTTLNonce(o.Client, o.owner.Address, Config.Client.TTL)
 	if err != nil {
 		return OracleRegisterTx{}, err
 	}
@@ -311,7 +311,7 @@ func (o *Oracle) OracleRegisterTx(querySpec, responseSpec string, queryFee utils
 
 // OracleExtendTx extend the lifetime of an existing oracle
 func (o *Oracle) OracleExtendTx(oracleID string, ttlType, ttlValue uint64) (tx OracleExtendTx, err error) {
-	ttl, nonce, err := getTTLNonce(o.nodeClient, o.owner.Address, Config.Client.TTL)
+	ttl, nonce, err := getTTLNonce(o.Client, o.owner.Address, Config.Client.TTL)
 	if err != nil {
 		return OracleExtendTx{}, err
 	}
@@ -322,7 +322,7 @@ func (o *Oracle) OracleExtendTx(oracleID string, ttlType, ttlValue uint64) (tx O
 
 // OracleQueryTx ask something of an oracle
 func (o *Oracle) OracleQueryTx(OracleID, Query string, QueryFee utils.BigInt, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64) (tx OracleQueryTx, err error) {
-	ttl, nonce, err := getTTLNonce(o.nodeClient, o.owner.Address, Config.Client.TTL)
+	ttl, nonce, err := getTTLNonce(o.Client, o.owner.Address, Config.Client.TTL)
 	if err != nil {
 		return OracleQueryTx{}, err
 	}
@@ -333,7 +333,7 @@ func (o *Oracle) OracleQueryTx(OracleID, Query string, QueryFee utils.BigInt, Qu
 
 // OracleRespondTx the oracle responds by sending this transaction
 func (o *Oracle) OracleRespondTx(OracleID string, QueryID string, Response string, TTLType uint64, TTLValue uint64) (tx OracleRespondTx, err error) {
-	ttl, nonce, err := getTTLNonce(o.nodeClient, o.owner.Address, Config.Client.TTL)
+	ttl, nonce, err := getTTLNonce(o.Client, o.owner.Address, Config.Client.TTL)
 	if err != nil {
 		return OracleRespondTx{}, err
 	}
