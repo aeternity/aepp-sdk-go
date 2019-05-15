@@ -916,7 +916,7 @@ func TestContractCallTx_RLP(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "Basic contract call tx",
+			name: "Minerva (AbiVersion 3)",
 			fields: fields{
 				CallerID:     "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
 				AccountNonce: uint64(1),
@@ -924,13 +924,31 @@ func TestContractCallTx_RLP(t *testing.T) {
 				Amount:       *utils.NewBigIntFromUint64(10),
 				Gas:          *utils.NewBigIntFromUint64(10),
 				GasPrice:     *utils.NewBigIntFromUint64(10),
-				AbiVersion:   uint64(0),
-				VMVersion:    uint64(0),
+				AbiVersion:   uint64(3),
+				VMVersion:    uint64(1),
 				CallData:     "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACDiIx1s38k5Ft5Ms6mFe/Zc9A/CVvShSYs/fnyYDBmTRAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACo7j+li",
 				Fee:          Config.Client.Fee,
 				TTL:          Config.Client.TTL,
 			},
-			wantTx:  "you tell me",
+			wantTx:  "tx_+NcrAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vMBoQXv7ERRuvBfaps6b3yVUqmUUEmGvanaJbGAxkh6t034wwOGteYg9IAAggH0CgoKuIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIOIjHWzfyTkW3kyzqYV79lz0D8JW9KFJiz9+fJgMGZNEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKk9Ku98=",
+			wantErr: false,
+		},
+		{
+			name: "Fortuna (AbiVersion 4), with Config defaults for gas etc",
+			fields: fields{
+				CallerID:     "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+				AccountNonce: uint64(2),
+				ContractID:   "ct_2pfWWzeRzWSdm68HXZJn61KhxdsBA46wzYgvo1swkdJZij1rKm",
+				Amount:       Config.Client.Contracts.Amount,
+				Gas:          Config.Client.Contracts.Gas,
+				GasPrice:     Config.Client.Contracts.GasPrice,
+				AbiVersion:   uint64(4),
+				VMVersion:    uint64(1),
+				CallData:     "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACDiIx1s38k5Ft5Ms6mFe/Zc9A/CVvShSYs/fnyYDBmTRAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACo7j+li",
+				Fee:          Config.Client.Fee,
+				TTL:          Config.Client.TTL,
+			},
+			wantTx:  "tx_+N8rAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vMCoQXv7ERRuvBfaps6b3yVUqmUUEmGvanaJbGAxkh6t034wwSGteYg9IAAggH0AIQ7msoAhDuaygC4gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAg4iMdbN/JORbeTLOphXv2XPQPwlb0oUmLP358mAwZk0QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAqty+KkQ==",
 			wantErr: false,
 		},
 	}

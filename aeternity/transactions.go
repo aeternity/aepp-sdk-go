@@ -1011,6 +1011,7 @@ func NewContractCreateTx(OwnerID string, AccountNonce uint64, Code string, VMVer
 }
 
 // ContractCallTx represents calling an existing smart contract
+// VMVersion is not included in RLP serialized representation (implied by contract type already)
 type ContractCallTx struct {
 	CallerID     string
 	AccountNonce uint64
@@ -1065,6 +1066,7 @@ func (tx *ContractCallTx) RLP() (rlpRawMsg []byte, err error) {
 		cID,
 		tx.AccountNonce,
 		ctID,
+		tx.AbiVersion,
 		tx.Fee.Int,
 		tx.TTL,
 		tx.Amount.Int,
