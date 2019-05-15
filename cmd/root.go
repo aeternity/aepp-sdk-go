@@ -49,8 +49,8 @@ func Execute(v string) {
 // you don't have to maintain a aeCli global variable (which needs the
 // config vars to be read immediately, with this helper function you can
 // defer the reading of the variables until the subcommand's execution)
-func NewAeCli() *aeternity.Ae {
-	return aeternity.NewCli(aeternity.Config.Node.URL, debug)
+func NewAeCli() *aeternity.Client {
+	return aeternity.NewClient(aeternity.Config.Node.URL, debug)
 }
 
 func init() {

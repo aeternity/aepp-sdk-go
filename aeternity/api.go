@@ -12,7 +12,7 @@ import (
 // Logic implementation is handled by the unexported functions.
 
 // APIGetStatus post transaction
-func (ae *Ae) APIGetStatus() (status *models.Status, err error) {
+func (ae *Client) APIGetStatus() (status *models.Status, err error) {
 	return getStatus(ae.Node)
 }
 
@@ -26,7 +26,7 @@ func getStatus(node *apiclient.Node) (status *models.Status, err error) {
 }
 
 // APIPostTransaction post transaction
-func (ae *Ae) APIPostTransaction(signedEncodedTx, signedEncodedTxHash string) (err error) {
+func (ae *Client) APIPostTransaction(signedEncodedTx, signedEncodedTxHash string) (err error) {
 	return postTransaction(ae.Node, signedEncodedTx, signedEncodedTxHash)
 }
 
@@ -46,12 +46,12 @@ func postTransaction(node *apiclient.Node, signedEncodedTx, signedEncodedTxHash 
 }
 
 // APIGetTopBlock get the top block of the chain
-func (ae *Ae) APIGetTopBlock() (kb *models.KeyBlockOrMicroBlockHeader, err error) {
+func (ae *Client) APIGetTopBlock() (kb *models.KeyBlockOrMicroBlockHeader, err error) {
 	return getTopBlock(ae.Node)
 }
 
 // APIGetHeight get the height of the chain
-func (ae *Ae) APIGetHeight() (height uint64, err error) {
+func (ae *Client) APIGetHeight() (height uint64, err error) {
 	tb, err := getTopBlock(ae.Node)
 	if err != nil {
 		return
@@ -77,7 +77,7 @@ func getTopBlock(node *apiclient.Node) (kb *models.KeyBlockOrMicroBlockHeader, e
 }
 
 // APIGetCurrentKeyBlock get current key block
-func (ae *Ae) APIGetCurrentKeyBlock() (kb *models.KeyBlock, err error) {
+func (ae *Client) APIGetCurrentKeyBlock() (kb *models.KeyBlock, err error) {
 	return getCurrentKeyBlock(ae.Node)
 }
 
@@ -92,7 +92,7 @@ func getCurrentKeyBlock(node *apiclient.Node) (kb *models.KeyBlock, err error) {
 }
 
 // APIGetAccount return the account
-func (ae *Ae) APIGetAccount(accountID string) (account *models.Account, err error) {
+func (ae *Client) APIGetAccount(accountID string) (account *models.Account, err error) {
 	return getAccount(ae.Node, accountID)
 }
 
@@ -110,7 +110,7 @@ func getAccount(node *apiclient.Node, accountID string) (account *models.Account
 }
 
 // APIGetNameEntryByName return the name entry
-func (ae *Ae) APIGetNameEntryByName(name string) (nameEntry *models.NameEntry, err error) {
+func (ae *Client) APIGetNameEntryByName(name string) (nameEntry *models.NameEntry, err error) {
 	return getNameEntryByName(ae.Node, name)
 }
 
@@ -128,7 +128,7 @@ func getNameEntryByName(node *apiclient.Node, name string) (nameEntry *models.Na
 }
 
 // APIGetMicroBlockTransactionsByHash get the transactions of a microblock
-func (ae *Ae) APIGetMicroBlockTransactionsByHash(microBlockID string) (txs *models.GenericTxs, err error) {
+func (ae *Client) APIGetMicroBlockTransactionsByHash(microBlockID string) (txs *models.GenericTxs, err error) {
 	return getMicroBlockTransactionsByHash(ae.Node, microBlockID)
 }
 
@@ -144,7 +144,7 @@ func getMicroBlockTransactionsByHash(node *apiclient.Node, microBlockID string) 
 }
 
 // APIGetMicroBlockHeaderByHash get the header of a micro block
-func (ae *Ae) APIGetMicroBlockHeaderByHash(microBlockID string) (txs *models.MicroBlockHeader, err error) {
+func (ae *Client) APIGetMicroBlockHeaderByHash(microBlockID string) (txs *models.MicroBlockHeader, err error) {
 	return getMicroBlockHeaderByHash(ae.Node, microBlockID)
 }
 
@@ -160,7 +160,7 @@ func getMicroBlockHeaderByHash(node *apiclient.Node, microBlockID string) (txs *
 }
 
 // APIGetKeyBlockByHash get a key block by its hash
-func (ae *Ae) APIGetKeyBlockByHash(keyBlockID string) (txs *models.KeyBlock, err error) {
+func (ae *Client) APIGetKeyBlockByHash(keyBlockID string) (txs *models.KeyBlock, err error) {
 	return getKeyBlockByHash(ae.Node, keyBlockID)
 }
 
@@ -176,7 +176,7 @@ func getKeyBlockByHash(node *apiclient.Node, keyBlockID string) (txs *models.Key
 }
 
 // APIGetTransactionByHash get a transaction by it's hash
-func (ae *Ae) APIGetTransactionByHash(txHash string) (tx *models.GenericSignedTx, err error) {
+func (ae *Client) APIGetTransactionByHash(txHash string) (tx *models.GenericSignedTx, err error) {
 	return getTransactionByHash(ae.Node, txHash)
 }
 
@@ -193,7 +193,7 @@ func getTransactionByHash(node *apiclient.Node, txHash string) (tx *models.Gener
 }
 
 // APIGetOracleByPubkey get an oracle by it's public key
-func (ae *Ae) APIGetOracleByPubkey(pubkey string) (oracle *models.RegisteredOracle, err error) {
+func (ae *Client) APIGetOracleByPubkey(pubkey string) (oracle *models.RegisteredOracle, err error) {
 	return getOracleByPubkey(ae.Node, pubkey)
 }
 
@@ -210,7 +210,7 @@ func getOracleByPubkey(node *apiclient.Node, pubkey string) (oracle *models.Regi
 }
 
 // APIGetOracleQueriesByPubkey get a list of queries made to a particular oracle
-func (ae *Ae) APIGetOracleQueriesByPubkey(pubkey string) (oracleQueries *models.OracleQueries, err error) {
+func (ae *Client) APIGetOracleQueriesByPubkey(pubkey string) (oracleQueries *models.OracleQueries, err error) {
 	return getOracleQueriesByPubkey(ae.Node, pubkey)
 }
 
@@ -227,7 +227,7 @@ func getOracleQueriesByPubkey(node *apiclient.Node, pubkey string) (oracleQuerie
 }
 
 // APIGetContractByID gets a contract by ct_ ID
-func (ae *Ae) APIGetContractByID(ctID string) (contract *models.ContractObject, err error) {
+func (ae *Client) APIGetContractByID(ctID string) (contract *models.ContractObject, err error) {
 	return getContractByID(ae.Node, ctID)
 }
 
