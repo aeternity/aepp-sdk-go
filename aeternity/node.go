@@ -6,40 +6,36 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// Client the aeternity client
+// Client is the HTTP connection to the aeternity node
 type Client struct {
 	*apiclient.Node
-	*Wallet
-	*Aens
-	*Contract
-	*Oracle
 }
 
-// Wallet high level abstraction for operation on a wallet
+// Wallet is a account-specific helper that stores state relevant to spending operations
 type Wallet struct {
-	Client *apiclient.Node
-	owner  *Account
+	Client  *Client
+	Account *Account
 }
 
-// Aens abstractions for aens operations
+// Aens ais a account-specific helper that stores state relevant to AENS operations
 type Aens struct {
-	Client       *apiclient.Node
-	owner        *Account
+	Client       *Client
+	Account      *Account
 	name         string
 	preClaimSalt []byte
 }
 
-// Contract abstractions for contracts
+// Contract is a account-specific helper that stores state relevant to smtart contract execution
 type Contract struct {
-	Client *apiclient.Node
-	owner  *Account
-	source string
+	Client  *Client
+	Account *Account
+	source  string
 }
 
-// Oracle abstractions for oracles
+// Oracle is a account-specific helper that stores state relevant to oracles
 type Oracle struct {
-	Client *apiclient.Node
-	owner  *Account
+	Client  *Client
+	Account *Account
 }
 
 // NewClient obtain a new nodeClient instance
@@ -52,27 +48,6 @@ func NewClient(nodeURL string, debug bool) *Client {
 	openAPIClient := apiclient.New(transport, strfmt.Default)
 	aecli := &Client{
 		Node: openAPIClient,
-		Wallet: &Wallet{
-			Client: openAPIClient,
-		},
-		Aens: &Aens{
-			Client: openAPIClient,
-		},
-		Contract: &Contract{
-			Client: openAPIClient,
-		},
-		Oracle: &Oracle{
-			Client: openAPIClient,
-		},
 	}
 	return aecli
-}
-
-// WithAccount associate a Account with the client
-func (ae *Client) WithAccount(account *Account) *Client {
-	ae.Wallet.owner = account
-	ae.Aens.owner = account
-	ae.Contract.owner = account
-	ae.Oracle.owner = account
-	return ae
 }

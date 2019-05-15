@@ -141,13 +141,15 @@ func TestAENSWorkflow(t *testing.T) {
 		fmt.Println(err)
 		return
 	}
-	aeClient := aeternity.NewClient(nodeURL, false).WithAccount(acc)
+	aeClient := aeternity.NewClient(nodeURL, false)
+	aensAlice := aeternity.Aens{Client: aeClient, Account: acc}
+
 	aeternity.Config.Node.NetworkID = networkID
 	aeternity.Config.Client.Fee = *utils.RequireBigIntFromString("100000000000000")
 
 	// Preclaim the name
 	fmt.Println("PreclaimTx")
-	preclaimTx, salt, err := aeClient.Aens.NamePreclaimTx(name, aeternity.Config.Client.Fee)
+	preclaimTx, salt, err := aensAlice.NamePreclaimTx(name, aeternity.Config.Client.Fee)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -167,7 +169,7 @@ func TestAENSWorkflow(t *testing.T) {
 
 	// Claim the name
 	fmt.Println("NameClaimTx")
-	claimTx, err := aeClient.Aens.NameClaimTx(name, *salt, aeternity.Config.Client.Fee)
+	claimTx, err := aensAlice.NameClaimTx(name, *salt, aeternity.Config.Client.Fee)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -191,7 +193,7 @@ func TestAENSWorkflow(t *testing.T) {
 
 	// Update the name, make it point to something
 	fmt.Println("NameUpdateTx")
-	updateTx, err := aeClient.Aens.NameUpdateTx(name, acc.Address)
+	updateTx, err := aensAlice.NameUpdateTx(name, acc.Address)
 	updateTxStr, _ := aeternity.BaseEncodeTx(&updateTx)
 	fmt.Println("UpdateTx:", updateTxStr)
 
@@ -219,7 +221,7 @@ func TestAENSWorkflow(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	transferTx, err := aeClient.Aens.NameTransferTx(name, acc2.Address)
+	transferTx, err := aensAlice.NameTransferTx(name, acc2.Address)
 	transferTxStr, _ := aeternity.BaseEncodeTx(&transferTx)
 	fmt.Println("TransferTx:", transferTxStr)
 	hash, err = signBroadcast(transferTxStr, acc, aeClient)
@@ -232,9 +234,11 @@ func TestAENSWorkflow(t *testing.T) {
 	_ = waitForTransaction(aeClient, hash)
 
 	// Receiver updates the name, makes it point to himself
-	aeClient2 := aeternity.NewClient(nodeURL, false).WithAccount(acc2)
+	aeClient2 := aeternity.NewClient(nodeURL, false)
+	aensBob := aeternity.Aens{Client: aeClient, Account: acc2}
+
 	fmt.Println("NameUpdateTx Signed By Recipient")
-	updateTx2, err := aeClient2.Aens.NameUpdateTx(name, acc2.Address)
+	updateTx2, err := aensBob.NameUpdateTx(name, acc2.Address)
 	updateTx2Str, _ := aeternity.BaseEncodeTx(&updateTx2)
 	fmt.Println("UpdateTx:", updateTx2Str)
 
@@ -247,7 +251,7 @@ func TestAENSWorkflow(t *testing.T) {
 
 	// Revoke the name - shouldn't work because it is signed by the sender, who no longer owns the address
 	fmt.Println("NameRevokeTx")
-	revokeTx, err := aeClient.Aens.NameRevokeTx(name, acc.Address)
+	revokeTx, err := aensAlice.NameRevokeTx(name, acc.Address)
 	revokeTxStr, _ := aeternity.BaseEncodeTx(&revokeTx)
 	fmt.Println("RevokeTx:", revokeTxStr)
 	hash, err = signBroadcast(revokeTxStr, acc, aeClient)
@@ -266,7 +270,7 @@ func TestAENSWorkflow(t *testing.T) {
 
 	// Revoke the name - signed by the recipient
 	fmt.Println("NameRevokeTx Signed By Recipient")
-	revokeTx2, err := aeClient2.Aens.NameRevokeTx(name, acc2.Address)
+	revokeTx2, err := aensBob.NameRevokeTx(name, acc2.Address)
 	revokeTx2Str, _ := aeternity.BaseEncodeTx(&revokeTx2)
 	fmt.Println("RevokeTx Signed By Recipient:", revokeTx2Str)
 	hash, err = signBroadcast(revokeTx2Str, acc2, aeClient)
@@ -287,11 +291,13 @@ func TestOracleWorkflow(t *testing.T) {
 		return
 	}
 	aeternity.Config.Node.NetworkID = networkID
-	aeClient := aeternity.NewClient(nodeURL, false).WithAccount(acc)
+	aeClient := aeternity.NewClient(nodeURL, false)
+
+	oracleAlice := aeternity.Oracle{Client: aeClient, Account: acc}
 
 	fmt.Println("OracleRegisterTx")
 	queryFee := utils.NewBigIntFromUint64(1000)
-	oracleRegisterTx, err := aeClient.Oracle.OracleRegisterTx("hello", "helloback", *queryFee, 0, 100, 0, 0)
+	oracleRegisterTx, err := oracleAlice.OracleRegisterTx("hello", "helloback", *queryFee, 0, 100, 0, 0)
 	if err != nil {
 		t.Error(err)
 	}
@@ -313,7 +319,7 @@ func TestOracleWorkflow(t *testing.T) {
 	fmt.Println("OracleExtendTx")
 	// save the oracle's initial TTL so we can compare it with after OracleExtendTx
 	oracleTTL := *oracle.TTL
-	oracleExtendTx, err := aeClient.Oracle.OracleExtendTx(oraclePubKey, 0, 1000)
+	oracleExtendTx, err := oracleAlice.OracleExtendTx(oraclePubKey, 0, 1000)
 	if err != nil {
 		t.Error(err)
 	}
@@ -333,7 +339,7 @@ func TestOracleWorkflow(t *testing.T) {
 	}
 
 	fmt.Println("OracleQueryTx")
-	oracleQueryTx, err := aeClient.Oracle.OracleQueryTx(oraclePubKey, "How was your day?", *queryFee, 0, 100, 0, 100)
+	oracleQueryTx, err := oracleAlice.OracleQueryTx(oraclePubKey, "How was your day?", *queryFee, 0, 100, 0, 100)
 	if err != nil {
 		t.Error(err)
 	}
@@ -351,7 +357,7 @@ func TestOracleWorkflow(t *testing.T) {
 		t.Errorf("APIGetOracleQueriesByPubkey: %s", err)
 	}
 	oqID := string(oracleQueries.OracleQueries[0].ID)
-	oracleRespondTx, err := aeClient.Oracle.OracleRespondTx(oraclePubKey, oqID, "My day was fine thank you", 0, 100)
+	oracleRespondTx, err := oracleAlice.OracleRespondTx(oraclePubKey, oqID, "My day was fine thank you", 0, 100)
 	oracleRespondTxStr, _ := aeternity.BaseEncodeTx(&oracleRespondTx)
 	oracleRespondTxHash, err := signBroadcast(oracleRespondTxStr, acc, aeClient)
 	if err != nil {
@@ -368,7 +374,8 @@ func TestContracts(t *testing.T) {
 		return
 	}
 	aeternity.Config.Node.NetworkID = networkID
-	aeClient := aeternity.NewClient(nodeURL, false).WithAccount(acc)
+	aeClient := aeternity.NewClient(nodeURL, false)
+	// contractsAlice := aeternity.Contract{Client: aeClient, Owner: acc}
 
 	ttl, nonce, _ := aeClient.GetTTLNonce(acc.Address, aeternity.Config.Client.TTL)
 	code := "cb_+QP1RgKgpVq1Ib2r2ug+UktHvfWSQ8P35HJQHM6qikqBu1DwgtT5Avv5ASqgaPJnYzj/UIg5q6R3Se/6i+h+8oTyB/s9mZhwHNU4h8WEbWFpbrjAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKD//////////////////////////////////////////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+QHLoLnJVvKLMUmp9Zh6pQXz2hsiCcxXOSNABiu2wb2fn5nqhGluaXS4YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//////////////////////////////////////////7kBQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEA//////////////////////////////////////////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA///////////////////////////////////////////uMxiAABkYgAAhJGAgIBRf7nJVvKLMUmp9Zh6pQXz2hsiCcxXOSNABiu2wb2fn5nqFGIAAMBXUIBRf2jyZ2M4/1CIOaukd0nv+ovofvKE8gf7PZmYcBzVOIfFFGIAAK9XUGABGVEAW2AAGVlgIAGQgVJgIJADYAOBUpBZYABRWVJgAFJgAPNbYACAUmAA81tZWWAgAZCBUmAgkANgABlZYCABkIFSYCCQA2ADgVKBUpBWW2AgAVFRWVCAkVBQgJBQkFZbUFCCkVBQYgAAjFaFMi4xLjBJtQib"
