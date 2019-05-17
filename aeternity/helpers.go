@@ -341,6 +341,26 @@ func (o *Oracle) OracleRespondTx(OracleID string, QueryID string, Response strin
 	return tx, nil
 }
 
+func (c *Contract) ContractCreateTx(Code string, CallData string, VMVersion, AbiVersion, Deposit uint64, Amount, Gas, GasPrice, Fee utils.BigInt) (tx ContractCreateTx, err error) {
+	ttl, nonce, err := getTTLNonce(c.Client, c.Account.Address, Config.Client.TTL)
+	if err != nil {
+		return ContractCreateTx{}, err
+	}
+
+	tx = NewContractCreateTx(c.Account.Address, nonce, Code, VMVersion, AbiVersion, Deposit, Amount, Gas, GasPrice, Fee, ttl, CallData)
+	return tx, nil
+}
+
+func (c *Contract) ContractCallTx(ContractID, CallData string, VMVersion, AbiVersion uint64, Amount, Gas, GasPrice, Fee utils.BigInt) (tx ContractCallTx, err error) {
+	ttl, nonce, err := getTTLNonce(c.Client, c.Account.Address, Config.Client.TTL)
+	if err != nil {
+		return ContractCallTx{}, err
+	}
+
+	tx = NewContractCallTx(c.Account.Address, nonce, ContractID, Amount, Gas, GasPrice, AbiVersion, VMVersion, CallData, Fee, ttl)
+	return tx, nil
+}
+
 // StoreAccountToKeyStoreFile store an account to a json file
 func StoreAccountToKeyStoreFile(account *Account, password, walletName string) (filePath string, err error) {
 	// keystore will be saved in current directory

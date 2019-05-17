@@ -1091,3 +1091,19 @@ func (tx *ContractCallTx) FeeEstimate() (*utils.BigInt, error) {
 	estimatedFee := calcFeeContract(&tx.Gas, 30, txLenEstimated)
 	return estimatedFee, nil
 }
+
+func NewContractCallTx(CallerID string, AccountNonce uint64, ContractID string, Amount, Gas, GasPrice utils.BigInt, AbiVersion, VMVersion uint64, CallData string, Fee utils.BigInt, TTL uint64) ContractCallTx {
+	return ContractCallTx{
+		CallerID:     CallerID,
+		AccountNonce: AccountNonce,
+		ContractID:   ContractID,
+		Amount:       Amount,
+		Gas:          Gas,
+		GasPrice:     GasPrice,
+		AbiVersion:   AbiVersion,
+		VMVersion:    VMVersion,
+		CallData:     CallData,
+		Fee:          Fee,
+		TTL:          TTL,
+	}
+}
