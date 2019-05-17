@@ -983,6 +983,71 @@ func TestContractCallTx_RLP(t *testing.T) {
 	}
 }
 
+func TestContractCallTx_FeeEstimate(t *testing.T) {
+	type fields struct {
+		CallerID     string
+		AccountNonce uint64
+		ContractID   string
+		Amount       utils.BigInt
+		Gas          utils.BigInt
+		GasPrice     utils.BigInt
+		AbiVersion   uint64
+		VMVersion    uint64
+		CallData     string
+		Fee          utils.BigInt
+		TTL          uint64
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		want    *utils.BigInt
+		wantErr bool
+	}{
+		{
+			name: "Fortuna (AbiVersion 4), with fixed params for fee estimation",
+			fields: fields{
+				CallerID:     "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+				AccountNonce: uint64(2),
+				ContractID:   "ct_2pfWWzeRzWSdm68HXZJn61KhxdsBA46wzYgvo1swkdJZij1rKm",
+				Amount:       *utils.NewBigIntFromUint64(0),
+				Gas:          *utils.NewBigIntFromUint64(1e5),
+				GasPrice:     *utils.NewBigIntFromUint64(1e9),
+				AbiVersion:   uint64(4),
+				VMVersion:    uint64(1),
+				CallData:     "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACDiIx1s38k5Ft5Ms6mFe/Zc9A/CVvShSYs/fnyYDBmTRAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACo7j+li",
+				Fee:          *utils.NewBigIntFromUint64(2e9),
+				TTL:          0,
+			},
+			want:    utils.NewBigIntFromUint64(554440000000000),
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tx := &ContractCallTx{
+				CallerID:     tt.fields.CallerID,
+				AccountNonce: tt.fields.AccountNonce,
+				ContractID:   tt.fields.ContractID,
+				Amount:       tt.fields.Amount,
+				Gas:          tt.fields.Gas,
+				GasPrice:     tt.fields.GasPrice,
+				AbiVersion:   tt.fields.AbiVersion,
+				VMVersion:    tt.fields.VMVersion,
+				CallData:     tt.fields.CallData,
+				Fee:          tt.fields.Fee,
+				TTL:          tt.fields.TTL,
+			}
+			got, err := tx.FeeEstimate()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ContractCallTx.FeeEstimate() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ContractCallTx.FeeEstimate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
 func Test_encodeVMABI(t *testing.T) {
 	type args struct {
 		VMVersion  uint64
