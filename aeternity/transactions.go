@@ -90,14 +90,14 @@ func calcFeeStd(tx Tx, txLen int) *utils.BigInt {
 	return fee
 }
 
-func calcFeeContract(gas *utils.BigInt, baseGasMultiplier int, length int) *utils.BigInt {
+func calcFeeContract(gas *utils.BigInt, baseGasMultiplier int64, length int) *utils.BigInt {
 	// (Config.Client.BaseGas * 5) + gaslimit + (len(txRLP) * Config.Client.GasPerByte) * Config.Client.GasPrice
 	//           baseGas5                                txLenGasPerByte
 	baseGas5 := utils.NewBigInt()
 	txLenBig := utils.NewBigInt()
 	answer := utils.NewBigInt()
 
-	baseGas5.Mul(Config.Client.BaseGas.Int, new(big.Int).SetInt64(5))
+	baseGas5.Mul(Config.Client.BaseGas.Int, new(big.Int).SetInt64(baseGasMultiplier))
 	txLenBig.SetUint64(uint64(length))
 	txLenGasPerByte := utils.NewBigInt()
 	txLenGasPerByte.Mul(txLenBig.Int, Config.Client.GasPerByte.Int)
