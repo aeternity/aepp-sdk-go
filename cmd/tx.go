@@ -57,7 +57,16 @@ func txSpendFunc(cmd *cobra.Command, args []string) (err error) {
 		return errors.New("Error, missing or invalid fee")
 	}
 
-	tx := aeternity.NewSpendTx(sender, recipient, *amount, *feeBigInt, "", ttl, nonce)
+	// Connect to the node to find out sender nonce only
+	if nonce == 0 {
+		client := aeternity.NewClient(aeternity.Config.Node.URL, false)
+		nonce, err = client.GetNextNonce(sender)
+		if err != nil {
+			return err
+		}
+	}
+
+	tx := aeternity.NewSpendTx(sender, recipient, *amount, *feeBigInt, spendTxPayload, ttl, nonce)
 	if err != nil {
 		return err
 	}
@@ -74,7 +83,7 @@ func txSpendFunc(cmd *cobra.Command, args []string) (err error) {
 		"TTL", ttl,
 		"Fee", fee,
 		"Nonce", nonce,
-		"Payload", "not implemented",
+		"Payload", spendTxPayload,
 		"Encoded", base64Tx,
 	)
 	return nil
@@ -141,4 +150,5 @@ func init() {
 	txSpendCmd.Flags().StringVar(&fee, "fee", aeternity.Config.Client.Fee.String(), fmt.Sprintf("Set the transaction fee (default=%s)", aeternity.Config.Client.Fee.String()))
 	txSpendCmd.Flags().Uint64Var(&ttl, "ttl", aeternity.Config.Client.TTL, fmt.Sprintf("Set the TTL in keyblocks (default=%d)", aeternity.Config.Client.TTL))
 	txSpendCmd.Flags().Uint64Var(&nonce, "nonce", 0, fmt.Sprint("Set the sender account nonce, if not the chain will be queried for its value"))
+	txSpendCmd.Flags().StringVar(&spendTxPayload, "payload", "", fmt.Sprint("Optional text payload for Spend Transactions"))
 }
