@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/aeternity/aepp-sdk-go/generated/models"
+	"github.com/aeternity/aepp-sdk-go/utils"
 )
 
 func times(str string, n int) (out string) {
@@ -67,13 +68,18 @@ func printIf(title string, v interface{}) {
 		case reflect.Interface:
 			p(title, n, v.Elem(), dept)
 		case reflect.Struct:
-			PpT(dept, fmt.Sprintf("<%s>", v.Type().Name()))
-			dept++
-			for i := 0; i < v.NumField(); i++ {
-				p("", v.Type().Field(i).Name, v.Field(i), dept)
+			if v.Type().Name() == "BigInt" {
+				vc := v.Interface().(utils.BigInt)
+				PpI(dept, "Balance", vc.Text(10))
+			} else {
+				PpT(dept, fmt.Sprintf("<%s>", v.Type().Name()))
+				dept++
+				for i := 0; i < v.NumField(); i++ {
+					p("", v.Type().Field(i).Name, v.Field(i), dept)
+				}
+				dept--
+				PpT(dept, fmt.Sprintf("</%s>", v.Type().Name()))
 			}
-			dept--
-			PpT(dept, fmt.Sprintf("</%s>", v.Type().Name()))
 		case reflect.Slice:
 			for i := 0; i < v.Len(); i++ {
 				p("", "", v.Index(i), dept)
