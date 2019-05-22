@@ -33,7 +33,7 @@ var RootCmd = &cobra.Command{
 	//	Run: func(cmd *cobra.Command, args []string) { },
 }
 
-var debug, outputFormatJSON bool
+var debug bool
 
 // Execute adds all child commands to the root command sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
@@ -66,5 +66,5 @@ func init() {
 	RootCmd.PersistentFlags().StringVarP(&aeternity.Config.Node.URL, "external-api", "u", viper.GetString("EXTERNAL_API"), "node external API endpoint")
 	RootCmd.PersistentFlags().StringVarP(&aeternity.Config.Node.NetworkID, "network-id", "n", viper.GetString("NETWORK_ID"), "network ID for custom private net")
 	RootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "enable debug")
-	RootCmd.PersistentFlags().BoolVar(&outputFormatJSON, "json", false, "print output in json format")
+	RootCmd.PersistentFlags().BoolVar(&aeternity.Config.Tuning.OutputFormatJSON, "json", false, "print output in json format")
 }
