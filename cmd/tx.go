@@ -92,11 +92,12 @@ func txSpendFunc(cmd *cobra.Command, args []string) (err error) {
 // txVerifyCmd implements the tx verify subcommand.
 // It verfies the signature of a signed transaction
 var txVerifyCmd = &cobra.Command{
-	Use:   "verify SENDER_ADDRESS SIGNED_TRANSACTION",
-	Short: "Verify the signature of a signed base64 transaction",
-	Long:  ``,
-	Args:  cobra.ExactArgs(2),
-	RunE:  txVerifyFunc,
+	Use:          "verify SENDER_ADDRESS SIGNED_TRANSACTION",
+	Short:        "Verify the signature of a signed base64 transaction",
+	Long:         ``,
+	Args:         cobra.ExactArgs(2),
+	RunE:         txVerifyFunc,
+	SilenceUsage: true,
 }
 
 func txVerifyFunc(cmd *cobra.Command, args []string) (err error) {
@@ -115,8 +116,14 @@ func txVerifyFunc(cmd *cobra.Command, args []string) (err error) {
 		err := fmt.Errorf("error while verifying signature: %s", err)
 		return err
 	}
-	fmt.Printf("The signature is %t\n", valid)
-	return nil
+	if valid {
+		fmt.Printf("The signature is valid (network-id: %s)\n", aeternity.Config.Node.NetworkID)
+	} else {
+		message := fmt.Sprintf("The signature is invalid (network-id: %s)", aeternity.Config.Node.NetworkID)
+		// fmt.Println(message)
+		err = errors.New(message)
+	}
+	return err
 }
 
 // txDumpRawCmd implements the tx dumpraw subcommand.

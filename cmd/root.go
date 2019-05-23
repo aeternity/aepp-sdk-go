@@ -63,8 +63,8 @@ func init() {
 	// Here you will define your flags and configuration settings.
 	// Cobra supports Persistent Flags, which, if defined here,
 	// will be global for your application.
-	RootCmd.PersistentFlags().StringVarP(&aeternity.Config.Node.URL, "external-api", "u", viper.GetString("EXTERNAL_API"), "node external API endpoint")
-	RootCmd.PersistentFlags().StringVarP(&aeternity.Config.Node.NetworkID, "network-id", "n", viper.GetString("NETWORK_ID"), "network ID for custom private net")
+	RootCmd.PersistentFlags().StringVarP(&aeternity.Config.Node.URL, "external-api", "u", aeternity.Config.Node.URL, "node external API endpoint")
+	RootCmd.PersistentFlags().StringVarP(&aeternity.Config.Node.NetworkID, "network-id", "n", aeternity.Config.Node.NetworkID, "network ID for custom private net")
 	RootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "enable debug")
 	RootCmd.PersistentFlags().BoolVar(&aeternity.Config.Tuning.OutputFormatJSON, "json", false, "print output in json format")
 }
