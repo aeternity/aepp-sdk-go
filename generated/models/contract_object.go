@@ -22,7 +22,7 @@ type ContractObject struct {
 	// abi version
 	// Maximum: 65535
 	// Minimum: 0
-	AbiVersion *int64 `json:"abi_version,omitempty"`
+	AbiVersion *uint64 `json:"abi_version,omitempty"`
 
 	// active
 	// Required: true
@@ -30,13 +30,13 @@ type ContractObject struct {
 
 	// deposit
 	// Required: true
-	Deposit *int64 `json:"deposit"`
+	Deposit *uint64 `json:"deposit"`
 
 	// id
 	// Required: true
 	ID EncodedHash `json:"id"`
 
-	// log
+	// DEPRECATED
 	// Required: true
 	Log *string `json:"log"`
 
@@ -52,7 +52,7 @@ type ContractObject struct {
 	// Required: true
 	// Maximum: 65535
 	// Minimum: 0
-	VMVersion *int64 `json:"vm_version"`
+	VMVersion *uint64 `json:"vm_version"`
 }
 
 // Validate validates this contract object

@@ -19,7 +19,7 @@ import (
 // swagger:model Account
 type Account struct {
 
-	// Balance
+	// balance
 	// Required: true
 	Balance utils.BigInt `json:"balance"`
 

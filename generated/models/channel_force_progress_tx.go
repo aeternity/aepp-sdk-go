@@ -24,6 +24,9 @@ import (
 // swagger:model ChannelForceProgressTx
 type ChannelForceProgressTx struct {
 
+	// The block hash the forced progress used as an on-chain environment
+	BlockHash EncodedHash `json:"block_hash,omitempty"`
+
 	// channel id
 	// Required: true
 	ChannelID EncodedHash `json:"channel_id"`
@@ -76,6 +79,8 @@ func (m *ChannelForceProgressTx) SetUpdate(val OffChainUpdate) {
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
 func (m *ChannelForceProgressTx) UnmarshalJSON(raw []byte) error {
 	var data struct {
+		BlockHash EncodedHash `json:"block_hash,omitempty"`
+
 		ChannelID EncodedHash `json:"channel_id"`
 
 		Fee utils.BigInt `json:"fee"`
@@ -110,6 +115,9 @@ func (m *ChannelForceProgressTx) UnmarshalJSON(raw []byte) error {
 	}
 
 	var result ChannelForceProgressTx
+
+	// block_hash
+	result.BlockHash = data.BlockHash
 
 	// channel_id
 	result.ChannelID = data.ChannelID
@@ -151,6 +159,8 @@ func (m ChannelForceProgressTx) MarshalJSON() ([]byte, error) {
 	var b1, b2, b3 []byte
 	var err error
 	b1, err = json.Marshal(struct {
+		BlockHash EncodedHash `json:"block_hash,omitempty"`
+
 		ChannelID EncodedHash `json:"channel_id"`
 
 		Fee utils.BigInt `json:"fee"`
@@ -169,6 +179,8 @@ func (m ChannelForceProgressTx) MarshalJSON() ([]byte, error) {
 
 		TTL *uint64 `json:"ttl,omitempty"`
 	}{
+
+		BlockHash: m.BlockHash,
 
 		ChannelID: m.ChannelID,
 
@@ -209,6 +221,10 @@ func (m ChannelForceProgressTx) MarshalJSON() ([]byte, error) {
 // Validate validates this channel force progress tx
 func (m *ChannelForceProgressTx) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := m.validateBlockHash(formats); err != nil {
+		res = append(res, err)
+	}
 
 	if err := m.validateChannelID(formats); err != nil {
 		res = append(res, err)
@@ -253,6 +269,22 @@ func (m *ChannelForceProgressTx) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *ChannelForceProgressTx) validateBlockHash(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.BlockHash) { // not required
+		return nil
+	}
+
+	if err := m.BlockHash.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("block_hash")
+		}
+		return err
+	}
+
 	return nil
 }
 

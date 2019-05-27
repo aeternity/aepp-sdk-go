@@ -28,7 +28,7 @@ import (
 
 var (
 	waitForTx       bool
-	payload         string
+	spendTxPayload  string
 	printPrivateKey bool
 	accountFileName string
 	password        string

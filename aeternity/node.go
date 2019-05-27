@@ -6,73 +6,48 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// Ae the aeternity client
-type Ae struct {
+// Client is the HTTP connection to the aeternity node
+type Client struct {
 	*apiclient.Node
-	*Wallet
-	*Aens
-	*Contract
-	*Oracle
 }
 
-// Wallet high level abstraction for operation on a wallet
+// Wallet is a account-specific helper that stores state relevant to spending operations
 type Wallet struct {
-	nodeClient *apiclient.Node
-	owner      *Account
+	Client  *Client
+	Account *Account
 }
 
-// Aens abstractions for aens operations
+// Aens ais a account-specific helper that stores state relevant to AENS operations
 type Aens struct {
-	nodeClient   *apiclient.Node
-	owner        *Account
+	Client       *Client
+	Account      *Account
 	name         string
 	preClaimSalt []byte
 }
 
-// Contract abstractions for contracts
+// Contract is a account-specific helper that stores state relevant to smtart contract execution
 type Contract struct {
-	nodeClient *apiclient.Node
-	owner      *Account
-	source     string
+	Client  *Client
+	Account *Account
+	source  string
 }
 
-// Oracle abstractions for oracles
+// Oracle is a account-specific helper that stores state relevant to oracles
 type Oracle struct {
-	nodeClient *apiclient.Node
-	owner      *Account
+	Client  *Client
+	Account *Account
 }
 
-// NewCli obtain a new nodeClient instance
-func NewCli(nodeURL string, debug bool) *Ae {
+// NewClient obtain a new nodeClient instance
+func NewClient(nodeURL string, debug bool) *Client {
 	// create the transport
 	host, schemas := urlComponents(nodeURL)
 	transport := httptransport.New(host, "/v2", schemas)
 	transport.SetDebug(debug)
 	// create the API client, with the transport
 	openAPIClient := apiclient.New(transport, strfmt.Default)
-	aecli := &Ae{
+	aecli := &Client{
 		Node: openAPIClient,
-		Wallet: &Wallet{
-			nodeClient: openAPIClient,
-		},
-		Aens: &Aens{
-			nodeClient: openAPIClient,
-		},
-		Contract: &Contract{
-			nodeClient: openAPIClient,
-		},
-		Oracle: &Oracle{
-			nodeClient: openAPIClient,
-		},
 	}
 	return aecli
-}
-
-// WithAccount associate a Account with the client
-func (ae *Ae) WithAccount(account *Account) *Ae {
-	ae.Wallet.owner = account
-	ae.Aens.owner = account
-	ae.Contract.owner = account
-	ae.Oracle.owner = account
-	return ae
 }

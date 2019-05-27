@@ -3,7 +3,6 @@ package aeternity
 import (
 	"fmt"
 
-	apiclient "github.com/aeternity/aepp-sdk-go/generated/client"
 	"github.com/aeternity/aepp-sdk-go/generated/client/external"
 	"github.com/aeternity/aepp-sdk-go/generated/models"
 )
@@ -12,11 +11,11 @@ import (
 // Logic implementation is handled by the unexported functions.
 
 // APIGetStatus post transaction
-func (ae *Ae) APIGetStatus() (status *models.Status, err error) {
-	return getStatus(ae.Node)
+func (ae *Client) APIGetStatus() (status *models.Status, err error) {
+	return getStatus(ae)
 }
 
-func getStatus(node *apiclient.Node) (status *models.Status, err error) {
+func getStatus(node *Client) (status *models.Status, err error) {
 	r, err := node.External.GetStatus(nil)
 	if err != nil {
 		return
@@ -26,12 +25,12 @@ func getStatus(node *apiclient.Node) (status *models.Status, err error) {
 }
 
 // APIPostTransaction post transaction
-func (ae *Ae) APIPostTransaction(signedEncodedTx, signedEncodedTxHash string) (err error) {
-	return postTransaction(ae.Node, signedEncodedTx, signedEncodedTxHash)
+func (ae *Client) APIPostTransaction(signedEncodedTx, signedEncodedTxHash string) (err error) {
+	return postTransaction(ae, signedEncodedTx, signedEncodedTxHash)
 }
 
 // postTransaction post a transaction to the chain
-func postTransaction(node *apiclient.Node, signedEncodedTx, signedEncodedTxHash string) (err error) {
+func postTransaction(node *Client, signedEncodedTx, signedEncodedTxHash string) (err error) {
 	p := external.NewPostTransactionParams().WithBody(&models.Tx{
 		Tx: &signedEncodedTx,
 	})
@@ -46,13 +45,13 @@ func postTransaction(node *apiclient.Node, signedEncodedTx, signedEncodedTxHash 
 }
 
 // APIGetTopBlock get the top block of the chain
-func (ae *Ae) APIGetTopBlock() (kb *models.KeyBlockOrMicroBlockHeader, err error) {
-	return getTopBlock(ae.Node)
+func (ae *Client) APIGetTopBlock() (kb *models.KeyBlockOrMicroBlockHeader, err error) {
+	return getTopBlock(ae)
 }
 
 // APIGetHeight get the height of the chain
-func (ae *Ae) APIGetHeight() (height uint64, err error) {
-	tb, err := getTopBlock(ae.Node)
+func (ae *Client) APIGetHeight() (height uint64, err error) {
+	tb, err := getTopBlock(ae)
 	if err != nil {
 		return
 	}
@@ -67,7 +66,7 @@ func (ae *Ae) APIGetHeight() (height uint64, err error) {
 // getTopBlock get the top block of the chain
 // wraps the generated code to avoid too much changes
 // in case of the swagger api call changes
-func getTopBlock(node *apiclient.Node) (kb *models.KeyBlockOrMicroBlockHeader, err error) {
+func getTopBlock(node *Client) (kb *models.KeyBlockOrMicroBlockHeader, err error) {
 	r, err := node.External.GetTopBlock(nil)
 	if err != nil {
 		return
@@ -77,11 +76,11 @@ func getTopBlock(node *apiclient.Node) (kb *models.KeyBlockOrMicroBlockHeader, e
 }
 
 // APIGetCurrentKeyBlock get current key block
-func (ae *Ae) APIGetCurrentKeyBlock() (kb *models.KeyBlock, err error) {
-	return getCurrentKeyBlock(ae.Node)
+func (ae *Client) APIGetCurrentKeyBlock() (kb *models.KeyBlock, err error) {
+	return getCurrentKeyBlock(ae)
 }
 
-func getCurrentKeyBlock(node *apiclient.Node) (kb *models.KeyBlock, err error) {
+func getCurrentKeyBlock(node *Client) (kb *models.KeyBlock, err error) {
 	r, err := node.External.GetCurrentKeyBlock(nil)
 	if err != nil {
 		err = fmt.Errorf("Error: %v", getErrorReason(err))
@@ -92,13 +91,13 @@ func getCurrentKeyBlock(node *apiclient.Node) (kb *models.KeyBlock, err error) {
 }
 
 // APIGetAccount return the account
-func (ae *Ae) APIGetAccount(accountID string) (account *models.Account, err error) {
-	return getAccount(ae.Node, accountID)
+func (ae *Client) APIGetAccount(accountID string) (account *models.Account, err error) {
+	return getAccount(ae, accountID)
 }
 
 // getAccount retrieve an account by its address (public key)
 // it is particularly useful to obtain the nonce for spending transactions
-func getAccount(node *apiclient.Node, accountID string) (account *models.Account, err error) {
+func getAccount(node *Client, accountID string) (account *models.Account, err error) {
 	p := external.NewGetAccountByPubkeyParams().WithPubkey(accountID)
 	r, err := node.External.GetAccountByPubkey(p)
 	if err != nil {
@@ -110,11 +109,11 @@ func getAccount(node *apiclient.Node, accountID string) (account *models.Account
 }
 
 // APIGetNameEntryByName return the name entry
-func (ae *Ae) APIGetNameEntryByName(name string) (nameEntry *models.NameEntry, err error) {
-	return getNameEntryByName(ae.Node, name)
+func (ae *Client) APIGetNameEntryByName(name string) (nameEntry *models.NameEntry, err error) {
+	return getNameEntryByName(ae, name)
 }
 
-func getNameEntryByName(node *apiclient.Node, name string) (nameEntry *models.NameEntry, err error) {
+func getNameEntryByName(node *Client, name string) (nameEntry *models.NameEntry, err error) {
 	p := external.NewGetNameEntryByNameParams().WithName(name)
 	r, err := node.External.GetNameEntryByName(p)
 
@@ -128,11 +127,11 @@ func getNameEntryByName(node *apiclient.Node, name string) (nameEntry *models.Na
 }
 
 // APIGetMicroBlockTransactionsByHash get the transactions of a microblock
-func (ae *Ae) APIGetMicroBlockTransactionsByHash(microBlockID string) (txs *models.GenericTxs, err error) {
-	return getMicroBlockTransactionsByHash(ae.Node, microBlockID)
+func (ae *Client) APIGetMicroBlockTransactionsByHash(microBlockID string) (txs *models.GenericTxs, err error) {
+	return getMicroBlockTransactionsByHash(ae, microBlockID)
 }
 
-func getMicroBlockTransactionsByHash(node *apiclient.Node, microBlockID string) (txs *models.GenericTxs, err error) {
+func getMicroBlockTransactionsByHash(node *Client, microBlockID string) (txs *models.GenericTxs, err error) {
 	p := external.NewGetMicroBlockTransactionsByHashParams().WithHash(microBlockID)
 	r, err := node.External.GetMicroBlockTransactionsByHash(p)
 	if err != nil {
@@ -144,11 +143,11 @@ func getMicroBlockTransactionsByHash(node *apiclient.Node, microBlockID string) 
 }
 
 // APIGetMicroBlockHeaderByHash get the header of a micro block
-func (ae *Ae) APIGetMicroBlockHeaderByHash(microBlockID string) (txs *models.MicroBlockHeader, err error) {
-	return getMicroBlockHeaderByHash(ae.Node, microBlockID)
+func (ae *Client) APIGetMicroBlockHeaderByHash(microBlockID string) (txs *models.MicroBlockHeader, err error) {
+	return getMicroBlockHeaderByHash(ae, microBlockID)
 }
 
-func getMicroBlockHeaderByHash(node *apiclient.Node, microBlockID string) (txs *models.MicroBlockHeader, err error) {
+func getMicroBlockHeaderByHash(node *Client, microBlockID string) (txs *models.MicroBlockHeader, err error) {
 	p := external.NewGetMicroBlockHeaderByHashParams().WithHash(microBlockID)
 	r, err := node.External.GetMicroBlockHeaderByHash(p)
 	if err != nil {
@@ -160,11 +159,11 @@ func getMicroBlockHeaderByHash(node *apiclient.Node, microBlockID string) (txs *
 }
 
 // APIGetKeyBlockByHash get a key block by its hash
-func (ae *Ae) APIGetKeyBlockByHash(keyBlockID string) (txs *models.KeyBlock, err error) {
-	return getKeyBlockByHash(ae.Node, keyBlockID)
+func (ae *Client) APIGetKeyBlockByHash(keyBlockID string) (txs *models.KeyBlock, err error) {
+	return getKeyBlockByHash(ae, keyBlockID)
 }
 
-func getKeyBlockByHash(node *apiclient.Node, keyBlockID string) (txs *models.KeyBlock, err error) {
+func getKeyBlockByHash(node *Client, keyBlockID string) (txs *models.KeyBlock, err error) {
 	p := external.NewGetKeyBlockByHashParams().WithHash(keyBlockID)
 	r, err := node.External.GetKeyBlockByHash(p)
 	if err != nil {
@@ -176,12 +175,12 @@ func getKeyBlockByHash(node *apiclient.Node, keyBlockID string) (txs *models.Key
 }
 
 // APIGetTransactionByHash get a transaction by it's hash
-func (ae *Ae) APIGetTransactionByHash(txHash string) (tx *models.GenericSignedTx, err error) {
-	return getTransactionByHash(ae.Node, txHash)
+func (ae *Client) APIGetTransactionByHash(txHash string) (tx *models.GenericSignedTx, err error) {
+	return getTransactionByHash(ae, txHash)
 }
 
 // getTransactionByHash retrieve a transaction by it's hash
-func getTransactionByHash(node *apiclient.Node, txHash string) (tx *models.GenericSignedTx, err error) {
+func getTransactionByHash(node *Client, txHash string) (tx *models.GenericSignedTx, err error) {
 	p := external.NewGetTransactionByHashParams().WithHash(txHash)
 	r, err := node.External.GetTransactionByHash(p)
 	if err != nil {
@@ -193,12 +192,12 @@ func getTransactionByHash(node *apiclient.Node, txHash string) (tx *models.Gener
 }
 
 // APIGetOracleByPubkey get an oracle by it's public key
-func (ae *Ae) APIGetOracleByPubkey(pubkey string) (oracle *models.RegisteredOracle, err error) {
-	return getOracleByPubkey(ae.Node, pubkey)
+func (ae *Client) APIGetOracleByPubkey(pubkey string) (oracle *models.RegisteredOracle, err error) {
+	return getOracleByPubkey(ae, pubkey)
 }
 
 // getOracleByPubkey get an oracle by it's public key
-func getOracleByPubkey(node *apiclient.Node, pubkey string) (oracle *models.RegisteredOracle, err error) {
+func getOracleByPubkey(node *Client, pubkey string) (oracle *models.RegisteredOracle, err error) {
 	p := external.NewGetOracleByPubkeyParams().WithPubkey(pubkey)
 	r, err := node.External.GetOracleByPubkey(p)
 	if err != nil {
@@ -210,12 +209,12 @@ func getOracleByPubkey(node *apiclient.Node, pubkey string) (oracle *models.Regi
 }
 
 // APIGetOracleQueriesByPubkey get a list of queries made to a particular oracle
-func (ae *Ae) APIGetOracleQueriesByPubkey(pubkey string) (oracleQueries *models.OracleQueries, err error) {
-	return getOracleQueriesByPubkey(ae.Node, pubkey)
+func (ae *Client) APIGetOracleQueriesByPubkey(pubkey string) (oracleQueries *models.OracleQueries, err error) {
+	return getOracleQueriesByPubkey(ae, pubkey)
 }
 
 // getOracleQueriesByPubkey get a list of queries made to a particular oracle
-func getOracleQueriesByPubkey(node *apiclient.Node, pubkey string) (oracleQueries *models.OracleQueries, err error) {
+func getOracleQueriesByPubkey(node *Client, pubkey string) (oracleQueries *models.OracleQueries, err error) {
 	p := external.NewGetOracleQueriesByPubkeyParams().WithPubkey(pubkey)
 	r, err := node.External.GetOracleQueriesByPubkey(p)
 	if err != nil {
@@ -223,5 +222,22 @@ func getOracleQueriesByPubkey(node *apiclient.Node, pubkey string) (oracleQuerie
 		return
 	}
 	oracleQueries = r.Payload
+	return
+}
+
+// APIGetContractByID gets a contract by ct_ ID
+func (ae *Client) APIGetContractByID(ctID string) (contract *models.ContractObject, err error) {
+	return getContractByID(ae, ctID)
+}
+
+// getContractByID get a contract by ct_ ID
+func getContractByID(node *Client, ctID string) (contract *models.ContractObject, err error) {
+	p := external.NewGetContractParams().WithPubkey(ctID)
+	r, err := node.External.GetContract(p)
+	if err != nil {
+		err = fmt.Errorf("Error: %v", getErrorReason(err))
+		return
+	}
+	contract = r.Payload
 	return
 }

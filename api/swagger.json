@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "description": "This is the [Aeternity](https://www.aeternity.com/) node API.",
-    "version": "2.0.0",
+    "version": "2.4.0",
     "title": "Aeternity node",
     "termsOfService": "https://www.aeternity.com/terms/",
     "contact": {
@@ -136,7 +136,13 @@
           "200": {
             "description": "Successful operation",
             "schema": {
-              "$ref": "#/definitions/inline_response_200"
+              "type": "object",
+              "properties": {
+                "hash": {
+                  "type": "string",
+                  "description": "Hash"
+                }
+              }
             }
           },
           "404": {
@@ -164,7 +170,14 @@
           "200": {
             "description": "Successful operation",
             "schema": {
-              "$ref": "#/definitions/inline_response_200_1"
+              "type": "object",
+              "properties": {
+                "height": {
+                  "type": "integer",
+                  "format": "uint64",
+                  "description": "Height"
+                }
+              }
             }
           },
           "404": {
@@ -485,7 +498,15 @@
           "200": {
             "description": "Successful operation",
             "schema": {
-              "$ref": "#/definitions/inline_response_200_2"
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer",
+                  "format": "uint64",
+                  "description": "Count",
+                  "minimum": 1
+                }
+              }
             }
           },
           "400": {
@@ -1343,7 +1364,12 @@
           "200": {
             "description": "Successful operation",
             "schema": {
-              "$ref": "#/definitions/inline_response_200_3"
+              "type": "object",
+              "properties": {
+                "pubkey": {
+                  "type": "string"
+                }
+              }
             }
           }
         }
@@ -2741,7 +2767,9 @@
       "items": {
         "type": "integer",
         "format": "int32"
-      }
+      },
+      "minItems": 42,
+      "maxItems": 42
     },
     "Uri": {
       "type": "string"
@@ -2808,15 +2836,10 @@
         }
       },
       "example": {
-        "prev_hash": null,
         "nonce": 1,
         "version": 5,
-        "miner": null,
         "target": 6,
-        "beneficiary": null,
-        "state_hash": null,
         "pow": "",
-        "prev_key_hash": null,
         "time": 5,
         "hash": {},
         "height": 0,
@@ -2874,15 +2897,9 @@
         }
       },
       "example": {
-        "txs_hash": null,
-        "state_hash": null,
-        "signature": null,
         "pof_hash": "pof_hash",
-        "prev_hash": null,
-        "prev_key_hash": null,
         "time": 7,
         "version": 9,
-        "hash": null,
         "height": 2
       }
     },
@@ -2898,27 +2915,16 @@
       },
       "example": {
         "micro_block": {
-          "txs_hash": null,
-          "state_hash": null,
-          "signature": null,
           "pof_hash": "pof_hash",
-          "prev_hash": null,
-          "prev_key_hash": null,
           "time": 7,
           "version": 9,
-          "hash": null,
           "height": 2
         },
         "key_block": {
-          "prev_hash": null,
           "nonce": 1,
           "version": 5,
-          "miner": null,
           "target": 6,
-          "beneficiary": null,
-          "state_hash": null,
           "pow": "",
-          "prev_key_hash": null,
           "time": 5,
           "hash": {},
           "height": 0,
@@ -2948,7 +2954,6 @@
             },
             "block_hash": {},
             "block_height": 6,
-            "hash": null,
             "signatures": [
               "signatures",
               "signatures"
@@ -2961,7 +2966,6 @@
             },
             "block_hash": {},
             "block_height": 6,
-            "hash": null,
             "signatures": [
               "signatures",
               "signatures"
@@ -2983,7 +2987,6 @@
           "$ref": "#/definitions/EncodedHash"
         },
         "balance": {
-          "description": "Balance",
           "$ref": "#/definitions/Balance"
         },
         "nonce": {
@@ -3042,12 +3045,14 @@
         "vm_version": {
           "type": "integer",
           "minimum": 0,
-          "maximum": 65535
+          "maximum": 65535,
+          "format": "uint64"
         },
         "abi_version": {
           "type": "integer",
           "minimum": 0,
-          "maximum": 65535
+          "maximum": 65535,
+          "format": "uint64"
         }
       },
       "example": {
@@ -3106,7 +3111,6 @@
         }
       },
       "example": {
-        "oracle_id": null,
         "response_ttl": {
           "type": "delta",
           "value": 1
@@ -3116,8 +3120,7 @@
         "fee": 5,
         "sender_nonce": 0,
         "id": {},
-        "ttl": 6,
-        "sender_id": null
+        "ttl": 6
       }
     },
     "OracleQueries": {
@@ -3136,7 +3139,6 @@
       "example": {
         "oracle_queries": [
           {
-            "oracle_id": null,
             "response_ttl": {
               "type": "delta",
               "value": 1
@@ -3146,11 +3148,9 @@
             "fee": 5,
             "sender_nonce": 0,
             "id": {},
-            "ttl": 6,
-            "sender_id": null
+            "ttl": 6
           },
           {
-            "oracle_id": null,
             "response_ttl": {
               "type": "delta",
               "value": 1
@@ -3160,8 +3160,7 @@
             "fee": 5,
             "sender_nonce": 0,
             "id": {},
-            "ttl": 6,
-            "sender_id": null
+            "ttl": 6
           }
         ]
       }
@@ -3206,7 +3205,6 @@
         "fee": 6,
         "ttl": 1,
         "nonce": 5,
-        "sender_id": null,
         "recipient_id": {}
       }
     },
@@ -3250,12 +3248,14 @@
         "vm_version": {
           "type": "integer",
           "minimum": 0,
-          "maximum": 65535
+          "maximum": 65535,
+          "format": "uint64"
         },
         "abi_version": {
           "type": "integer",
           "minimum": 0,
-          "maximum": 65535
+          "maximum": 65535,
+          "format": "uint64"
         }
       },
       "example": {
@@ -3368,8 +3368,7 @@
         "fee": 6,
         "query_fee": 0,
         "ttl": 1,
-        "nonce": 5,
-        "sender_id": null
+        "nonce": 5
       }
     },
     "OracleRespondTx": {
@@ -3412,7 +3411,6 @@
           "type": "delta",
           "value": 1
         },
-        "oracle_id": null,
         "query_id": {},
         "response": "response",
         "fee": 0,
@@ -3496,11 +3494,9 @@
         "ttl": 0,
         "pointers": [
           {
-            "id": null,
             "key": "key"
           },
           {
-            "id": null,
             "key": "key"
           }
         ]
@@ -3531,13 +3527,6 @@
           "type": "integer",
           "format": "uint64"
         }
-      },
-      "example": {
-        "commitment_id": {},
-        "account_id": null,
-        "fee": 0,
-        "ttl": 6,
-        "nonce": 1
       }
     },
     "NameClaimTx": {
@@ -3569,14 +3558,6 @@
           "type": "integer",
           "format": "uint64"
         }
-      },
-      "example": {
-        "name_salt": 0,
-        "account_id": {},
-        "fee": 6,
-        "name": "name",
-        "ttl": 1,
-        "nonce": 5
       }
     },
     "NameUpdateTx": {
@@ -3621,25 +3602,6 @@
           "type": "integer",
           "format": "uint64"
         }
-      },
-      "example": {
-        "name_ttl": 0,
-        "client_ttl": 6,
-        "account_id": null,
-        "fee": 1,
-        "name_id": {},
-        "ttl": 5,
-        "nonce": 5,
-        "pointers": [
-          {
-            "id": null,
-            "key": "key"
-          },
-          {
-            "id": null,
-            "key": "key"
-          }
-        ]
       }
     },
     "NameTransferTx": {
@@ -3671,14 +3633,6 @@
           "type": "integer",
           "format": "uint64"
         }
-      },
-      "example": {
-        "account_id": null,
-        "fee": 0,
-        "name_id": {},
-        "ttl": 6,
-        "nonce": 1,
-        "recipient_id": null
       }
     },
     "NameRevokeTx": {
@@ -3706,13 +3660,6 @@
           "type": "integer",
           "format": "uint64"
         }
-      },
-      "example": {
-        "account_id": null,
-        "fee": 0,
-        "name_id": {},
-        "ttl": 6,
-        "nonce": 1
       }
     },
     "CommitmentId": {
@@ -3755,7 +3702,6 @@
         }
       },
       "example": {
-        "id": null,
         "key": "key"
       }
     },
@@ -3832,14 +3778,11 @@
           null,
           null
         ],
-        "responder_id": null,
         "locked_until": 9,
         "lock_period": 0,
         "responder_amount": 0,
         "initiator_amount": 0,
         "round": 0,
-        "initiator_id": null,
-        "state_hash": null,
         "id": {},
         "solo_round": 0,
         "channel_amount": 0,
@@ -3900,19 +3843,6 @@
           "description": "Root hash of the channel's internal state tree",
           "$ref": "#/definitions/EncodedHash"
         }
-      },
-      "example": {
-        "responder_amount": 0,
-        "initiator_amount": 0,
-        "initiator_id": {},
-        "responder_id": null,
-        "state_hash": null,
-        "fee": 0,
-        "push_amount": 0,
-        "ttl": 0,
-        "nonce": 0,
-        "lock_period": 0,
-        "channel_reserve": 0
       }
     },
     "ChannelDepositTx": {
@@ -3959,16 +3889,6 @@
           "description": "Channel's next round",
           "minimum": 0
         }
-      },
-      "example": {
-        "amount": 0,
-        "from_id": null,
-        "round": 0,
-        "state_hash": null,
-        "fee": 0,
-        "channel_id": {},
-        "ttl": 0,
-        "nonce": 0
       }
     },
     "ChannelWithdrawTx": {
@@ -4015,16 +3935,6 @@
           "description": "Channel's next round",
           "minimum": 0
         }
-      },
-      "example": {
-        "amount": 0,
-        "round": 0,
-        "state_hash": null,
-        "fee": 0,
-        "to_id": null,
-        "channel_id": {},
-        "ttl": 0,
-        "nonce": 0
       }
     },
     "ChannelForceProgressTx": {
@@ -4060,6 +3970,10 @@
         },
         "state_hash": {
           "description": "Channel's next state_hash",
+          "$ref": "#/definitions/EncodedHash"
+        },
+        "block_hash": {
+          "description": "The block hash the forced progress used as an on-chain environment",
           "$ref": "#/definitions/EncodedHash"
         },
         "ttl": {
@@ -4117,15 +4031,6 @@
           "format": "uint64",
           "minimum": 0
         }
-      },
-      "example": {
-        "from_id": null,
-        "responder_amount_final": 0,
-        "fee": 0,
-        "initiator_amount_final": 0,
-        "channel_id": {},
-        "ttl": 0,
-        "nonce": 0
       }
     },
     "ChannelCloseSoloTx": {
@@ -4164,15 +4069,6 @@
           "type": "string",
           "description": "Proof of inclusion containing information for closing the channel"
         }
-      },
-      "example": {
-        "from_id": null,
-        "payload": "payload",
-        "fee": 0,
-        "poi": "poi",
-        "channel_id": {},
-        "ttl": 0,
-        "nonce": 0
       }
     },
     "ChannelSlashTx": {
@@ -4211,15 +4107,6 @@
           "type": "string",
           "description": "Proof of inclusion containing information for closing the channel"
         }
-      },
-      "example": {
-        "from_id": null,
-        "payload": "payload",
-        "fee": 0,
-        "poi": "poi",
-        "channel_id": {},
-        "ttl": 0,
-        "nonce": 0
       }
     },
     "ChannelSettleTx": {
@@ -4258,15 +4145,6 @@
           "format": "uint64",
           "minimum": 0
         }
-      },
-      "example": {
-        "from_id": null,
-        "responder_amount_final": 0,
-        "fee": 0,
-        "initiator_amount_final": 0,
-        "channel_id": {},
-        "ttl": 0,
-        "nonce": 0
       }
     },
     "ChannelSnapshotSoloTx": {
@@ -4300,14 +4178,6 @@
           "format": "uint64",
           "minimum": 0
         }
-      },
-      "example": {
-        "from_id": null,
-        "payload": "payload",
-        "fee": 0,
-        "channel_id": {},
-        "ttl": 0,
-        "nonce": 0
       }
     },
     "PubKey": {
@@ -4355,6 +4225,12 @@
         "syncing": {
           "type": "boolean"
         },
+        "sync_progress": {
+          "type": "number",
+          "format": "float",
+          "minimum": 0,
+          "maximum": 100
+        },
         "listening": {
           "type": "boolean"
         },
@@ -4395,6 +4271,7 @@
         "node_revision": "node_revision",
         "solutions": 0,
         "node_version": "node_version",
+        "sync_progress": 14.65813,
         "protocols": [
           {
             "effective_at_height": 0,
@@ -4469,7 +4346,6 @@
         },
         "block_hash": {},
         "block_height": 6,
-        "hash": null,
         "signatures": [
           "signatures",
           "signatures"
@@ -4716,6 +4592,7 @@
         "gas_price",
         "gas_used",
         "height",
+        "log",
         "return_type",
         "return_value"
       ],
@@ -4724,19 +4601,28 @@
           "$ref": "#/definitions/EncodedHash"
         },
         "caller_nonce": {
-          "type": "integer"
+          "type": "integer",
+          "format": "uint64"
         },
         "height": {
-          "type": "integer"
+          "type": "integer",
+          "format": "uint64"
         },
         "contract_id": {
           "$ref": "#/definitions/EncodedHash"
         },
         "gas_price": {
-          "type": "integer"
+          "$ref": "#/definitions/GasPrice"
         },
         "gas_used": {
-          "type": "integer"
+          "type": "integer",
+          "format": "uint64"
+        },
+        "log": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Event"
+          }
         },
         "return_value": {
           "$ref": "#/definitions/EncodedByteArray"
@@ -4749,12 +4635,59 @@
       "example": {
         "gas_price": 1,
         "return_type": "return_type",
-        "return_value": {},
+        "log": [
+          {
+            "data": {},
+            "topics": [
+              5,
+              5
+            ]
+          },
+          {
+            "data": {},
+            "topics": [
+              5,
+              5
+            ]
+          }
+        ],
         "caller_id": {},
-        "contract_id": null,
         "gas_used": 5,
         "caller_nonce": 0,
         "height": 6
+      }
+    },
+    "Event": {
+      "type": "object",
+      "required": [
+        "address",
+        "data",
+        "topics"
+      ],
+      "properties": {
+        "address": {
+          "description": "Contract address",
+          "$ref": "#/definitions/EncodedHash"
+        },
+        "topics": {
+          "type": "array",
+          "description": "Event topics",
+          "items": {
+            "type": "integer",
+            "format": "uint64"
+          }
+        },
+        "data": {
+          "description": "Log event data (as contract byte array).",
+          "$ref": "#/definitions/EncodedByteArray"
+        }
+      },
+      "example": {
+        "data": {},
+        "topics": [
+          5,
+          5
+        ]
       }
     },
     "Error": {
@@ -4789,15 +4722,18 @@
         "vm_version": {
           "type": "integer",
           "minimum": 0,
-          "maximum": 65535
+          "maximum": 65535,
+          "format": "uint64"
         },
         "abi_version": {
           "type": "integer",
           "minimum": 0,
-          "maximum": 65535
+          "maximum": 65535,
+          "format": "uint64"
         },
         "log": {
-          "type": "string"
+          "type": "string",
+          "description": "DEPRECATED"
         },
         "active": {
           "type": "boolean"
@@ -4809,13 +4745,13 @@
           }
         },
         "deposit": {
-          "type": "integer"
+          "type": "integer",
+          "format": "uint64"
         }
       },
       "example": {
         "vm_version": 5248,
         "log": "log",
-        "owner_id": null,
         "active": true,
         "deposit": 1,
         "abi_version": 39500,
@@ -5015,9 +4951,23 @@
             "call_obj": {
               "gas_price": 1,
               "return_type": "return_type",
-              "return_value": {},
+              "log": [
+                {
+                  "data": {},
+                  "topics": [
+                    5,
+                    5
+                  ]
+                },
+                {
+                  "data": {},
+                  "topics": [
+                    5,
+                    5
+                  ]
+                }
+              ],
               "caller_id": {},
-              "contract_id": null,
               "gas_used": 5,
               "caller_nonce": 0,
               "height": 6
@@ -5030,9 +4980,23 @@
             "call_obj": {
               "gas_price": 1,
               "return_type": "return_type",
-              "return_value": {},
+              "log": [
+                {
+                  "data": {},
+                  "topics": [
+                    5,
+                    5
+                  ]
+                },
+                {
+                  "data": {},
+                  "topics": [
+                    5,
+                    5
+                  ]
+                }
+              ],
               "caller_id": {},
-              "contract_id": null,
               "gas_used": 5,
               "caller_nonce": 0,
               "height": 6
@@ -5068,9 +5032,23 @@
         "call_obj": {
           "gas_price": 1,
           "return_type": "return_type",
-          "return_value": {},
+          "log": [
+            {
+              "data": {},
+              "topics": [
+                5,
+                5
+              ]
+            },
+            {
+              "data": {},
+              "topics": [
+                5,
+                5
+              ]
+            }
+          ],
           "caller_id": {},
-          "contract_id": null,
           "gas_used": 5,
           "caller_nonce": 0,
           "height": 6
@@ -5185,7 +5163,8 @@
         },
         "nonce": {
           "type": "integer",
-          "description": "Owner's nonce"
+          "description": "Owner's nonce",
+          "format": "uint64"
         },
         "code": {
           "type": "string",
@@ -5195,41 +5174,39 @@
           "type": "integer",
           "description": "Virtual machine's version",
           "minimum": 0,
-          "maximum": 65535
+          "maximum": 65535,
+          "format": "uint64"
         },
         "abi_version": {
           "type": "integer",
           "description": "ABI version",
           "minimum": 0,
-          "maximum": 65535
+          "maximum": 65535,
+          "format": "uint64"
         },
         "deposit": {
           "type": "integer",
           "description": "Deposit",
-          "minimum": 0
+          "minimum": 0,
+          "format": "uint64"
         },
         "amount": {
-          "description": "Amount",
           "$ref": "#/definitions/Amount"
         },
         "gas": {
-          "type": "integer",
-          "description": "Contract gas",
-          "minimum": 0
+          "$ref": "#/definitions/Gas"
         },
         "gas_price": {
-          "type": "integer",
-          "description": "Gas price",
-          "minimum": 0
+          "$ref": "#/definitions/GasPrice"
         },
         "fee": {
-          "description": "Transaction fee",
           "$ref": "#/definitions/Fee"
         },
         "ttl": {
           "type": "integer",
           "description": "Transaction TTL",
-          "minimum": 0
+          "minimum": 0,
+          "format": "uint64"
         },
         "call_data": {
           "description": "Contract call data",
@@ -5270,7 +5247,8 @@
         },
         "nonce": {
           "type": "integer",
-          "description": "Owner's nonce"
+          "description": "Owner's nonce",
+          "format": "uint64"
         },
         "code": {
           "type": "string",
@@ -5280,41 +5258,39 @@
           "type": "integer",
           "description": "Virtual machine's version",
           "minimum": 0,
-          "maximum": 65535
+          "maximum": 65535,
+          "format": "uint64"
         },
         "abi_version": {
           "type": "integer",
           "description": "ABI version",
           "minimum": 0,
-          "maximum": 65535
+          "maximum": 65535,
+          "format": "uint64"
         },
         "deposit": {
           "type": "integer",
           "description": "Deposit",
-          "minimum": 0
+          "minimum": 0,
+          "format": "uint64"
         },
         "amount": {
-          "description": "Amount",
           "$ref": "#/definitions/Amount"
         },
         "gas": {
-          "type": "integer",
-          "description": "Contract gas",
-          "minimum": 0
+          "$ref": "#/definitions/Gas"
         },
         "gas_price": {
-          "type": "integer",
-          "description": "Gas price",
-          "minimum": 0
+          "$ref": "#/definitions/GasPrice"
         },
         "fee": {
-          "description": "Transaction fee",
           "$ref": "#/definitions/Fee"
         },
         "ttl": {
           "type": "integer",
           "description": "Transaction TTL",
-          "minimum": 0
+          "minimum": 0,
+          "format": "uint64"
         },
         "arguments": {
           "type": "string",
@@ -5359,7 +5335,8 @@
         },
         "nonce": {
           "type": "integer",
-          "description": "Caller's nonce"
+          "description": "Caller's nonce",
+          "format": "uint64"
         },
         "contract_id": {
           "description": "Contract's pub_key",
@@ -5369,36 +5346,33 @@
           "type": "integer",
           "description": "VM version",
           "minimum": 0,
-          "maximum": 65535
+          "maximum": 65535,
+          "format": "uint64"
         },
         "abi_version": {
           "type": "integer",
           "description": "ABI version",
           "minimum": 0,
-          "maximum": 65535
+          "maximum": 65535,
+          "format": "uint64"
         },
         "fee": {
-          "description": "Transaction fee",
           "$ref": "#/definitions/Fee"
         },
         "ttl": {
           "type": "integer",
           "description": "Transaction TTL",
-          "minimum": 0
+          "minimum": 0,
+          "format": "uint64"
         },
         "amount": {
-          "description": "Amount",
           "$ref": "#/definitions/Amount"
         },
         "gas": {
-          "type": "integer",
-          "description": "Contract gas",
-          "minimum": 0
+          "$ref": "#/definitions/Gas"
         },
         "gas_price": {
-          "type": "integer",
-          "description": "Gas price",
-          "minimum": 0
+          "$ref": "#/definitions/GasPrice"
         },
         "call_data": {
           "description": "Contract call data",
@@ -5411,7 +5385,6 @@
         "amount": 0,
         "call_data": {},
         "caller_id": {},
-        "contract_id": null,
         "fee": 0,
         "gas": 0,
         "abi_version": 9606,
@@ -5436,7 +5409,8 @@
         },
         "nonce": {
           "type": "integer",
-          "description": "Caller's nonce"
+          "description": "Caller's nonce",
+          "format": "uint64"
         },
         "contract_id": {
           "description": "Contract's pub_key",
@@ -5446,36 +5420,33 @@
           "type": "integer",
           "description": "VM version",
           "minimum": 0,
-          "maximum": 65535
+          "maximum": 65535,
+          "format": "uint64"
         },
         "abi_version": {
           "type": "integer",
           "description": "ABI version",
           "minimum": 0,
-          "maximum": 65535
+          "maximum": 65535,
+          "format": "uint64"
         },
         "fee": {
-          "description": "Transaction fee",
           "$ref": "#/definitions/Fee"
         },
         "ttl": {
           "type": "integer",
           "description": "Transaction TTL",
-          "minimum": 0
+          "minimum": 0,
+          "format": "uint64"
         },
         "amount": {
-          "description": "Amount",
           "$ref": "#/definitions/Amount"
         },
         "gas": {
-          "type": "integer",
-          "description": "Contract gas",
-          "minimum": 0
+          "$ref": "#/definitions/Gas"
         },
         "gas_price": {
-          "type": "integer",
-          "description": "Gas price",
-          "minimum": 0
+          "$ref": "#/definitions/GasPrice"
         },
         "function": {
           "type": "string",
@@ -5493,7 +5464,6 @@
       "example": {
         "gas_price": 0,
         "amount": 0,
-        "contract_id": null,
         "fee": 0,
         "nonce": 0,
         "ttl": 0,
@@ -5593,15 +5563,10 @@
           {}
         ],
         "key_block": {
-          "prev_hash": null,
           "nonce": 1,
           "version": 5,
-          "miner": null,
           "target": 6,
-          "beneficiary": null,
-          "state_hash": null,
           "pow": "",
-          "prev_key_hash": null,
           "time": 5,
           "hash": {},
           "height": 0,
@@ -5812,35 +5777,43 @@
       "properties": {
         "accounts": {
           "type": "integer",
-          "description": "Tokens in account balances"
+          "description": "Tokens in account balances",
+          "format": "uint64"
         },
         "contracts": {
           "type": "integer",
-          "description": "Tokens in contracts"
+          "description": "Tokens in contracts",
+          "format": "uint64"
         },
         "contract_oracles": {
           "type": "integer",
-          "description": "Tokens in contracts registered as oracles"
+          "description": "Tokens in contracts registered as oracles",
+          "format": "uint64"
         },
         "locked": {
           "type": "integer",
-          "description": "Tokens locked (not owned by anyone)"
+          "description": "Tokens locked (not owned by anyone)",
+          "format": "uint64"
         },
         "oracles": {
           "type": "integer",
-          "description": "Tokens in accounts registered as oracles"
+          "description": "Tokens in accounts registered as oracles",
+          "format": "uint64"
         },
         "oracle_queries": {
           "type": "integer",
-          "description": "Tokens in pending oracle queries"
+          "description": "Tokens in pending oracle queries",
+          "format": "uint64"
         },
         "pending_rewards": {
           "type": "integer",
-          "description": "Tokens from fees and coinbase pending in the beneficiary reward delay"
+          "description": "Tokens from fees and coinbase pending in the beneficiary reward delay",
+          "format": "uint64"
         },
         "total": {
           "type": "integer",
-          "description": "Sum of all tokens from other fields"
+          "description": "Sum of all tokens from other fields",
+          "format": "uint64"
         }
       },
       "example": {
@@ -5945,6 +5918,26 @@
       }
     },
     "NameSalt": {
+      "type": "integer",
+      "minimum": 0,
+      "x-go-type": {
+        "import": {
+          "package": "github.com/aeternity/aepp-sdk-go/utils"
+        },
+        "type": "BigInt"
+      }
+    },
+    "Gas": {
+      "type": "integer",
+      "minimum": 0,
+      "x-go-type": {
+        "import": {
+          "package": "github.com/aeternity/aepp-sdk-go/utils"
+        },
+        "type": "BigInt"
+      }
+    },
+    "GasPrice": {
       "type": "integer",
       "minimum": 0,
       "x-go-type": {

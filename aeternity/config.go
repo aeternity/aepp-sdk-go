@@ -28,10 +28,12 @@ type AensConfig struct {
 
 // ContractConfig configurations for contracts
 type ContractConfig struct {
-	Gas       uint64 `json:"gas" yaml:"gas" mapstructure:"gas"`
-	GasPrice  uint64 `json:"gas_price" yaml:"gas_price" mapstructure:"gas_price"`
-	Deposit   uint64 `json:"deposit" yaml:"deposit" mapstructure:"deposit"`
-	VMVersion uint64 `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
+	Gas        utils.BigInt `json:"gas" yaml:"gas" mapstructure:"gas"`
+	GasPrice   utils.BigInt `json:"gas_price" yaml:"gas_price" mapstructure:"gas_price"`
+	Amount     utils.BigInt `json:"amount" yaml:"amount" mapstructure:"amount"`
+	Deposit    uint64       `json:"deposit" yaml:"deposit" mapstructure:"deposit"`
+	VMVersion  uint64       `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
+	ABIVersion uint64       `json:"abi_version" yaml:"abi_version" mapstructure:"abi_version"`
 }
 
 // OracleConfig configurations for contracts
@@ -50,8 +52,11 @@ type StateChannelConfig struct {
 	ChannelReserve uint64 `json:"channel_reserve" yaml:"channel_reserve" mapstructure:"channel_reserve"`
 }
 
-// ClientConfig client paramters configuration
+// ClientConfig client parameters configuration
 type ClientConfig struct {
+	BaseGas            utils.BigInt
+	GasPerByte         utils.BigInt
+	GasPrice           utils.BigInt
 	TTL                uint64             `json:"ttl" yaml:"ttl" mapstructure:"ttl"`
 	Fee                utils.BigInt       `json:"fee" yaml:"fee" mapstructure:"fee"`
 	DefaultKey         string             `json:"default_key_name" yaml:"default_key_name" mapstructure:"default_key_name"`
@@ -91,8 +96,11 @@ var Config = ProfileConfig{
 		NetworkID:   "ae_mainnet",
 	},
 	Client: ClientConfig{
-		TTL: 500,
-		Fee: *utils.RequireBigIntFromString("200000000000000"),
+		BaseGas:    *utils.NewBigIntFromUint64(15000),
+		GasPerByte: *utils.NewBigIntFromUint64(20),
+		GasPrice:   *utils.NewBigIntFromUint64(1000000000),
+		TTL:        500,
+		Fee:        *utils.RequireBigIntFromString("200000000000000"),
 		Names: AensConfig{
 			NameTTL:     500, // absolute block height when the name will expire
 			ClientTTL:   500, // time in blocks until the name resolver should check again in case the name was updated
@@ -100,11 +108,13 @@ var Config = ProfileConfig{
 			ClaimFee:    *utils.RequireBigIntFromString("100000000000000"),
 			UpdateFee:   *utils.RequireBigIntFromString("100000000000000"),
 		},
-		Contracts: ContractConfig{ // UNUSED
-			Gas:       1e9,
-			GasPrice:  1,
-			Deposit:   0,
-			VMVersion: 0,
+		Contracts: ContractConfig{
+			Gas:        *utils.NewBigIntFromUint64(1e9),
+			GasPrice:   *utils.NewBigIntFromUint64(1e9),
+			Amount:     *utils.NewBigInt(),
+			Deposit:    0,
+			VMVersion:  3,
+			ABIVersion: 1,
 		},
 		Oracles: OracleConfig{
 			QueryFee:         *utils.NewBigIntFromUint64(0),

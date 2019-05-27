@@ -3,6 +3,7 @@ package aeternity
 import (
 	"fmt"
 	"io"
+	"math/big"
 
 	"github.com/aeternity/aepp-sdk-go/generated/models"
 	"github.com/aeternity/aepp-sdk-go/rlp"
@@ -77,17 +78,60 @@ func buildPointers(pointers []string) (ptrs []*NamePointer, err error) {
 	return
 }
 
+func calcFeeStd(tx Tx, txLen int) *utils.BigInt {
+	// (Config.Client.BaseGas + len(txRLP) * Config.Client.GasPerByte) * Config.Client.GasPrice
+	//                                   txLenGasPerByte
+	fee := utils.NewBigInt()
+	txLenGasPerByte := utils.NewBigInt()
+
+	txLenGasPerByte.Mul(utils.NewBigIntFromUint64(uint64(txLen)).Int, Config.Client.GasPerByte.Int)
+	fee.Add(Config.Client.BaseGas.Int, txLenGasPerByte.Int)
+	fee.Mul(fee.Int, Config.Client.GasPrice.Int)
+	return fee
+}
+
+func calcFeeContract(gas *utils.BigInt, baseGasMultiplier int64, length int) *utils.BigInt {
+	// (Config.Client.BaseGas * 5) + gaslimit + (len(txRLP) * Config.Client.GasPerByte) * Config.Client.GasPrice
+	//           baseGas5                                txLenGasPerByte
+	baseGas5 := utils.NewBigInt()
+	txLenBig := utils.NewBigInt()
+	answer := utils.NewBigInt()
+
+	baseGas5.Mul(Config.Client.BaseGas.Int, new(big.Int).SetInt64(baseGasMultiplier))
+	txLenBig.SetUint64(uint64(length))
+	txLenGasPerByte := utils.NewBigInt()
+	txLenGasPerByte.Mul(txLenBig.Int, Config.Client.GasPerByte.Int)
+
+	answer.Add(baseGas5.Int, gas.Int)
+	answer.Add(answer.Int, txLenGasPerByte.Int)
+	answer.Mul(answer.Int, Config.Client.GasPrice.Int)
+	return answer
+}
+
+// sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
+func calcSizeEstimate(tx Tx, fee *utils.BigInt) (int, error) {
+	feeRlp, err := rlp.EncodeToBytes(fee)
+	if err != nil {
+		return 0, err
+	}
+	feeRlpLen := len(feeRlp)
+
+	rlpRawMsg, err := tx.RLP()
+	if err != nil {
+		return 0, err
+	}
+
+	return len(rlpRawMsg) - feeRlpLen + 8, nil
+}
+
 // Tx interface guarantees that code using Tx can rely on these functions being present
-// Since the methods to Tx-like structs do not modify the Tx themselves - they simply generate values
-// from the Tx's values - Tx methods should not have a pointer receiver.
-// See https://tour.golang.org/methods/4 or https://dave.cheney.net/2016/03/19/should-methods-be-declared-on-t-or-t
 type Tx interface {
 	RLP() ([]byte, error)
 }
 
 // BaseEncodeTx takes a Tx, runs its RLP() method, and base encodes the result.
-func BaseEncodeTx(t Tx) (string, error) {
-	txRaw, err := t.RLP()
+func BaseEncodeTx(tx Tx) (string, error) {
+	txRaw, err := tx.RLP()
 	if err != nil {
 		return "", err
 	}
@@ -107,14 +151,14 @@ type SpendTx struct {
 }
 
 // RLP returns a byte serialized representation
-func (t *SpendTx) RLP() (rlpRawMsg []byte, err error) {
+func (tx *SpendTx) RLP() (rlpRawMsg []byte, err error) {
 	// build id for the sender
-	sID, err := buildIDTag(IDTagAccount, t.SenderID)
+	sID, err := buildIDTag(IDTagAccount, tx.SenderID)
 	if err != nil {
 		return
 	}
 	// build id for the recipient
-	rID, err := buildIDTag(IDTagAccount, t.RecipientID)
+	rID, err := buildIDTag(IDTagAccount, tx.RecipientID)
 	if err != nil {
 		return
 	}
@@ -124,27 +168,42 @@ func (t *SpendTx) RLP() (rlpRawMsg []byte, err error) {
 		rlpMessageVersion,
 		sID,
 		rID,
-		t.Amount.Int,
-		t.Fee.Int,
-		t.TTL,
-		t.Nonce,
-		[]byte(t.Payload))
+		tx.Amount.Int,
+		tx.Fee.Int,
+		tx.TTL,
+		tx.Nonce,
+		[]byte(tx.Payload))
 	return
 }
 
 // JSON representation of a Tx is useful for querying the node's debug endpoint
-func (t *SpendTx) JSON() (string, error) {
+func (tx *SpendTx) JSON() (string, error) {
 	swaggerT := models.SpendTx{
-		Amount:      t.Amount,
-		Fee:         t.Fee,
-		Nonce:       t.Nonce,
-		Payload:     &t.Payload,
-		RecipientID: models.EncodedHash(t.RecipientID),
-		SenderID:    models.EncodedHash(t.SenderID),
-		TTL:         t.TTL,
+		Amount:      tx.Amount,
+		Fee:         tx.Fee,
+		Nonce:       tx.Nonce,
+		Payload:     &tx.Payload,
+		RecipientID: models.EncodedHash(tx.RecipientID),
+		SenderID:    models.EncodedHash(tx.SenderID),
+		TTL:         tx.TTL,
 	}
 	output, err := swaggerT.MarshalBinary()
 	return string(output), err
+}
+
+// sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
+func (tx *SpendTx) sizeEstimate() (int, error) {
+	return calcSizeEstimate(tx, &tx.Fee)
+}
+
+// FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
+func (tx *SpendTx) FeeEstimate() (*utils.BigInt, error) {
+	txLenEstimated, err := tx.sizeEstimate()
+	if err != nil {
+		return utils.NewBigInt(), err
+	}
+	estimatedFee := calcFeeStd(tx, txLenEstimated)
+	return estimatedFee, nil
 }
 
 // NewSpendTx is a constructor for a SpendTx struct
@@ -162,14 +221,14 @@ type NamePreclaimTx struct {
 }
 
 // RLP returns a byte serialized representation
-func (t *NamePreclaimTx) RLP() (rlpRawMsg []byte, err error) {
+func (tx *NamePreclaimTx) RLP() (rlpRawMsg []byte, err error) {
 	// build id for the sender
-	aID, err := buildIDTag(IDTagAccount, t.AccountID)
+	aID, err := buildIDTag(IDTagAccount, tx.AccountID)
 	if err != nil {
 		return
 	}
 	// build id for the committment
-	cID, err := buildIDTag(IDTagCommitment, t.CommitmentID)
+	cID, err := buildIDTag(IDTagCommitment, tx.CommitmentID)
 	if err != nil {
 		return
 	}
@@ -178,24 +237,39 @@ func (t *NamePreclaimTx) RLP() (rlpRawMsg []byte, err error) {
 		ObjectTagNameServicePreclaimTransaction,
 		rlpMessageVersion,
 		aID,
-		t.AccountNonce,
+		tx.AccountNonce,
 		cID,
-		t.Fee.Int,
-		t.TTL)
+		tx.Fee.Int,
+		tx.TTL)
 	return
 }
 
 // JSON representation of a Tx is useful for querying the node's debug endpoint
-func (t *NamePreclaimTx) JSON() (string, error) {
+func (tx *NamePreclaimTx) JSON() (string, error) {
 	swaggerT := models.NamePreclaimTx{
-		AccountID:    models.EncodedHash(t.AccountID),
-		CommitmentID: models.EncodedHash(t.CommitmentID),
-		Fee:          t.Fee,
-		Nonce:        t.AccountNonce,
-		TTL:          t.TTL,
+		AccountID:    models.EncodedHash(tx.AccountID),
+		CommitmentID: models.EncodedHash(tx.CommitmentID),
+		Fee:          tx.Fee,
+		Nonce:        tx.AccountNonce,
+		TTL:          tx.TTL,
 	}
 	output, err := swaggerT.MarshalBinary()
 	return string(output), err
+}
+
+// sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
+func (tx *NamePreclaimTx) sizeEstimate() (int, error) {
+	return calcSizeEstimate(tx, &tx.Fee)
+}
+
+// FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
+func (tx *NamePreclaimTx) FeeEstimate() (*utils.BigInt, error) {
+	txLenEstimated, err := tx.sizeEstimate()
+	if err != nil {
+		return utils.NewBigInt(), err
+	}
+	estimatedFee := calcFeeStd(tx, txLenEstimated)
+	return estimatedFee, nil
 }
 
 // NewNamePreclaimTx is a constructor for a NamePreclaimTx struct
@@ -216,9 +290,9 @@ type NameClaimTx struct {
 }
 
 // RLP returns a byte serialized representation
-func (t *NameClaimTx) RLP() (rlpRawMsg []byte, err error) {
+func (tx *NameClaimTx) RLP() (rlpRawMsg []byte, err error) {
 	// build id for the sender
-	aID, err := buildIDTag(IDTagAccount, t.AccountID)
+	aID, err := buildIDTag(IDTagAccount, tx.AccountID)
 	if err != nil {
 		return
 	}
@@ -228,30 +302,45 @@ func (t *NameClaimTx) RLP() (rlpRawMsg []byte, err error) {
 		ObjectTagNameServiceClaimTransaction,
 		rlpMessageVersion,
 		aID,
-		t.AccountNonce,
-		t.Name,
-		t.NameSalt.Int,
-		t.Fee.Int,
-		t.TTL)
+		tx.AccountNonce,
+		tx.Name,
+		tx.NameSalt.Int,
+		tx.Fee.Int,
+		tx.TTL)
 	return
 }
 
 // JSON representation of a Tx is useful for querying the node's debug endpoints
-func (t *NameClaimTx) JSON() (string, error) {
+func (tx *NameClaimTx) JSON() (string, error) {
 	// When talking JSON to the node, the name should be 'API encoded'
 	// (base58), not namehash-ed.
-	nameAPIEncoded := Encode(PrefixName, []byte(t.Name))
+	nameAPIEncoded := Encode(PrefixName, []byte(tx.Name))
 	swaggerT := models.NameClaimTx{
-		AccountID: models.EncodedHash(t.AccountID),
-		Fee:       t.Fee,
+		AccountID: models.EncodedHash(tx.AccountID),
+		Fee:       tx.Fee,
 		Name:      &nameAPIEncoded,
-		NameSalt:  t.NameSalt,
-		Nonce:     t.AccountNonce,
-		TTL:       t.TTL,
+		NameSalt:  tx.NameSalt,
+		Nonce:     tx.AccountNonce,
+		TTL:       tx.TTL,
 	}
 
 	output, err := swaggerT.MarshalBinary()
 	return string(output), err
+}
+
+// sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
+func (tx *NameClaimTx) sizeEstimate() (int, error) {
+	return calcSizeEstimate(tx, &tx.Fee)
+}
+
+// FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
+func (tx *NameClaimTx) FeeEstimate() (*utils.BigInt, error) {
+	txLenEstimated, err := tx.sizeEstimate()
+	if err != nil {
+		return utils.NewBigInt(), err
+	}
+	estimatedFee := calcFeeStd(tx, txLenEstimated)
+	return estimatedFee, nil
 }
 
 // NewNameClaimTx is a constructor for a NameClaimTx struct
@@ -265,13 +354,13 @@ type NamePointer struct {
 }
 
 // EncodeRLP implements rlp.Encoder interface.
-func (t *NamePointer) EncodeRLP(w io.Writer) (err error) {
-	accountID, err := buildIDTag(IDTagAccount, string(t.NamePointer.ID))
+func (tx *NamePointer) EncodeRLP(w io.Writer) (err error) {
+	accountID, err := buildIDTag(IDTagAccount, string(tx.NamePointer.ID))
 	if err != nil {
 		return
 	}
 
-	err = rlp.Encode(w, []interface{}{t.Key, accountID})
+	err = rlp.Encode(w, []interface{}{tx.Key, accountID})
 	if err != nil {
 		return
 	}
@@ -300,24 +389,24 @@ type NameUpdateTx struct {
 }
 
 // RLP returns a byte serialized representation
-func (t *NameUpdateTx) RLP() (rlpRawMsg []byte, err error) {
+func (tx *NameUpdateTx) RLP() (rlpRawMsg []byte, err error) {
 	// build id for the sender
-	aID, err := buildIDTag(IDTagAccount, t.AccountID)
+	aID, err := buildIDTag(IDTagAccount, tx.AccountID)
 	if err != nil {
 		return
 	}
 	// build id for the name
-	nID, err := buildIDTag(IDTagName, t.NameID)
+	nID, err := buildIDTag(IDTagName, tx.NameID)
 	if err != nil {
 		return
 	}
 
 	// reverse the NamePointer order as compared to the JSON serialization, because the node seems to want it that way
 	i := 0
-	j := len(t.Pointers) - 1
-	reversedPointers := make([]*NamePointer, len(t.Pointers))
-	for i <= len(t.Pointers)-1 {
-		reversedPointers[i] = t.Pointers[j]
+	j := len(tx.Pointers) - 1
+	reversedPointers := make([]*NamePointer, len(tx.Pointers))
+	for i <= len(tx.Pointers)-1 {
+		reversedPointers[i] = tx.Pointers[j]
 		i++
 		j--
 	}
@@ -327,36 +416,52 @@ func (t *NameUpdateTx) RLP() (rlpRawMsg []byte, err error) {
 		ObjectTagNameServiceUpdateTransaction,
 		rlpMessageVersion,
 		aID,
-		t.AccountNonce,
+
+		tx.AccountNonce,
 		nID,
-		t.NameTTL,
+		tx.NameTTL,
 		reversedPointers,
-		t.ClientTTL,
-		t.Fee.Int,
-		t.TTL)
+		tx.ClientTTL,
+		tx.Fee.Int,
+		tx.TTL)
 	return
 }
 
 // JSON representation of a Tx is useful for querying the node's debug endpoint
-func (t *NameUpdateTx) JSON() (string, error) {
+func (tx *NameUpdateTx) JSON() (string, error) {
 	swaggerNamePointers := []*models.NamePointer{}
-	for _, np := range t.Pointers {
+	for _, np := range tx.Pointers {
 		swaggerNamePointers = append(swaggerNamePointers, np.NamePointer)
 	}
 
 	swaggerT := models.NameUpdateTx{
-		AccountID: models.EncodedHash(t.AccountID),
-		ClientTTL: &t.ClientTTL,
-		Fee:       t.Fee,
-		NameID:    models.EncodedHash(t.NameID),
-		NameTTL:   &t.NameTTL,
-		Nonce:     t.AccountNonce,
+		AccountID: models.EncodedHash(tx.AccountID),
+		ClientTTL: &tx.ClientTTL,
+		Fee:       tx.Fee,
+		NameID:    models.EncodedHash(tx.NameID),
+		NameTTL:   &tx.NameTTL,
+		Nonce:     tx.AccountNonce,
 		Pointers:  swaggerNamePointers,
-		TTL:       t.TTL,
+		TTL:       tx.TTL,
 	}
 
 	output, err := swaggerT.MarshalBinary()
 	return string(output), err
+}
+
+// sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
+func (tx *NameUpdateTx) sizeEstimate() (int, error) {
+	return calcSizeEstimate(tx, &tx.Fee)
+}
+
+// FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
+func (tx *NameUpdateTx) FeeEstimate() (*utils.BigInt, error) {
+	txLenEstimated, err := tx.sizeEstimate()
+	if err != nil {
+		return utils.NewBigInt(), err
+	}
+	estimatedFee := calcFeeStd(tx, txLenEstimated)
+	return estimatedFee, nil
 }
 
 // NewNameUpdateTx is a constructor for a NameUpdateTx struct
@@ -366,6 +471,152 @@ func NewNameUpdateTx(accountID, nameID string, pointers []string, nameTTL, clien
 		panic(err)
 	}
 	return NameUpdateTx{accountID, nameID, parsedPointers, nameTTL, clientTTL, fee, ttl, accountNonce}
+}
+
+// NameRevokeTx represents a transaction that revokes the name, i.e. has the same effect as waiting for the Name's TTL to expire.
+type NameRevokeTx struct {
+	AccountID    string
+	NameID       string
+	Fee          utils.BigInt
+	TTL          uint64
+	AccountNonce uint64
+}
+
+// RLP returns a byte serialized representation
+func (tx *NameRevokeTx) RLP() (rlpRawMsg []byte, err error) {
+	// build id for the sender
+	aID, err := buildIDTag(IDTagAccount, tx.AccountID)
+	if err != nil {
+		return
+	}
+	// build id for the name
+	nID, err := buildIDTag(IDTagName, tx.NameID)
+	if err != nil {
+		return
+	}
+
+	rlpRawMsg, err = buildRLPMessage(
+		ObjectTagNameServiceRevokeTransaction,
+		rlpMessageVersion,
+		aID,
+		tx.AccountNonce,
+		nID,
+		tx.Fee.Int,
+		tx.TTL)
+	return
+}
+
+// JSON representation of a Tx is useful for querying the node's debug endpoint
+func (tx *NameRevokeTx) JSON() (string, error) {
+	swaggerT := models.NameRevokeTx{
+		AccountID: models.EncodedHash(tx.AccountID),
+		Fee:       tx.Fee,
+		NameID:    models.EncodedHash(tx.NameID),
+		Nonce:     tx.AccountNonce,
+		TTL:       tx.TTL,
+	}
+
+	output, err := swaggerT.MarshalBinary()
+	return string(output), err
+}
+
+// sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
+func (tx *NameRevokeTx) sizeEstimate() (int, error) {
+	return calcSizeEstimate(tx, &tx.Fee)
+}
+
+// FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
+func (tx *NameRevokeTx) FeeEstimate() (*utils.BigInt, error) {
+	txLenEstimated, err := tx.sizeEstimate()
+	if err != nil {
+		return utils.NewBigInt(), err
+	}
+	estimatedFee := calcFeeStd(tx, txLenEstimated)
+	return estimatedFee, nil
+}
+
+// NewNameRevokeTx is a constructor for a NameRevokeTx struct
+func NewNameRevokeTx(accountID, name string, fee utils.BigInt, ttl, accountNonce uint64) NameRevokeTx {
+	return NameRevokeTx{accountID, name, fee, ttl, accountNonce}
+}
+
+// NameTransferTx represents a transaction that transfers ownership of one name to another account.
+type NameTransferTx struct {
+	AccountID    string
+	NameID       string
+	RecipientID  string
+	Fee          utils.BigInt
+	TTL          uint64
+	AccountNonce uint64
+}
+
+// RLP returns a byte serialized representation
+func (tx *NameTransferTx) RLP() (rlpRawMsg []byte, err error) {
+	// build id for the sender
+	aID, err := buildIDTag(IDTagAccount, tx.AccountID)
+	if err != nil {
+		return
+	}
+
+	// build id for the recipient
+	rID, err := buildIDTag(IDTagAccount, tx.RecipientID)
+	if err != nil {
+		return
+	}
+
+	// build id for the name
+	nID, err := buildIDTag(IDTagName, tx.NameID)
+	if err != nil {
+		return
+	}
+
+	// create the transaction
+	rlpRawMsg, err = buildRLPMessage(
+		ObjectTagNameServiceTransferTransaction,
+		rlpMessageVersion,
+		aID,
+		tx.AccountNonce,
+		nID,
+		rID,
+		tx.Fee.Int,
+		tx.TTL,
+	)
+	return
+}
+
+// JSON representation of a Tx is useful for querying the node's debug endpoint
+func (tx *NameTransferTx) JSON() (string, error) {
+	swaggerT := models.NameTransferTx{
+		AccountID:   models.EncodedHash(tx.AccountID),
+		Fee:         tx.Fee,
+		NameID:      models.EncodedHash(tx.NameID),
+		Nonce:       tx.AccountNonce,
+		RecipientID: models.EncodedHash(tx.RecipientID),
+		TTL:         tx.TTL,
+	}
+
+	output, err := swaggerT.MarshalBinary()
+	return string(output), err
+}
+
+// sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
+func (tx *NameTransferTx) sizeEstimate() (int, error) {
+	return calcSizeEstimate(tx, &tx.Fee)
+}
+
+// FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
+func (tx *NameTransferTx) FeeEstimate() (*utils.BigInt, error) {
+	txLenEstimated, err := tx.sizeEstimate()
+	if err != nil {
+		return utils.NewBigInt(), err
+	}
+	estimatedFee := calcFeeStd(tx, txLenEstimated)
+	return estimatedFee, nil
+}
+
+// NewNameTransferTx is a constructor for a NameTransferTx struct
+func NewNameTransferTx(AccountID, NameID, RecipientID string, Fee utils.BigInt, TTL, AccountNonce uint64) NameTransferTx {
+	return NameTransferTx{AccountID, NameID, RecipientID, Fee, TTL, AccountNonce}
 }
 
 // OracleRegisterTx represents a transaction that registers an oracle on the blockchain's state
@@ -379,14 +630,14 @@ type OracleRegisterTx struct {
 	OracleTTLValue uint64
 	AbiVersion     uint64
 	VMVersion      uint64
-	TxFee          utils.BigInt
-	TxTTL          uint64
+	Fee            utils.BigInt
+	TTL            uint64
 }
 
 // RLP returns a byte serialized representation
-func (t *OracleRegisterTx) RLP() (rlpRawMsg []byte, err error) {
+func (tx *OracleRegisterTx) RLP() (rlpRawMsg []byte, err error) {
 	// build id for the account
-	aID, err := buildIDTag(IDTagAccount, t.AccountID)
+	aID, err := buildIDTag(IDTagAccount, tx.AccountID)
 	if err != nil {
 		return
 	}
@@ -395,21 +646,21 @@ func (t *OracleRegisterTx) RLP() (rlpRawMsg []byte, err error) {
 		ObjectTagOracleRegisterTransaction,
 		rlpMessageVersion,
 		aID,
-		t.AccountNonce,
-		[]byte(t.QuerySpec),
-		[]byte(t.ResponseSpec),
-		t.QueryFee.Int,
-		t.OracleTTLType,
-		t.OracleTTLValue,
-		t.TxFee.Int,
-		t.TxTTL,
-		t.AbiVersion)
+		tx.AccountNonce,
+		[]byte(tx.QuerySpec),
+		[]byte(tx.ResponseSpec),
+		tx.QueryFee.Int,
+		tx.OracleTTLType,
+		tx.OracleTTLValue,
+		tx.Fee.Int,
+		tx.TTL,
+		tx.AbiVersion)
 	return
 }
 
 // JSON representation of a Tx is useful for querying the node's debug endpoint
-// BUG: Account Nonce won't be represented in JSON output if nonce is 0, thanks to swagger.json
-func (t *OracleRegisterTx) JSON() (string, error) {
+// BUG: Account Nonce won'tx be represented in JSON output if nonce is 0, thanks to swagger.json
+func (tx *OracleRegisterTx) JSON() (string, error) {
 	// # Oracles
 	// ORACLE_TTL_TYPE_DELTA = 'delta'
 	// ORACLE_TTL_TYPE_BLOCK = 'block'
@@ -425,25 +676,23 @@ func (t *OracleRegisterTx) JSON() (string, error) {
 	// NO_ABI = 0
 	// ABI_SOPHIA = 1
 	// ABI_SOLIDITY = 2
-	abiVersionCasted := int64(t.AbiVersion)
-	vmVersionCasted := int64(t.VMVersion)
 
-	ttlTypeStr := ttlTypeIntToStr(t.OracleTTLType)
+	ttlTypeStr := ttlTypeIntToStr(tx.OracleTTLType)
 
 	swaggerT := models.OracleRegisterTx{
-		AbiVersion: &abiVersionCasted,
-		AccountID:  models.EncodedHash(t.AccountID),
-		Fee:        t.TxFee,
-		Nonce:      t.AccountNonce,
+		AbiVersion: &tx.AbiVersion,
+		AccountID:  models.EncodedHash(tx.AccountID),
+		Fee:        tx.Fee,
+		Nonce:      tx.AccountNonce,
 		OracleTTL: &models.TTL{
 			Type:  &ttlTypeStr,
-			Value: &t.OracleTTLValue,
+			Value: &tx.OracleTTLValue,
 		},
-		QueryFee:       t.QueryFee,
-		QueryFormat:    &t.QuerySpec,
-		ResponseFormat: &t.ResponseSpec,
-		TTL:            t.TxTTL,
-		VMVersion:      &vmVersionCasted,
+		QueryFee:       tx.QueryFee,
+		QueryFormat:    &tx.QuerySpec,
+		ResponseFormat: &tx.ResponseSpec,
+		TTL:            tx.TTL,
+		VMVersion:      &tx.VMVersion,
 	}
 	output, err := swaggerT.MarshalBinary()
 	return string(output), err
@@ -460,13 +709,13 @@ type OracleExtendTx struct {
 	AccountNonce   uint64
 	OracleTTLType  uint64
 	OracleTTLValue uint64
-	TxFee          utils.BigInt
-	TxTTL          uint64
+	Fee            utils.BigInt
+	TTL            uint64
 }
 
 // RLP returns a byte serialized representation
-func (t *OracleExtendTx) RLP() (rlpRawMsg []byte, err error) {
-	oID, err := buildIDTag(IDTagOracle, t.OracleID)
+func (tx *OracleExtendTx) RLP() (rlpRawMsg []byte, err error) {
+	oID, err := buildIDTag(IDTagOracle, tx.OracleID)
 	if err != nil {
 		return
 	}
@@ -475,27 +724,27 @@ func (t *OracleExtendTx) RLP() (rlpRawMsg []byte, err error) {
 		ObjectTagOracleExtendTransaction,
 		rlpMessageVersion,
 		oID,
-		t.AccountNonce,
-		t.OracleTTLType,
-		t.OracleTTLValue,
-		t.TxFee.Int,
-		t.TxTTL)
+		tx.AccountNonce,
+		tx.OracleTTLType,
+		tx.OracleTTLValue,
+		tx.Fee.Int,
+		tx.TTL)
 	return
 }
 
 // JSON representation of a Tx is useful for querying the node's debug endpoint
-func (t *OracleExtendTx) JSON() (string, error) {
-	oracleTTLTypeStr := ttlTypeIntToStr(t.OracleTTLType)
+func (tx *OracleExtendTx) JSON() (string, error) {
+	oracleTTLTypeStr := ttlTypeIntToStr(tx.OracleTTLType)
 
 	swaggerT := models.OracleExtendTx{
-		Fee:      t.TxFee,
-		Nonce:    t.AccountNonce,
-		OracleID: models.EncodedHash(t.OracleID),
+		Fee:      tx.Fee,
+		Nonce:    tx.AccountNonce,
+		OracleID: models.EncodedHash(tx.OracleID),
 		OracleTTL: &models.RelativeTTL{
 			Type:  &oracleTTLTypeStr,
-			Value: &t.OracleTTLValue,
+			Value: &tx.OracleTTLValue,
 		},
-		TTL: t.TxTTL,
+		TTL: tx.TTL,
 	}
 
 	output, err := swaggerT.MarshalBinary()
@@ -503,8 +752,8 @@ func (t *OracleExtendTx) JSON() (string, error) {
 }
 
 // NewOracleExtendTx is a constructor for a OracleExtendTx struct
-func NewOracleExtendTx(oracleID string, accountNonce, oracleTTLType, oracleTTLValue uint64, TxFee utils.BigInt, TxTTL uint64) OracleExtendTx {
-	return OracleExtendTx{oracleID, accountNonce, oracleTTLType, oracleTTLValue, TxFee, TxTTL}
+func NewOracleExtendTx(oracleID string, accountNonce, oracleTTLType, oracleTTLValue uint64, Fee utils.BigInt, TTL uint64) OracleExtendTx {
+	return OracleExtendTx{oracleID, accountNonce, oracleTTLType, oracleTTLValue, Fee, TTL}
 }
 
 // OracleQueryTx represents a transaction that a program sends to query an oracle
@@ -518,18 +767,18 @@ type OracleQueryTx struct {
 	QueryTTLValue    uint64
 	ResponseTTLType  uint64
 	ResponseTTLValue uint64
-	TxFee            utils.BigInt
-	TxTTL            uint64
+	Fee              utils.BigInt
+	TTL              uint64
 }
 
 // RLP returns a byte serialized representation
-func (t *OracleQueryTx) RLP() (rlpRawMsg []byte, err error) {
-	accountID, err := buildIDTag(IDTagAccount, t.SenderID)
+func (tx *OracleQueryTx) RLP() (rlpRawMsg []byte, err error) {
+	accountID, err := buildIDTag(IDTagAccount, tx.SenderID)
 	if err != nil {
 		return
 	}
 
-	oracleID, err := buildIDTag(IDTagOracle, t.OracleID)
+	oracleID, err := buildIDTag(IDTagOracle, tx.OracleID)
 	if err != nil {
 		return
 	}
@@ -538,40 +787,40 @@ func (t *OracleQueryTx) RLP() (rlpRawMsg []byte, err error) {
 		ObjectTagOracleQueryTransaction,
 		rlpMessageVersion,
 		accountID,
-		t.AccountNonce,
+		tx.AccountNonce,
 		oracleID,
-		[]byte(t.Query),
-		t.QueryFee.Int,
-		t.QueryTTLType,
-		t.QueryTTLValue,
-		t.ResponseTTLType,
-		t.ResponseTTLValue,
-		t.TxFee.Int,
-		t.TxTTL)
+		[]byte(tx.Query),
+		tx.QueryFee.Int,
+		tx.QueryTTLType,
+		tx.QueryTTLValue,
+		tx.ResponseTTLType,
+		tx.ResponseTTLValue,
+		tx.Fee.Int,
+		tx.TTL)
 	return
 }
 
 // JSON representation of a Tx is useful for querying the node's debug endpoint
-func (t *OracleQueryTx) JSON() (string, error) {
-	responseTTLTypeStr := ttlTypeIntToStr(t.ResponseTTLType)
-	queryTTLTypeStr := ttlTypeIntToStr(t.QueryTTLType)
+func (tx *OracleQueryTx) JSON() (string, error) {
+	responseTTLTypeStr := ttlTypeIntToStr(tx.ResponseTTLType)
+	queryTTLTypeStr := ttlTypeIntToStr(tx.QueryTTLType)
 
 	swaggerT := models.OracleQueryTx{
-		Fee:      t.TxFee,
-		Nonce:    t.AccountNonce,
-		OracleID: models.EncodedHash(t.OracleID),
-		Query:    &t.Query,
-		QueryFee: t.QueryFee,
+		Fee:      tx.Fee,
+		Nonce:    tx.AccountNonce,
+		OracleID: models.EncodedHash(tx.OracleID),
+		Query:    &tx.Query,
+		QueryFee: tx.QueryFee,
 		QueryTTL: &models.TTL{
 			Type:  &queryTTLTypeStr,
-			Value: &t.QueryTTLValue,
+			Value: &tx.QueryTTLValue,
 		},
 		ResponseTTL: &models.RelativeTTL{
 			Type:  &responseTTLTypeStr,
-			Value: &t.ResponseTTLValue,
+			Value: &tx.ResponseTTLValue,
 		},
-		SenderID: models.EncodedHash(t.SenderID),
-		TTL:      t.TxTTL,
+		SenderID: models.EncodedHash(tx.SenderID),
+		TTL:      tx.TTL,
 	}
 
 	output, err := swaggerT.MarshalBinary()
@@ -579,8 +828,8 @@ func (t *OracleQueryTx) JSON() (string, error) {
 }
 
 // NewOracleQueryTx is a constructor for a OracleQueryTx struct
-func NewOracleQueryTx(SenderID string, AccountNonce uint64, OracleID, Query string, QueryFee utils.BigInt, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64, TxFee utils.BigInt, TxTTL uint64) OracleQueryTx {
-	return OracleQueryTx{SenderID, AccountNonce, OracleID, Query, QueryFee, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue, TxFee, TxTTL}
+func NewOracleQueryTx(SenderID string, AccountNonce uint64, OracleID, Query string, QueryFee utils.BigInt, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64, Fee utils.BigInt, TTL uint64) OracleQueryTx {
+	return OracleQueryTx{SenderID, AccountNonce, OracleID, Query, QueryFee, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue, Fee, TTL}
 }
 
 // OracleRespondTx represents a transaction that an oracle sends to respond to an incoming query
@@ -591,8 +840,54 @@ type OracleRespondTx struct {
 	Response         string
 	ResponseTTLType  uint64
 	ResponseTTLValue uint64
-	TxFee            utils.BigInt
-	TxTTL            uint64
+	Fee              utils.BigInt
+	TTL              uint64
+}
+
+// RLP returns a byte serialized representation
+func (tx *OracleRespondTx) RLP() (rlpRawMsg []byte, err error) {
+	oID, err := buildIDTag(IDTagOracle, tx.OracleID)
+	if err != nil {
+		return
+	}
+	queryIDBytes, err := Decode(tx.QueryID)
+	if err != nil {
+		return
+	}
+
+	rlpRawMsg, err = buildRLPMessage(
+		ObjectTagOracleResponseTransaction,
+		rlpMessageVersion,
+		oID,
+		tx.AccountNonce,
+		queryIDBytes,
+		tx.Response,
+		tx.ResponseTTLType,
+		tx.ResponseTTLValue,
+		tx.Fee.Int,
+		tx.TTL)
+	return
+}
+
+// JSON representation of a Tx is useful for querying the node's debug endpoint
+func (tx *OracleRespondTx) JSON() (string, error) {
+	responseTTLTypeStr := ttlTypeIntToStr(tx.ResponseTTLType)
+
+	swaggerT := models.OracleRespondTx{
+		Fee:      tx.Fee,
+		Nonce:    tx.AccountNonce,
+		OracleID: models.EncodedHash(tx.OracleID),
+		QueryID:  models.EncodedHash(tx.QueryID),
+		Response: &tx.Response,
+		ResponseTTL: &models.RelativeTTL{
+			Type:  &responseTTLTypeStr,
+			Value: &tx.ResponseTTLValue,
+		},
+		TTL: tx.TTL,
+	}
+	output, err := swaggerT.MarshalBinary()
+	return string(output), err
+
 }
 
 // RLP returns a byte serialized representation
@@ -642,6 +937,220 @@ func (t *OracleRespondTx) JSON() (string, error) {
 }
 
 // NewOracleRespondTx is a constructor for a OracleRespondTx struct
-func NewOracleRespondTx(OracleID string, AccountNonce uint64, QueryID string, Response string, TTLType uint64, TTLValue uint64, TxFee utils.BigInt, TxTTL uint64) OracleRespondTx {
-	return OracleRespondTx{OracleID, AccountNonce, QueryID, Response, TTLType, TTLValue, TxFee, TxTTL}
+func NewOracleRespondTx(OracleID string, AccountNonce uint64, QueryID string, Response string, TTLType uint64, TTLValue uint64, Fee utils.BigInt, TTL uint64) OracleRespondTx {
+	return OracleRespondTx{OracleID, AccountNonce, QueryID, Response, TTLType, TTLValue, Fee, TTL}
+}
+
+// ContractCreateTx represents a transaction that creates a smart contract
+type ContractCreateTx struct {
+	OwnerID      string
+	AccountNonce uint64
+	Code         string
+	VMVersion    uint64
+	AbiVersion   uint64
+	Deposit      uint64
+	Amount       utils.BigInt
+	Gas          utils.BigInt
+	GasPrice     utils.BigInt
+	Fee          utils.BigInt
+	TTL          uint64
+	CallData     string
+}
+
+func encodeVMABI(VMVersion, ABIVersion uint64) []byte {
+	vmBytes := utils.NewBigIntFromUint64(VMVersion).Bytes()
+	abiBytes := utils.NewBigIntFromUint64(ABIVersion).Bytes()
+	vmAbiBytes := []byte{}
+	vmAbiBytes = append(vmAbiBytes, vmBytes...)
+	vmAbiBytes = append(vmAbiBytes, leftPadByteSlice(2, abiBytes)...)
+	return vmAbiBytes
+}
+
+// RLP returns a byte serialized representation
+func (tx *ContractCreateTx) RLP() (rlpRawMsg []byte, err error) {
+	aID, err := buildIDTag(IDTagAccount, tx.OwnerID)
+	if err != nil {
+		return
+	}
+	codeBinary, err := Decode(tx.Code)
+	if err != nil {
+		return
+	}
+	callDataBinary, err := Decode(tx.CallData)
+	if err != nil {
+		return
+	}
+
+	rlpRawMsg, err = buildRLPMessage(
+		ObjectTagContractCreateTransaction,
+		rlpMessageVersion,
+		aID,
+		tx.AccountNonce,
+		codeBinary,
+		encodeVMABI(tx.VMVersion, tx.AbiVersion),
+		tx.Fee.Int,
+		tx.TTL,
+		tx.Deposit,
+		tx.Amount.Int,
+		tx.Gas.Int,
+		tx.GasPrice.Int,
+		callDataBinary,
+	)
+	return
+}
+
+// JSON representation of a Tx is useful for querying the node's debug endpoint
+func (tx *ContractCreateTx) JSON() (string, error) {
+	swaggerT := models.ContractCreateTx{
+		OwnerID:    models.EncodedHash(tx.OwnerID),
+		Nonce:      tx.AccountNonce,
+		Code:       &tx.Code,
+		VMVersion:  &tx.VMVersion,
+		AbiVersion: &tx.AbiVersion,
+		Deposit:    &tx.Deposit,
+		Amount:     tx.Amount,
+		Gas:        tx.Gas,
+		GasPrice:   tx.GasPrice,
+		Fee:        tx.Fee,
+		TTL:        &tx.TTL,
+		CallData:   models.EncodedByteArray(tx.CallData),
+	}
+	output, err := swaggerT.MarshalBinary()
+	return string(output), err
+}
+
+// sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
+func (tx *ContractCreateTx) sizeEstimate() (int, error) {
+	return calcSizeEstimate(tx, &tx.Fee)
+}
+
+// FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
+func (tx *ContractCreateTx) FeeEstimate() (*utils.BigInt, error) {
+	txLenEstimated, err := tx.sizeEstimate()
+	if err != nil {
+		return utils.NewBigInt(), err
+	}
+	estimatedFee := calcFeeContract(&tx.Gas, 5, txLenEstimated)
+	return estimatedFee, nil
+}
+
+// ContractID returns the ct_ ID that this transaction would produce, which depends on the OwnerID and AccountNonce.
+func (tx *ContractCreateTx) ContractID() (string, error) {
+	return buildContractID(tx.OwnerID, tx.AccountNonce)
+}
+
+// NewContractCreateTx is a constructor for a ContractCreateTx struct
+func NewContractCreateTx(OwnerID string, AccountNonce uint64, Code string, VMVersion, AbiVersion, Deposit uint64, Amount, Gas, GasPrice, Fee utils.BigInt, TTL uint64, CallData string) ContractCreateTx {
+	return ContractCreateTx{
+		OwnerID:      OwnerID,
+		AccountNonce: AccountNonce,
+		Code:         Code,
+		VMVersion:    VMVersion,
+		AbiVersion:   AbiVersion,
+		Deposit:      Deposit,
+		Amount:       Amount,
+		Gas:          Gas,
+		GasPrice:     GasPrice,
+		Fee:          Fee,
+		TTL:          TTL,
+		CallData:     CallData,
+	}
+}
+
+// ContractCallTx represents calling an existing smart contract
+// VMVersion is not included in RLP serialized representation (implied by contract type already)
+type ContractCallTx struct {
+	CallerID     string
+	AccountNonce uint64
+	ContractID   string
+	Amount       utils.BigInt
+	Gas          utils.BigInt
+	GasPrice     utils.BigInt
+	AbiVersion   uint64
+	VMVersion    uint64
+	CallData     string
+	Fee          utils.BigInt
+	TTL          uint64
+}
+
+// JSON representation of a Tx is useful for querying the node's debug endpoint
+func (tx *ContractCallTx) JSON() (string, error) {
+	swaggerT := models.ContractCallTx{
+		CallerID:   models.EncodedHash(tx.CallerID),
+		Nonce:      tx.AccountNonce,
+		ContractID: models.EncodedHash(tx.ContractID),
+		Amount:     tx.Amount,
+		Gas:        tx.Gas,
+		GasPrice:   tx.GasPrice,
+		AbiVersion: &tx.AbiVersion,
+		VMVersion:  &tx.VMVersion,
+		CallData:   models.EncodedByteArray(tx.CallData),
+		Fee:        tx.Fee,
+		TTL:        &tx.TTL,
+	}
+	output, err := swaggerT.MarshalBinary()
+	return string(output), err
+}
+
+// RLP returns a byte serialized representation
+func (tx *ContractCallTx) RLP() (rlpRawMsg []byte, err error) {
+	cID, err := buildIDTag(IDTagAccount, tx.CallerID)
+	if err != nil {
+		return
+	}
+	ctID, err := buildIDTag(IDTagContract, tx.ContractID)
+	if err != nil {
+		return
+	}
+	callDataBinary, err := Decode(tx.CallData)
+	if err != nil {
+		return
+	}
+
+	rlpRawMsg, err = buildRLPMessage(
+		ObjectTagContractCallTransaction,
+		rlpMessageVersion,
+		cID,
+		tx.AccountNonce,
+		ctID,
+		tx.AbiVersion,
+		tx.Fee.Int,
+		tx.TTL,
+		tx.Amount.Int,
+		tx.Gas.Int,
+		tx.GasPrice.Int,
+		callDataBinary,
+	)
+	return
+}
+
+// sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
+func (tx *ContractCallTx) sizeEstimate() (int, error) {
+	return calcSizeEstimate(tx, &tx.Fee)
+}
+
+// FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
+func (tx *ContractCallTx) FeeEstimate() (*utils.BigInt, error) {
+	txLenEstimated, err := tx.sizeEstimate()
+	if err != nil {
+		return utils.NewBigInt(), err
+	}
+	estimatedFee := calcFeeContract(&tx.Gas, 30, txLenEstimated)
+	return estimatedFee, nil
+}
+
+func NewContractCallTx(CallerID string, AccountNonce uint64, ContractID string, Amount, Gas, GasPrice utils.BigInt, AbiVersion, VMVersion uint64, CallData string, Fee utils.BigInt, TTL uint64) ContractCallTx {
+	return ContractCallTx{
+		CallerID:     CallerID,
+		AccountNonce: AccountNonce,
+		ContractID:   ContractID,
+		Amount:       Amount,
+		Gas:          Gas,
+		GasPrice:     GasPrice,
+		AbiVersion:   AbiVersion,
+		VMVersion:    VMVersion,
+		CallData:     CallData,
+		Fee:          Fee,
+		TTL:          TTL,
+	}
 }

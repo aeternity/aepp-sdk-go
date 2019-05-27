@@ -10,6 +10,7 @@ import (
 	"io"
 
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/swag"
 
 	strfmt "github.com/go-openapi/strfmt"
 
@@ -54,7 +55,7 @@ func NewGetCurrentKeyBlockHashOK() *GetCurrentKeyBlockHashOK {
 Successful operation
 */
 type GetCurrentKeyBlockHashOK struct {
-	Payload *models.InlineResponse200
+	Payload *GetCurrentKeyBlockHashOKBody
 }
 
 func (o *GetCurrentKeyBlockHashOK) Error() string {
@@ -63,7 +64,7 @@ func (o *GetCurrentKeyBlockHashOK) Error() string {
 
 func (o *GetCurrentKeyBlockHashOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.InlineResponse200)
+	o.Payload = new(GetCurrentKeyBlockHashOKBody)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -99,5 +100,37 @@ func (o *GetCurrentKeyBlockHashNotFound) readResponse(response runtime.ClientRes
 		return err
 	}
 
+	return nil
+}
+
+/*GetCurrentKeyBlockHashOKBody get current key block hash o k body
+swagger:model GetCurrentKeyBlockHashOKBody
+*/
+type GetCurrentKeyBlockHashOKBody struct {
+
+	// Hash
+	Hash string `json:"hash,omitempty"`
+}
+
+// Validate validates this get current key block hash o k body
+func (o *GetCurrentKeyBlockHashOKBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *GetCurrentKeyBlockHashOKBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *GetCurrentKeyBlockHashOKBody) UnmarshalBinary(b []byte) error {
+	var res GetCurrentKeyBlockHashOKBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
 	return nil
 }

@@ -26,7 +26,10 @@ services:
       - ${PWD}/build/docker/keys/node:/home/aeternity/node/keys
       - node_db:/home/aeternity/node/data/mnesia
       - node_keys:/home/aeternity/node/keys
-
+  compiler:
+    image: aeternity/aesophia_http:${COMPILER_TAG}
+    hostname: compiler
+    expose: [3080]
 volumes:
   node_db:
   node_keys:

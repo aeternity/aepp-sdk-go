@@ -22,9 +22,9 @@ type ContractCreateTx struct {
 	// ABI version
 	// Maximum: 65535
 	// Minimum: 0
-	AbiVersion *int64 `json:"abi_version,omitempty"`
+	AbiVersion *uint64 `json:"abi_version,omitempty"`
 
-	// Amount
+	// amount
 	// Required: true
 	Amount utils.BigInt `json:"amount"`
 
@@ -39,24 +39,22 @@ type ContractCreateTx struct {
 	// Deposit
 	// Required: true
 	// Minimum: 0
-	Deposit *int64 `json:"deposit"`
+	Deposit *uint64 `json:"deposit"`
 
-	// Transaction fee
+	// fee
 	// Required: true
 	Fee utils.BigInt `json:"fee"`
 
-	// Contract gas
+	// gas
 	// Required: true
-	// Minimum: 0
-	Gas *int64 `json:"gas"`
+	Gas utils.BigInt `json:"gas"`
 
-	// Gas price
+	// gas price
 	// Required: true
-	// Minimum: 0
-	GasPrice *int64 `json:"gas_price"`
+	GasPrice utils.BigInt `json:"gas_price"`
 
 	// Owner's nonce
-	Nonce int64 `json:"nonce,omitempty"`
+	Nonce uint64 `json:"nonce,omitempty"`
 
 	// Contract owner pub_key
 	// Required: true
@@ -64,13 +62,13 @@ type ContractCreateTx struct {
 
 	// Transaction TTL
 	// Minimum: 0
-	TTL *int64 `json:"ttl,omitempty"`
+	TTL *uint64 `json:"ttl,omitempty"`
 
 	// Virtual machine's version
 	// Required: true
 	// Maximum: 65535
 	// Minimum: 0
-	VMVersion *int64 `json:"vm_version"`
+	VMVersion *uint64 `json:"vm_version"`
 }
 
 // Validate validates this contract create tx
@@ -204,11 +202,10 @@ func (m *ContractCreateTx) validateFee(formats strfmt.Registry) error {
 
 func (m *ContractCreateTx) validateGas(formats strfmt.Registry) error {
 
-	if err := validate.Required("gas", "body", m.Gas); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("gas", "body", int64(*m.Gas), 0, false); err != nil {
+	if err := m.Gas.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("gas")
+		}
 		return err
 	}
 
@@ -217,11 +214,10 @@ func (m *ContractCreateTx) validateGas(formats strfmt.Registry) error {
 
 func (m *ContractCreateTx) validateGasPrice(formats strfmt.Registry) error {
 
-	if err := validate.Required("gas_price", "body", m.GasPrice); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("gas_price", "body", int64(*m.GasPrice), 0, false); err != nil {
+	if err := m.GasPrice.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("gas_price")
+		}
 		return err
 	}
 
