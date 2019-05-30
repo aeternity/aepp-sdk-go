@@ -78,6 +78,8 @@ func TestOracleWorkflow(t *testing.T) {
 	_ = waitForTransaction(aeClient, oracleQueryTxHash)
 
 	fmt.Println("OracleRespondTx")
+	fmt.Println("Sleeping a bit before querying node for OracleID")
+	time.Sleep(1000 * time.Millisecond)
 	// Find the Oracle Query ID to reply to
 	oracleQueries, err := aeClient.APIGetOracleQueriesByPubkey(oraclePubKey)
 	if err != nil {
