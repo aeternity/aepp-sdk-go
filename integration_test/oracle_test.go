@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
 	"github.com/aeternity/aepp-sdk-go/utils"
@@ -35,6 +36,7 @@ func TestOracleWorkflow(t *testing.T) {
 	_ = waitForTransaction(aeClient, oracleRegisterTxHash)
 
 	// Confirm that the oracle exists
+	time.Sleep(1000 * time.Millisecond)
 	oraclePubKey := strings.Replace(acc.Address, "ak_", "ok_", 1)
 	oracle, err := aeClient.APIGetOracleByPubkey(oraclePubKey)
 	if err != nil {
