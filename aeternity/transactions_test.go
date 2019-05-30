@@ -501,7 +501,7 @@ func TestOracleRegisterTx_RLP(t *testing.T) {
 				queryFee:       Config.Client.Oracles.QueryFee,
 				oracleTTLType:  0,
 				oracleTTLValue: uint64(100),
-				abiVersion:     uint64(1),
+				abiVersion:     uint64(0),
 				vmVersion:      uint64(0),
 				txFee:          Config.Client.Fee,
 				txTTL:          uint64(50000),
