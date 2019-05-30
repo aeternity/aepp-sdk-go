@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"errors"
 	"fmt"
 	"math"
 	"math/big"
@@ -41,13 +40,13 @@ func TestBigIntLargerOrEqualToZero(t *testing.T) {
 	var amount = NewBigInt()
 	var tests = []struct {
 		input    int64
-		expected error
+		expected bool
 	}{
-		{math.MinInt64, errors.New("-9223372036854775808 was negative")},
-		{-1, errors.New("-1 was negative")},
-		{0, nil},
-		{1, nil},
-		{math.MaxInt64, nil},
+		{math.MinInt64, false},
+		{-1, false},
+		{0, true},
+		{1, true},
+		{math.MaxInt64, true},
 	}
 
 	for _, test := range tests {
@@ -63,13 +62,13 @@ func TestBigIntLargerThanZero(t *testing.T) {
 	var amount = NewBigInt()
 	var tests = []struct {
 		input    int64
-		expected error
+		expected bool
 	}{
-		{math.MinInt64, errors.New("-9223372036854775808 was negative")},
-		{-1, errors.New("-1 was negative")},
-		{0, errors.New("0 was not larger than 0")},
-		{1, nil},
-		{math.MaxInt64, nil},
+		{math.MinInt64, false},
+		{-1, false},
+		{0, false},
+		{1, true},
+		{math.MaxInt64, true},
 	}
 
 	for _, test := range tests {
