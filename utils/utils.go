@@ -144,28 +144,34 @@ type BigInt struct {
 // Validate ensures that the BigInt's value is >= 0.
 // The actual check does not need 'formats' from swagger, which is why Validate() wraps that function.
 func (b *BigInt) Validate(formats strfmt.Registry) error {
-	return b.LargerOrEqualToZero()
+	v := b.LargerOrEqualToZero()
+	if !v {
+		return fmt.Errorf("%v was not >=0", b.Int.String())
+	}
+	return nil
 }
 
 // LargerThanZero checks that the number is >=0
-func (b *BigInt) LargerThanZero() error {
+func (b *BigInt) LargerThanZero() bool {
 	zero := NewBigInt()
 
 	if b.Cmp(zero.Int) != 1 {
-		return fmt.Errorf("%v was not larger than 0", b.Int.String())
+		return false
 	}
-	return nil
+	return true
 }
 
 // LargerOrEqualToZero checks that the number is >=0
-func (b *BigInt) LargerOrEqualToZero() error {
+func (b *BigInt) LargerOrEqualToZero() bool {
 	zero := NewBigInt()
 
 	if b.Cmp(zero.Int) == -1 {
-		return fmt.Errorf("%v was negative", b.Int.String())
+		return false
 	}
-	return nil
+	return true
 }
+
+// UnmarshalJSON ensures that BigInt.Int is always initialized, even if the JSON value is nil.
 func (b *BigInt) UnmarshalJSON(text []byte) error {
 	if b.Int == nil {
 		b.Int = &big.Int{}
