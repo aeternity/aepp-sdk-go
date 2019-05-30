@@ -3,6 +3,7 @@ package integrationtest
 import (
 	"fmt"
 	"os"
+	"testing"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
 )
@@ -12,6 +13,27 @@ var senderPrivateKey = os.Getenv("INTEGRATION_TEST_SENDER_PRIVATE_KEY")
 var recipientPrivateKey = os.Getenv("INTEGRATION_TEST_RECEIVER_PRIVATE_KEY")
 var nodeURL = "http://localhost:3013"
 var networkID = "ae_docker"
+
+func setupNetwork(t *testing.T) *aeternity.Client {
+	t.Log("setup integration test")
+	aeternity.Config.Node.NetworkID = networkID
+	client := aeternity.NewClient(nodeURL, false)
+	return client
+}
+
+func setupAccounts(t *testing.T) (*aeternity.Account, *aeternity.Account) {
+	alice, err := aeternity.AccountFromHexString(senderPrivateKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	bob, err := aeternity.AccountFromHexString(recipientPrivateKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("Alice: %s, Bob: %s", alice.Address, bob.Address)
+	return alice, bob
+}
 
 func signBroadcast(tx string, acc *aeternity.Account, aeClient *aeternity.Client) (hash string, err error) {
 	signedTxStr, hash, _, err := aeternity.SignEncodeTxStr(acc, tx, aeternity.Config.Node.NetworkID)
