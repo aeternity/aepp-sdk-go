@@ -4,94 +4,84 @@ import (
 	"fmt"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
+	"github.com/aeternity/aepp-sdk-go/generated/models"
 	"github.com/aeternity/aepp-sdk-go/utils"
 )
 
 func TestOracleWorkflow(t *testing.T) {
-	acc, err := aeternity.AccountFromHexString(senderPrivateKey)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	aeternity.Config.Node.NetworkID = networkID
-	aeClient := aeternity.NewClient(nodeURL, false)
+	alice, _ := setupAccounts(t)
+	client := setupNetwork(t)
 
-	oracleAlice := aeternity.Oracle{Client: aeClient, Account: acc}
+	oracleAlice := aeternity.Oracle{Client: client, Account: alice}
 
-	fmt.Println("OracleRegisterTx")
+	// Register
 	queryFee := utils.NewBigIntFromUint64(1000)
-	oracleRegisterTx, err := oracleAlice.OracleRegisterTx("hello", "helloback", *queryFee, 0, 100, 0, 0)
+	register, err := oracleAlice.OracleRegisterTx("hello", "helloback", *queryFee, 0, 100, 0, 0)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
-	oracleRegisterTxStr, _ := aeternity.BaseEncodeTx(&oracleRegisterTx)
-	oracleRegisterTxHash, err := signBroadcast(oracleRegisterTxStr, acc, aeClient)
-	if err != nil {
-		t.Error(err)
-	}
-
-	_ = waitForTransaction(aeClient, oracleRegisterTxHash)
+	fmt.Printf("Register %+v\n", register)
+	registerHash := signBroadcast(t, &register, alice, client)
+	_ = waitForTransaction(client, registerHash)
 
 	// Confirm that the oracle exists
-	time.Sleep(1000 * time.Millisecond)
-	oraclePubKey := strings.Replace(acc.Address, "ak_", "ok_", 1)
-	oracle, err := aeClient.APIGetOracleByPubkey(oraclePubKey)
-	if err != nil {
-		t.Errorf("APIGetOracleByPubkey: %s", err)
+	oraclePubKey := strings.Replace(alice.Address, "ak_", "ok_", 1)
+	var oracle *models.RegisteredOracle
+	getOracle := func() {
+		oracle, err = client.APIGetOracleByPubkey(oraclePubKey)
+		if err != nil {
+			t.Fatalf("APIGetOracleByPubkey: %s", err)
+		}
 	}
+	delay(getOracle)
 
-	fmt.Println("OracleExtendTx")
+	// Extend
 	// save the oracle's initial TTL so we can compare it with after OracleExtendTx
 	oracleTTL := *oracle.TTL
-	oracleExtendTx, err := oracleAlice.OracleExtendTx(oraclePubKey, 0, 1000)
+	extend, err := oracleAlice.OracleExtendTx(oraclePubKey, 0, 1000)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
-	oracleExtendTxStr, _ := aeternity.BaseEncodeTx(&oracleExtendTx)
-	oracleExtendTxHash, err := signBroadcast(oracleExtendTxStr, acc, aeClient)
-	if err != nil {
-		t.Error(err)
-	}
-	_ = waitForTransaction(aeClient, oracleExtendTxHash)
+	fmt.Printf("Extend %+v\n", extend)
+	extendHash := signBroadcast(t, &extend, alice, client)
+	_ = waitForTransaction(client, extendHash)
 
-	oracle, err = aeClient.APIGetOracleByPubkey(oraclePubKey)
+	// Confirm that the oracle's TTL changed
+	oracle, err = client.APIGetOracleByPubkey(oraclePubKey)
 	if err != nil {
-		t.Errorf("APIGetOracleByPubkey: %s", err)
+		t.Fatalf("APIGetOracleByPubkey: %s", err)
 	}
 	if *oracle.TTL == oracleTTL {
-		t.Errorf("The Oracle's TTL did not change after OracleExtendTx. Got %v but expected %v", *oracle.TTL, oracleTTL)
+		t.Fatalf("The Oracle's TTL did not change after OracleExtendTx. Got %v but expected %v", *oracle.TTL, oracleTTL)
 	}
 
-	fmt.Println("OracleQueryTx")
-	oracleQueryTx, err := oracleAlice.OracleQueryTx(oraclePubKey, "How was your day?", *queryFee, 0, 100, 0, 100)
+	// Query
+	query, err := oracleAlice.OracleQueryTx(oraclePubKey, "How was your day?", *queryFee, 0, 100, 0, 100)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
-	oracleQueryTxStr, _ := aeternity.BaseEncodeTx(&oracleQueryTx)
-	oracleQueryTxHash, err := signBroadcast(oracleQueryTxStr, acc, aeClient)
-	if err != nil {
-		t.Error(err)
-	}
-	_ = waitForTransaction(aeClient, oracleQueryTxHash)
+	fmt.Printf("Query %+v\n", query)
+	queryHash := signBroadcast(t, &query, alice, client)
+	_ = waitForTransaction(client, queryHash)
 
-	fmt.Println("OracleRespondTx")
-	fmt.Println("Sleeping a bit before querying node for OracleID")
-	time.Sleep(1000 * time.Millisecond)
 	// Find the Oracle Query ID to reply to
-	oracleQueries, err := aeClient.APIGetOracleQueriesByPubkey(oraclePubKey)
-	if err != nil {
-		t.Errorf("APIGetOracleQueriesByPubkey: %s", err)
-	}
-	oqID := string(oracleQueries.OracleQueries[0].ID)
-	oracleRespondTx, err := oracleAlice.OracleRespondTx(oraclePubKey, oqID, "My day was fine thank you", 0, 100)
-	oracleRespondTxStr, _ := aeternity.BaseEncodeTx(&oracleRespondTx)
-	oracleRespondTxHash, err := signBroadcast(oracleRespondTxStr, acc, aeClient)
-	if err != nil {
-		t.Error(err)
-	}
-	_ = waitForTransaction(aeClient, oracleRespondTxHash)
+	fmt.Println("Sleeping a bit before querying node for OracleID")
 
+	var oracleQueries *models.OracleQueries
+	getOracleQueries := func() {
+		oracleQueries, err = client.APIGetOracleQueriesByPubkey(oraclePubKey)
+		if err != nil {
+			t.Fatalf("APIGetOracleQueriesByPubkey: %s", err)
+		}
+	}
+	delay(getOracleQueries)
+	oqID := string(oracleQueries.OracleQueries[0].ID)
+
+	// Respond
+	respond, err := oracleAlice.OracleRespondTx(oraclePubKey, oqID, "My day was fine thank you", 0, 100)
+	fmt.Printf("Respond %+v\n", respond)
+	respondHash := signBroadcast(t, &respond, alice, client)
+	_ = waitForTransaction(client, respondHash)
 }

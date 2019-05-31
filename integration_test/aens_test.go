@@ -10,15 +10,14 @@ import (
 	"github.com/aeternity/aepp-sdk-go/aeternity"
 )
 
-func getNameEntry(aeClient *aeternity.Client, name string) (responseJSON string, err error) {
-	response, err := aeClient.APIGetNameEntryByName(name)
+func getNameEntry(t *testing.T, node *aeternity.Client, name string) (responseJSON string) {
+	response, err := node.APIGetNameEntryByName(name)
 	if err != nil {
-		fmt.Println(err)
-		return
+		t.Fatal(err)
 	}
 	r, _ := response.MarshalBinary()
 	responseJSON = string(r)
-	return responseJSON, nil
+	return responseJSON
 }
 
 func randomName(length int) string {
@@ -35,151 +34,100 @@ func randomName(length int) string {
 }
 
 func TestAENSWorkflow(t *testing.T) {
-	acc, err := aeternity.AccountFromHexString(senderPrivateKey)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	aeClient := aeternity.NewClient(nodeURL, false)
-	aensAlice := aeternity.Aens{Client: aeClient, Account: acc}
-
-	aeternity.Config.Node.NetworkID = networkID
+	node := setupNetwork(t)
+	alice, bob := setupAccounts(t)
+	aensAlice := aeternity.Aens{Client: node, Account: alice}
 
 	name := randomName(6)
-	fmt.Println("Testing with name: ", name)
 	// Preclaim the name
-	fmt.Println("PreclaimTx")
 	preclaimTx, salt, err := aensAlice.NamePreclaimTx(name, aeternity.Config.Client.Fee)
 	if err != nil {
-		fmt.Println(err)
-		return
+		t.Fatal(err)
 	}
-	preclaimTxStr, _ := aeternity.BaseEncodeTx(&preclaimTx)
-	fmt.Println("PreclaimTx and Salt:", preclaimTxStr, salt)
-
-	hash, err := signBroadcast(preclaimTxStr, acc, aeClient)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println("Signed & Broadcasted NamePreclaimTx", hash)
+	fmt.Printf("Preclaim %+v with name %s \n", preclaimTx, name)
+	hash := signBroadcast(t, &preclaimTx, alice, node)
 
 	// Wait for a bit
-	_ = waitForTransaction(aeClient, hash)
+	_ = waitForTransaction(node, hash)
 
 	// Claim the name
-	fmt.Println("NameClaimTx")
 	claimTx, err := aensAlice.NameClaimTx(name, *salt, aeternity.Config.Client.Fee)
 	if err != nil {
-		fmt.Println(err)
-		return
+		t.Fatal(err)
 	}
-	claimTxStr, _ := aeternity.BaseEncodeTx(&claimTx)
-	fmt.Println("ClaimTx:", claimTxStr)
-
-	hash, err = signBroadcast(claimTxStr, acc, aeClient)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println("Signed & Broadcasted NameClaimTx")
+	fmt.Printf("Claim %+v\n", claimTx)
+	hash = signBroadcast(t, &claimTx, alice, node)
 
 	// Wait for a bit
-	_ = waitForTransaction(aeClient, hash)
+	_ = waitForTransaction(node, hash)
 
 	// Verify that the name exists
-	entryAfterNameClaim, err := getNameEntry(aeClient, name)
-	fmt.Println(entryAfterNameClaim)
+	var nameEntry string
+	printNameEntry := func() {
+		nameEntry = getNameEntry(t, node, name)
+		fmt.Println(nameEntry)
+	}
+	delay(printNameEntry)
 
 	// Update the name, make it point to something
-	fmt.Println("NameUpdateTx")
-	updateTx, err := aensAlice.NameUpdateTx(name, acc.Address)
-	updateTxStr, _ := aeternity.BaseEncodeTx(&updateTx)
-	fmt.Println("UpdateTx:", updateTxStr)
-
-	_, err = signBroadcast(updateTxStr, acc, aeClient)
+	updateTx, err := aensAlice.NameUpdateTx(name, alice.Address)
 	if err != nil {
-		fmt.Println(err)
-		return
+		t.Fatal(err)
 	}
-	fmt.Println("Signed & Broadcasted NameUpdateTx")
+	fmt.Printf("Update %+v\n", updateTx)
+	_ = signBroadcast(t, &updateTx, alice, node)
 
 	// Verify that the name was updated
-	// Sleep a little, it takes time for the entry update to show up
-	fmt.Printf("Sleeping a bit before querying /names/%s...\n", name)
-	time.Sleep(1000 * time.Millisecond)
-	entryAfterNameUpdate, _ := getNameEntry(aeClient, name)
-	fmt.Println(entryAfterNameUpdate)
-
-	if !strings.Contains(entryAfterNameUpdate, acc.Address) {
-		t.Errorf("The AENS entry should now point to %s but doesn't: %s", acc.Address, entryAfterNameUpdate)
+	delay(printNameEntry)
+	if !strings.Contains(nameEntry, alice.Address) {
+		t.Fatalf("The AENS entry should now point to %s but doesn't: %s", alice.Address, nameEntry)
 	}
 
 	// Transfer the name to a recipient
-	fmt.Println("NameTransferTx")
-	acc2, err := aeternity.AccountFromHexString(recipientPrivateKey)
+	transferTx, err := aensAlice.NameTransferTx(name, bob.Address)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
-	transferTx, err := aensAlice.NameTransferTx(name, acc2.Address)
-	transferTxStr, _ := aeternity.BaseEncodeTx(&transferTx)
-	fmt.Println("TransferTx:", transferTxStr)
-	hash, err = signBroadcast(transferTxStr, acc, aeClient)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println("Signed & Broadcasted NameTransferTx")
+	fmt.Printf("Transfer %+v\n", transferTx)
+	hash = signBroadcast(t, &transferTx, alice, node)
+
 	// Wait for a bit
-	_ = waitForTransaction(aeClient, hash)
+	_ = waitForTransaction(node, hash)
 
 	// Receiver updates the name, makes it point to himself
-	aeClient2 := aeternity.NewClient(nodeURL, false)
-	aensBob := aeternity.Aens{Client: aeClient, Account: acc2}
+	aensBob := aeternity.Aens{Client: node, Account: bob}
 
-	fmt.Println("NameUpdateTx Signed By Recipient")
-	updateTx2, err := aensBob.NameUpdateTx(name, acc2.Address)
-	updateTx2Str, _ := aeternity.BaseEncodeTx(&updateTx2)
-	fmt.Println("UpdateTx:", updateTx2Str)
-
-	_, err = signBroadcast(updateTx2Str, acc2, aeClient2)
+	updateTx2, err := aensBob.NameUpdateTx(name, bob.Address)
 	if err != nil {
-		fmt.Println(err)
-		return
+		t.Fatal(err)
 	}
-	fmt.Println("Signed & Broadcasted NameUpdateTx Signed By Recipient")
+	fmt.Printf("Update Signed By Recipient %+v\n", updateTx2)
+	_ = signBroadcast(t, &updateTx2, bob, node)
 
 	// Revoke the name - shouldn't work because it is signed by the sender, who no longer owns the address
-	fmt.Println("NameRevokeTx")
-	revokeTx, err := aensAlice.NameRevokeTx(name, acc.Address)
-	revokeTxStr, _ := aeternity.BaseEncodeTx(&revokeTx)
-	fmt.Println("RevokeTx:", revokeTxStr)
-	hash, err = signBroadcast(revokeTxStr, acc, aeClient)
+	revokeTx, err := aensAlice.NameRevokeTx(name, alice.Address)
 	if err != nil {
-		fmt.Println(err)
-		return
+		t.Fatal(err)
 	}
-	fmt.Println("Signed & Broadcasted NameRevokeTx")
+	fmt.Printf("Revoke %+v\n", revokeTx)
+	hash = signBroadcast(t, &revokeTx, alice, node)
+
 	// Wait for a bit
-	revokeTxShouldHaveFailed := waitForTransaction(aeClient, hash)
+	revokeTxShouldHaveFailed := waitForTransaction(node, hash)
 	if revokeTxShouldHaveFailed == nil {
-		t.Error("After transferring the name to Recipient, the Sender should not have been able to revoke the name")
+		t.Fatal("After transferring the name to Recipient, the Sender should not have been able to revoke the name")
 	} else {
 		fmt.Println(revokeTxShouldHaveFailed)
 	}
 
 	// Revoke the name - signed by the recipient
-	fmt.Println("NameRevokeTx Signed By Recipient")
-	revokeTx2, err := aensBob.NameRevokeTx(name, acc2.Address)
-	revokeTx2Str, _ := aeternity.BaseEncodeTx(&revokeTx2)
-	fmt.Println("RevokeTx Signed By Recipient:", revokeTx2Str)
-	hash, err = signBroadcast(revokeTx2Str, acc2, aeClient)
+	revokeTx2, err := aensBob.NameRevokeTx(name, bob.Address)
 	if err != nil {
-		fmt.Println(err)
-		return
+		t.Fatal(err)
 	}
-	fmt.Println("Signed & Broadcasted NameRevokeTx Signed By Recipient")
+	fmt.Printf("Revoke Signed By Recipient %+v\n", revokeTx2)
+	hash = signBroadcast(t, &revokeTx2, bob, node)
 	// Wait for a bit
-	_ = waitForTransaction(aeClient, hash)
+	_ = waitForTransaction(node, hash)
 
 }
