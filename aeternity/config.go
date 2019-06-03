@@ -1,6 +1,8 @@
 package aeternity
 
 import (
+	"math/big"
+
 	"github.com/aeternity/aepp-sdk-go/utils"
 )
 
@@ -19,31 +21,31 @@ type NodeConfig struct {
 
 // AensConfig configurations for Aens
 type AensConfig struct {
-	NameTTL     uint64       `json:"name_ttl" yaml:"name_ttl" mapstructure:"name_ttl"`
-	ClientTTL   uint64       `json:"client_ttl" yaml:"client_ttl" mapstructure:"client_ttl"`
-	PreClaimFee utils.BigInt `json:"preclaim_fee" yaml:"preclaim_fee" mapstructure:"preclaim_fee"`
-	ClaimFee    utils.BigInt `json:"claim_fee" yaml:"claim_fee" mapstructure:"claim_fee"`
-	UpdateFee   utils.BigInt `json:"update_fee" yaml:"update_fee" mapstructure:"update_fee"`
+	NameTTL     uint64  `json:"name_ttl" yaml:"name_ttl" mapstructure:"name_ttl"`
+	ClientTTL   uint64  `json:"client_ttl" yaml:"client_ttl" mapstructure:"client_ttl"`
+	PreClaimFee big.Int `json:"preclaim_fee" yaml:"preclaim_fee" mapstructure:"preclaim_fee"`
+	ClaimFee    big.Int `json:"claim_fee" yaml:"claim_fee" mapstructure:"claim_fee"`
+	UpdateFee   big.Int `json:"update_fee" yaml:"update_fee" mapstructure:"update_fee"`
 }
 
 // ContractConfig configurations for contracts
 type ContractConfig struct {
-	Gas        utils.BigInt `json:"gas" yaml:"gas" mapstructure:"gas"`
-	GasPrice   utils.BigInt `json:"gas_price" yaml:"gas_price" mapstructure:"gas_price"`
-	Amount     utils.BigInt `json:"amount" yaml:"amount" mapstructure:"amount"`
-	Deposit    uint64       `json:"deposit" yaml:"deposit" mapstructure:"deposit"`
-	VMVersion  uint64       `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
-	ABIVersion uint64       `json:"abi_version" yaml:"abi_version" mapstructure:"abi_version"`
+	Gas        big.Int `json:"gas" yaml:"gas" mapstructure:"gas"`
+	GasPrice   big.Int `json:"gas_price" yaml:"gas_price" mapstructure:"gas_price"`
+	Amount     big.Int `json:"amount" yaml:"amount" mapstructure:"amount"`
+	Deposit    uint64  `json:"deposit" yaml:"deposit" mapstructure:"deposit"`
+	VMVersion  uint64  `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
+	ABIVersion uint64  `json:"abi_version" yaml:"abi_version" mapstructure:"abi_version"`
 }
 
 // OracleConfig configurations for contracts
 type OracleConfig struct {
-	QueryFee         utils.BigInt `json:"query_fee" yaml:"query_fee" mapstructure:"query_fee"`
-	QueryTTLType     uint64       `json:"query_ttl_type" yaml:"query_ttl_type" mapstructure:"query_ttl_type"`
-	QueryTTLValue    uint64       `json:"query_ttl_value" yaml:"query_ttl_value" mapstructure:"query_ttl_value"`
-	ResponseTTLType  uint64       `json:"response_ttl_type" yaml:"response_ttl_type" mapstructure:"response_ttl_type"`
-	ResponseTTLValue uint64       `json:"response_ttl_value" yaml:"response_ttl_value" mapstructure:"response_ttl_value"`
-	VMVersion        uint64       `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
+	QueryFee         big.Int `json:"query_fee" yaml:"query_fee" mapstructure:"query_fee"`
+	QueryTTLType     uint64  `json:"query_ttl_type" yaml:"query_ttl_type" mapstructure:"query_ttl_type"`
+	QueryTTLValue    uint64  `json:"query_ttl_value" yaml:"query_ttl_value" mapstructure:"query_ttl_value"`
+	ResponseTTLType  uint64  `json:"response_ttl_type" yaml:"response_ttl_type" mapstructure:"response_ttl_type"`
+	ResponseTTLValue uint64  `json:"response_ttl_value" yaml:"response_ttl_value" mapstructure:"response_ttl_value"`
+	VMVersion        uint64  `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
 }
 
 // StateChannelConfig configurations for contracts TODO: not complete
@@ -54,11 +56,11 @@ type StateChannelConfig struct {
 
 // ClientConfig client parameters configuration
 type ClientConfig struct {
-	BaseGas            utils.BigInt
-	GasPerByte         utils.BigInt
-	GasPrice           utils.BigInt
+	BaseGas            big.Int
+	GasPerByte         big.Int
+	GasPrice           big.Int
 	TTL                uint64             `json:"ttl" yaml:"ttl" mapstructure:"ttl"`
-	Fee                utils.BigInt       `json:"fee" yaml:"fee" mapstructure:"fee"`
+	Fee                big.Int            `json:"fee" yaml:"fee" mapstructure:"fee"`
 	DefaultKey         string             `json:"default_key_name" yaml:"default_key_name" mapstructure:"default_key_name"`
 	Names              AensConfig         `json:"names" yaml:"names" mapstructure:"names"`
 	Contracts          ContractConfig     `json:"contracts" yaml:"contracts" mapstructure:"contracts"`
@@ -111,7 +113,7 @@ var Config = ProfileConfig{
 		Contracts: ContractConfig{
 			Gas:        *utils.NewBigIntFromUint64(1e9),
 			GasPrice:   *utils.NewBigIntFromUint64(1e9),
-			Amount:     *utils.NewBigInt(),
+			Amount:     *new(big.Int),
 			Deposit:    0,
 			VMVersion:  3,
 			ABIVersion: 1,

@@ -22,10 +22,10 @@ All notable changes to this project will be documented in this file. See [standa
 * renamed helper function arguments to accomodate different kinds of TTLs in other transaction types ([2970997](https://github.com/aeternity/aepp-sdk-go/commit/2970997))
 * renamed helper function arguments to accomodate different kinds of TTLs in other transaction types ([5697537](https://github.com/aeternity/aepp-sdk-go/commit/5697537))
 * rlp Encode() was encoding 0 value of uint64 as 0x00, but big.Int 0 value as 0x80. Changed big.Int 0 value to 0x00 ([e21c6f5](https://github.com/aeternity/aepp-sdk-go/commit/e21c6f5))
-* SpendTx, OracleRegisterTx RLP() methods should always use utils.BigInt.Int while serializing, not the utils.BigInt directly, because otherwise there will be a list within a list ([fcaa28d](https://github.com/aeternity/aepp-sdk-go/commit/fcaa28d))
+* SpendTx, OracleRegisterTx RLP() methods should always use big.Int.Int while serializing, not the big.Int directly, because otherwise there will be a list within a list ([fcaa28d](https://github.com/aeternity/aepp-sdk-go/commit/fcaa28d))
 * tx command shouldn't use BaseEncodeTx() as a returned function ([21c5a7c](https://github.com/aeternity/aepp-sdk-go/commit/21c5a7c))
-* uint64/utils.BigInt instead of int64 for certain variables in config.go ([1c65c9a](https://github.com/aeternity/aepp-sdk-go/commit/1c65c9a))
-* uint64/utils.BigInt instead of int64 for certain variables in config.go ([4c76f06](https://github.com/aeternity/aepp-sdk-go/commit/4c76f06))
+* uint64/big.Int instead of int64 for certain variables in config.go ([1c65c9a](https://github.com/aeternity/aepp-sdk-go/commit/1c65c9a))
+* uint64/big.Int instead of int64 for certain variables in config.go ([4c76f06](https://github.com/aeternity/aepp-sdk-go/commit/4c76f06))
 
 
 ### Features

@@ -19,7 +19,7 @@ func TestSpendTx(t *testing.T) {
 	msg := "Hello World"
 
 	// In case the recipient account already has funds, get recipient's account info. If it exists, expectedAmount = existing balance + amount + fee
-	expected := utils.NewBigInt()
+	expected := new(big.Int)
 	bobState, err := node.APIGetAccount(bob.Address)
 	if err != nil {
 		expected.Set(amount.Int)

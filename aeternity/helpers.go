@@ -3,6 +3,7 @@ package aeternity
 import (
 	"fmt"
 	"io/ioutil"
+	"math/big"
 	"os"
 	"path/filepath"
 	"strings"
@@ -10,7 +11,6 @@ import (
 
 	"github.com/aeternity/aepp-sdk-go/generated/client/external"
 	"github.com/aeternity/aepp-sdk-go/generated/models"
-	"github.com/aeternity/aepp-sdk-go/utils"
 )
 
 func urlComponents(url string) (host string, schemas []string) {
@@ -218,7 +218,7 @@ func (client *Client) GetTTLNonce(accountID string, offset uint64) (txTTL, accou
 
 // NamePreclaimTx creates a name preclaim transaction and salt (required for claiming)
 // It should return the Tx struct, not the base64 encoded RLP, to ease subsequent inspection.
-func (n *Aens) NamePreclaimTx(name string, fee utils.BigInt) (tx NamePreclaimTx, nameSalt *utils.BigInt, err error) {
+func (n *Aens) NamePreclaimTx(name string, fee big.Int) (tx NamePreclaimTx, nameSalt *big.Int, err error) {
 	txTTL, accountNonce, err := getTTLNonce(n.Client, n.Account.Address, Config.Client.TTL)
 	if err != nil {
 		return
@@ -228,20 +228,20 @@ func (n *Aens) NamePreclaimTx(name string, fee utils.BigInt) (tx NamePreclaimTx,
 	// since the salt is 32 bytes long, you must use a big.Int to convert it into an integer
 	cm, nameSalt, err := generateCommitmentID(name)
 	if err != nil {
-		return NamePreclaimTx{}, utils.NewBigInt(), err
+		return NamePreclaimTx{}, new(big.Int), err
 	}
 
 	// build the transaction
 	tx = NewNamePreclaimTx(n.Account.Address, cm, fee, txTTL, accountNonce)
 	if err != nil {
-		return NamePreclaimTx{}, utils.NewBigInt(), err
+		return NamePreclaimTx{}, new(big.Int), err
 	}
 
 	return
 }
 
 // NameClaimTx creates a claim transaction
-func (n *Aens) NameClaimTx(name string, nameSalt utils.BigInt, fee utils.BigInt) (tx NameClaimTx, err error) {
+func (n *Aens) NameClaimTx(name string, nameSalt big.Int, fee big.Int) (tx NameClaimTx, err error) {
 	txTTL, accountNonce, err := getTTLNonce(n.Client, n.Account.Address, Config.Client.TTL)
 	if err != nil {
 		return
@@ -298,7 +298,7 @@ func (n *Aens) NameRevokeTx(name string, recipientAddress string) (tx NameRevoke
 }
 
 // OracleRegisterTx create a new oracle
-func (o *Oracle) OracleRegisterTx(querySpec, responseSpec string, queryFee utils.BigInt, oracleTTLType, oracleTTLValue, abiVersion uint64, vmVersion uint64) (tx OracleRegisterTx, err error) {
+func (o *Oracle) OracleRegisterTx(querySpec, responseSpec string, queryFee big.Int, oracleTTLType, oracleTTLValue, abiVersion uint64, vmVersion uint64) (tx OracleRegisterTx, err error) {
 	ttl, nonce, err := getTTLNonce(o.Client, o.Account.Address, Config.Client.TTL)
 	if err != nil {
 		return OracleRegisterTx{}, err
@@ -320,7 +320,7 @@ func (o *Oracle) OracleExtendTx(oracleID string, ttlType, ttlValue uint64) (tx O
 }
 
 // OracleQueryTx ask something of an oracle
-func (o *Oracle) OracleQueryTx(OracleID, Query string, QueryFee utils.BigInt, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64) (tx OracleQueryTx, err error) {
+func (o *Oracle) OracleQueryTx(OracleID, Query string, QueryFee big.Int, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64) (tx OracleQueryTx, err error) {
 	ttl, nonce, err := getTTLNonce(o.Client, o.Account.Address, Config.Client.TTL)
 	if err != nil {
 		return OracleQueryTx{}, err
@@ -341,7 +341,7 @@ func (o *Oracle) OracleRespondTx(OracleID string, QueryID string, Response strin
 	return tx, nil
 }
 
-func (c *Contract) ContractCreateTx(Code string, CallData string, VMVersion, AbiVersion, Deposit uint64, Amount, Gas, GasPrice, Fee utils.BigInt) (tx ContractCreateTx, err error) {
+func (c *Contract) ContractCreateTx(Code string, CallData string, VMVersion, AbiVersion, Deposit uint64, Amount, Gas, GasPrice, Fee big.Int) (tx ContractCreateTx, err error) {
 	ttl, nonce, err := getTTLNonce(c.Client, c.Account.Address, Config.Client.TTL)
 	if err != nil {
 		return ContractCreateTx{}, err
@@ -351,7 +351,7 @@ func (c *Contract) ContractCreateTx(Code string, CallData string, VMVersion, Abi
 	return tx, nil
 }
 
-func (c *Contract) ContractCallTx(ContractID, CallData string, VMVersion, AbiVersion uint64, Amount, Gas, GasPrice, Fee utils.BigInt) (tx ContractCallTx, err error) {
+func (c *Contract) ContractCallTx(ContractID, CallData string, VMVersion, AbiVersion uint64, Amount, Gas, GasPrice, Fee big.Int) (tx ContractCallTx, err error) {
 	ttl, nonce, err := getTTLNonce(c.Client, c.Account.Address, Config.Client.TTL)
 	if err != nil {
 		return ContractCallTx{}, err

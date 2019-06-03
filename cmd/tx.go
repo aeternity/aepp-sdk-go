@@ -33,8 +33,8 @@ func txSpendFunc(cmd *cobra.Command, args []string) (err error) {
 	var (
 		sender    string
 		recipient string
-		amount    *utils.BigInt
-		feeBigInt *utils.BigInt
+		amount    *big.Int
+		feeBigInt *big.Int
 	)
 
 	// Load variables from arguments
