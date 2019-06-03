@@ -168,8 +168,8 @@ func (tx *SpendTx) RLP() (rlpRawMsg []byte, err error) {
 		rlpMessageVersion,
 		sID,
 		rID,
-		tx.Amount.Int,
-		tx.Fee.Int,
+		tx.Amount,
+		tx.Fee,
 		tx.TTL,
 		tx.Nonce,
 		[]byte(tx.Payload))
@@ -179,8 +179,8 @@ func (tx *SpendTx) RLP() (rlpRawMsg []byte, err error) {
 // JSON representation of a Tx is useful for querying the node's debug endpoint
 func (tx *SpendTx) JSON() (string, error) {
 	swaggerT := models.SpendTx{
-		Amount:      tx.Amount,
-		Fee:         tx.Fee,
+		Amount:      utils.BigInt(tx.Amount),
+		Fee:         utils.BigInt(tx.Fee),
 		Nonce:       tx.Nonce,
 		Payload:     &tx.Payload,
 		RecipientID: models.EncodedHash(tx.RecipientID),
@@ -239,7 +239,7 @@ func (tx *NamePreclaimTx) RLP() (rlpRawMsg []byte, err error) {
 		aID,
 		tx.AccountNonce,
 		cID,
-		tx.Fee.Int,
+		tx.Fee,
 		tx.TTL)
 	return
 }
@@ -249,7 +249,7 @@ func (tx *NamePreclaimTx) JSON() (string, error) {
 	swaggerT := models.NamePreclaimTx{
 		AccountID:    models.EncodedHash(tx.AccountID),
 		CommitmentID: models.EncodedHash(tx.CommitmentID),
-		Fee:          tx.Fee,
+		Fee:          utils.BigInt(tx.Fee),
 		Nonce:        tx.AccountNonce,
 		TTL:          tx.TTL,
 	}
@@ -304,8 +304,8 @@ func (tx *NameClaimTx) RLP() (rlpRawMsg []byte, err error) {
 		aID,
 		tx.AccountNonce,
 		tx.Name,
-		tx.NameSalt.Int,
-		tx.Fee.Int,
+		tx.NameSalt,
+		tx.Fee,
 		tx.TTL)
 	return
 }
@@ -317,9 +317,9 @@ func (tx *NameClaimTx) JSON() (string, error) {
 	nameAPIEncoded := Encode(PrefixName, []byte(tx.Name))
 	swaggerT := models.NameClaimTx{
 		AccountID: models.EncodedHash(tx.AccountID),
-		Fee:       tx.Fee,
+		Fee:       utils.BigInt(tx.Fee),
 		Name:      &nameAPIEncoded,
-		NameSalt:  tx.NameSalt,
+		NameSalt:  utils.BigInt(tx.NameSalt),
 		Nonce:     tx.AccountNonce,
 		TTL:       tx.TTL,
 	}
@@ -421,7 +421,7 @@ func (tx *NameUpdateTx) RLP() (rlpRawMsg []byte, err error) {
 		tx.NameTTL,
 		reversedPointers,
 		tx.ClientTTL,
-		tx.Fee.Int,
+		tx.Fee,
 		tx.TTL)
 	return
 }
@@ -436,7 +436,7 @@ func (tx *NameUpdateTx) JSON() (string, error) {
 	swaggerT := models.NameUpdateTx{
 		AccountID: models.EncodedHash(tx.AccountID),
 		ClientTTL: &tx.ClientTTL,
-		Fee:       tx.Fee,
+		Fee:       utils.BigInt(tx.Fee),
 		NameID:    models.EncodedHash(tx.NameID),
 		NameTTL:   &tx.NameTTL,
 		Nonce:     tx.AccountNonce,
@@ -500,7 +500,7 @@ func (tx *NameRevokeTx) RLP() (rlpRawMsg []byte, err error) {
 		aID,
 		tx.AccountNonce,
 		nID,
-		tx.Fee.Int,
+		tx.Fee,
 		tx.TTL)
 	return
 }
@@ -509,7 +509,7 @@ func (tx *NameRevokeTx) RLP() (rlpRawMsg []byte, err error) {
 func (tx *NameRevokeTx) JSON() (string, error) {
 	swaggerT := models.NameRevokeTx{
 		AccountID: models.EncodedHash(tx.AccountID),
-		Fee:       tx.Fee,
+		Fee:       utils.BigInt(tx.Fee),
 		NameID:    models.EncodedHash(tx.NameID),
 		Nonce:     tx.AccountNonce,
 		TTL:       tx.TTL,
@@ -577,7 +577,7 @@ func (tx *NameTransferTx) RLP() (rlpRawMsg []byte, err error) {
 		tx.AccountNonce,
 		nID,
 		rID,
-		tx.Fee.Int,
+		tx.Fee,
 		tx.TTL,
 	)
 	return
@@ -587,7 +587,7 @@ func (tx *NameTransferTx) RLP() (rlpRawMsg []byte, err error) {
 func (tx *NameTransferTx) JSON() (string, error) {
 	swaggerT := models.NameTransferTx{
 		AccountID:   models.EncodedHash(tx.AccountID),
-		Fee:         tx.Fee,
+		Fee:         utils.BigInt(tx.Fee),
 		NameID:      models.EncodedHash(tx.NameID),
 		Nonce:       tx.AccountNonce,
 		RecipientID: models.EncodedHash(tx.RecipientID),
@@ -648,10 +648,10 @@ func (tx *OracleRegisterTx) RLP() (rlpRawMsg []byte, err error) {
 		tx.AccountNonce,
 		[]byte(tx.QuerySpec),
 		[]byte(tx.ResponseSpec),
-		tx.QueryFee.Int,
+		tx.QueryFee,
 		tx.OracleTTLType,
 		tx.OracleTTLValue,
-		tx.Fee.Int,
+		tx.Fee,
 		tx.TTL,
 		tx.AbiVersion)
 	return
@@ -681,13 +681,13 @@ func (tx *OracleRegisterTx) JSON() (string, error) {
 	swaggerT := models.OracleRegisterTx{
 		AbiVersion: &tx.AbiVersion,
 		AccountID:  models.EncodedHash(tx.AccountID),
-		Fee:        tx.Fee,
+		Fee:        utils.BigInt(tx.Fee),
 		Nonce:      tx.AccountNonce,
 		OracleTTL: &models.TTL{
 			Type:  &ttlTypeStr,
 			Value: &tx.OracleTTLValue,
 		},
-		QueryFee:       tx.QueryFee,
+		QueryFee:       utils.BigInt(tx.QueryFee),
 		QueryFormat:    &tx.QuerySpec,
 		ResponseFormat: &tx.ResponseSpec,
 		TTL:            tx.TTL,
@@ -726,7 +726,7 @@ func (tx *OracleExtendTx) RLP() (rlpRawMsg []byte, err error) {
 		tx.AccountNonce,
 		tx.OracleTTLType,
 		tx.OracleTTLValue,
-		tx.Fee.Int,
+		tx.Fee,
 		tx.TTL)
 	return
 }
@@ -736,7 +736,7 @@ func (tx *OracleExtendTx) JSON() (string, error) {
 	oracleTTLTypeStr := ttlTypeIntToStr(tx.OracleTTLType)
 
 	swaggerT := models.OracleExtendTx{
-		Fee:      tx.Fee,
+		Fee:      utils.BigInt(tx.Fee),
 		Nonce:    tx.AccountNonce,
 		OracleID: models.EncodedHash(tx.OracleID),
 		OracleTTL: &models.RelativeTTL{
@@ -789,12 +789,12 @@ func (tx *OracleQueryTx) RLP() (rlpRawMsg []byte, err error) {
 		tx.AccountNonce,
 		oracleID,
 		[]byte(tx.Query),
-		tx.QueryFee.Int,
+		tx.QueryFee,
 		tx.QueryTTLType,
 		tx.QueryTTLValue,
 		tx.ResponseTTLType,
 		tx.ResponseTTLValue,
-		tx.Fee.Int,
+		tx.Fee,
 		tx.TTL)
 	return
 }
@@ -805,11 +805,11 @@ func (tx *OracleQueryTx) JSON() (string, error) {
 	queryTTLTypeStr := ttlTypeIntToStr(tx.QueryTTLType)
 
 	swaggerT := models.OracleQueryTx{
-		Fee:      tx.Fee,
+		Fee:      utils.BigInt(tx.Fee),
 		Nonce:    tx.AccountNonce,
 		OracleID: models.EncodedHash(tx.OracleID),
 		Query:    &tx.Query,
-		QueryFee: tx.QueryFee,
+		QueryFee: utils.BigInt(tx.QueryFee),
 		QueryTTL: &models.TTL{
 			Type:  &queryTTLTypeStr,
 			Value: &tx.QueryTTLValue,
@@ -863,7 +863,7 @@ func (tx *OracleRespondTx) RLP() (rlpRawMsg []byte, err error) {
 		tx.Response,
 		tx.ResponseTTLType,
 		tx.ResponseTTLValue,
-		tx.Fee.Int,
+		tx.Fee,
 		tx.TTL)
 	return
 }
@@ -873,7 +873,7 @@ func (tx *OracleRespondTx) JSON() (string, error) {
 	responseTTLTypeStr := ttlTypeIntToStr(tx.ResponseTTLType)
 
 	swaggerT := models.OracleRespondTx{
-		Fee:      tx.Fee,
+		Fee:      utils.BigInt(tx.Fee),
 		Nonce:    tx.AccountNonce,
 		OracleID: models.EncodedHash(tx.OracleID),
 		QueryID:  models.EncodedHash(tx.QueryID),
@@ -941,12 +941,12 @@ func (tx *ContractCreateTx) RLP() (rlpRawMsg []byte, err error) {
 		tx.AccountNonce,
 		codeBinary,
 		encodeVMABI(tx.VMVersion, tx.AbiVersion),
-		tx.Fee.Int,
+		tx.Fee,
 		tx.TTL,
 		tx.Deposit,
-		tx.Amount.Int,
-		tx.Gas.Int,
-		tx.GasPrice.Int,
+		tx.Amount,
+		tx.Gas,
+		tx.GasPrice,
 		callDataBinary,
 	)
 	return
@@ -961,10 +961,10 @@ func (tx *ContractCreateTx) JSON() (string, error) {
 		VMVersion:  &tx.VMVersion,
 		AbiVersion: &tx.AbiVersion,
 		Deposit:    &tx.Deposit,
-		Amount:     tx.Amount,
-		Gas:        tx.Gas,
-		GasPrice:   tx.GasPrice,
-		Fee:        tx.Fee,
+		Amount:     utils.BigInt(tx.Amount),
+		Gas:        utils.BigInt(tx.Gas),
+		GasPrice:   utils.BigInt(tx.GasPrice),
+		Fee:        utils.BigInt(tx.Fee),
 		TTL:        &tx.TTL,
 		CallData:   models.EncodedByteArray(tx.CallData),
 	}
@@ -1032,13 +1032,13 @@ func (tx *ContractCallTx) JSON() (string, error) {
 		CallerID:   models.EncodedHash(tx.CallerID),
 		Nonce:      tx.AccountNonce,
 		ContractID: models.EncodedHash(tx.ContractID),
-		Amount:     tx.Amount,
-		Gas:        tx.Gas,
-		GasPrice:   tx.GasPrice,
+		Amount:     utils.BigInt(tx.Amount),
+		Gas:        utils.BigInt(tx.Gas),
+		GasPrice:   utils.BigInt(tx.GasPrice),
 		AbiVersion: &tx.AbiVersion,
 		VMVersion:  &tx.VMVersion,
 		CallData:   models.EncodedByteArray(tx.CallData),
-		Fee:        tx.Fee,
+		Fee:        utils.BigInt(tx.Fee),
 		TTL:        &tx.TTL,
 	}
 	output, err := swaggerT.MarshalBinary()
@@ -1067,11 +1067,11 @@ func (tx *ContractCallTx) RLP() (rlpRawMsg []byte, err error) {
 		tx.AccountNonce,
 		ctID,
 		tx.AbiVersion,
-		tx.Fee.Int,
+		tx.Fee,
 		tx.TTL,
-		tx.Amount.Int,
-		tx.Gas.Int,
-		tx.GasPrice.Int,
+		tx.Amount,
+		tx.Gas,
+		tx.GasPrice,
 		callDataBinary,
 	)
 	return
