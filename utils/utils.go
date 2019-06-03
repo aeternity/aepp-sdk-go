@@ -30,10 +30,9 @@ func (b *BigInt) Validate(formats strfmt.Registry) error {
 
 // LargerThanZero returns true if it is >0
 func (b *BigInt) LargerThanZero() bool {
-	bc := big.Int(*b)
-	zero := big.Int{}
+	zero := new(BigInt)
 
-	if bc.Cmp(&zero) != 1 {
+	if b.Cmp(zero) != 1 {
 		return false
 	}
 	return true
@@ -41,10 +40,9 @@ func (b *BigInt) LargerThanZero() bool {
 
 // LargerOrEqualToZero checks that the number is >=0
 func (b *BigInt) LargerOrEqualToZero() bool {
-	bc := big.Int(*b)
-	zero := big.Int{}
+	zero := new(BigInt)
 
-	if bc.Cmp(&zero) == -1 {
+	if b.Cmp(zero) == -1 {
 		return false
 	}
 	return true
