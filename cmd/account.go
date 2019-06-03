@@ -21,7 +21,6 @@ import (
 	"sync"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
-	"github.com/aeternity/aepp-sdk-go/utils"
 
 	"github.com/spf13/cobra"
 )
@@ -58,7 +57,7 @@ func getPassword() (p string, err error) {
 	if len(password) != 0 {
 		return password, nil
 	}
-	p, err = utils.AskPassword("Enter the password to unlock the keystore: ")
+	p, err = AskPassword("Enter the password to unlock the keystore: ")
 	if err != nil {
 		return "", err
 	}
@@ -79,7 +78,7 @@ func addressFunc(cmd *cobra.Command, args []string) error {
 
 	aeternity.Pp("Account address", account.Address)
 	if printPrivateKey {
-		if utils.AskYes("Are you sure you want to print your private key? This could be insecure.", false) {
+		if AskYes("Are you sure you want to print your private key? This could be insecure.", false) {
 			aeternity.Pp("Account private key", account.SigningKeyToHexString())
 		}
 	}
