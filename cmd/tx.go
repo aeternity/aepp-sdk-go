@@ -119,7 +119,7 @@ func txVerifyFunc(cmd *cobra.Command, args []string) (err error) {
 	if valid {
 		fmt.Printf("The signature is valid (network-id: %s)\n", aeternity.Config.Node.NetworkID)
 	} else {
-		message := fmt.Sprintf("The signature is invalid (network-id: %s)", aeternity.Config.Node.NetworkID)
+		message := fmt.Sprintf("The signature is invalid (expecting network-id: %s)", aeternity.Config.Node.NetworkID)
 		// fmt.Println(message)
 		err = errors.New(message)
 	}
