@@ -135,7 +135,7 @@ func AskPassword(question string) (password string, err error) {
 	return
 }
 
-// BigInt is an alias for math/big.Int
+// BigInt is an alias for math/big.Int, for use with Swagger generated code.
 type BigInt big.Int
 
 // String casts BigInt into big.Int and uses its String method.

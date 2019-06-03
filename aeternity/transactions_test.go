@@ -3,6 +3,7 @@ package aeternity
 import (
 	"bytes"
 	"fmt"
+	"math/big"
 	"reflect"
 	"testing"
 
@@ -936,12 +937,13 @@ func TestContractCreateTx_FeeEstimate(t *testing.T) {
 				CallData:     tt.fields.CallData,
 			}
 
+			zero := new(big.Int)
 			got, err := tx.FeeEstimate()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ContractCreateTx.FeeEstimate() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !got.LargerThanZero() {
+			if got.Cmp(zero) != 1 {
 				t.Errorf("ContractCreateTx.FeeEstimate() was not larger than 0: %v", got)
 			}
 		})
@@ -1106,13 +1108,13 @@ func TestContractCallTx_FeeEstimate(t *testing.T) {
 				Fee:          tt.fields.Fee,
 				TTL:          tt.fields.TTL,
 			}
-
+			zero := new(big.Int)
 			got, err := tx.FeeEstimate()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ContractCallTx.FeeEstimate() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !got.LargerThanZero() {
+			if got.Cmp(zero) != 1 {
 				t.Errorf("ContractCallTx.FeeEstimate() was not larger than 0: %v", got)
 			}
 		})
