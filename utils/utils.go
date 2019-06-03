@@ -136,6 +136,7 @@ func AskPassword(question string) (password string, err error) {
 }
 
 // BigInt is an alias for math/big.Int, for use with Swagger generated code.
+// Even though it has some corresponding methods, convert it as soon as possible into big.Int.
 type BigInt big.Int
 
 // String casts BigInt into big.Int and uses its String method.
@@ -178,8 +179,27 @@ func (b *BigInt) LargerOrEqualToZero() bool {
 
 // UnmarshalJSON casts BigInt into big.Int and uses its UnmarshalJSON method.
 func (b *BigInt) UnmarshalJSON(text []byte) error {
-	bc := big.Int(*b)
-	return bc.UnmarshalJSON(text)
+	bc := new(big.Int)
+	err := bc.UnmarshalJSON(text)
+	if err != nil {
+		return err
+	}
+	b.Set(bc)
+	return nil
+}
+
+// Set makes a BigInt equal to a given big.Int.
+func (b *BigInt) Set(i *big.Int) *BigInt {
+	iB := BigInt(*i)
+	*b = iB
+	return b
+}
+
+// Cmp compares two BigInts just like big.Int
+func (b *BigInt) Cmp(i *BigInt) int {
+	b2 := big.Int(*b)
+	i2 := big.Int(*i)
+	return b2.Cmp(&i2)
 }
 
 // NewBigIntFromString returns a new math/big.Int from a string representation
