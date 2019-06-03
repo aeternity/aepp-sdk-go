@@ -3,6 +3,7 @@ package cmd
 import (
 	"testing"
 
+	"github.com/aeternity/aepp-sdk-go/aeternity"
 	"github.com/spf13/cobra"
 )
 
@@ -19,7 +20,10 @@ func TestTxSpend(t *testing.T) {
 
 func TestTxVerify(t *testing.T) {
 	sender := "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"
-	signedTx := "tx_+JYLAfhCuEAkhq5DuTb5s67AwoOgto9eihfvCPZrDmgDYxYLZ7hggGhp7LvzS0KDebV24R4Xnijz1LgxRKVzel/36JoLH1AIuE74TAwBoQHOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+86EBHxOjsIvwAUAGYqaLadh194A87EwIZH9u1dhMeJe9UKMKCoGaAYBc/oor"
+	// unsigned tx_+FMMAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vOhAR8To7CL8AFABmKmi2nYdfeAPOxMCGR/btXYTHiXvVCjCoa15iD0gACCAfQBgIHqJ/Y=
+	// sign with ae_mainnet
+	signedTx := "tx_+J0LAfhCuEBcvwtyCo3FYqmINcP6lHLH/dRDcj5rUiKDqYKhPpiQ+1SBQ66rF3gdVQ1IcANcw/IayK//YgK2dsDF1VtroQEAuFX4UwwBoQHOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+86EBHxOjsIvwAUAGYqaLadh194A87EwIZH9u1dhMeJe9UKMKhrXmIPSAAIIB9AGAx+EjLg=="
+	aeternity.Config.Node.NetworkID = "ae_mainnet"
 	emptyCmd := cobra.Command{}
 
 	err := txVerifyFunc(&emptyCmd, []string{sender, signedTx})
