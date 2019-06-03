@@ -3,12 +3,12 @@ package aeternity
 import (
 	"encoding/json"
 	"fmt"
+	"math/big"
 	"reflect"
 
 	"time"
 
 	"github.com/aeternity/aepp-sdk-go/generated/models"
-	"github.com/aeternity/aepp-sdk-go/utils"
 )
 
 func times(str string, n int) (out string) {
@@ -69,7 +69,7 @@ func printIf(title string, v interface{}) {
 			p(title, n, v.Elem(), dept)
 		case reflect.Struct:
 			if v.Type().Name() == "BigInt" {
-				vc := v.Interface().(utils.BigInt)
+				vc := v.Interface().(big.Int)
 				PpI(dept, "Balance", vc.Text(10))
 			} else {
 				PpT(dept, fmt.Sprintf("<%s>", v.Type().Name()))

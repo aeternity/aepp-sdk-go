@@ -135,10 +135,13 @@ func AskPassword(question string) (password string, err error) {
 	return
 }
 
-// BigInt is composed of a big.Int, but includes a Validate() method for swagger and other convenience functions.
-// Once created, it can be used just like a big.Int.
-type BigInt struct {
-	*big.Int
+// BigInt is an alias for math/big.Int
+type BigInt big.Int
+
+// String casts BigInt into big.Int and uses its String method.
+func (b *BigInt) String() string {
+	bc := big.Int(*b)
+	return bc.String()
 }
 
 // Validate ensures that the BigInt's value is >= 0.
@@ -146,16 +149,17 @@ type BigInt struct {
 func (b *BigInt) Validate(formats strfmt.Registry) error {
 	v := b.LargerOrEqualToZero()
 	if !v {
-		return fmt.Errorf("%v was not >=0", b.Int.String())
+		return fmt.Errorf("%v was not >=0", b.String())
 	}
 	return nil
 }
 
-// LargerThanZero checks that the number is >=0
+// LargerThanZero returns true if it is >0
 func (b *BigInt) LargerThanZero() bool {
-	zero := NewBigInt()
+	bc := big.Int(*b)
+	zero := big.Int{}
 
-	if b.Cmp(zero.Int) != 1 {
+	if bc.Cmp(&zero) != 1 {
 		return false
 	}
 	return true
@@ -163,31 +167,24 @@ func (b *BigInt) LargerThanZero() bool {
 
 // LargerOrEqualToZero checks that the number is >=0
 func (b *BigInt) LargerOrEqualToZero() bool {
-	zero := NewBigInt()
+	bc := big.Int(*b)
+	zero := big.Int{}
 
-	if b.Cmp(zero.Int) == -1 {
+	if bc.Cmp(&zero) == -1 {
 		return false
 	}
 	return true
 }
 
-// UnmarshalJSON ensures that BigInt.Int is always initialized, even if the JSON value is nil.
+// UnmarshalJSON casts BigInt into big.Int and uses its UnmarshalJSON method.
 func (b *BigInt) UnmarshalJSON(text []byte) error {
-	if b.Int == nil {
-		b.Int = &big.Int{}
-	}
-
-	return b.Int.UnmarshalJSON(text)
+	bc := big.Int(*b)
+	return bc.UnmarshalJSON(text)
 }
 
-// NewBigInt returns a new BigInt with its Int struct field initialized
-func NewBigInt() (i *BigInt) {
-	return &BigInt{new(big.Int)}
-}
-
-// NewBigIntFromString returns a new BigInt from a string representation
-func NewBigIntFromString(number string) (i *BigInt, err error) {
-	i = &BigInt{new(big.Int)}
+// NewBigIntFromString returns a new math/big.Int from a string representation
+func NewBigIntFromString(number string) (i *big.Int, err error) {
+	i = new(big.Int)
 	_, success := i.SetString(number, 10)
 	if success == false {
 		return nil, errors.New("Could not parse string as a number")
@@ -195,8 +192,8 @@ func NewBigIntFromString(number string) (i *BigInt, err error) {
 	return i, nil
 }
 
-// RequireBigIntFromString returns a new BigInt from a string representation or panics if NewBigIntFromString would have returned an error.
-func RequireBigIntFromString(number string) *BigInt {
+// RequireBigIntFromString returns a new  big.Int from a string representation or panics if NewBigIntFromString would have returned an error.
+func RequireBigIntFromString(number string) *big.Int {
 	i, err := NewBigIntFromString(number)
 	if err != nil {
 		panic(err)
@@ -204,9 +201,9 @@ func RequireBigIntFromString(number string) *BigInt {
 	return i
 }
 
-// NewBigIntFromUint64 returns a new BigInt from a uint64 representation
-func NewBigIntFromUint64(number uint64) (i *BigInt) {
-	i = &BigInt{new(big.Int)}
+// NewBigIntFromUint64 returns a new big.Int from a uint64 representation
+func NewBigIntFromUint64(number uint64) (i *big.Int) {
+	i = new(big.Int)
 	i.SetUint64(number)
 	return i
 }

@@ -21,8 +21,8 @@ func TestSpendTx_RLP(t *testing.T) {
 	type fields struct {
 		senderID    string
 		recipientID string
-		amount      utils.BigInt
-		fee         utils.BigInt
+		amount      big.Int
+		fee         big.Int
 		payload     string
 		ttl         uint64
 		nonce       uint64
@@ -130,7 +130,7 @@ func TestNamePreclaimTx_RLP(t *testing.T) {
 	type fields struct {
 		AccountID    string
 		CommitmentID string
-		Fee          utils.BigInt
+		Fee          big.Int
 		TTL          uint64
 		Nonce        uint64
 	}
@@ -182,8 +182,8 @@ func TestNameClaimTx_RLP(t *testing.T) {
 	type fields struct {
 		AccountID string
 		Name      string
-		NameSalt  utils.BigInt
-		Fee       utils.BigInt
+		NameSalt  big.Int
+		Fee       big.Int
 		TTL       uint64
 		Nonce     uint64
 	}
@@ -241,7 +241,7 @@ func TestNameUpdateTx_RLP(t *testing.T) {
 		Pointers  []string
 		NameTTL   uint64
 		ClientTTL uint64
-		Fee       utils.BigInt
+		Fee       big.Int
 		TTL       uint64
 		Nonce     uint64
 	}
@@ -331,7 +331,7 @@ func TestNameRevokeTx_RLP(t *testing.T) {
 	type fields struct {
 		AccountID    string
 		NameID       string
-		Fee          utils.BigInt
+		Fee          big.Int
 		TTL          uint64
 		AccountNonce uint64
 	}
@@ -384,7 +384,7 @@ func TestNameTransferTx_RLP(t *testing.T) {
 		AccountID    string
 		NameID       string
 		RecipientID  string
-		Fee          utils.BigInt
+		Fee          big.Int
 		TTL          uint64
 		AccountNonce uint64
 	}
@@ -440,12 +440,12 @@ func TestOracleRegisterTx_RLP(t *testing.T) {
 		accountNonce   uint64
 		querySpec      string
 		responseSpec   string
-		queryFee       utils.BigInt
+		queryFee       big.Int
 		oracleTTLType  uint64
 		oracleTTLValue uint64
 		abiVersion     uint64
 		vmVersion      uint64
-		txFee          utils.BigInt
+		txFee          big.Int
 		txTTL          uint64
 	}
 	tests := []struct {
@@ -548,7 +548,7 @@ func TestOracleExtendTx_RLP(t *testing.T) {
 		AccountNonce uint64
 		TTLType      uint64
 		TTLValue     uint64
-		Fee          utils.BigInt
+		Fee          big.Int
 		TTL          uint64
 	}
 	tests := []struct {
@@ -605,12 +605,12 @@ func TestOracleQueryTx_RLP(t *testing.T) {
 		AccountNonce     uint64
 		OracleID         string
 		Query            string
-		QueryFee         utils.BigInt
+		QueryFee         big.Int
 		QueryTTLType     uint64
 		QueryTTLValue    uint64
 		ResponseTTLType  uint64
 		ResponseTTLValue uint64
-		Fee              utils.BigInt
+		Fee              big.Int
 		TTL              uint64
 	}
 	tests := []struct {
@@ -697,7 +697,7 @@ func TestOracleRespondTx_RLP(t *testing.T) {
 		Response         string
 		ResponseTTLType  uint64
 		ResponseTTLValue uint64
-		Fee              utils.BigInt
+		Fee              big.Int
 		TTL              uint64
 	}
 	tests := []struct {
@@ -773,10 +773,10 @@ func TestContractCreateTx_RLP(t *testing.T) {
 		VMVersion    uint64
 		AbiVersion   uint64
 		Deposit      uint64
-		Amount       utils.BigInt
-		Gas          utils.BigInt
-		GasPrice     utils.BigInt
-		Fee          utils.BigInt
+		Amount       big.Int
+		Gas          big.Int
+		GasPrice     big.Int
+		Fee          big.Int
 		TTL          uint64
 		CallData     string
 	}
@@ -796,7 +796,7 @@ func TestContractCreateTx_RLP(t *testing.T) {
 				VMVersion:  uint64(3),
 				AbiVersion: uint64(1),
 				Deposit:    0,
-				Amount:     *utils.NewBigInt(),
+				Amount:     *new(big.Int),
 				Gas:        *utils.NewBigIntFromUint64(1e9),
 				GasPrice:   *utils.NewBigIntFromUint64(1e9),
 				Fee:        *utils.RequireBigIntFromString("200000000000000"),
@@ -816,7 +816,7 @@ func TestContractCreateTx_RLP(t *testing.T) {
 				VMVersion:  uint64(4),
 				AbiVersion: uint64(1),
 				Deposit:    0,
-				Amount:     *utils.NewBigInt(),
+				Amount:     *new(big.Int),
 				Gas:        *utils.NewBigIntFromUint64(1e9),
 				GasPrice:   *utils.NewBigIntFromUint64(1e9),
 				Fee:        *utils.RequireBigIntFromString("200000000000000"),
@@ -887,10 +887,10 @@ func TestContractCreateTx_FeeEstimate(t *testing.T) {
 		VMVersion    uint64
 		AbiVersion   uint64
 		Deposit      uint64
-		Amount       utils.BigInt
-		Gas          utils.BigInt
-		GasPrice     utils.BigInt
-		Fee          utils.BigInt
+		Amount       big.Int
+		Gas          big.Int
+		GasPrice     big.Int
+		Fee          big.Int
 		TTL          uint64
 		CallData     string
 	}
@@ -909,7 +909,7 @@ func TestContractCreateTx_FeeEstimate(t *testing.T) {
 				VMVersion:  3,
 				AbiVersion: 1,
 				Deposit:    0,
-				Amount:     *utils.NewBigInt(),
+				Amount:     *new(big.Int),
 				Gas:        *utils.NewBigIntFromUint64(1e9),
 				GasPrice:   *utils.NewBigIntFromUint64(1e9),
 				Fee:        *utils.RequireBigIntFromString("200000000000000"),
@@ -953,13 +953,13 @@ func TestContractCallTx_RLP(t *testing.T) {
 		CallerID     string
 		AccountNonce uint64
 		ContractID   string
-		Amount       utils.BigInt
-		Gas          utils.BigInt
-		GasPrice     utils.BigInt
+		Amount       big.Int
+		Gas          big.Int
+		GasPrice     big.Int
 		AbiVersion   uint64
 		VMVersion    uint64
 		CallData     string
-		Fee          utils.BigInt
+		Fee          big.Int
 		TTL          uint64
 	}
 	testCases := []struct {
@@ -992,7 +992,7 @@ func TestContractCallTx_RLP(t *testing.T) {
 				CallerID:     "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
 				AccountNonce: uint64(2),
 				ContractID:   "ct_2pfWWzeRzWSdm68HXZJn61KhxdsBA46wzYgvo1swkdJZij1rKm",
-				Amount:       *utils.NewBigInt(),
+				Amount:       *new(big.Int),
 				Gas:          *utils.NewBigIntFromUint64(1e9),
 				GasPrice:     *utils.NewBigIntFromUint64(1e9),
 				AbiVersion:   uint64(4),
@@ -1059,13 +1059,13 @@ func TestContractCallTx_FeeEstimate(t *testing.T) {
 		CallerID     string
 		AccountNonce uint64
 		ContractID   string
-		Amount       utils.BigInt
-		Gas          utils.BigInt
-		GasPrice     utils.BigInt
+		Amount       big.Int
+		Gas          big.Int
+		GasPrice     big.Int
 		AbiVersion   uint64
 		VMVersion    uint64
 		CallData     string
-		Fee          utils.BigInt
+		Fee          big.Int
 		TTL          uint64
 	}
 	tests := []struct {

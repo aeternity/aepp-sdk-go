@@ -167,7 +167,7 @@ func uuidV4() (u string) {
 // since the salt is a uint256, which Erlang handles well, but Go has nothing similar to it,
 // it is imperative that the salt be kept as a bytearray unless you really have to convert it
 // into an integer. Which you usually don't, because it's a salt.
-func generateCommitmentID(name string) (ch string, salt *utils.BigInt, err error) {
+func generateCommitmentID(name string) (ch string, salt *big.Int, err error) {
 	saltBytes, err := randomBytes(32)
 	if err != nil {
 		return
@@ -175,7 +175,7 @@ func generateCommitmentID(name string) (ch string, salt *utils.BigInt, err error
 
 	ch, err = computeCommitmentID(name, saltBytes)
 
-	salt = utils.NewBigInt()
+	salt = new(big.Int)
 	salt.SetBytes(saltBytes)
 
 	return ch, salt, err

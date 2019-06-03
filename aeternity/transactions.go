@@ -78,38 +78,38 @@ func buildPointers(pointers []string) (ptrs []*NamePointer, err error) {
 	return
 }
 
-func calcFeeStd(tx Tx, txLen int) *utils.BigInt {
+func calcFeeStd(tx Tx, txLen int) *big.Int {
 	// (Config.Client.BaseGas + len(txRLP) * Config.Client.GasPerByte) * Config.Client.GasPrice
 	//                                   txLenGasPerByte
-	fee := utils.NewBigInt()
-	txLenGasPerByte := utils.NewBigInt()
+	fee := new(big.Int)
+	txLenGasPerByte := new(big.Int)
 
-	txLenGasPerByte.Mul(utils.NewBigIntFromUint64(uint64(txLen)).Int, Config.Client.GasPerByte.Int)
-	fee.Add(Config.Client.BaseGas.Int, txLenGasPerByte.Int)
-	fee.Mul(fee.Int, Config.Client.GasPrice.Int)
+	txLenGasPerByte.Mul(utils.NewBigIntFromUint64(uint64(txLen)), &Config.Client.GasPerByte)
+	fee.Add(&Config.Client.BaseGas, txLenGasPerByte)
+	fee.Mul(fee, &Config.Client.GasPrice)
 	return fee
 }
 
-func calcFeeContract(gas *utils.BigInt, baseGasMultiplier int64, length int) *utils.BigInt {
+func calcFeeContract(gas *big.Int, baseGasMultiplier int64, length int) *big.Int {
 	// (Config.Client.BaseGas * 5) + gaslimit + (len(txRLP) * Config.Client.GasPerByte) * Config.Client.GasPrice
 	//           baseGas5                                txLenGasPerByte
-	baseGas5 := utils.NewBigInt()
-	txLenBig := utils.NewBigInt()
-	answer := utils.NewBigInt()
+	baseGas5 := new(big.Int)
+	txLenBig := new(big.Int)
+	answer := new(big.Int)
 
-	baseGas5.Mul(Config.Client.BaseGas.Int, new(big.Int).SetInt64(baseGasMultiplier))
+	baseGas5.Mul(&Config.Client.BaseGas, big.NewInt(baseGasMultiplier))
 	txLenBig.SetUint64(uint64(length))
-	txLenGasPerByte := utils.NewBigInt()
-	txLenGasPerByte.Mul(txLenBig.Int, Config.Client.GasPerByte.Int)
+	txLenGasPerByte := new(big.Int)
+	txLenGasPerByte.Mul(txLenBig, &Config.Client.GasPerByte)
 
-	answer.Add(baseGas5.Int, gas.Int)
-	answer.Add(answer.Int, txLenGasPerByte.Int)
-	answer.Mul(answer.Int, Config.Client.GasPrice.Int)
+	answer.Add(baseGas5, gas)
+	answer.Add(answer, txLenGasPerByte)
+	answer.Mul(answer, &Config.Client.GasPrice)
 	return answer
 }
 
 // sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
-func calcSizeEstimate(tx Tx, fee *utils.BigInt) (int, error) {
+func calcSizeEstimate(tx Tx, fee *big.Int) (int, error) {
 	feeRlp, err := rlp.EncodeToBytes(fee)
 	if err != nil {
 		return 0, err
@@ -143,8 +143,8 @@ func BaseEncodeTx(tx Tx) (string, error) {
 type SpendTx struct {
 	SenderID    string
 	RecipientID string
-	Amount      utils.BigInt
-	Fee         utils.BigInt
+	Amount      big.Int
+	Fee         big.Int
 	Payload     string
 	TTL         uint64
 	Nonce       uint64
@@ -197,17 +197,17 @@ func (tx *SpendTx) sizeEstimate() (int, error) {
 }
 
 // FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
-func (tx *SpendTx) FeeEstimate() (*utils.BigInt, error) {
+func (tx *SpendTx) FeeEstimate() (*big.Int, error) {
 	txLenEstimated, err := tx.sizeEstimate()
 	if err != nil {
-		return utils.NewBigInt(), err
+		return new(big.Int), err
 	}
 	estimatedFee := calcFeeStd(tx, txLenEstimated)
 	return estimatedFee, nil
 }
 
 // NewSpendTx is a constructor for a SpendTx struct
-func NewSpendTx(senderID, recipientID string, amount, fee utils.BigInt, payload string, ttl, nonce uint64) SpendTx {
+func NewSpendTx(senderID, recipientID string, amount, fee big.Int, payload string, ttl, nonce uint64) SpendTx {
 	return SpendTx{senderID, recipientID, amount, fee, payload, ttl, nonce}
 }
 
@@ -215,7 +215,7 @@ func NewSpendTx(senderID, recipientID string, amount, fee utils.BigInt, payload 
 type NamePreclaimTx struct {
 	AccountID    string
 	CommitmentID string
-	Fee          utils.BigInt
+	Fee          big.Int
 	TTL          uint64
 	AccountNonce uint64
 }
@@ -263,17 +263,17 @@ func (tx *NamePreclaimTx) sizeEstimate() (int, error) {
 }
 
 // FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
-func (tx *NamePreclaimTx) FeeEstimate() (*utils.BigInt, error) {
+func (tx *NamePreclaimTx) FeeEstimate() (*big.Int, error) {
 	txLenEstimated, err := tx.sizeEstimate()
 	if err != nil {
-		return utils.NewBigInt(), err
+		return new(big.Int), err
 	}
 	estimatedFee := calcFeeStd(tx, txLenEstimated)
 	return estimatedFee, nil
 }
 
 // NewNamePreclaimTx is a constructor for a NamePreclaimTx struct
-func NewNamePreclaimTx(accountID, commitmentID string, fee utils.BigInt, ttl, accountNonce uint64) NamePreclaimTx {
+func NewNamePreclaimTx(accountID, commitmentID string, fee big.Int, ttl, accountNonce uint64) NamePreclaimTx {
 	return NamePreclaimTx{accountID, commitmentID, fee, ttl, accountNonce}
 }
 
@@ -283,8 +283,8 @@ func NewNamePreclaimTx(accountID, commitmentID string, fee utils.BigInt, ttl, ac
 type NameClaimTx struct {
 	AccountID    string
 	Name         string
-	NameSalt     utils.BigInt
-	Fee          utils.BigInt
+	NameSalt     big.Int
+	Fee          big.Int
 	TTL          uint64
 	AccountNonce uint64
 }
@@ -334,17 +334,17 @@ func (tx *NameClaimTx) sizeEstimate() (int, error) {
 }
 
 // FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
-func (tx *NameClaimTx) FeeEstimate() (*utils.BigInt, error) {
+func (tx *NameClaimTx) FeeEstimate() (*big.Int, error) {
 	txLenEstimated, err := tx.sizeEstimate()
 	if err != nil {
-		return utils.NewBigInt(), err
+		return new(big.Int), err
 	}
 	estimatedFee := calcFeeStd(tx, txLenEstimated)
 	return estimatedFee, nil
 }
 
 // NewNameClaimTx is a constructor for a NameClaimTx struct
-func NewNameClaimTx(accountID, name string, nameSalt utils.BigInt, fee utils.BigInt, ttl, accountNonce uint64) NameClaimTx {
+func NewNameClaimTx(accountID, name string, nameSalt big.Int, fee big.Int, ttl, accountNonce uint64) NameClaimTx {
 	return NameClaimTx{accountID, name, nameSalt, fee, ttl, accountNonce}
 }
 
@@ -383,7 +383,7 @@ type NameUpdateTx struct {
 	Pointers     []*NamePointer
 	NameTTL      uint64
 	ClientTTL    uint64
-	Fee          utils.BigInt
+	Fee          big.Int
 	TTL          uint64
 	AccountNonce uint64
 }
@@ -454,17 +454,17 @@ func (tx *NameUpdateTx) sizeEstimate() (int, error) {
 }
 
 // FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
-func (tx *NameUpdateTx) FeeEstimate() (*utils.BigInt, error) {
+func (tx *NameUpdateTx) FeeEstimate() (*big.Int, error) {
 	txLenEstimated, err := tx.sizeEstimate()
 	if err != nil {
-		return utils.NewBigInt(), err
+		return new(big.Int), err
 	}
 	estimatedFee := calcFeeStd(tx, txLenEstimated)
 	return estimatedFee, nil
 }
 
 // NewNameUpdateTx is a constructor for a NameUpdateTx struct
-func NewNameUpdateTx(accountID, nameID string, pointers []string, nameTTL, clientTTL uint64, fee utils.BigInt, ttl, accountNonce uint64) NameUpdateTx {
+func NewNameUpdateTx(accountID, nameID string, pointers []string, nameTTL, clientTTL uint64, fee big.Int, ttl, accountNonce uint64) NameUpdateTx {
 	parsedPointers, err := buildPointers(pointers)
 	if err != nil {
 		panic(err)
@@ -476,7 +476,7 @@ func NewNameUpdateTx(accountID, nameID string, pointers []string, nameTTL, clien
 type NameRevokeTx struct {
 	AccountID    string
 	NameID       string
-	Fee          utils.BigInt
+	Fee          big.Int
 	TTL          uint64
 	AccountNonce uint64
 }
@@ -525,17 +525,17 @@ func (tx *NameRevokeTx) sizeEstimate() (int, error) {
 }
 
 // FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
-func (tx *NameRevokeTx) FeeEstimate() (*utils.BigInt, error) {
+func (tx *NameRevokeTx) FeeEstimate() (*big.Int, error) {
 	txLenEstimated, err := tx.sizeEstimate()
 	if err != nil {
-		return utils.NewBigInt(), err
+		return new(big.Int), err
 	}
 	estimatedFee := calcFeeStd(tx, txLenEstimated)
 	return estimatedFee, nil
 }
 
 // NewNameRevokeTx is a constructor for a NameRevokeTx struct
-func NewNameRevokeTx(accountID, name string, fee utils.BigInt, ttl, accountNonce uint64) NameRevokeTx {
+func NewNameRevokeTx(accountID, name string, fee big.Int, ttl, accountNonce uint64) NameRevokeTx {
 	return NameRevokeTx{accountID, name, fee, ttl, accountNonce}
 }
 
@@ -544,7 +544,7 @@ type NameTransferTx struct {
 	AccountID    string
 	NameID       string
 	RecipientID  string
-	Fee          utils.BigInt
+	Fee          big.Int
 	TTL          uint64
 	AccountNonce uint64
 }
@@ -604,17 +604,17 @@ func (tx *NameTransferTx) sizeEstimate() (int, error) {
 }
 
 // FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
-func (tx *NameTransferTx) FeeEstimate() (*utils.BigInt, error) {
+func (tx *NameTransferTx) FeeEstimate() (*big.Int, error) {
 	txLenEstimated, err := tx.sizeEstimate()
 	if err != nil {
-		return utils.NewBigInt(), err
+		return new(big.Int), err
 	}
 	estimatedFee := calcFeeStd(tx, txLenEstimated)
 	return estimatedFee, nil
 }
 
 // NewNameTransferTx is a constructor for a NameTransferTx struct
-func NewNameTransferTx(AccountID, NameID, RecipientID string, Fee utils.BigInt, TTL, AccountNonce uint64) NameTransferTx {
+func NewNameTransferTx(AccountID, NameID, RecipientID string, Fee big.Int, TTL, AccountNonce uint64) NameTransferTx {
 	return NameTransferTx{AccountID, NameID, RecipientID, Fee, TTL, AccountNonce}
 }
 
@@ -624,12 +624,12 @@ type OracleRegisterTx struct {
 	AccountNonce   uint64
 	QuerySpec      string
 	ResponseSpec   string
-	QueryFee       utils.BigInt
+	QueryFee       big.Int
 	OracleTTLType  uint64
 	OracleTTLValue uint64
 	AbiVersion     uint64
 	VMVersion      uint64
-	Fee            utils.BigInt
+	Fee            big.Int
 	TTL            uint64
 }
 
@@ -698,7 +698,7 @@ func (tx *OracleRegisterTx) JSON() (string, error) {
 }
 
 // NewOracleRegisterTx is a constructor for a OracleRegisterTx struct
-func NewOracleRegisterTx(accountID string, accountNonce uint64, querySpec, responseSpec string, queryFee utils.BigInt, oracleTTLType, oracleTTLValue, abiVersion uint64, vmVersion uint64, txFee utils.BigInt, txTTL uint64) OracleRegisterTx {
+func NewOracleRegisterTx(accountID string, accountNonce uint64, querySpec, responseSpec string, queryFee big.Int, oracleTTLType, oracleTTLValue, abiVersion uint64, vmVersion uint64, txFee big.Int, txTTL uint64) OracleRegisterTx {
 	return OracleRegisterTx{accountID, accountNonce, querySpec, responseSpec, queryFee, oracleTTLType, oracleTTLValue, abiVersion, vmVersion, txFee, txTTL}
 }
 
@@ -708,7 +708,7 @@ type OracleExtendTx struct {
 	AccountNonce   uint64
 	OracleTTLType  uint64
 	OracleTTLValue uint64
-	Fee            utils.BigInt
+	Fee            big.Int
 	TTL            uint64
 }
 
@@ -751,7 +751,7 @@ func (tx *OracleExtendTx) JSON() (string, error) {
 }
 
 // NewOracleExtendTx is a constructor for a OracleExtendTx struct
-func NewOracleExtendTx(oracleID string, accountNonce, oracleTTLType, oracleTTLValue uint64, Fee utils.BigInt, TTL uint64) OracleExtendTx {
+func NewOracleExtendTx(oracleID string, accountNonce, oracleTTLType, oracleTTLValue uint64, Fee big.Int, TTL uint64) OracleExtendTx {
 	return OracleExtendTx{oracleID, accountNonce, oracleTTLType, oracleTTLValue, Fee, TTL}
 }
 
@@ -761,12 +761,12 @@ type OracleQueryTx struct {
 	AccountNonce     uint64
 	OracleID         string
 	Query            string
-	QueryFee         utils.BigInt
+	QueryFee         big.Int
 	QueryTTLType     uint64
 	QueryTTLValue    uint64
 	ResponseTTLType  uint64
 	ResponseTTLValue uint64
-	Fee              utils.BigInt
+	Fee              big.Int
 	TTL              uint64
 }
 
@@ -827,7 +827,7 @@ func (tx *OracleQueryTx) JSON() (string, error) {
 }
 
 // NewOracleQueryTx is a constructor for a OracleQueryTx struct
-func NewOracleQueryTx(SenderID string, AccountNonce uint64, OracleID, Query string, QueryFee utils.BigInt, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64, Fee utils.BigInt, TTL uint64) OracleQueryTx {
+func NewOracleQueryTx(SenderID string, AccountNonce uint64, OracleID, Query string, QueryFee big.Int, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64, Fee big.Int, TTL uint64) OracleQueryTx {
 	return OracleQueryTx{SenderID, AccountNonce, OracleID, Query, QueryFee, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue, Fee, TTL}
 }
 
@@ -839,7 +839,7 @@ type OracleRespondTx struct {
 	Response         string
 	ResponseTTLType  uint64
 	ResponseTTLValue uint64
-	Fee              utils.BigInt
+	Fee              big.Int
 	TTL              uint64
 }
 
@@ -890,7 +890,7 @@ func (tx *OracleRespondTx) JSON() (string, error) {
 }
 
 // NewOracleRespondTx is a constructor for a OracleRespondTx struct
-func NewOracleRespondTx(OracleID string, AccountNonce uint64, QueryID string, Response string, TTLType uint64, TTLValue uint64, Fee utils.BigInt, TTL uint64) OracleRespondTx {
+func NewOracleRespondTx(OracleID string, AccountNonce uint64, QueryID string, Response string, TTLType uint64, TTLValue uint64, Fee big.Int, TTL uint64) OracleRespondTx {
 	return OracleRespondTx{OracleID, AccountNonce, QueryID, Response, TTLType, TTLValue, Fee, TTL}
 }
 
@@ -902,10 +902,10 @@ type ContractCreateTx struct {
 	VMVersion    uint64
 	AbiVersion   uint64
 	Deposit      uint64
-	Amount       utils.BigInt
-	Gas          utils.BigInt
-	GasPrice     utils.BigInt
-	Fee          utils.BigInt
+	Amount       big.Int
+	Gas          big.Int
+	GasPrice     big.Int
+	Fee          big.Int
 	TTL          uint64
 	CallData     string
 }
@@ -978,10 +978,10 @@ func (tx *ContractCreateTx) sizeEstimate() (int, error) {
 }
 
 // FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
-func (tx *ContractCreateTx) FeeEstimate() (*utils.BigInt, error) {
+func (tx *ContractCreateTx) FeeEstimate() (*big.Int, error) {
 	txLenEstimated, err := tx.sizeEstimate()
 	if err != nil {
-		return utils.NewBigInt(), err
+		return new(big.Int), err
 	}
 	estimatedFee := calcFeeContract(&tx.Gas, 5, txLenEstimated)
 	return estimatedFee, nil
@@ -993,7 +993,7 @@ func (tx *ContractCreateTx) ContractID() (string, error) {
 }
 
 // NewContractCreateTx is a constructor for a ContractCreateTx struct
-func NewContractCreateTx(OwnerID string, AccountNonce uint64, Code string, VMVersion, AbiVersion, Deposit uint64, Amount, Gas, GasPrice, Fee utils.BigInt, TTL uint64, CallData string) ContractCreateTx {
+func NewContractCreateTx(OwnerID string, AccountNonce uint64, Code string, VMVersion, AbiVersion, Deposit uint64, Amount, Gas, GasPrice, Fee big.Int, TTL uint64, CallData string) ContractCreateTx {
 	return ContractCreateTx{
 		OwnerID:      OwnerID,
 		AccountNonce: AccountNonce,
@@ -1016,13 +1016,13 @@ type ContractCallTx struct {
 	CallerID     string
 	AccountNonce uint64
 	ContractID   string
-	Amount       utils.BigInt
-	Gas          utils.BigInt
-	GasPrice     utils.BigInt
+	Amount       big.Int
+	Gas          big.Int
+	GasPrice     big.Int
 	AbiVersion   uint64
 	VMVersion    uint64
 	CallData     string
-	Fee          utils.BigInt
+	Fee          big.Int
 	TTL          uint64
 }
 
@@ -1083,16 +1083,16 @@ func (tx *ContractCallTx) sizeEstimate() (int, error) {
 }
 
 // FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
-func (tx *ContractCallTx) FeeEstimate() (*utils.BigInt, error) {
+func (tx *ContractCallTx) FeeEstimate() (*big.Int, error) {
 	txLenEstimated, err := tx.sizeEstimate()
 	if err != nil {
-		return utils.NewBigInt(), err
+		return new(big.Int), err
 	}
 	estimatedFee := calcFeeContract(&tx.Gas, 30, txLenEstimated)
 	return estimatedFee, nil
 }
 
-func NewContractCallTx(CallerID string, AccountNonce uint64, ContractID string, Amount, Gas, GasPrice utils.BigInt, AbiVersion, VMVersion uint64, CallData string, Fee utils.BigInt, TTL uint64) ContractCallTx {
+func NewContractCallTx(CallerID string, AccountNonce uint64, ContractID string, Amount, Gas, GasPrice big.Int, AbiVersion, VMVersion uint64, CallData string, Fee big.Int, TTL uint64) ContractCallTx {
 	return ContractCallTx{
 		CallerID:     CallerID,
 		AccountNonce: AccountNonce,

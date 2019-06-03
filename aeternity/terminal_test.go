@@ -13,14 +13,14 @@ import (
 func Test_printIf_BigIntBalancePrinted(t *testing.T) {
 	type args struct {
 		title string
-		v     *utils.BigInt
+		v     *big.Int
 	}
 	tests := []struct {
 		name string
 		args args
 	}{
 		{
-			name: "Test that printIf() recognizes the utils.BigInt special case",
+			name: "Test that printIf() recognizes the big.Int special case",
 			args: args{
 				title: "Title",
 				v:     utils.NewBigIntFromUint64(1377),
