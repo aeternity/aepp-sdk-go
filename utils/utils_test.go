@@ -70,3 +70,31 @@ func TestBigIntLargerThanZero(t *testing.T) {
 		}
 	}
 }
+
+func TestBigInt_UnmarshalJSON(t *testing.T) {
+	type args struct {
+		text []byte
+	}
+	tests := []struct {
+		name    string
+		b       BigInt
+		args    args
+		wantErr bool
+	}{{
+		name:    "Deserialize this",
+		args:    args{[]byte("1600000000000000000129127208515966861305")},
+		b:       BigInt(*RequireBigIntFromString("1600000000000000000129127208515966861305")),
+		wantErr: false,
+	}}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &BigInt{}
+			if err := b.UnmarshalJSON(tt.args.text); (err != nil) != tt.wantErr {
+				t.Errorf("BigInt.UnmarshalJSON() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if b.Cmp(&tt.b) != 0 {
+				t.Errorf("The values are not the same: b: %s, want: %s", b.String(), tt.b.String())
+			}
+		})
+	}
+}

@@ -2,6 +2,7 @@ package integrationtest
 
 import (
 	"fmt"
+	"math/big"
 	"testing"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
@@ -22,9 +23,10 @@ func TestSpendTx(t *testing.T) {
 	expected := new(big.Int)
 	bobState, err := node.APIGetAccount(bob.Address)
 	if err != nil {
-		expected.Set(amount.Int)
+		expected.Set(amount)
 	} else {
-		expected.Add(bobState.Balance.Int, amount.Int)
+		bS := big.Int(bobState.Balance)
+		expected.Add(&bS, amount)
 	}
 
 	ttl, nonce, err := node.GetTTLNonce(sender, aeternity.Config.Client.TTL)
@@ -50,8 +52,9 @@ func TestSpendTx(t *testing.T) {
 		}
 	}
 	delay(getBobsAccount)
+	b := big.Int(bobState.Balance)
 
-	if bobState.Balance.Cmp(expected.Int) != 0 {
+	if expected.Cmp(&b) != 0 {
 		t.Fatalf("Bob should have %v, but has %v instead", expected.String(), bobState.Balance.String())
 	}
 }
