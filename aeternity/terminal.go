@@ -68,7 +68,7 @@ func printIf(title string, v interface{}) {
 		case reflect.Interface:
 			p(title, n, v.Elem(), dept)
 		case reflect.Struct:
-			if v.Type().Name() == "BigInt" {
+			if v.Type().Name() == "Int" {
 				vc := v.Interface().(big.Int)
 				PpI(dept, "Balance", vc.Text(10))
 			} else {
