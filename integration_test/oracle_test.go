@@ -17,7 +17,7 @@ func TestOracleWorkflow(t *testing.T) {
 	oracleAlice := aeternity.Oracle{Client: client, Account: alice}
 
 	// Register
-	queryFee := utils.NewBigIntFromUint64(1000)
+	queryFee := utils.NewIntFromUint64(1000)
 	register, err := oracleAlice.OracleRegisterTx("hello", "helloback", *queryFee, 0, 100, 0, 0)
 	if err != nil {
 		t.Fatal(err)

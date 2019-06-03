@@ -9,7 +9,7 @@ import (
 
 func TestBigIntNewStr(t *testing.T) {
 	// Use the convenience function NewBigIntFromString to set the number
-	a, err := NewBigIntFromString("20000000000000000000") // 2e19
+	a, err := NewIntFromString("20000000000000000000") // 2e19
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -83,7 +83,7 @@ func TestBigInt_UnmarshalJSON(t *testing.T) {
 	}{{
 		name:    "Deserialize this",
 		args:    args{[]byte("1600000000000000000129127208515966861305")},
-		b:       BigInt(*RequireBigIntFromString("1600000000000000000129127208515966861305")),
+		b:       BigInt(*RequireIntFromString("1600000000000000000129127208515966861305")),
 		wantErr: false,
 	}}
 	for _, tt := range tests {
