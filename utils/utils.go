@@ -177,7 +177,7 @@ func (b *BigInt) LargerOrEqualToZero() bool {
 	return true
 }
 
-// UnmarshalJSON casts BigInt into big.Int and uses its UnmarshalJSON method.
+// UnmarshalJSON implements the json.Unmarshaler interface.
 func (b *BigInt) UnmarshalJSON(text []byte) error {
 	bc := new(big.Int)
 	err := bc.UnmarshalJSON(text)
