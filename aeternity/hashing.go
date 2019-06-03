@@ -97,7 +97,7 @@ func buildOracleQueryID(sender string, senderNonce uint64, recipient string) (id
 	}
 	queryIDBin = append(queryIDBin, senderBin...)
 
-	senderNonceBytes := utils.NewBigIntFromUint64(senderNonce).Bytes()
+	senderNonceBytes := utils.NewIntFromUint64(senderNonce).Bytes()
 	senderNonceBytesPadded := leftPadByteSlice(32, senderNonceBytes)
 	queryIDBin = append(queryIDBin, senderNonceBytesPadded...)
 

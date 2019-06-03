@@ -84,7 +84,7 @@ func calcFeeStd(tx Tx, txLen int) *big.Int {
 	fee := new(big.Int)
 	txLenGasPerByte := new(big.Int)
 
-	txLenGasPerByte.Mul(utils.NewBigIntFromUint64(uint64(txLen)), &Config.Client.GasPerByte)
+	txLenGasPerByte.Mul(utils.NewIntFromUint64(uint64(txLen)), &Config.Client.GasPerByte)
 	fee.Add(&Config.Client.BaseGas, txLenGasPerByte)
 	fee.Mul(fee, &Config.Client.GasPrice)
 	return fee
@@ -911,8 +911,8 @@ type ContractCreateTx struct {
 }
 
 func encodeVMABI(VMVersion, ABIVersion uint64) []byte {
-	vmBytes := utils.NewBigIntFromUint64(VMVersion).Bytes()
-	abiBytes := utils.NewBigIntFromUint64(ABIVersion).Bytes()
+	vmBytes := utils.NewIntFromUint64(VMVersion).Bytes()
+	abiBytes := utils.NewIntFromUint64(ABIVersion).Bytes()
 	vmAbiBytes := []byte{}
 	vmAbiBytes = append(vmAbiBytes, vmBytes...)
 	vmAbiBytes = append(vmAbiBytes, leftPadByteSlice(2, abiBytes)...)

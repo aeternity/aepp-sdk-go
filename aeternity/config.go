@@ -98,28 +98,28 @@ var Config = ProfileConfig{
 		NetworkID:   "ae_mainnet",
 	},
 	Client: ClientConfig{
-		BaseGas:    *utils.NewBigIntFromUint64(15000),
-		GasPerByte: *utils.NewBigIntFromUint64(20),
-		GasPrice:   *utils.NewBigIntFromUint64(1000000000),
+		BaseGas:    *utils.NewIntFromUint64(15000),
+		GasPerByte: *utils.NewIntFromUint64(20),
+		GasPrice:   *utils.NewIntFromUint64(1000000000),
 		TTL:        500,
-		Fee:        *utils.RequireBigIntFromString("200000000000000"),
+		Fee:        *utils.RequireIntFromString("200000000000000"),
 		Names: AensConfig{
 			NameTTL:     500, // absolute block height when the name will expire
 			ClientTTL:   500, // time in blocks until the name resolver should check again in case the name was updated
-			PreClaimFee: *utils.RequireBigIntFromString("100000000000000"),
-			ClaimFee:    *utils.RequireBigIntFromString("100000000000000"),
-			UpdateFee:   *utils.RequireBigIntFromString("100000000000000"),
+			PreClaimFee: *utils.RequireIntFromString("100000000000000"),
+			ClaimFee:    *utils.RequireIntFromString("100000000000000"),
+			UpdateFee:   *utils.RequireIntFromString("100000000000000"),
 		},
 		Contracts: ContractConfig{
-			Gas:        *utils.NewBigIntFromUint64(1e9),
-			GasPrice:   *utils.NewBigIntFromUint64(1e9),
+			Gas:        *utils.NewIntFromUint64(1e9),
+			GasPrice:   *utils.NewIntFromUint64(1e9),
 			Amount:     *new(big.Int),
 			Deposit:    0,
 			VMVersion:  3,
 			ABIVersion: 1,
 		},
 		Oracles: OracleConfig{
-			QueryFee:         *utils.NewBigIntFromUint64(0),
+			QueryFee:         *utils.NewIntFromUint64(0),
 			QueryTTLType:     0,
 			QueryTTLValue:    300,
 			ResponseTTLType:  0,

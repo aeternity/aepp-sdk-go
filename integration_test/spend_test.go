@@ -15,8 +15,8 @@ func TestSpendTx(t *testing.T) {
 	node := setupNetwork(t)
 	alice, bob := setupAccounts(t)
 
-	amount := utils.RequireBigIntFromString("18446744073709551615") // max uint64
-	fee := utils.NewBigIntFromUint64(uint64(2e13))
+	amount := utils.RequireIntFromString("18446744073709551615") // max uint64
+	fee := utils.NewIntFromUint64(uint64(2e13))
 	msg := "Hello World"
 
 	// In case the recipient account already has funds, get recipient's account info. If it exists, expectedAmount = existing balance + amount + fee

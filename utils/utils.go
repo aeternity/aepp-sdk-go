@@ -73,8 +73,8 @@ func (b *BigInt) Cmp(i *BigInt) int {
 	return b2.Cmp(&i2)
 }
 
-// NewBigIntFromString returns a new math/big.Int from a string representation
-func NewBigIntFromString(number string) (i *big.Int, err error) {
+// NewIntFromString returns a new math/big.Int from a string representation
+func NewIntFromString(number string) (i *big.Int, err error) {
 	i = new(big.Int)
 	_, success := i.SetString(number, 10)
 	if success == false {
@@ -83,17 +83,17 @@ func NewBigIntFromString(number string) (i *big.Int, err error) {
 	return i, nil
 }
 
-// RequireBigIntFromString returns a new  big.Int from a string representation or panics if NewBigIntFromString would have returned an error.
-func RequireBigIntFromString(number string) *big.Int {
-	i, err := NewBigIntFromString(number)
+// RequireIntFromString returns a new  big.Int from a string representation or panics if NewBigIntFromString would have returned an error.
+func RequireIntFromString(number string) *big.Int {
+	i, err := NewIntFromString(number)
 	if err != nil {
 		panic(err)
 	}
 	return i
 }
 
-// NewBigIntFromUint64 returns a new big.Int from a uint64 representation
-func NewBigIntFromUint64(number uint64) (i *big.Int) {
+// NewIntFromUint64 returns a new big.Int from a uint64 representation
+func NewIntFromUint64(number uint64) (i *big.Int) {
 	i = new(big.Int)
 	i.SetUint64(number)
 	return i

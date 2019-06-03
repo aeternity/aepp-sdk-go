@@ -40,8 +40,8 @@ func txSpendFunc(cmd *cobra.Command, args []string) (err error) {
 	// Load variables from arguments
 	sender = args[0]
 	recipient = args[1]
-	amount, err = utils.NewBigIntFromString(args[2])
-	feeBigInt, _ = utils.NewBigIntFromString(fee)
+	amount, err = utils.NewIntFromString(args[2])
+	feeBigInt, _ = utils.NewIntFromString(fee)
 
 	// Validate arguments
 	if len(sender) == 0 {

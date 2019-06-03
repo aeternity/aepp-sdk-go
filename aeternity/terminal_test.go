@@ -24,7 +24,7 @@ func Test_printIf_BigIntBalancePrinted(t *testing.T) {
 			name: "Test that printIf() recognizes the big.Int special case",
 			args: args{
 				title: "Title",
-				v:     utils.NewBigIntFromUint64(1377),
+				v:     utils.NewIntFromUint64(1377),
 			},
 		},
 	}
