@@ -33,7 +33,7 @@ type ContractConfig struct {
 	Gas        big.Int `json:"gas" yaml:"gas" mapstructure:"gas"`
 	GasPrice   big.Int `json:"gas_price" yaml:"gas_price" mapstructure:"gas_price"`
 	Amount     big.Int `json:"amount" yaml:"amount" mapstructure:"amount"`
-	Deposit    uint64  `json:"deposit" yaml:"deposit" mapstructure:"deposit"`
+	Deposit    big.Int `json:"deposit" yaml:"deposit" mapstructure:"deposit"`
 	VMVersion  uint64  `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
 	ABIVersion uint64  `json:"abi_version" yaml:"abi_version" mapstructure:"abi_version"`
 }
@@ -114,7 +114,7 @@ var Config = ProfileConfig{
 			Gas:        *utils.NewIntFromUint64(1e9),
 			GasPrice:   *utils.NewIntFromUint64(1e9),
 			Amount:     *new(big.Int),
-			Deposit:    0,
+			Deposit:    *new(big.Int),
 			VMVersion:  3,
 			ABIVersion: 1,
 		},

@@ -181,11 +181,11 @@ func (tx *SpendTx) JSON() (string, error) {
 	swaggerT := models.SpendTx{
 		Amount:      utils.BigInt(tx.Amount),
 		Fee:         utils.BigInt(tx.Fee),
-		Nonce:       tx.Nonce,
-		Payload:     &tx.Payload,
-		RecipientID: models.EncodedHash(tx.RecipientID),
-		SenderID:    models.EncodedHash(tx.SenderID),
-		TTL:         tx.TTL,
+		Nonce:       models.Uint64(tx.Nonce),
+		Payload:     models.EncodedByteArray(tx.Payload),
+		RecipientID: models.EncodedPubkey(tx.RecipientID),
+		SenderID:    models.EncodedPubkey(tx.SenderID),
+		TTL:         models.Uint64(tx.TTL),
 	}
 	output, err := swaggerT.MarshalBinary()
 	return string(output), err
@@ -247,11 +247,11 @@ func (tx *NamePreclaimTx) RLP() (rlpRawMsg []byte, err error) {
 // JSON representation of a Tx is useful for querying the node's debug endpoint
 func (tx *NamePreclaimTx) JSON() (string, error) {
 	swaggerT := models.NamePreclaimTx{
-		AccountID:    models.EncodedHash(tx.AccountID),
-		CommitmentID: models.EncodedHash(tx.CommitmentID),
+		AccountID:    models.EncodedPubkey(tx.AccountID),
+		CommitmentID: models.EncodedValue(tx.CommitmentID),
 		Fee:          utils.BigInt(tx.Fee),
-		Nonce:        tx.AccountNonce,
-		TTL:          tx.TTL,
+		Nonce:        models.Uint64(tx.AccountNonce),
+		TTL:          models.Uint64(tx.TTL),
 	}
 	output, err := swaggerT.MarshalBinary()
 	return string(output), err
@@ -316,12 +316,12 @@ func (tx *NameClaimTx) JSON() (string, error) {
 	// (base58), not namehash-ed.
 	nameAPIEncoded := Encode(PrefixName, []byte(tx.Name))
 	swaggerT := models.NameClaimTx{
-		AccountID: models.EncodedHash(tx.AccountID),
+		AccountID: models.EncodedPubkey(tx.AccountID),
 		Fee:       utils.BigInt(tx.Fee),
 		Name:      &nameAPIEncoded,
 		NameSalt:  utils.BigInt(tx.NameSalt),
-		Nonce:     tx.AccountNonce,
-		TTL:       tx.TTL,
+		Nonce:     models.Uint64(tx.AccountNonce),
+		TTL:       models.Uint64(tx.TTL),
 	}
 
 	output, err := swaggerT.MarshalBinary()
@@ -370,7 +370,7 @@ func (tx *NamePointer) EncodeRLP(w io.Writer) (err error) {
 // NewNamePointer is a constructor for a swagger generated NamePointer struct.
 // It returns a pointer because
 func NewNamePointer(key string, id string) *NamePointer {
-	np := models.NamePointer{ID: models.EncodedHash(id), Key: &key}
+	np := models.NamePointer{ID: models.EncodedPubkey(id), Key: &key}
 	return &NamePointer{
 		NamePointer: &np,
 	}
@@ -434,14 +434,14 @@ func (tx *NameUpdateTx) JSON() (string, error) {
 	}
 
 	swaggerT := models.NameUpdateTx{
-		AccountID: models.EncodedHash(tx.AccountID),
-		ClientTTL: &tx.ClientTTL,
+		AccountID: models.EncodedPubkey(tx.AccountID),
+		ClientTTL: models.Uint64(tx.ClientTTL),
 		Fee:       utils.BigInt(tx.Fee),
-		NameID:    models.EncodedHash(tx.NameID),
-		NameTTL:   &tx.NameTTL,
-		Nonce:     tx.AccountNonce,
+		NameID:    models.EncodedValue(tx.NameID),
+		NameTTL:   models.Uint64(tx.NameTTL),
+		Nonce:     models.Uint64(tx.AccountNonce),
 		Pointers:  swaggerNamePointers,
-		TTL:       tx.TTL,
+		TTL:       models.Uint64(tx.TTL),
 	}
 
 	output, err := swaggerT.MarshalBinary()
@@ -508,11 +508,11 @@ func (tx *NameRevokeTx) RLP() (rlpRawMsg []byte, err error) {
 // JSON representation of a Tx is useful for querying the node's debug endpoint
 func (tx *NameRevokeTx) JSON() (string, error) {
 	swaggerT := models.NameRevokeTx{
-		AccountID: models.EncodedHash(tx.AccountID),
+		AccountID: models.EncodedPubkey(tx.AccountID),
 		Fee:       utils.BigInt(tx.Fee),
-		NameID:    models.EncodedHash(tx.NameID),
-		Nonce:     tx.AccountNonce,
-		TTL:       tx.TTL,
+		NameID:    models.EncodedValue(tx.NameID),
+		Nonce:     models.Uint64(tx.AccountNonce),
+		TTL:       models.Uint64(tx.TTL),
 	}
 
 	output, err := swaggerT.MarshalBinary()
@@ -586,12 +586,12 @@ func (tx *NameTransferTx) RLP() (rlpRawMsg []byte, err error) {
 // JSON representation of a Tx is useful for querying the node's debug endpoint
 func (tx *NameTransferTx) JSON() (string, error) {
 	swaggerT := models.NameTransferTx{
-		AccountID:   models.EncodedHash(tx.AccountID),
+		AccountID:   models.EncodedPubkey(tx.AccountID),
 		Fee:         utils.BigInt(tx.Fee),
-		NameID:      models.EncodedHash(tx.NameID),
-		Nonce:       tx.AccountNonce,
-		RecipientID: models.EncodedHash(tx.RecipientID),
-		TTL:         tx.TTL,
+		NameID:      models.EncodedValue(tx.NameID),
+		Nonce:       models.Uint64(tx.AccountNonce),
+		RecipientID: models.EncodedPubkey(tx.RecipientID),
+		TTL:         models.Uint64(tx.TTL),
 	}
 
 	output, err := swaggerT.MarshalBinary()
@@ -628,7 +628,6 @@ type OracleRegisterTx struct {
 	OracleTTLType  uint64
 	OracleTTLValue uint64
 	AbiVersion     uint64
-	VMVersion      uint64
 	Fee            big.Int
 	TTL            uint64
 }
@@ -679,27 +678,26 @@ func (tx *OracleRegisterTx) JSON() (string, error) {
 	ttlTypeStr := ttlTypeIntToStr(tx.OracleTTLType)
 
 	swaggerT := models.OracleRegisterTx{
-		AbiVersion: &tx.AbiVersion,
-		AccountID:  models.EncodedHash(tx.AccountID),
+		AbiVersion: models.Uint16(tx.AbiVersion),
+		AccountID:  models.EncodedPubkey(tx.AccountID),
 		Fee:        utils.BigInt(tx.Fee),
-		Nonce:      tx.AccountNonce,
+		Nonce:      models.Uint64(tx.AccountNonce),
 		OracleTTL: &models.TTL{
 			Type:  &ttlTypeStr,
-			Value: &tx.OracleTTLValue,
+			Value: models.Uint64(tx.OracleTTLValue),
 		},
 		QueryFee:       utils.BigInt(tx.QueryFee),
 		QueryFormat:    &tx.QuerySpec,
 		ResponseFormat: &tx.ResponseSpec,
-		TTL:            tx.TTL,
-		VMVersion:      &tx.VMVersion,
+		TTL:            models.Uint64(tx.TTL),
 	}
 	output, err := swaggerT.MarshalBinary()
 	return string(output), err
 }
 
 // NewOracleRegisterTx is a constructor for a OracleRegisterTx struct
-func NewOracleRegisterTx(accountID string, accountNonce uint64, querySpec, responseSpec string, queryFee big.Int, oracleTTLType, oracleTTLValue, abiVersion uint64, vmVersion uint64, txFee big.Int, txTTL uint64) OracleRegisterTx {
-	return OracleRegisterTx{accountID, accountNonce, querySpec, responseSpec, queryFee, oracleTTLType, oracleTTLValue, abiVersion, vmVersion, txFee, txTTL}
+func NewOracleRegisterTx(accountID string, accountNonce uint64, querySpec, responseSpec string, queryFee big.Int, oracleTTLType, oracleTTLValue, abiVersion uint64, txFee big.Int, txTTL uint64) OracleRegisterTx {
+	return OracleRegisterTx{accountID, accountNonce, querySpec, responseSpec, queryFee, oracleTTLType, oracleTTLValue, abiVersion, txFee, txTTL}
 }
 
 // OracleExtendTx represents a transaction that extends the lifetime of an oracle
@@ -737,13 +735,13 @@ func (tx *OracleExtendTx) JSON() (string, error) {
 
 	swaggerT := models.OracleExtendTx{
 		Fee:      utils.BigInt(tx.Fee),
-		Nonce:    tx.AccountNonce,
-		OracleID: models.EncodedHash(tx.OracleID),
+		Nonce:    models.Uint64(tx.AccountNonce),
+		OracleID: models.EncodedPubkey(tx.OracleID),
 		OracleTTL: &models.RelativeTTL{
 			Type:  &oracleTTLTypeStr,
-			Value: &tx.OracleTTLValue,
+			Value: models.Uint64(tx.OracleTTLValue),
 		},
-		TTL: tx.TTL,
+		TTL: models.Uint64(tx.TTL),
 	}
 
 	output, err := swaggerT.MarshalBinary()
@@ -806,20 +804,20 @@ func (tx *OracleQueryTx) JSON() (string, error) {
 
 	swaggerT := models.OracleQueryTx{
 		Fee:      utils.BigInt(tx.Fee),
-		Nonce:    tx.AccountNonce,
-		OracleID: models.EncodedHash(tx.OracleID),
+		Nonce:    models.Uint64(tx.AccountNonce),
+		OracleID: models.EncodedPubkey(tx.OracleID),
 		Query:    &tx.Query,
 		QueryFee: utils.BigInt(tx.QueryFee),
 		QueryTTL: &models.TTL{
 			Type:  &queryTTLTypeStr,
-			Value: &tx.QueryTTLValue,
+			Value: models.Uint64(tx.QueryTTLValue),
 		},
 		ResponseTTL: &models.RelativeTTL{
 			Type:  &responseTTLTypeStr,
-			Value: &tx.ResponseTTLValue,
+			Value: models.Uint64(tx.ResponseTTLValue),
 		},
-		SenderID: models.EncodedHash(tx.SenderID),
-		TTL:      tx.TTL,
+		SenderID: models.EncodedPubkey(tx.SenderID),
+		TTL:      models.Uint64(tx.TTL),
 	}
 
 	output, err := swaggerT.MarshalBinary()
@@ -874,15 +872,15 @@ func (tx *OracleRespondTx) JSON() (string, error) {
 
 	swaggerT := models.OracleRespondTx{
 		Fee:      utils.BigInt(tx.Fee),
-		Nonce:    tx.AccountNonce,
-		OracleID: models.EncodedHash(tx.OracleID),
-		QueryID:  models.EncodedHash(tx.QueryID),
+		Nonce:    models.Uint64(tx.AccountNonce),
+		OracleID: models.EncodedPubkey(tx.OracleID),
+		QueryID:  models.EncodedValue(tx.QueryID),
 		Response: &tx.Response,
 		ResponseTTL: &models.RelativeTTL{
 			Type:  &responseTTLTypeStr,
-			Value: &tx.ResponseTTLValue,
+			Value: models.Uint64(tx.ResponseTTLValue),
 		},
-		TTL: tx.TTL,
+		TTL: models.Uint64(tx.TTL),
 	}
 	output, err := swaggerT.MarshalBinary()
 	return string(output), err
@@ -901,7 +899,7 @@ type ContractCreateTx struct {
 	Code         string
 	VMVersion    uint64
 	AbiVersion   uint64
-	Deposit      uint64
+	Deposit      big.Int
 	Amount       big.Int
 	Gas          big.Int
 	GasPrice     big.Int
@@ -955,17 +953,17 @@ func (tx *ContractCreateTx) RLP() (rlpRawMsg []byte, err error) {
 // JSON representation of a Tx is useful for querying the node's debug endpoint
 func (tx *ContractCreateTx) JSON() (string, error) {
 	swaggerT := models.ContractCreateTx{
-		OwnerID:    models.EncodedHash(tx.OwnerID),
-		Nonce:      tx.AccountNonce,
-		Code:       &tx.Code,
-		VMVersion:  &tx.VMVersion,
-		AbiVersion: &tx.AbiVersion,
-		Deposit:    &tx.Deposit,
+		OwnerID:    models.EncodedPubkey(tx.OwnerID),
+		Nonce:      models.Uint64(tx.AccountNonce),
+		Code:       models.EncodedByteArray(tx.Code),
+		VMVersion:  models.Uint16(tx.VMVersion),
+		AbiVersion: models.Uint16(tx.AbiVersion),
+		Deposit:    utils.BigInt(tx.Deposit),
 		Amount:     utils.BigInt(tx.Amount),
-		Gas:        utils.BigInt(tx.Gas),
+		Gas:        models.Uint64(tx.Gas.Uint64()),
 		GasPrice:   utils.BigInt(tx.GasPrice),
 		Fee:        utils.BigInt(tx.Fee),
-		TTL:        &tx.TTL,
+		TTL:        models.Uint64(tx.TTL),
 		CallData:   models.EncodedByteArray(tx.CallData),
 	}
 	output, err := swaggerT.MarshalBinary()
@@ -993,7 +991,7 @@ func (tx *ContractCreateTx) ContractID() (string, error) {
 }
 
 // NewContractCreateTx is a constructor for a ContractCreateTx struct
-func NewContractCreateTx(OwnerID string, AccountNonce uint64, Code string, VMVersion, AbiVersion, Deposit uint64, Amount, Gas, GasPrice, Fee big.Int, TTL uint64, CallData string) ContractCreateTx {
+func NewContractCreateTx(OwnerID string, AccountNonce uint64, Code string, VMVersion, AbiVersion uint64, Deposit, Amount, Gas, GasPrice, Fee big.Int, TTL uint64, CallData string) ContractCreateTx {
 	return ContractCreateTx{
 		OwnerID:      OwnerID,
 		AccountNonce: AccountNonce,
@@ -1020,7 +1018,6 @@ type ContractCallTx struct {
 	Gas          big.Int
 	GasPrice     big.Int
 	AbiVersion   uint64
-	VMVersion    uint64
 	CallData     string
 	Fee          big.Int
 	TTL          uint64
@@ -1029,17 +1026,16 @@ type ContractCallTx struct {
 // JSON representation of a Tx is useful for querying the node's debug endpoint
 func (tx *ContractCallTx) JSON() (string, error) {
 	swaggerT := models.ContractCallTx{
-		CallerID:   models.EncodedHash(tx.CallerID),
-		Nonce:      tx.AccountNonce,
-		ContractID: models.EncodedHash(tx.ContractID),
+		CallerID:   models.EncodedPubkey(tx.CallerID),
+		Nonce:      models.Uint64(tx.AccountNonce),
+		ContractID: models.EncodedPubkey(tx.ContractID),
 		Amount:     utils.BigInt(tx.Amount),
-		Gas:        utils.BigInt(tx.Gas),
+		Gas:        models.Uint64(tx.Gas.Uint64()),
 		GasPrice:   utils.BigInt(tx.GasPrice),
-		AbiVersion: &tx.AbiVersion,
-		VMVersion:  &tx.VMVersion,
+		AbiVersion: models.Uint16(tx.AbiVersion),
 		CallData:   models.EncodedByteArray(tx.CallData),
 		Fee:        utils.BigInt(tx.Fee),
-		TTL:        &tx.TTL,
+		TTL:        models.Uint64(tx.TTL),
 	}
 	output, err := swaggerT.MarshalBinary()
 	return string(output), err
@@ -1092,7 +1088,7 @@ func (tx *ContractCallTx) FeeEstimate() (*big.Int, error) {
 	return estimatedFee, nil
 }
 
-func NewContractCallTx(CallerID string, AccountNonce uint64, ContractID string, Amount, Gas, GasPrice big.Int, AbiVersion, VMVersion uint64, CallData string, Fee big.Int, TTL uint64) ContractCallTx {
+func NewContractCallTx(CallerID string, AccountNonce uint64, ContractID string, Amount, Gas, GasPrice big.Int, AbiVersion uint64, CallData string, Fee big.Int, TTL uint64) ContractCallTx {
 	return ContractCallTx{
 		CallerID:     CallerID,
 		AccountNonce: AccountNonce,
@@ -1101,7 +1097,6 @@ func NewContractCallTx(CallerID string, AccountNonce uint64, ContractID string, 
 		Gas:          Gas,
 		GasPrice:     GasPrice,
 		AbiVersion:   AbiVersion,
-		VMVersion:    VMVersion,
 		CallData:     CallData,
 		Fee:          Fee,
 		TTL:          TTL,

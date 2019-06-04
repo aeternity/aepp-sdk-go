@@ -32,9 +32,9 @@ func getTTL(node *Client, offset uint64) (height uint64, err error) {
 	}
 
 	if kb.KeyBlock == nil {
-		height = *kb.MicroBlock.Height + offset
+		height = uint64(kb.MicroBlock.Height) + offset
 	} else {
-		height = *kb.KeyBlock.Height + offset
+		height = uint64(kb.KeyBlock.Height) + offset
 	}
 
 	return
@@ -45,7 +45,7 @@ func getNextNonce(node *Client, accountID string) (nextNonce uint64, err error) 
 	if err != nil {
 		return
 	}
-	nextNonce = *a.Nonce + 1
+	nextNonce = uint64(a.Nonce) + 1
 	return
 }
 
@@ -79,7 +79,8 @@ func waitForTransaction(nodeClient *Client, txHash string) (blockHeight uint64, 
 			break
 		}
 		if len(tx.BlockHash) > 0 {
-			blockHeight = *tx.BlockHeight
+			txbh := big.Int(tx.BlockHeight)
+			blockHeight = txbh.Uint64()
 			blockHash = fmt.Sprint(tx.BlockHash)
 			break
 		}
@@ -152,8 +153,8 @@ func (client *Client) WaitForTransactionUntilHeight(height uint64, txHash string
 		return
 	}
 	// current height
-	targetHeight := *kb.Height
-	nextHeight := *kb.Height
+	targetHeight := uint64(kb.Height)
+	nextHeight := uint64(kb.Height)
 	// hold the generation
 	var g *models.Generation
 
@@ -187,7 +188,7 @@ Main:
 				if fmt.Sprint(btx.Hash) == txHash {
 					// transaction found !!
 					blockHash = fmt.Sprint(g.KeyBlock.Hash)
-					blockHeight = *g.KeyBlock.Height
+					blockHeight = uint64(g.KeyBlock.Height)
 					microBlockHash = mbhs
 					tx = btx
 					break Main
@@ -205,7 +206,7 @@ Main:
 		if err != nil {
 			break
 		}
-		nextHeight = *kb.Height
+		nextHeight = uint64(kb.Height)
 	}
 
 	return
@@ -298,13 +299,13 @@ func (n *Aens) NameRevokeTx(name string, recipientAddress string) (tx NameRevoke
 }
 
 // OracleRegisterTx create a new oracle
-func (o *Oracle) OracleRegisterTx(querySpec, responseSpec string, queryFee big.Int, oracleTTLType, oracleTTLValue, abiVersion uint64, vmVersion uint64) (tx OracleRegisterTx, err error) {
+func (o *Oracle) OracleRegisterTx(querySpec, responseSpec string, queryFee big.Int, oracleTTLType, oracleTTLValue, abiVersion uint64) (tx OracleRegisterTx, err error) {
 	ttl, nonce, err := getTTLNonce(o.Client, o.Account.Address, Config.Client.TTL)
 	if err != nil {
 		return OracleRegisterTx{}, err
 	}
 
-	tx = NewOracleRegisterTx(o.Account.Address, nonce, querySpec, responseSpec, queryFee, oracleTTLType, oracleTTLValue, abiVersion, vmVersion, Config.Client.Fee, ttl)
+	tx = NewOracleRegisterTx(o.Account.Address, nonce, querySpec, responseSpec, queryFee, oracleTTLType, oracleTTLValue, abiVersion, Config.Client.Fee, ttl)
 	return tx, nil
 }
 
@@ -341,7 +342,7 @@ func (o *Oracle) OracleRespondTx(OracleID string, QueryID string, Response strin
 	return tx, nil
 }
 
-func (c *Contract) ContractCreateTx(Code string, CallData string, VMVersion, AbiVersion, Deposit uint64, Amount, Gas, GasPrice, Fee big.Int) (tx ContractCreateTx, err error) {
+func (c *Contract) ContractCreateTx(Code string, CallData string, VMVersion, AbiVersion uint64, Deposit, Amount, Gas, GasPrice, Fee big.Int) (tx ContractCreateTx, err error) {
 	ttl, nonce, err := getTTLNonce(c.Client, c.Account.Address, Config.Client.TTL)
 	if err != nil {
 		return ContractCreateTx{}, err
@@ -351,13 +352,13 @@ func (c *Contract) ContractCreateTx(Code string, CallData string, VMVersion, Abi
 	return tx, nil
 }
 
-func (c *Contract) ContractCallTx(ContractID, CallData string, VMVersion, AbiVersion uint64, Amount, Gas, GasPrice, Fee big.Int) (tx ContractCallTx, err error) {
+func (c *Contract) ContractCallTx(ContractID, CallData string, AbiVersion uint64, Amount, Gas, GasPrice, Fee big.Int) (tx ContractCallTx, err error) {
 	ttl, nonce, err := getTTLNonce(c.Client, c.Account.Address, Config.Client.TTL)
 	if err != nil {
 		return ContractCallTx{}, err
 	}
 
-	tx = NewContractCallTx(c.Account.Address, nonce, ContractID, Amount, Gas, GasPrice, AbiVersion, VMVersion, CallData, Fee, ttl)
+	tx = NewContractCallTx(c.Account.Address, nonce, ContractID, Amount, Gas, GasPrice, AbiVersion, CallData, Fee, ttl)
 	return tx, nil
 }
 
