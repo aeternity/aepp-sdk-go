@@ -9,11 +9,11 @@ import (
 	strfmt "github.com/go-openapi/strfmt"
 )
 
-// EncodedHash Base58Check encoded tagged hash
-// swagger:model EncodedHash
-type EncodedHash string
+// EncodedPubkey Base58Check encoded tagged pubkey
+// swagger:model EncodedPubkey
+type EncodedPubkey string
 
-// Validate validates this encoded hash
-func (m EncodedHash) Validate(formats strfmt.Registry) error {
+// Validate validates this encoded pubkey
+func (m EncodedPubkey) Validate(formats strfmt.Registry) error {
 	return nil
 }

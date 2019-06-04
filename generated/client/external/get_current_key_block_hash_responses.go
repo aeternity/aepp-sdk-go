@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/swag"
 
@@ -108,12 +109,37 @@ swagger:model GetCurrentKeyBlockHashOKBody
 */
 type GetCurrentKeyBlockHashOKBody struct {
 
-	// Hash
-	Hash string `json:"hash,omitempty"`
+	// hash
+	Hash models.EncodedHash `json:"hash,omitempty"`
 }
 
 // Validate validates this get current key block hash o k body
 func (o *GetCurrentKeyBlockHashOKBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateHash(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *GetCurrentKeyBlockHashOKBody) validateHash(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.Hash) { // not required
+		return nil
+	}
+
+	if err := o.Hash.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("getCurrentKeyBlockHashOK" + "." + "hash")
+		}
+		return err
+	}
+
 	return nil
 }
 

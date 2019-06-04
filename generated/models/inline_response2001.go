@@ -8,6 +8,7 @@ package models
 import (
 	strfmt "github.com/go-openapi/strfmt"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 )
 
@@ -15,12 +16,37 @@ import (
 // swagger:model inline_response_200_1
 type InlineResponse2001 struct {
 
-	// Height
-	Height uint64 `json:"height,omitempty"`
+	// height
+	Height Uint64 `json:"height,omitempty"`
 }
 
 // Validate validates this inline response 200 1
 func (m *InlineResponse2001) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateHeight(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *InlineResponse2001) validateHeight(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Height) { // not required
+		return nil
+	}
+
+	if err := m.Height.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("height")
+		}
+		return err
+	}
+
 	return nil
 }
 

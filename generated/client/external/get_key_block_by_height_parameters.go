@@ -63,10 +63,10 @@ for the get key block by height operation typically these are written to a http.
 type GetKeyBlockByHeightParams struct {
 
 	/*Height
-	  The height of the block
+	  The height
 
 	*/
-	Height int64
+	Height uint64
 
 	timeout    time.Duration
 	Context    context.Context
@@ -107,13 +107,13 @@ func (o *GetKeyBlockByHeightParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithHeight adds the height to the get key block by height params
-func (o *GetKeyBlockByHeightParams) WithHeight(height int64) *GetKeyBlockByHeightParams {
+func (o *GetKeyBlockByHeightParams) WithHeight(height uint64) *GetKeyBlockByHeightParams {
 	o.SetHeight(height)
 	return o
 }
 
 // SetHeight adds the height to the get key block by height params
-func (o *GetKeyBlockByHeightParams) SetHeight(height int64) {
+func (o *GetKeyBlockByHeightParams) SetHeight(height uint64) {
 	o.Height = height
 }
 
@@ -126,7 +126,7 @@ func (o *GetKeyBlockByHeightParams) WriteToRequest(r runtime.ClientRequest, reg 
 	var res []error
 
 	// path param height
-	if err := r.SetPathParam("height", swag.FormatInt64(o.Height)); err != nil {
+	if err := r.SetPathParam("height", swag.FormatUint64(o.Height)); err != nil {
 		return err
 	}
 

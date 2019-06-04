@@ -18,7 +18,7 @@ type UnsignedTx struct {
 
 	// Unsigned transaction object
 	// Required: true
-	Tx EncodedHash `json:"tx"`
+	Tx EncodedByteArray `json:"tx"`
 }
 
 // Validate validates this unsigned tx

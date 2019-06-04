@@ -10,7 +10,6 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 
 	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
@@ -25,7 +24,7 @@ type ChannelWithdrawTx struct {
 
 	// channel id
 	// Required: true
-	ChannelID EncodedHash `json:"channel_id"`
+	ChannelID EncodedPubkey `json:"channel_id"`
 
 	// fee
 	// Required: true
@@ -33,13 +32,11 @@ type ChannelWithdrawTx struct {
 
 	// nonce
 	// Required: true
-	// Minimum: 0
-	Nonce *uint64 `json:"nonce"`
+	Nonce Uint64 `json:"nonce"`
 
 	// Channel's next round
 	// Required: true
-	// Minimum: 0
-	Round *uint64 `json:"round"`
+	Round Uint64 `json:"round"`
 
 	// Root hash of the channel's internal state tree after the withdraw had been applied to it
 	// Required: true
@@ -47,11 +44,10 @@ type ChannelWithdrawTx struct {
 
 	// to id
 	// Required: true
-	ToID EncodedHash `json:"to_id"`
+	ToID EncodedPubkey `json:"to_id"`
 
 	// ttl
-	// Minimum: 0
-	TTL *uint64 `json:"ttl,omitempty"`
+	TTL Uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this channel withdraw tx
@@ -134,11 +130,10 @@ func (m *ChannelWithdrawTx) validateFee(formats strfmt.Registry) error {
 
 func (m *ChannelWithdrawTx) validateNonce(formats strfmt.Registry) error {
 
-	if err := validate.Required("nonce", "body", m.Nonce); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("nonce", "body", int64(*m.Nonce), 0, false); err != nil {
+	if err := m.Nonce.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("nonce")
+		}
 		return err
 	}
 
@@ -147,11 +142,10 @@ func (m *ChannelWithdrawTx) validateNonce(formats strfmt.Registry) error {
 
 func (m *ChannelWithdrawTx) validateRound(formats strfmt.Registry) error {
 
-	if err := validate.Required("round", "body", m.Round); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("round", "body", int64(*m.Round), 0, false); err != nil {
+	if err := m.Round.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("round")
+		}
 		return err
 	}
 
@@ -188,7 +182,10 @@ func (m *ChannelWithdrawTx) validateTTL(formats strfmt.Registry) error {
 		return nil
 	}
 
-	if err := validate.MinimumInt("ttl", "body", int64(*m.TTL), 0, false); err != nil {
+	if err := m.TTL.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("ttl")
+		}
 		return err
 	}
 

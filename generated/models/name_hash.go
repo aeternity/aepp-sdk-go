@@ -18,7 +18,7 @@ type NameHash struct {
 
 	// name id
 	// Required: true
-	NameID EncodedHash `json:"name_id"`
+	NameID EncodedValue `json:"name_id"`
 }
 
 // Validate validates this name hash

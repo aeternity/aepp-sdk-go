@@ -10,7 +10,6 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 )
 
 // Tx tx
@@ -19,7 +18,7 @@ type Tx struct {
 
 	// tx
 	// Required: true
-	Tx *string `json:"tx"`
+	Tx EncodedByteArray `json:"tx"`
 }
 
 // Validate validates this tx
@@ -38,7 +37,10 @@ func (m *Tx) Validate(formats strfmt.Registry) error {
 
 func (m *Tx) validateTx(formats strfmt.Registry) error {
 
-	if err := validate.Required("tx", "body", m.Tx); err != nil {
+	if err := m.Tx.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("tx")
+		}
 		return err
 	}
 

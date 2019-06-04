@@ -24,7 +24,7 @@ type DryRunAccount struct {
 
 	// pub key
 	// Required: true
-	PubKey EncodedHash `json:"pub_key"`
+	PubKey EncodedPubkey `json:"pub_key"`
 }
 
 // Validate validates this dry run account

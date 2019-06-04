@@ -13,20 +13,21 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
+
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // OffChainWithdrawal off chain withdrawal
 // swagger:model OffChainWithdrawal
 type OffChainWithdrawal struct {
 
-	// Amount of tokens to withdraw
+	// amount
 	// Required: true
-	Am *uint64 `json:"am"`
+	Amount utils.BigInt `json:"amount"`
 
 	// Withdrawer of tokens
 	// Required: true
-	To EncodedHash `json:"to"`
+	To EncodedPubkey `json:"to"`
 }
 
 // Op gets the op of this subtype
@@ -39,7 +40,7 @@ func (m *OffChainWithdrawal) SetOp(val string) {
 
 }
 
-// Am gets the am of this subtype
+// Amount gets the amount of this subtype
 
 // To gets the to of this subtype
 
@@ -47,13 +48,13 @@ func (m *OffChainWithdrawal) SetOp(val string) {
 func (m *OffChainWithdrawal) UnmarshalJSON(raw []byte) error {
 	var data struct {
 
-		// Amount of tokens to withdraw
+		// amount
 		// Required: true
-		Am *uint64 `json:"am"`
+		Amount utils.BigInt `json:"amount"`
 
 		// Withdrawer of tokens
 		// Required: true
-		To EncodedHash `json:"to"`
+		To EncodedPubkey `json:"to"`
 	}
 	buf := bytes.NewBuffer(raw)
 	dec := json.NewDecoder(buf)
@@ -83,7 +84,7 @@ func (m *OffChainWithdrawal) UnmarshalJSON(raw []byte) error {
 		return errors.New(422, "invalid op value: %q", base.Op)
 	}
 
-	result.Am = data.Am
+	result.Amount = data.Amount
 
 	result.To = data.To
 
@@ -98,16 +99,16 @@ func (m OffChainWithdrawal) MarshalJSON() ([]byte, error) {
 	var err error
 	b1, err = json.Marshal(struct {
 
-		// Amount of tokens to withdraw
+		// amount
 		// Required: true
-		Am *uint64 `json:"am"`
+		Amount utils.BigInt `json:"amount"`
 
 		// Withdrawer of tokens
 		// Required: true
-		To EncodedHash `json:"to"`
+		To EncodedPubkey `json:"to"`
 	}{
 
-		Am: m.Am,
+		Amount: m.Amount,
 
 		To: m.To,
 	},
@@ -133,7 +134,7 @@ func (m OffChainWithdrawal) MarshalJSON() ([]byte, error) {
 func (m *OffChainWithdrawal) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateAm(formats); err != nil {
+	if err := m.validateAmount(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -147,9 +148,12 @@ func (m *OffChainWithdrawal) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *OffChainWithdrawal) validateAm(formats strfmt.Registry) error {
+func (m *OffChainWithdrawal) validateAmount(formats strfmt.Registry) error {
 
-	if err := validate.Required("am", "body", m.Am); err != nil {
+	if err := m.Amount.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("amount")
+		}
 		return err
 	}
 

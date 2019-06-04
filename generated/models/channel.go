@@ -31,11 +31,11 @@ type Channel struct {
 
 	// delegate ids
 	// Required: true
-	DelegateIds []EncodedHash `json:"delegate_ids"`
+	DelegateIds []EncodedPubkey `json:"delegate_ids"`
 
 	// id
 	// Required: true
-	ID EncodedHash `json:"id"`
+	ID EncodedPubkey `json:"id"`
 
 	// initiator amount
 	// Required: true
@@ -43,16 +43,15 @@ type Channel struct {
 
 	// initiator id
 	// Required: true
-	InitiatorID EncodedHash `json:"initiator_id"`
+	InitiatorID EncodedPubkey `json:"initiator_id"`
 
 	// lock period
 	// Required: true
-	// Minimum: 0
-	LockPeriod *uint64 `json:"lock_period"`
+	LockPeriod Uint64 `json:"lock_period"`
 
 	// locked until
 	// Required: true
-	LockedUntil *uint64 `json:"locked_until"`
+	LockedUntil Uint64 `json:"locked_until"`
 
 	// responder amount
 	// Required: true
@@ -60,17 +59,15 @@ type Channel struct {
 
 	// responder id
 	// Required: true
-	ResponderID EncodedHash `json:"responder_id"`
+	ResponderID EncodedPubkey `json:"responder_id"`
 
 	// round
 	// Required: true
-	// Minimum: 0
-	Round *uint64 `json:"round"`
+	Round Uint64 `json:"round"`
 
 	// solo round
 	// Required: true
-	// Minimum: 0
-	SoloRound *uint64 `json:"solo_round"`
+	SoloRound Uint64 `json:"solo_round"`
 
 	// state hash
 	// Required: true
@@ -221,11 +218,10 @@ func (m *Channel) validateInitiatorID(formats strfmt.Registry) error {
 
 func (m *Channel) validateLockPeriod(formats strfmt.Registry) error {
 
-	if err := validate.Required("lock_period", "body", m.LockPeriod); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("lock_period", "body", int64(*m.LockPeriod), 0, false); err != nil {
+	if err := m.LockPeriod.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("lock_period")
+		}
 		return err
 	}
 
@@ -234,7 +230,10 @@ func (m *Channel) validateLockPeriod(formats strfmt.Registry) error {
 
 func (m *Channel) validateLockedUntil(formats strfmt.Registry) error {
 
-	if err := validate.Required("locked_until", "body", m.LockedUntil); err != nil {
+	if err := m.LockedUntil.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("locked_until")
+		}
 		return err
 	}
 
@@ -267,11 +266,10 @@ func (m *Channel) validateResponderID(formats strfmt.Registry) error {
 
 func (m *Channel) validateRound(formats strfmt.Registry) error {
 
-	if err := validate.Required("round", "body", m.Round); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("round", "body", int64(*m.Round), 0, false); err != nil {
+	if err := m.Round.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("round")
+		}
 		return err
 	}
 
@@ -280,11 +278,10 @@ func (m *Channel) validateRound(formats strfmt.Registry) error {
 
 func (m *Channel) validateSoloRound(formats strfmt.Registry) error {
 
-	if err := validate.Required("solo_round", "body", m.SoloRound); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("solo_round", "body", int64(*m.SoloRound), 0, false); err != nil {
+	if err := m.SoloRound.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("solo_round")
+		}
 		return err
 	}
 

@@ -6,6 +6,8 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"strconv"
+
 	strfmt "github.com/go-openapi/strfmt"
 
 	"github.com/go-openapi/errors"
@@ -14,7 +16,7 @@ import (
 
 // Pow pow
 // swagger:model Pow
-type Pow []int32
+type Pow []Uint32
 
 // Validate validates this pow
 func (m Pow) Validate(formats strfmt.Registry) error {
@@ -28,6 +30,17 @@ func (m Pow) Validate(formats strfmt.Registry) error {
 
 	if err := validate.MaxItems("", "body", iPowSize, 42); err != nil {
 		return err
+	}
+
+	for i := 0; i < len(m); i++ {
+
+		if err := m[i].Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName(strconv.Itoa(i))
+			}
+			return err
+		}
+
 	}
 
 	if len(res) > 0 {

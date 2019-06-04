@@ -19,7 +19,7 @@ type CreateContractUnsignedTx struct {
 
 	// Address of the contract to be created
 	// Required: true
-	ContractID EncodedHash `json:"contract_id"`
+	ContractID EncodedPubkey `json:"contract_id"`
 }
 
 // UnmarshalJSON unmarshals this object from a JSON structure
@@ -33,7 +33,7 @@ func (m *CreateContractUnsignedTx) UnmarshalJSON(raw []byte) error {
 
 	// AO1
 	var dataAO1 struct {
-		ContractID EncodedHash `json:"contract_id"`
+		ContractID EncodedPubkey `json:"contract_id"`
 	}
 	if err := swag.ReadJSON(raw, &dataAO1); err != nil {
 		return err
@@ -55,7 +55,7 @@ func (m CreateContractUnsignedTx) MarshalJSON() ([]byte, error) {
 	_parts = append(_parts, aO0)
 
 	var dataAO1 struct {
-		ContractID EncodedHash `json:"contract_id"`
+		ContractID EncodedPubkey `json:"contract_id"`
 	}
 
 	dataAO1.ContractID = m.ContractID

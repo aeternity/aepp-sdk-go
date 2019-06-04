@@ -18,7 +18,7 @@ type CommitmentID struct {
 
 	// commitment id
 	// Required: true
-	CommitmentID EncodedHash `json:"commitment_id"`
+	CommitmentID EncodedValue `json:"commitment_id"`
 }
 
 // Validate validates this commitment Id

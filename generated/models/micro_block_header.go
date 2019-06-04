@@ -10,7 +10,6 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 )
 
 // MicroBlockHeader micro block header
@@ -23,11 +22,11 @@ type MicroBlockHeader struct {
 
 	// height
 	// Required: true
-	Height *uint64 `json:"height"`
+	Height Uint64 `json:"height"`
 
 	// "no_fraud" | api encoded Proof of Fraud hash
 	// Required: true
-	PofHash *string `json:"pof_hash"`
+	PofHash EncodedHash `json:"pof_hash"`
 
 	// prev hash
 	// Required: true
@@ -39,7 +38,7 @@ type MicroBlockHeader struct {
 
 	// signature
 	// Required: true
-	Signature EncodedHash `json:"signature"`
+	Signature EncodedValue `json:"signature"`
 
 	// state hash
 	// Required: true
@@ -47,7 +46,7 @@ type MicroBlockHeader struct {
 
 	// time
 	// Required: true
-	Time *int64 `json:"time"`
+	Time Uint64 `json:"time"`
 
 	// txs hash
 	// Required: true
@@ -55,7 +54,7 @@ type MicroBlockHeader struct {
 
 	// version
 	// Required: true
-	Version *uint64 `json:"version"`
+	Version Uint32 `json:"version"`
 }
 
 // Validate validates this micro block header
@@ -122,7 +121,10 @@ func (m *MicroBlockHeader) validateHash(formats strfmt.Registry) error {
 
 func (m *MicroBlockHeader) validateHeight(formats strfmt.Registry) error {
 
-	if err := validate.Required("height", "body", m.Height); err != nil {
+	if err := m.Height.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("height")
+		}
 		return err
 	}
 
@@ -131,7 +133,10 @@ func (m *MicroBlockHeader) validateHeight(formats strfmt.Registry) error {
 
 func (m *MicroBlockHeader) validatePofHash(formats strfmt.Registry) error {
 
-	if err := validate.Required("pof_hash", "body", m.PofHash); err != nil {
+	if err := m.PofHash.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("pof_hash")
+		}
 		return err
 	}
 
@@ -188,7 +193,10 @@ func (m *MicroBlockHeader) validateStateHash(formats strfmt.Registry) error {
 
 func (m *MicroBlockHeader) validateTime(formats strfmt.Registry) error {
 
-	if err := validate.Required("time", "body", m.Time); err != nil {
+	if err := m.Time.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("time")
+		}
 		return err
 	}
 
@@ -209,7 +217,10 @@ func (m *MicroBlockHeader) validateTxsHash(formats strfmt.Registry) error {
 
 func (m *MicroBlockHeader) validateVersion(formats strfmt.Registry) error {
 
-	if err := validate.Required("version", "body", m.Version); err != nil {
+	if err := m.Version.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("version")
+		}
 		return err
 	}
 

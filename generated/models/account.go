@@ -6,6 +6,8 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
+
 	strfmt "github.com/go-openapi/strfmt"
 
 	"github.com/go-openapi/errors"
@@ -19,18 +21,27 @@ import (
 // swagger:model Account
 type Account struct {
 
-	// balance
+	// Name of authorization function for generalized account
+	AuthFun string `json:"auth_fun,omitempty"`
+
+	// Balance
 	// Required: true
 	Balance utils.BigInt `json:"balance"`
 
+	// Id of authorization contract for generalized account
+	ContractID EncodedPubkey `json:"contract_id,omitempty"`
+
 	// Public key
 	// Required: true
-	ID EncodedHash `json:"id"`
+	ID EncodedPubkey `json:"id"`
+
+	// kind
+	// Enum: [basic generalized]
+	Kind string `json:"kind,omitempty"`
 
 	// Nonce
 	// Required: true
-	// Minimum: 0
-	Nonce *uint64 `json:"nonce"`
+	Nonce Uint64 `json:"nonce"`
 }
 
 // Validate validates this account
@@ -41,7 +52,15 @@ func (m *Account) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateContractID(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateID(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateKind(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -67,6 +86,22 @@ func (m *Account) validateBalance(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *Account) validateContractID(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.ContractID) { // not required
+		return nil
+	}
+
+	if err := m.ContractID.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("contract_id")
+		}
+		return err
+	}
+
+	return nil
+}
+
 func (m *Account) validateID(formats strfmt.Registry) error {
 
 	if err := m.ID.Validate(formats); err != nil {
@@ -79,13 +114,55 @@ func (m *Account) validateID(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Account) validateNonce(formats strfmt.Registry) error {
+var accountTypeKindPropEnum []interface{}
 
-	if err := validate.Required("nonce", "body", m.Nonce); err != nil {
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["basic","generalized"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		accountTypeKindPropEnum = append(accountTypeKindPropEnum, v)
+	}
+}
+
+const (
+
+	// AccountKindBasic captures enum value "basic"
+	AccountKindBasic string = "basic"
+
+	// AccountKindGeneralized captures enum value "generalized"
+	AccountKindGeneralized string = "generalized"
+)
+
+// prop value enum
+func (m *Account) validateKindEnum(path, location string, value string) error {
+	if err := validate.Enum(path, location, value, accountTypeKindPropEnum); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *Account) validateKind(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Kind) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateKindEnum("kind", "body", m.Kind); err != nil {
 		return err
 	}
 
-	if err := validate.MinimumInt("nonce", "body", int64(*m.Nonce), 0, false); err != nil {
+	return nil
+}
+
+func (m *Account) validateNonce(formats strfmt.Registry) error {
+
+	if err := m.Nonce.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("nonce")
+		}
 		return err
 	}
 

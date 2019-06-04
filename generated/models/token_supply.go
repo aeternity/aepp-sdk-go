@@ -8,7 +8,10 @@ package models
 import (
 	strfmt "github.com/go-openapi/strfmt"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // TokenSupply token supply
@@ -16,32 +19,197 @@ import (
 type TokenSupply struct {
 
 	// Tokens in account balances
-	Accounts uint64 `json:"accounts,omitempty"`
+	Accounts utils.BigInt `json:"accounts,omitempty"`
 
 	// Tokens in contracts registered as oracles
-	ContractOracles uint64 `json:"contract_oracles,omitempty"`
+	ContractOracles utils.BigInt `json:"contract_oracles,omitempty"`
 
 	// Tokens in contracts
-	Contracts uint64 `json:"contracts,omitempty"`
+	Contracts utils.BigInt `json:"contracts,omitempty"`
 
 	// Tokens locked (not owned by anyone)
-	Locked uint64 `json:"locked,omitempty"`
+	Locked utils.BigInt `json:"locked,omitempty"`
 
 	// Tokens in pending oracle queries
-	OracleQueries uint64 `json:"oracle_queries,omitempty"`
+	OracleQueries utils.BigInt `json:"oracle_queries,omitempty"`
 
 	// Tokens in accounts registered as oracles
-	Oracles uint64 `json:"oracles,omitempty"`
+	Oracles utils.BigInt `json:"oracles,omitempty"`
 
 	// Tokens from fees and coinbase pending in the beneficiary reward delay
-	PendingRewards uint64 `json:"pending_rewards,omitempty"`
+	PendingRewards utils.BigInt `json:"pending_rewards,omitempty"`
 
 	// Sum of all tokens from other fields
-	Total uint64 `json:"total,omitempty"`
+	Total utils.BigInt `json:"total,omitempty"`
 }
 
 // Validate validates this token supply
 func (m *TokenSupply) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateAccounts(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateContractOracles(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateContracts(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateLocked(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateOracleQueries(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateOracles(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePendingRewards(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateTotal(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *TokenSupply) validateAccounts(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Accounts) { // not required
+		return nil
+	}
+
+	if err := m.Accounts.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("accounts")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *TokenSupply) validateContractOracles(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.ContractOracles) { // not required
+		return nil
+	}
+
+	if err := m.ContractOracles.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("contract_oracles")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *TokenSupply) validateContracts(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Contracts) { // not required
+		return nil
+	}
+
+	if err := m.Contracts.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("contracts")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *TokenSupply) validateLocked(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Locked) { // not required
+		return nil
+	}
+
+	if err := m.Locked.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("locked")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *TokenSupply) validateOracleQueries(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.OracleQueries) { // not required
+		return nil
+	}
+
+	if err := m.OracleQueries.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("oracle_queries")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *TokenSupply) validateOracles(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Oracles) { // not required
+		return nil
+	}
+
+	if err := m.Oracles.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("oracles")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *TokenSupply) validatePendingRewards(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.PendingRewards) { // not required
+		return nil
+	}
+
+	if err := m.PendingRewards.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("pending_rewards")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *TokenSupply) validateTotal(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Total) { // not required
+		return nil
+	}
+
+	if err := m.Total.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("total")
+		}
+		return err
+	}
+
 	return nil
 }
 

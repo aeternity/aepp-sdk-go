@@ -13,24 +13,25 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
+
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // OffChainTransfer off chain transfer
 // swagger:model OffChainTransfer
 type OffChainTransfer struct {
 
-	// Amount of tokens to transfer
+	// amount
 	// Required: true
-	Am *uint64 `json:"am"`
+	Amount utils.BigInt `json:"amount"`
 
 	// Sender of tokens
 	// Required: true
-	From EncodedHash `json:"from"`
+	From EncodedPubkey `json:"from"`
 
 	// Receiver of tokens
 	// Required: true
-	To EncodedHash `json:"to"`
+	To EncodedPubkey `json:"to"`
 }
 
 // Op gets the op of this subtype
@@ -43,7 +44,7 @@ func (m *OffChainTransfer) SetOp(val string) {
 
 }
 
-// Am gets the am of this subtype
+// Amount gets the amount of this subtype
 
 // From gets the from of this subtype
 
@@ -53,17 +54,17 @@ func (m *OffChainTransfer) SetOp(val string) {
 func (m *OffChainTransfer) UnmarshalJSON(raw []byte) error {
 	var data struct {
 
-		// Amount of tokens to transfer
+		// amount
 		// Required: true
-		Am *uint64 `json:"am"`
+		Amount utils.BigInt `json:"amount"`
 
 		// Sender of tokens
 		// Required: true
-		From EncodedHash `json:"from"`
+		From EncodedPubkey `json:"from"`
 
 		// Receiver of tokens
 		// Required: true
-		To EncodedHash `json:"to"`
+		To EncodedPubkey `json:"to"`
 	}
 	buf := bytes.NewBuffer(raw)
 	dec := json.NewDecoder(buf)
@@ -93,7 +94,7 @@ func (m *OffChainTransfer) UnmarshalJSON(raw []byte) error {
 		return errors.New(422, "invalid op value: %q", base.Op)
 	}
 
-	result.Am = data.Am
+	result.Amount = data.Amount
 
 	result.From = data.From
 
@@ -110,20 +111,20 @@ func (m OffChainTransfer) MarshalJSON() ([]byte, error) {
 	var err error
 	b1, err = json.Marshal(struct {
 
-		// Amount of tokens to transfer
+		// amount
 		// Required: true
-		Am *uint64 `json:"am"`
+		Amount utils.BigInt `json:"amount"`
 
 		// Sender of tokens
 		// Required: true
-		From EncodedHash `json:"from"`
+		From EncodedPubkey `json:"from"`
 
 		// Receiver of tokens
 		// Required: true
-		To EncodedHash `json:"to"`
+		To EncodedPubkey `json:"to"`
 	}{
 
-		Am: m.Am,
+		Amount: m.Amount,
 
 		From: m.From,
 
@@ -151,7 +152,7 @@ func (m OffChainTransfer) MarshalJSON() ([]byte, error) {
 func (m *OffChainTransfer) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateAm(formats); err != nil {
+	if err := m.validateAmount(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -169,9 +170,12 @@ func (m *OffChainTransfer) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *OffChainTransfer) validateAm(formats strfmt.Registry) error {
+func (m *OffChainTransfer) validateAmount(formats strfmt.Registry) error {
 
-	if err := validate.Required("am", "body", m.Am); err != nil {
+	if err := m.Amount.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("amount")
+		}
 		return err
 	}
 

@@ -26,8 +26,7 @@ type RelativeTTL struct {
 
 	// value
 	// Required: true
-	// Minimum: 1
-	Value *uint64 `json:"value"`
+	Value Uint64 `json:"value"`
 }
 
 // Validate validates this relative TTL
@@ -90,11 +89,10 @@ func (m *RelativeTTL) validateType(formats strfmt.Registry) error {
 
 func (m *RelativeTTL) validateValue(formats strfmt.Registry) error {
 
-	if err := validate.Required("value", "body", m.Value); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("value", "body", int64(*m.Value), 1, false); err != nil {
+	if err := m.Value.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("value")
+		}
 		return err
 	}
 

@@ -10,7 +10,6 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 )
 
 // PubKey pub key
@@ -19,7 +18,7 @@ type PubKey struct {
 
 	// pub key
 	// Required: true
-	PubKey *string `json:"pub_key"`
+	PubKey EncodedPubkey `json:"pub_key"`
 }
 
 // Validate validates this pub key
@@ -38,7 +37,10 @@ func (m *PubKey) Validate(formats strfmt.Registry) error {
 
 func (m *PubKey) validatePubKey(formats strfmt.Registry) error {
 
-	if err := validate.Required("pub_key", "body", m.PubKey); err != nil {
+	if err := m.PubKey.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("pub_key")
+		}
 		return err
 	}
 

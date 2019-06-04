@@ -19,7 +19,7 @@ type NamePointer struct {
 
 	// id
 	// Required: true
-	ID EncodedHash `json:"id"`
+	ID EncodedPubkey `json:"id"`
 
 	// key
 	// Required: true

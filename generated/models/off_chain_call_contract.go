@@ -13,21 +13,21 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
+
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // OffChainCallContract off chain call contract
 // swagger:model OffChainCallContract
 type OffChainCallContract struct {
 
-	// ABI version for the call/calldata
-	// Maximum: 65535
-	// Minimum: 0
-	AbiVersion *int64 `json:"abi_version,omitempty"`
-
-	// Amount of tokens to transfer to the contract
+	// abi version
 	// Required: true
-	Amount *uint64 `json:"amount"`
+	AbiVersion Uint16 `json:"abi_version"`
+
+	// amount
+	// Required: true
+	Amount utils.BigInt `json:"amount"`
 
 	// Contract call data
 	// Required: true
@@ -35,24 +35,19 @@ type OffChainCallContract struct {
 
 	// Contract caller
 	// Required: true
-	Caller EncodedHash `json:"caller"`
+	Caller EncodedPubkey `json:"caller"`
 
 	// Contract address
 	// Required: true
-	Contract EncodedHash `json:"contract"`
+	Contract EncodedPubkey `json:"contract"`
 
-	// Gas limit for the contract call
+	// gas
 	// Required: true
-	Gas *uint64 `json:"gas"`
+	Gas Uint64 `json:"gas"`
 
-	// Gas price for the contract call
+	// gas price
 	// Required: true
-	GasPrice *uint64 `json:"gas_price"`
-
-	// ABI version for the call/calldata
-	// Maximum: 65535
-	// Minimum: 0
-	VMVersion *int64 `json:"vm_version,omitempty"`
+	GasPrice utils.BigInt `json:"gas_price"`
 }
 
 // Op gets the op of this subtype
@@ -79,20 +74,17 @@ func (m *OffChainCallContract) SetOp(val string) {
 
 // GasPrice gets the gas price of this subtype
 
-// VMVersion gets the vm version of this subtype
-
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
 func (m *OffChainCallContract) UnmarshalJSON(raw []byte) error {
 	var data struct {
 
-		// ABI version for the call/calldata
-		// Maximum: 65535
-		// Minimum: 0
-		AbiVersion *int64 `json:"abi_version,omitempty"`
-
-		// Amount of tokens to transfer to the contract
+		// abi version
 		// Required: true
-		Amount *uint64 `json:"amount"`
+		AbiVersion Uint16 `json:"abi_version"`
+
+		// amount
+		// Required: true
+		Amount utils.BigInt `json:"amount"`
 
 		// Contract call data
 		// Required: true
@@ -100,24 +92,19 @@ func (m *OffChainCallContract) UnmarshalJSON(raw []byte) error {
 
 		// Contract caller
 		// Required: true
-		Caller EncodedHash `json:"caller"`
+		Caller EncodedPubkey `json:"caller"`
 
 		// Contract address
 		// Required: true
-		Contract EncodedHash `json:"contract"`
+		Contract EncodedPubkey `json:"contract"`
 
-		// Gas limit for the contract call
+		// gas
 		// Required: true
-		Gas *uint64 `json:"gas"`
+		Gas Uint64 `json:"gas"`
 
-		// Gas price for the contract call
+		// gas price
 		// Required: true
-		GasPrice *uint64 `json:"gas_price"`
-
-		// ABI version for the call/calldata
-		// Maximum: 65535
-		// Minimum: 0
-		VMVersion *int64 `json:"vm_version,omitempty"`
+		GasPrice utils.BigInt `json:"gas_price"`
 	}
 	buf := bytes.NewBuffer(raw)
 	dec := json.NewDecoder(buf)
@@ -161,8 +148,6 @@ func (m *OffChainCallContract) UnmarshalJSON(raw []byte) error {
 
 	result.GasPrice = data.GasPrice
 
-	result.VMVersion = data.VMVersion
-
 	*m = result
 
 	return nil
@@ -174,14 +159,13 @@ func (m OffChainCallContract) MarshalJSON() ([]byte, error) {
 	var err error
 	b1, err = json.Marshal(struct {
 
-		// ABI version for the call/calldata
-		// Maximum: 65535
-		// Minimum: 0
-		AbiVersion *int64 `json:"abi_version,omitempty"`
-
-		// Amount of tokens to transfer to the contract
+		// abi version
 		// Required: true
-		Amount *uint64 `json:"amount"`
+		AbiVersion Uint16 `json:"abi_version"`
+
+		// amount
+		// Required: true
+		Amount utils.BigInt `json:"amount"`
 
 		// Contract call data
 		// Required: true
@@ -189,24 +173,19 @@ func (m OffChainCallContract) MarshalJSON() ([]byte, error) {
 
 		// Contract caller
 		// Required: true
-		Caller EncodedHash `json:"caller"`
+		Caller EncodedPubkey `json:"caller"`
 
 		// Contract address
 		// Required: true
-		Contract EncodedHash `json:"contract"`
+		Contract EncodedPubkey `json:"contract"`
 
-		// Gas limit for the contract call
+		// gas
 		// Required: true
-		Gas *uint64 `json:"gas"`
+		Gas Uint64 `json:"gas"`
 
-		// Gas price for the contract call
+		// gas price
 		// Required: true
-		GasPrice *uint64 `json:"gas_price"`
-
-		// ABI version for the call/calldata
-		// Maximum: 65535
-		// Minimum: 0
-		VMVersion *int64 `json:"vm_version,omitempty"`
+		GasPrice utils.BigInt `json:"gas_price"`
 	}{
 
 		AbiVersion: m.AbiVersion,
@@ -222,8 +201,6 @@ func (m OffChainCallContract) MarshalJSON() ([]byte, error) {
 		Gas: m.Gas,
 
 		GasPrice: m.GasPrice,
-
-		VMVersion: m.VMVersion,
 	},
 	)
 	if err != nil {
@@ -275,10 +252,6 @@ func (m *OffChainCallContract) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateVMVersion(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -287,15 +260,10 @@ func (m *OffChainCallContract) Validate(formats strfmt.Registry) error {
 
 func (m *OffChainCallContract) validateAbiVersion(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.AbiVersion) { // not required
-		return nil
-	}
-
-	if err := validate.MinimumInt("abi_version", "body", int64(*m.AbiVersion), 0, false); err != nil {
-		return err
-	}
-
-	if err := validate.MaximumInt("abi_version", "body", int64(*m.AbiVersion), 65535, false); err != nil {
+	if err := m.AbiVersion.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("abi_version")
+		}
 		return err
 	}
 
@@ -304,7 +272,10 @@ func (m *OffChainCallContract) validateAbiVersion(formats strfmt.Registry) error
 
 func (m *OffChainCallContract) validateAmount(formats strfmt.Registry) error {
 
-	if err := validate.Required("amount", "body", m.Amount); err != nil {
+	if err := m.Amount.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("amount")
+		}
 		return err
 	}
 
@@ -349,7 +320,10 @@ func (m *OffChainCallContract) validateContract(formats strfmt.Registry) error {
 
 func (m *OffChainCallContract) validateGas(formats strfmt.Registry) error {
 
-	if err := validate.Required("gas", "body", m.Gas); err != nil {
+	if err := m.Gas.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("gas")
+		}
 		return err
 	}
 
@@ -358,24 +332,10 @@ func (m *OffChainCallContract) validateGas(formats strfmt.Registry) error {
 
 func (m *OffChainCallContract) validateGasPrice(formats strfmt.Registry) error {
 
-	if err := validate.Required("gas_price", "body", m.GasPrice); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *OffChainCallContract) validateVMVersion(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.VMVersion) { // not required
-		return nil
-	}
-
-	if err := validate.MinimumInt("vm_version", "body", int64(*m.VMVersion), 0, false); err != nil {
-		return err
-	}
-
-	if err := validate.MaximumInt("vm_version", "body", int64(*m.VMVersion), 65535, false); err != nil {
+	if err := m.GasPrice.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("gas_price")
+		}
 		return err
 	}
 

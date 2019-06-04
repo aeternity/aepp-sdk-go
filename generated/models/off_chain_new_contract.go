@@ -14,16 +14,17 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
+
+	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
 // OffChainNewContract off chain new contract
 // swagger:model OffChainNewContract
 type OffChainNewContract struct {
 
-	// ABI version of the contract
-	// Maximum: 65535
-	// Minimum: 0
-	AbiVersion *int64 `json:"abi_version,omitempty"`
+	// abi version
+	// Required: true
+	AbiVersion Uint16 `json:"abi_version"`
 
 	// Contract call data
 	// Required: true
@@ -33,19 +34,17 @@ type OffChainNewContract struct {
 	// Required: true
 	Code *ByteCode `json:"code"`
 
-	// Amount of tokens to deposit to the new contract
+	// deposit
 	// Required: true
-	Deposit *uint64 `json:"deposit"`
+	Deposit utils.BigInt `json:"deposit"`
 
 	// Contract owner
 	// Required: true
-	Owner EncodedHash `json:"owner"`
+	Owner EncodedPubkey `json:"owner"`
 
-	// VM version of the contract
+	// vm version
 	// Required: true
-	// Maximum: 65535
-	// Minimum: 0
-	VMVersion *int64 `json:"vm_version"`
+	VMVersion Uint16 `json:"vm_version"`
 }
 
 // Op gets the op of this subtype
@@ -74,10 +73,9 @@ func (m *OffChainNewContract) SetOp(val string) {
 func (m *OffChainNewContract) UnmarshalJSON(raw []byte) error {
 	var data struct {
 
-		// ABI version of the contract
-		// Maximum: 65535
-		// Minimum: 0
-		AbiVersion *int64 `json:"abi_version,omitempty"`
+		// abi version
+		// Required: true
+		AbiVersion Uint16 `json:"abi_version"`
 
 		// Contract call data
 		// Required: true
@@ -87,19 +85,17 @@ func (m *OffChainNewContract) UnmarshalJSON(raw []byte) error {
 		// Required: true
 		Code *ByteCode `json:"code"`
 
-		// Amount of tokens to deposit to the new contract
+		// deposit
 		// Required: true
-		Deposit *uint64 `json:"deposit"`
+		Deposit utils.BigInt `json:"deposit"`
 
 		// Contract owner
 		// Required: true
-		Owner EncodedHash `json:"owner"`
+		Owner EncodedPubkey `json:"owner"`
 
-		// VM version of the contract
+		// vm version
 		// Required: true
-		// Maximum: 65535
-		// Minimum: 0
-		VMVersion *int64 `json:"vm_version"`
+		VMVersion Uint16 `json:"vm_version"`
 	}
 	buf := bytes.NewBuffer(raw)
 	dec := json.NewDecoder(buf)
@@ -152,10 +148,9 @@ func (m OffChainNewContract) MarshalJSON() ([]byte, error) {
 	var err error
 	b1, err = json.Marshal(struct {
 
-		// ABI version of the contract
-		// Maximum: 65535
-		// Minimum: 0
-		AbiVersion *int64 `json:"abi_version,omitempty"`
+		// abi version
+		// Required: true
+		AbiVersion Uint16 `json:"abi_version"`
 
 		// Contract call data
 		// Required: true
@@ -165,19 +160,17 @@ func (m OffChainNewContract) MarshalJSON() ([]byte, error) {
 		// Required: true
 		Code *ByteCode `json:"code"`
 
-		// Amount of tokens to deposit to the new contract
+		// deposit
 		// Required: true
-		Deposit *uint64 `json:"deposit"`
+		Deposit utils.BigInt `json:"deposit"`
 
 		// Contract owner
 		// Required: true
-		Owner EncodedHash `json:"owner"`
+		Owner EncodedPubkey `json:"owner"`
 
-		// VM version of the contract
+		// vm version
 		// Required: true
-		// Maximum: 65535
-		// Minimum: 0
-		VMVersion *int64 `json:"vm_version"`
+		VMVersion Uint16 `json:"vm_version"`
 	}{
 
 		AbiVersion: m.AbiVersion,
@@ -246,15 +239,10 @@ func (m *OffChainNewContract) Validate(formats strfmt.Registry) error {
 
 func (m *OffChainNewContract) validateAbiVersion(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.AbiVersion) { // not required
-		return nil
-	}
-
-	if err := validate.MinimumInt("abi_version", "body", int64(*m.AbiVersion), 0, false); err != nil {
-		return err
-	}
-
-	if err := validate.MaximumInt("abi_version", "body", int64(*m.AbiVersion), 65535, false); err != nil {
+	if err := m.AbiVersion.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("abi_version")
+		}
 		return err
 	}
 
@@ -293,7 +281,10 @@ func (m *OffChainNewContract) validateCode(formats strfmt.Registry) error {
 
 func (m *OffChainNewContract) validateDeposit(formats strfmt.Registry) error {
 
-	if err := validate.Required("deposit", "body", m.Deposit); err != nil {
+	if err := m.Deposit.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("deposit")
+		}
 		return err
 	}
 
@@ -314,15 +305,10 @@ func (m *OffChainNewContract) validateOwner(formats strfmt.Registry) error {
 
 func (m *OffChainNewContract) validateVMVersion(formats strfmt.Registry) error {
 
-	if err := validate.Required("vm_version", "body", m.VMVersion); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("vm_version", "body", int64(*m.VMVersion), 0, false); err != nil {
-		return err
-	}
-
-	if err := validate.MaximumInt("vm_version", "body", int64(*m.VMVersion), 65535, false); err != nil {
+	if err := m.VMVersion.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("vm_version")
+		}
 		return err
 	}
 

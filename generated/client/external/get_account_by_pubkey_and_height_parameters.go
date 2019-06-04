@@ -63,10 +63,10 @@ for the get account by pubkey and height operation typically these are written t
 type GetAccountByPubkeyAndHeightParams struct {
 
 	/*Height
-	  The height of the key block
+	  The height
 
 	*/
-	Height int64
+	Height uint64
 	/*Pubkey
 	  The public key of the account
 
@@ -112,13 +112,13 @@ func (o *GetAccountByPubkeyAndHeightParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithHeight adds the height to the get account by pubkey and height params
-func (o *GetAccountByPubkeyAndHeightParams) WithHeight(height int64) *GetAccountByPubkeyAndHeightParams {
+func (o *GetAccountByPubkeyAndHeightParams) WithHeight(height uint64) *GetAccountByPubkeyAndHeightParams {
 	o.SetHeight(height)
 	return o
 }
 
 // SetHeight adds the height to the get account by pubkey and height params
-func (o *GetAccountByPubkeyAndHeightParams) SetHeight(height int64) {
+func (o *GetAccountByPubkeyAndHeightParams) SetHeight(height uint64) {
 	o.Height = height
 }
 
@@ -142,7 +142,7 @@ func (o *GetAccountByPubkeyAndHeightParams) WriteToRequest(r runtime.ClientReque
 	var res []error
 
 	// path param height
-	if err := r.SetPathParam("height", swag.FormatInt64(o.Height)); err != nil {
+	if err := r.SetPathParam("height", swag.FormatUint64(o.Height)); err != nil {
 		return err
 	}
 

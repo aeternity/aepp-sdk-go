@@ -63,7 +63,7 @@ for the get generation by height operation typically these are written to a http
 type GetGenerationByHeightParams struct {
 
 	/*Height
-	  The height of the generation
+	  The height
 
 	*/
 	Height uint64

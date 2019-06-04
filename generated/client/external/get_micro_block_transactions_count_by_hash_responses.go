@@ -12,7 +12,6 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 
 	strfmt "github.com/go-openapi/strfmt"
 
@@ -147,34 +146,16 @@ swagger:model GetMicroBlockTransactionsCountByHashOKBody
 type GetMicroBlockTransactionsCountByHashOKBody struct {
 
 	// Count
-	// Minimum: 1
-	Count uint64 `json:"count,omitempty"`
+	Count models.Uint32 `json:"count,omitempty"`
 }
 
 // Validate validates this get micro block transactions count by hash o k body
 func (o *GetMicroBlockTransactionsCountByHashOKBody) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := o.validateCount(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
-	return nil
-}
-
-func (o *GetMicroBlockTransactionsCountByHashOKBody) validateCount(formats strfmt.Registry) error {
-
-	if swag.IsZero(o.Count) { // not required
-		return nil
-	}
-
-	if err := validate.MinimumInt("getMicroBlockTransactionsCountByHashOK"+"."+"count", "body", int64(o.Count), 1, false); err != nil {
-		return err
-	}
-
 	return nil
 }
 

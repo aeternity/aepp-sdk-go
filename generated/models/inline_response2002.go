@@ -10,7 +10,6 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 )
 
 // InlineResponse2002 inline response 200 2
@@ -18,8 +17,7 @@ import (
 type InlineResponse2002 struct {
 
 	// Count
-	// Minimum: 1
-	Count uint64 `json:"count,omitempty"`
+	Count Uint32 `json:"count,omitempty"`
 }
 
 // Validate validates this inline response 200 2
@@ -42,7 +40,10 @@ func (m *InlineResponse2002) validateCount(formats strfmt.Registry) error {
 		return nil
 	}
 
-	if err := validate.MinimumInt("count", "body", int64(m.Count), 1, false); err != nil {
+	if err := m.Count.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("count")
+		}
 		return err
 	}
 
