@@ -10,7 +10,6 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 
 	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
@@ -20,9 +19,8 @@ import (
 type ContractCreateTx struct {
 
 	// ABI version
-	// Maximum: 65535
-	// Minimum: 0
-	AbiVersion *uint64 `json:"abi_version,omitempty"`
+	// Required: true
+	AbiVersion Uint16 `json:"abi_version"`
 
 	// amount
 	// Required: true
@@ -34,12 +32,11 @@ type ContractCreateTx struct {
 
 	// Contract's code
 	// Required: true
-	Code *string `json:"code"`
+	Code EncodedByteArray `json:"code"`
 
-	// Deposit
+	// deposit
 	// Required: true
-	// Minimum: 0
-	Deposit *uint64 `json:"deposit"`
+	Deposit utils.BigInt `json:"deposit"`
 
 	// fee
 	// Required: true
@@ -47,28 +44,25 @@ type ContractCreateTx struct {
 
 	// gas
 	// Required: true
-	Gas utils.BigInt `json:"gas"`
+	Gas Uint64 `json:"gas"`
 
 	// gas price
 	// Required: true
 	GasPrice utils.BigInt `json:"gas_price"`
 
 	// Owner's nonce
-	Nonce uint64 `json:"nonce,omitempty"`
+	Nonce Uint64 `json:"nonce,omitempty"`
 
 	// Contract owner pub_key
 	// Required: true
-	OwnerID EncodedHash `json:"owner_id"`
+	OwnerID EncodedPubkey `json:"owner_id"`
 
-	// Transaction TTL
-	// Minimum: 0
-	TTL *uint64 `json:"ttl,omitempty"`
+	// ttl
+	TTL Uint64 `json:"ttl,omitempty"`
 
 	// Virtual machine's version
 	// Required: true
-	// Maximum: 65535
-	// Minimum: 0
-	VMVersion *uint64 `json:"vm_version"`
+	VMVersion Uint16 `json:"vm_version"`
 }
 
 // Validate validates this contract create tx
@@ -107,6 +101,10 @@ func (m *ContractCreateTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateNonce(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateOwnerID(formats); err != nil {
 		res = append(res, err)
 	}
@@ -127,15 +125,10 @@ func (m *ContractCreateTx) Validate(formats strfmt.Registry) error {
 
 func (m *ContractCreateTx) validateAbiVersion(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.AbiVersion) { // not required
-		return nil
-	}
-
-	if err := validate.MinimumInt("abi_version", "body", int64(*m.AbiVersion), 0, false); err != nil {
-		return err
-	}
-
-	if err := validate.MaximumInt("abi_version", "body", int64(*m.AbiVersion), 65535, false); err != nil {
+	if err := m.AbiVersion.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("abi_version")
+		}
 		return err
 	}
 
@@ -168,7 +161,10 @@ func (m *ContractCreateTx) validateCallData(formats strfmt.Registry) error {
 
 func (m *ContractCreateTx) validateCode(formats strfmt.Registry) error {
 
-	if err := validate.Required("code", "body", m.Code); err != nil {
+	if err := m.Code.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("code")
+		}
 		return err
 	}
 
@@ -177,11 +173,10 @@ func (m *ContractCreateTx) validateCode(formats strfmt.Registry) error {
 
 func (m *ContractCreateTx) validateDeposit(formats strfmt.Registry) error {
 
-	if err := validate.Required("deposit", "body", m.Deposit); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("deposit", "body", int64(*m.Deposit), 0, false); err != nil {
+	if err := m.Deposit.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("deposit")
+		}
 		return err
 	}
 
@@ -224,6 +219,22 @@ func (m *ContractCreateTx) validateGasPrice(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *ContractCreateTx) validateNonce(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Nonce) { // not required
+		return nil
+	}
+
+	if err := m.Nonce.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("nonce")
+		}
+		return err
+	}
+
+	return nil
+}
+
 func (m *ContractCreateTx) validateOwnerID(formats strfmt.Registry) error {
 
 	if err := m.OwnerID.Validate(formats); err != nil {
@@ -242,7 +253,10 @@ func (m *ContractCreateTx) validateTTL(formats strfmt.Registry) error {
 		return nil
 	}
 
-	if err := validate.MinimumInt("ttl", "body", int64(*m.TTL), 0, false); err != nil {
+	if err := m.TTL.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("ttl")
+		}
 		return err
 	}
 
@@ -251,15 +265,10 @@ func (m *ContractCreateTx) validateTTL(formats strfmt.Registry) error {
 
 func (m *ContractCreateTx) validateVMVersion(formats strfmt.Registry) error {
 
-	if err := validate.Required("vm_version", "body", m.VMVersion); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("vm_version", "body", int64(*m.VMVersion), 0, false); err != nil {
-		return err
-	}
-
-	if err := validate.MaximumInt("vm_version", "body", int64(*m.VMVersion), 65535, false); err != nil {
+	if err := m.VMVersion.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("vm_version")
+		}
 		return err
 	}
 

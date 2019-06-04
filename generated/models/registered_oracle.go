@@ -20,13 +20,12 @@ import (
 type RegisteredOracle struct {
 
 	// abi version
-	// Maximum: 65535
-	// Minimum: 0
-	AbiVersion *uint64 `json:"abi_version,omitempty"`
+	// Required: true
+	AbiVersion Uint16 `json:"abi_version"`
 
 	// id
 	// Required: true
-	ID EncodedHash `json:"id"`
+	ID EncodedPubkey `json:"id"`
 
 	// query fee
 	// Required: true
@@ -42,12 +41,7 @@ type RegisteredOracle struct {
 
 	// ttl
 	// Required: true
-	TTL *uint64 `json:"ttl"`
-
-	// vm version
-	// Maximum: 65535
-	// Minimum: 0
-	VMVersion *uint64 `json:"vm_version,omitempty"`
+	TTL Uint64 `json:"ttl"`
 }
 
 // Validate validates this registered oracle
@@ -78,10 +72,6 @@ func (m *RegisteredOracle) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateVMVersion(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -90,15 +80,10 @@ func (m *RegisteredOracle) Validate(formats strfmt.Registry) error {
 
 func (m *RegisteredOracle) validateAbiVersion(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.AbiVersion) { // not required
-		return nil
-	}
-
-	if err := validate.MinimumInt("abi_version", "body", int64(*m.AbiVersion), 0, false); err != nil {
-		return err
-	}
-
-	if err := validate.MaximumInt("abi_version", "body", int64(*m.AbiVersion), 65535, false); err != nil {
+	if err := m.AbiVersion.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("abi_version")
+		}
 		return err
 	}
 
@@ -149,24 +134,10 @@ func (m *RegisteredOracle) validateResponseFormat(formats strfmt.Registry) error
 
 func (m *RegisteredOracle) validateTTL(formats strfmt.Registry) error {
 
-	if err := validate.Required("ttl", "body", m.TTL); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *RegisteredOracle) validateVMVersion(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.VMVersion) { // not required
-		return nil
-	}
-
-	if err := validate.MinimumInt("vm_version", "body", int64(*m.VMVersion), 0, false); err != nil {
-		return err
-	}
-
-	if err := validate.MaximumInt("vm_version", "body", int64(*m.VMVersion), 65535, false); err != nil {
+	if err := m.TTL.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("ttl")
+		}
 		return err
 	}
 

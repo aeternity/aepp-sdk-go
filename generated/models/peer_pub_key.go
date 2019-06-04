@@ -10,23 +10,22 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 )
 
-// SophiaJSONData sophia Json data
-// swagger:model SophiaJsonData
-type SophiaJSONData struct {
+// PeerPubKey peer pub key
+// swagger:model PeerPubKey
+type PeerPubKey struct {
 
-	// data
+	// pubkey
 	// Required: true
-	Data interface{} `json:"data"`
+	Pubkey EncodedPubkey `json:"pubkey"`
 }
 
-// Validate validates this sophia Json data
-func (m *SophiaJSONData) Validate(formats strfmt.Registry) error {
+// Validate validates this peer pub key
+func (m *PeerPubKey) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateData(formats); err != nil {
+	if err := m.validatePubkey(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -36,9 +35,12 @@ func (m *SophiaJSONData) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *SophiaJSONData) validateData(formats strfmt.Registry) error {
+func (m *PeerPubKey) validatePubkey(formats strfmt.Registry) error {
 
-	if err := validate.Required("data", "body", m.Data); err != nil {
+	if err := m.Pubkey.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("pubkey")
+		}
 		return err
 	}
 
@@ -46,7 +48,7 @@ func (m *SophiaJSONData) validateData(formats strfmt.Registry) error {
 }
 
 // MarshalBinary interface implementation
-func (m *SophiaJSONData) MarshalBinary() ([]byte, error) {
+func (m *PeerPubKey) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -54,8 +56,8 @@ func (m *SophiaJSONData) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *SophiaJSONData) UnmarshalBinary(b []byte) error {
-	var res SophiaJSONData
+func (m *PeerPubKey) UnmarshalBinary(b []byte) error {
+	var res PeerPubKey
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

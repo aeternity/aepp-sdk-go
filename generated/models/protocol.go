@@ -10,7 +10,6 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 )
 
 // Protocol protocol
@@ -19,13 +18,11 @@ type Protocol struct {
 
 	// effective at height
 	// Required: true
-	// Minimum: 0
-	EffectiveAtHeight *uint64 `json:"effective_at_height"`
+	EffectiveAtHeight Uint64 `json:"effective_at_height"`
 
 	// version
 	// Required: true
-	// Minimum: 1
-	Version *uint64 `json:"version"`
+	Version Uint32 `json:"version"`
 }
 
 // Validate validates this protocol
@@ -48,11 +45,10 @@ func (m *Protocol) Validate(formats strfmt.Registry) error {
 
 func (m *Protocol) validateEffectiveAtHeight(formats strfmt.Registry) error {
 
-	if err := validate.Required("effective_at_height", "body", m.EffectiveAtHeight); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("effective_at_height", "body", int64(*m.EffectiveAtHeight), 0, false); err != nil {
+	if err := m.EffectiveAtHeight.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("effective_at_height")
+		}
 		return err
 	}
 
@@ -61,11 +57,10 @@ func (m *Protocol) validateEffectiveAtHeight(formats strfmt.Registry) error {
 
 func (m *Protocol) validateVersion(formats strfmt.Registry) error {
 
-	if err := validate.Required("version", "body", m.Version); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("version", "body", int64(*m.Version), 1, false); err != nil {
+	if err := m.Version.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("version")
+		}
 		return err
 	}
 

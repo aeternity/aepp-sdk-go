@@ -10,7 +10,6 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 
 	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
@@ -28,22 +27,22 @@ type SpendTx struct {
 	Fee utils.BigInt `json:"fee"`
 
 	// nonce
-	Nonce uint64 `json:"nonce,omitempty"`
+	Nonce Uint64 `json:"nonce,omitempty"`
 
 	// payload
 	// Required: true
-	Payload *string `json:"payload"`
+	Payload EncodedByteArray `json:"payload"`
 
 	// recipient id
 	// Required: true
-	RecipientID EncodedHash `json:"recipient_id"`
+	RecipientID EncodedPubkey `json:"recipient_id"`
 
 	// sender id
 	// Required: true
-	SenderID EncodedHash `json:"sender_id"`
+	SenderID EncodedPubkey `json:"sender_id"`
 
 	// ttl
-	TTL uint64 `json:"ttl,omitempty"`
+	TTL Uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this spend tx
@@ -58,6 +57,10 @@ func (m *SpendTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateNonce(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validatePayload(formats); err != nil {
 		res = append(res, err)
 	}
@@ -67,6 +70,10 @@ func (m *SpendTx) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateSenderID(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateTTL(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -100,9 +107,28 @@ func (m *SpendTx) validateFee(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *SpendTx) validateNonce(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Nonce) { // not required
+		return nil
+	}
+
+	if err := m.Nonce.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("nonce")
+		}
+		return err
+	}
+
+	return nil
+}
+
 func (m *SpendTx) validatePayload(formats strfmt.Registry) error {
 
-	if err := validate.Required("payload", "body", m.Payload); err != nil {
+	if err := m.Payload.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("payload")
+		}
 		return err
 	}
 
@@ -126,6 +152,22 @@ func (m *SpendTx) validateSenderID(formats strfmt.Registry) error {
 	if err := m.SenderID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("sender_id")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *SpendTx) validateTTL(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.TTL) { // not required
+		return nil
+	}
+
+	if err := m.TTL.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("ttl")
 		}
 		return err
 	}

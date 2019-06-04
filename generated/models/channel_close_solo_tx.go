@@ -10,7 +10,6 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 
 	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
@@ -21,7 +20,7 @@ type ChannelCloseSoloTx struct {
 
 	// channel id
 	// Required: true
-	ChannelID EncodedHash `json:"channel_id"`
+	ChannelID EncodedPubkey `json:"channel_id"`
 
 	// fee
 	// Required: true
@@ -29,23 +28,21 @@ type ChannelCloseSoloTx struct {
 
 	// from id
 	// Required: true
-	FromID EncodedHash `json:"from_id"`
+	FromID EncodedPubkey `json:"from_id"`
 
 	// nonce
-	// Minimum: 0
-	Nonce *uint64 `json:"nonce,omitempty"`
+	Nonce Uint64 `json:"nonce,omitempty"`
 
 	// payload
 	// Required: true
-	Payload *string `json:"payload"`
+	Payload EncodedByteArray `json:"payload"`
 
 	// Proof of inclusion containing information for closing the channel
 	// Required: true
-	Poi *string `json:"poi"`
+	Poi EncodedByteArray `json:"poi"`
 
 	// ttl
-	// Minimum: 0
-	TTL *uint64 `json:"ttl,omitempty"`
+	TTL Uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this channel close solo tx
@@ -128,7 +125,10 @@ func (m *ChannelCloseSoloTx) validateNonce(formats strfmt.Registry) error {
 		return nil
 	}
 
-	if err := validate.MinimumInt("nonce", "body", int64(*m.Nonce), 0, false); err != nil {
+	if err := m.Nonce.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("nonce")
+		}
 		return err
 	}
 
@@ -137,7 +137,10 @@ func (m *ChannelCloseSoloTx) validateNonce(formats strfmt.Registry) error {
 
 func (m *ChannelCloseSoloTx) validatePayload(formats strfmt.Registry) error {
 
-	if err := validate.Required("payload", "body", m.Payload); err != nil {
+	if err := m.Payload.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("payload")
+		}
 		return err
 	}
 
@@ -146,7 +149,10 @@ func (m *ChannelCloseSoloTx) validatePayload(formats strfmt.Registry) error {
 
 func (m *ChannelCloseSoloTx) validatePoi(formats strfmt.Registry) error {
 
-	if err := validate.Required("poi", "body", m.Poi); err != nil {
+	if err := m.Poi.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("poi")
+		}
 		return err
 	}
 
@@ -159,7 +165,10 @@ func (m *ChannelCloseSoloTx) validateTTL(formats strfmt.Registry) error {
 		return nil
 	}
 
-	if err := validate.MinimumInt("ttl", "body", int64(*m.TTL), 0, false); err != nil {
+	if err := m.TTL.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("ttl")
+		}
 		return err
 	}
 

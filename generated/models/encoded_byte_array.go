@@ -9,7 +9,7 @@ import (
 	strfmt "github.com/go-openapi/strfmt"
 )
 
-// EncodedByteArray encoded byte array
+// EncodedByteArray Base64Check encoded tagged byte array
 // swagger:model EncodedByteArray
 type EncodedByteArray string
 

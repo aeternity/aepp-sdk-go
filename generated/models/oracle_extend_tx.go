@@ -24,18 +24,18 @@ type OracleExtendTx struct {
 	Fee utils.BigInt `json:"fee"`
 
 	// nonce
-	Nonce uint64 `json:"nonce,omitempty"`
+	Nonce Uint64 `json:"nonce,omitempty"`
 
 	// oracle id
 	// Required: true
-	OracleID EncodedHash `json:"oracle_id"`
+	OracleID EncodedPubkey `json:"oracle_id"`
 
 	// oracle ttl
 	// Required: true
 	OracleTTL *RelativeTTL `json:"oracle_ttl"`
 
 	// ttl
-	TTL uint64 `json:"ttl,omitempty"`
+	TTL Uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this oracle extend tx
@@ -46,11 +46,19 @@ func (m *OracleExtendTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateNonce(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateOracleID(formats); err != nil {
 		res = append(res, err)
 	}
 
 	if err := m.validateOracleTTL(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateTTL(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -65,6 +73,22 @@ func (m *OracleExtendTx) validateFee(formats strfmt.Registry) error {
 	if err := m.Fee.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("fee")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *OracleExtendTx) validateNonce(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Nonce) { // not required
+		return nil
+	}
+
+	if err := m.Nonce.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("nonce")
 		}
 		return err
 	}
@@ -97,6 +121,22 @@ func (m *OracleExtendTx) validateOracleTTL(formats strfmt.Registry) error {
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (m *OracleExtendTx) validateTTL(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.TTL) { // not required
+		return nil
+	}
+
+	if err := m.TTL.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("ttl")
+		}
+		return err
 	}
 
 	return nil

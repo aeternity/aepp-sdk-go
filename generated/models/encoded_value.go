@@ -9,11 +9,11 @@ import (
 	strfmt "github.com/go-openapi/strfmt"
 )
 
-// URI Uri
-// swagger:model Uri
-type URI string
+// EncodedValue Base58Check encoded tagged value
+// swagger:model EncodedValue
+type EncodedValue string
 
-// Validate validates this Uri
-func (m URI) Validate(formats strfmt.Registry) error {
+// Validate validates this encoded value
+func (m EncodedValue) Validate(formats strfmt.Registry) error {
 	return nil
 }

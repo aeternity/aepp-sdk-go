@@ -10,7 +10,6 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 )
 
 // ByteCode byte code
@@ -19,7 +18,7 @@ type ByteCode struct {
 
 	// bytecode
 	// Required: true
-	Bytecode *string `json:"bytecode"`
+	Bytecode EncodedByteArray `json:"bytecode"`
 }
 
 // Validate validates this byte code
@@ -38,7 +37,10 @@ func (m *ByteCode) Validate(formats strfmt.Registry) error {
 
 func (m *ByteCode) validateBytecode(formats strfmt.Registry) error {
 
-	if err := validate.Required("bytecode", "body", m.Bytecode); err != nil {
+	if err := m.Bytecode.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("bytecode")
+		}
 		return err
 	}
 

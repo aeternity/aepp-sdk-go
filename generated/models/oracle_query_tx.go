@@ -24,11 +24,11 @@ type OracleQueryTx struct {
 	Fee utils.BigInt `json:"fee"`
 
 	// Sender nonce
-	Nonce uint64 `json:"nonce,omitempty"`
+	Nonce Uint64 `json:"nonce,omitempty"`
 
 	// oracle id
 	// Required: true
-	OracleID EncodedHash `json:"oracle_id"`
+	OracleID EncodedPubkey `json:"oracle_id"`
 
 	// query
 	// Required: true
@@ -48,10 +48,10 @@ type OracleQueryTx struct {
 
 	// sender id
 	// Required: true
-	SenderID EncodedHash `json:"sender_id"`
+	SenderID EncodedPubkey `json:"sender_id"`
 
 	// ttl
-	TTL uint64 `json:"ttl,omitempty"`
+	TTL Uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this oracle query tx
@@ -59,6 +59,10 @@ func (m *OracleQueryTx) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateFee(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateNonce(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -86,6 +90,10 @@ func (m *OracleQueryTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateTTL(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -97,6 +105,22 @@ func (m *OracleQueryTx) validateFee(formats strfmt.Registry) error {
 	if err := m.Fee.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("fee")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *OracleQueryTx) validateNonce(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Nonce) { // not required
+		return nil
+	}
+
+	if err := m.Nonce.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("nonce")
 		}
 		return err
 	}
@@ -178,6 +202,22 @@ func (m *OracleQueryTx) validateSenderID(formats strfmt.Registry) error {
 	if err := m.SenderID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("sender_id")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *OracleQueryTx) validateTTL(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.TTL) { // not required
+		return nil
+	}
+
+	if err := m.TTL.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("ttl")
 		}
 		return err
 	}

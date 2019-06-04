@@ -25,7 +25,7 @@ type Generation struct {
 
 	// micro blocks
 	// Required: true
-	MicroBlocks []EncodedHash `json:"micro_blocks"`
+	MicroBlocks []EncodedPubkey `json:"micro_blocks"`
 }
 
 // Validate validates this generation

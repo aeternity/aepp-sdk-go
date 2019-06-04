@@ -865,7 +865,7 @@ func (a *Client) GetTransactionByHash(params *GetTransactionByHashParams) (*GetT
 }
 
 /*
-GetTransactionInfoByHash Get a transaction info by hash
+GetTransactionInfoByHash get transaction info by hash API
 */
 func (a *Client) GetTransactionInfoByHash(params *GetTransactionInfoByHashParams) (*GetTransactionInfoByHashOK, error) {
 	// TODO: Validate the params before sending

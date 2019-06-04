@@ -20,20 +20,18 @@ import (
 type OracleRegisterTx struct {
 
 	// abi version
-	// Maximum: 65535
-	// Minimum: 0
-	AbiVersion *uint64 `json:"abi_version,omitempty"`
+	AbiVersion Uint16 `json:"abi_version,omitempty"`
 
 	// account id
 	// Required: true
-	AccountID EncodedHash `json:"account_id"`
+	AccountID EncodedPubkey `json:"account_id"`
 
 	// fee
 	// Required: true
 	Fee utils.BigInt `json:"fee"`
 
 	// nonce
-	Nonce uint64 `json:"nonce,omitempty"`
+	Nonce Uint64 `json:"nonce,omitempty"`
 
 	// oracle ttl
 	// Required: true
@@ -52,12 +50,7 @@ type OracleRegisterTx struct {
 	ResponseFormat *string `json:"response_format"`
 
 	// ttl
-	TTL uint64 `json:"ttl,omitempty"`
-
-	// vm version
-	// Maximum: 65535
-	// Minimum: 0
-	VMVersion *uint64 `json:"vm_version,omitempty"`
+	TTL Uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this oracle register tx
@@ -73,6 +66,10 @@ func (m *OracleRegisterTx) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateFee(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateNonce(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -92,7 +89,7 @@ func (m *OracleRegisterTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateVMVersion(formats); err != nil {
+	if err := m.validateTTL(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -108,11 +105,10 @@ func (m *OracleRegisterTx) validateAbiVersion(formats strfmt.Registry) error {
 		return nil
 	}
 
-	if err := validate.MinimumInt("abi_version", "body", int64(*m.AbiVersion), 0, false); err != nil {
-		return err
-	}
-
-	if err := validate.MaximumInt("abi_version", "body", int64(*m.AbiVersion), 65535, false); err != nil {
+	if err := m.AbiVersion.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("abi_version")
+		}
 		return err
 	}
 
@@ -136,6 +132,22 @@ func (m *OracleRegisterTx) validateFee(formats strfmt.Registry) error {
 	if err := m.Fee.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("fee")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *OracleRegisterTx) validateNonce(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Nonce) { // not required
+		return nil
+	}
+
+	if err := m.Nonce.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("nonce")
 		}
 		return err
 	}
@@ -191,17 +203,16 @@ func (m *OracleRegisterTx) validateResponseFormat(formats strfmt.Registry) error
 	return nil
 }
 
-func (m *OracleRegisterTx) validateVMVersion(formats strfmt.Registry) error {
+func (m *OracleRegisterTx) validateTTL(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.VMVersion) { // not required
+	if swag.IsZero(m.TTL) { // not required
 		return nil
 	}
 
-	if err := validate.MinimumInt("vm_version", "body", int64(*m.VMVersion), 0, false); err != nil {
-		return err
-	}
-
-	if err := validate.MaximumInt("vm_version", "body", int64(*m.VMVersion), 65535, false); err != nil {
+	if err := m.TTL.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("ttl")
+		}
 		return err
 	}
 

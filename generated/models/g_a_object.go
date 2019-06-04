@@ -6,8 +6,6 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"strconv"
-
 	strfmt "github.com/go-openapi/strfmt"
 
 	"github.com/go-openapi/errors"
@@ -17,21 +15,13 @@ import (
 	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
 
-// ContractCallObject contract call object
-// swagger:model ContractCallObject
-type ContractCallObject struct {
+// GAObject g a object
+// swagger:model GAObject
+type GAObject struct {
 
 	// caller id
 	// Required: true
 	CallerID EncodedPubkey `json:"caller_id"`
-
-	// caller nonce
-	// Required: true
-	CallerNonce Uint64 `json:"caller_nonce"`
-
-	// contract id
-	// Required: true
-	ContractID EncodedPubkey `json:"contract_id"`
 
 	// gas price
 	// Required: true
@@ -45,11 +35,10 @@ type ContractCallObject struct {
 	// Required: true
 	Height Uint64 `json:"height"`
 
-	// log
-	// Required: true
-	Log []*Event `json:"log"`
+	// inner object
+	InnerObject *TxInfoObject `json:"inner_object,omitempty"`
 
-	// The status of the call 'ok | error | revert'.
+	// The status of the call 'ok | error'.
 	// Required: true
 	ReturnType *string `json:"return_type"`
 
@@ -58,19 +47,11 @@ type ContractCallObject struct {
 	ReturnValue EncodedByteArray `json:"return_value"`
 }
 
-// Validate validates this contract call object
-func (m *ContractCallObject) Validate(formats strfmt.Registry) error {
+// Validate validates this g a object
+func (m *GAObject) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateCallerID(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateCallerNonce(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateContractID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -86,7 +67,7 @@ func (m *ContractCallObject) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateLog(formats); err != nil {
+	if err := m.validateInnerObject(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -104,7 +85,7 @@ func (m *ContractCallObject) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractCallObject) validateCallerID(formats strfmt.Registry) error {
+func (m *GAObject) validateCallerID(formats strfmt.Registry) error {
 
 	if err := m.CallerID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
@@ -116,31 +97,7 @@ func (m *ContractCallObject) validateCallerID(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractCallObject) validateCallerNonce(formats strfmt.Registry) error {
-
-	if err := m.CallerNonce.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("caller_nonce")
-		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *ContractCallObject) validateContractID(formats strfmt.Registry) error {
-
-	if err := m.ContractID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("contract_id")
-		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *ContractCallObject) validateGasPrice(formats strfmt.Registry) error {
+func (m *GAObject) validateGasPrice(formats strfmt.Registry) error {
 
 	if err := m.GasPrice.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
@@ -152,7 +109,7 @@ func (m *ContractCallObject) validateGasPrice(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractCallObject) validateGasUsed(formats strfmt.Registry) error {
+func (m *GAObject) validateGasUsed(formats strfmt.Registry) error {
 
 	if err := m.GasUsed.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
@@ -164,7 +121,7 @@ func (m *ContractCallObject) validateGasUsed(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractCallObject) validateHeight(formats strfmt.Registry) error {
+func (m *GAObject) validateHeight(formats strfmt.Registry) error {
 
 	if err := m.Height.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
@@ -176,32 +133,25 @@ func (m *ContractCallObject) validateHeight(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractCallObject) validateLog(formats strfmt.Registry) error {
+func (m *GAObject) validateInnerObject(formats strfmt.Registry) error {
 
-	if err := validate.Required("log", "body", m.Log); err != nil {
-		return err
+	if swag.IsZero(m.InnerObject) { // not required
+		return nil
 	}
 
-	for i := 0; i < len(m.Log); i++ {
-		if swag.IsZero(m.Log[i]) { // not required
-			continue
-		}
-
-		if m.Log[i] != nil {
-			if err := m.Log[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("log" + "." + strconv.Itoa(i))
-				}
-				return err
+	if m.InnerObject != nil {
+		if err := m.InnerObject.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("inner_object")
 			}
+			return err
 		}
-
 	}
 
 	return nil
 }
 
-func (m *ContractCallObject) validateReturnType(formats strfmt.Registry) error {
+func (m *GAObject) validateReturnType(formats strfmt.Registry) error {
 
 	if err := validate.Required("return_type", "body", m.ReturnType); err != nil {
 		return err
@@ -210,7 +160,7 @@ func (m *ContractCallObject) validateReturnType(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractCallObject) validateReturnValue(formats strfmt.Registry) error {
+func (m *GAObject) validateReturnValue(formats strfmt.Registry) error {
 
 	if err := m.ReturnValue.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
@@ -223,7 +173,7 @@ func (m *ContractCallObject) validateReturnValue(formats strfmt.Registry) error 
 }
 
 // MarshalBinary interface implementation
-func (m *ContractCallObject) MarshalBinary() ([]byte, error) {
+func (m *GAObject) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -231,8 +181,8 @@ func (m *ContractCallObject) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *ContractCallObject) UnmarshalBinary(b []byte) error {
-	var res ContractCallObject
+func (m *GAObject) UnmarshalBinary(b []byte) error {
+	var res GAObject
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

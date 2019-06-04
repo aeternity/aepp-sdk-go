@@ -21,7 +21,7 @@ type Status struct {
 
 	// difficulty
 	// Required: true
-	Difficulty *uint64 `json:"difficulty"`
+	Difficulty Uint64 `json:"difficulty"`
 
 	// genesis key block hash
 	// Required: true
@@ -45,13 +45,11 @@ type Status struct {
 
 	// peer count
 	// Required: true
-	// Minimum: 0
-	PeerCount *uint64 `json:"peer_count"`
+	PeerCount Uint32 `json:"peer_count"`
 
 	// pending transactions count
 	// Required: true
-	// Minimum: 0
-	PendingTransactionsCount *uint64 `json:"pending_transactions_count"`
+	PendingTransactionsCount Uint32 `json:"pending_transactions_count"`
 
 	// protocols
 	// Required: true
@@ -59,8 +57,7 @@ type Status struct {
 
 	// solutions
 	// Required: true
-	// Minimum: 0
-	Solutions *uint64 `json:"solutions"`
+	Solutions Uint64 `json:"solutions"`
 
 	// sync progress
 	// Maximum: 100
@@ -132,7 +129,10 @@ func (m *Status) Validate(formats strfmt.Registry) error {
 
 func (m *Status) validateDifficulty(formats strfmt.Registry) error {
 
-	if err := validate.Required("difficulty", "body", m.Difficulty); err != nil {
+	if err := m.Difficulty.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("difficulty")
+		}
 		return err
 	}
 
@@ -189,11 +189,10 @@ func (m *Status) validateNodeVersion(formats strfmt.Registry) error {
 
 func (m *Status) validatePeerCount(formats strfmt.Registry) error {
 
-	if err := validate.Required("peer_count", "body", m.PeerCount); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("peer_count", "body", int64(*m.PeerCount), 0, false); err != nil {
+	if err := m.PeerCount.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("peer_count")
+		}
 		return err
 	}
 
@@ -202,11 +201,10 @@ func (m *Status) validatePeerCount(formats strfmt.Registry) error {
 
 func (m *Status) validatePendingTransactionsCount(formats strfmt.Registry) error {
 
-	if err := validate.Required("pending_transactions_count", "body", m.PendingTransactionsCount); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("pending_transactions_count", "body", int64(*m.PendingTransactionsCount), 0, false); err != nil {
+	if err := m.PendingTransactionsCount.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("pending_transactions_count")
+		}
 		return err
 	}
 
@@ -240,11 +238,10 @@ func (m *Status) validateProtocols(formats strfmt.Registry) error {
 
 func (m *Status) validateSolutions(formats strfmt.Registry) error {
 
-	if err := validate.Required("solutions", "body", m.Solutions); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("solutions", "body", int64(*m.Solutions), 0, false); err != nil {
+	if err := m.Solutions.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("solutions")
+		}
 		return err
 	}
 

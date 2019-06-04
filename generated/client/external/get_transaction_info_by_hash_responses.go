@@ -61,7 +61,7 @@ func NewGetTransactionInfoByHashOK() *GetTransactionInfoByHashOK {
 Successful operation
 */
 type GetTransactionInfoByHashOK struct {
-	Payload *models.ContractCallObject
+	Payload *models.TxInfoObject
 }
 
 func (o *GetTransactionInfoByHashOK) Error() string {
@@ -70,7 +70,7 @@ func (o *GetTransactionInfoByHashOK) Error() string {
 
 func (o *GetTransactionInfoByHashOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.ContractCallObject)
+	o.Payload = new(models.TxInfoObject)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

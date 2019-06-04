@@ -15,7 +15,6 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 
 	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
@@ -24,12 +23,9 @@ import (
 // swagger:model ChannelForceProgressTx
 type ChannelForceProgressTx struct {
 
-	// The block hash the forced progress used as an on-chain environment
-	BlockHash EncodedHash `json:"block_hash,omitempty"`
-
 	// channel id
 	// Required: true
-	ChannelID EncodedHash `json:"channel_id"`
+	ChannelID EncodedPubkey `json:"channel_id"`
 
 	// fee
 	// Required: true
@@ -37,31 +33,28 @@ type ChannelForceProgressTx struct {
 
 	// from id
 	// Required: true
-	FromID EncodedHash `json:"from_id"`
+	FromID EncodedPubkey `json:"from_id"`
 
 	// nonce
-	// Minimum: 0
-	Nonce *uint64 `json:"nonce,omitempty"`
+	Nonce Uint64 `json:"nonce,omitempty"`
 
 	// The whole set of off-chain state trees
-	OffchainTrees EncodedHash `json:"offchain_trees,omitempty"`
+	OffchainTrees EncodedByteArray `json:"offchain_trees,omitempty"`
 
 	// payload
 	// Required: true
-	Payload *string `json:"payload"`
+	Payload EncodedByteArray `json:"payload"`
 
 	// Channel's next round
 	// Required: true
-	// Minimum: 0
-	Round *uint64 `json:"round"`
+	Round Uint64 `json:"round"`
 
 	// Channel's next state_hash
 	// Required: true
 	StateHash EncodedHash `json:"state_hash"`
 
 	// ttl
-	// Minimum: 0
-	TTL *uint64 `json:"ttl,omitempty"`
+	TTL Uint64 `json:"ttl,omitempty"`
 
 	updateField OffChainUpdate
 }
@@ -79,25 +72,23 @@ func (m *ChannelForceProgressTx) SetUpdate(val OffChainUpdate) {
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
 func (m *ChannelForceProgressTx) UnmarshalJSON(raw []byte) error {
 	var data struct {
-		BlockHash EncodedHash `json:"block_hash,omitempty"`
-
-		ChannelID EncodedHash `json:"channel_id"`
+		ChannelID EncodedPubkey `json:"channel_id"`
 
 		Fee utils.BigInt `json:"fee"`
 
-		FromID EncodedHash `json:"from_id"`
+		FromID EncodedPubkey `json:"from_id"`
 
-		Nonce *uint64 `json:"nonce,omitempty"`
+		Nonce Uint64 `json:"nonce,omitempty"`
 
-		OffchainTrees EncodedHash `json:"offchain_trees,omitempty"`
+		OffchainTrees EncodedByteArray `json:"offchain_trees,omitempty"`
 
-		Payload *string `json:"payload"`
+		Payload EncodedByteArray `json:"payload"`
 
-		Round *uint64 `json:"round"`
+		Round Uint64 `json:"round"`
 
 		StateHash EncodedHash `json:"state_hash"`
 
-		TTL *uint64 `json:"ttl,omitempty"`
+		TTL Uint64 `json:"ttl,omitempty"`
 
 		Update json.RawMessage `json:"update"`
 	}
@@ -115,9 +106,6 @@ func (m *ChannelForceProgressTx) UnmarshalJSON(raw []byte) error {
 	}
 
 	var result ChannelForceProgressTx
-
-	// block_hash
-	result.BlockHash = data.BlockHash
 
 	// channel_id
 	result.ChannelID = data.ChannelID
@@ -159,28 +147,24 @@ func (m ChannelForceProgressTx) MarshalJSON() ([]byte, error) {
 	var b1, b2, b3 []byte
 	var err error
 	b1, err = json.Marshal(struct {
-		BlockHash EncodedHash `json:"block_hash,omitempty"`
-
-		ChannelID EncodedHash `json:"channel_id"`
+		ChannelID EncodedPubkey `json:"channel_id"`
 
 		Fee utils.BigInt `json:"fee"`
 
-		FromID EncodedHash `json:"from_id"`
+		FromID EncodedPubkey `json:"from_id"`
 
-		Nonce *uint64 `json:"nonce,omitempty"`
+		Nonce Uint64 `json:"nonce,omitempty"`
 
-		OffchainTrees EncodedHash `json:"offchain_trees,omitempty"`
+		OffchainTrees EncodedByteArray `json:"offchain_trees,omitempty"`
 
-		Payload *string `json:"payload"`
+		Payload EncodedByteArray `json:"payload"`
 
-		Round *uint64 `json:"round"`
+		Round Uint64 `json:"round"`
 
 		StateHash EncodedHash `json:"state_hash"`
 
-		TTL *uint64 `json:"ttl,omitempty"`
+		TTL Uint64 `json:"ttl,omitempty"`
 	}{
-
-		BlockHash: m.BlockHash,
 
 		ChannelID: m.ChannelID,
 
@@ -221,10 +205,6 @@ func (m ChannelForceProgressTx) MarshalJSON() ([]byte, error) {
 // Validate validates this channel force progress tx
 func (m *ChannelForceProgressTx) Validate(formats strfmt.Registry) error {
 	var res []error
-
-	if err := m.validateBlockHash(formats); err != nil {
-		res = append(res, err)
-	}
 
 	if err := m.validateChannelID(formats); err != nil {
 		res = append(res, err)
@@ -272,22 +252,6 @@ func (m *ChannelForceProgressTx) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ChannelForceProgressTx) validateBlockHash(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.BlockHash) { // not required
-		return nil
-	}
-
-	if err := m.BlockHash.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("block_hash")
-		}
-		return err
-	}
-
-	return nil
-}
-
 func (m *ChannelForceProgressTx) validateChannelID(formats strfmt.Registry) error {
 
 	if err := m.ChannelID.Validate(formats); err != nil {
@@ -330,7 +294,10 @@ func (m *ChannelForceProgressTx) validateNonce(formats strfmt.Registry) error {
 		return nil
 	}
 
-	if err := validate.MinimumInt("nonce", "body", int64(*m.Nonce), 0, false); err != nil {
+	if err := m.Nonce.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("nonce")
+		}
 		return err
 	}
 
@@ -355,7 +322,10 @@ func (m *ChannelForceProgressTx) validateOffchainTrees(formats strfmt.Registry) 
 
 func (m *ChannelForceProgressTx) validatePayload(formats strfmt.Registry) error {
 
-	if err := validate.Required("payload", "body", m.Payload); err != nil {
+	if err := m.Payload.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("payload")
+		}
 		return err
 	}
 
@@ -364,11 +334,10 @@ func (m *ChannelForceProgressTx) validatePayload(formats strfmt.Registry) error 
 
 func (m *ChannelForceProgressTx) validateRound(formats strfmt.Registry) error {
 
-	if err := validate.Required("round", "body", m.Round); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("round", "body", int64(*m.Round), 0, false); err != nil {
+	if err := m.Round.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("round")
+		}
 		return err
 	}
 
@@ -393,7 +362,10 @@ func (m *ChannelForceProgressTx) validateTTL(formats strfmt.Registry) error {
 		return nil
 	}
 
-	if err := validate.MinimumInt("ttl", "body", int64(*m.TTL), 0, false); err != nil {
+	if err := m.TTL.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("ttl")
+		}
 		return err
 	}
 

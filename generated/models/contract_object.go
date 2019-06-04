@@ -20,9 +20,8 @@ import (
 type ContractObject struct {
 
 	// abi version
-	// Maximum: 65535
-	// Minimum: 0
-	AbiVersion *uint64 `json:"abi_version,omitempty"`
+	// Required: true
+	AbiVersion Uint16 `json:"abi_version"`
 
 	// active
 	// Required: true
@@ -30,29 +29,23 @@ type ContractObject struct {
 
 	// deposit
 	// Required: true
-	Deposit *uint64 `json:"deposit"`
+	Deposit Uint64 `json:"deposit"`
 
 	// id
 	// Required: true
-	ID EncodedHash `json:"id"`
-
-	// DEPRECATED
-	// Required: true
-	Log *string `json:"log"`
+	ID EncodedPubkey `json:"id"`
 
 	// owner id
 	// Required: true
-	OwnerID EncodedHash `json:"owner_id"`
+	OwnerID EncodedPubkey `json:"owner_id"`
 
 	// referrer ids
 	// Required: true
-	ReferrerIds []EncodedHash `json:"referrer_ids"`
+	ReferrerIds []EncodedPubkey `json:"referrer_ids"`
 
 	// vm version
 	// Required: true
-	// Maximum: 65535
-	// Minimum: 0
-	VMVersion *uint64 `json:"vm_version"`
+	VMVersion Uint16 `json:"vm_version"`
 }
 
 // Validate validates this contract object
@@ -72,10 +65,6 @@ func (m *ContractObject) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateID(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateLog(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -99,15 +88,10 @@ func (m *ContractObject) Validate(formats strfmt.Registry) error {
 
 func (m *ContractObject) validateAbiVersion(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.AbiVersion) { // not required
-		return nil
-	}
-
-	if err := validate.MinimumInt("abi_version", "body", int64(*m.AbiVersion), 0, false); err != nil {
-		return err
-	}
-
-	if err := validate.MaximumInt("abi_version", "body", int64(*m.AbiVersion), 65535, false); err != nil {
+	if err := m.AbiVersion.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("abi_version")
+		}
 		return err
 	}
 
@@ -125,7 +109,10 @@ func (m *ContractObject) validateActive(formats strfmt.Registry) error {
 
 func (m *ContractObject) validateDeposit(formats strfmt.Registry) error {
 
-	if err := validate.Required("deposit", "body", m.Deposit); err != nil {
+	if err := m.Deposit.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("deposit")
+		}
 		return err
 	}
 
@@ -138,15 +125,6 @@ func (m *ContractObject) validateID(formats strfmt.Registry) error {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("id")
 		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *ContractObject) validateLog(formats strfmt.Registry) error {
-
-	if err := validate.Required("log", "body", m.Log); err != nil {
 		return err
 	}
 
@@ -187,15 +165,10 @@ func (m *ContractObject) validateReferrerIds(formats strfmt.Registry) error {
 
 func (m *ContractObject) validateVMVersion(formats strfmt.Registry) error {
 
-	if err := validate.Required("vm_version", "body", m.VMVersion); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("vm_version", "body", int64(*m.VMVersion), 0, false); err != nil {
-		return err
-	}
-
-	if err := validate.MaximumInt("vm_version", "body", int64(*m.VMVersion), 65535, false); err != nil {
+	if err := m.VMVersion.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("vm_version")
+		}
 		return err
 	}
 

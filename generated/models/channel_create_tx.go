@@ -10,7 +10,6 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 
 	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
@@ -33,16 +32,14 @@ type ChannelCreateTx struct {
 
 	// initiator id
 	// Required: true
-	InitiatorID EncodedHash `json:"initiator_id"`
+	InitiatorID EncodedPubkey `json:"initiator_id"`
 
 	// lock period
 	// Required: true
-	// Minimum: 0
-	LockPeriod *uint64 `json:"lock_period"`
+	LockPeriod Uint64 `json:"lock_period"`
 
 	// nonce
-	// Minimum: 0
-	Nonce *uint64 `json:"nonce,omitempty"`
+	Nonce Uint64 `json:"nonce,omitempty"`
 
 	// push amount
 	// Required: true
@@ -54,15 +51,14 @@ type ChannelCreateTx struct {
 
 	// responder id
 	// Required: true
-	ResponderID EncodedHash `json:"responder_id"`
+	ResponderID EncodedPubkey `json:"responder_id"`
 
 	// Root hash of the channel's internal state tree
 	// Required: true
 	StateHash EncodedHash `json:"state_hash"`
 
 	// ttl
-	// Minimum: 0
-	TTL *uint64 `json:"ttl,omitempty"`
+	TTL Uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this channel create tx
@@ -169,11 +165,10 @@ func (m *ChannelCreateTx) validateInitiatorID(formats strfmt.Registry) error {
 
 func (m *ChannelCreateTx) validateLockPeriod(formats strfmt.Registry) error {
 
-	if err := validate.Required("lock_period", "body", m.LockPeriod); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("lock_period", "body", int64(*m.LockPeriod), 0, false); err != nil {
+	if err := m.LockPeriod.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("lock_period")
+		}
 		return err
 	}
 
@@ -186,7 +181,10 @@ func (m *ChannelCreateTx) validateNonce(formats strfmt.Registry) error {
 		return nil
 	}
 
-	if err := validate.MinimumInt("nonce", "body", int64(*m.Nonce), 0, false); err != nil {
+	if err := m.Nonce.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("nonce")
+		}
 		return err
 	}
 
@@ -247,7 +245,10 @@ func (m *ChannelCreateTx) validateTTL(formats strfmt.Registry) error {
 		return nil
 	}
 
-	if err := validate.MinimumInt("ttl", "body", int64(*m.TTL), 0, false); err != nil {
+	if err := m.TTL.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("ttl")
+		}
 		return err
 	}
 

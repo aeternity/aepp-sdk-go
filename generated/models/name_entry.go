@@ -21,7 +21,7 @@ type NameEntry struct {
 
 	// id
 	// Required: true
-	ID EncodedHash `json:"id"`
+	ID EncodedValue `json:"id"`
 
 	// pointers
 	// Required: true
@@ -29,7 +29,7 @@ type NameEntry struct {
 
 	// ttl
 	// Required: true
-	TTL *uint64 `json:"ttl"`
+	TTL Uint64 `json:"ttl"`
 }
 
 // Validate validates this name entry
@@ -93,7 +93,10 @@ func (m *NameEntry) validatePointers(formats strfmt.Registry) error {
 
 func (m *NameEntry) validateTTL(formats strfmt.Registry) error {
 
-	if err := validate.Required("ttl", "body", m.TTL); err != nil {
+	if err := m.TTL.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("ttl")
+		}
 		return err
 	}
 

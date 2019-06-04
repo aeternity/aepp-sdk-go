@@ -9,11 +9,11 @@ import (
 	strfmt "github.com/go-openapi/strfmt"
 )
 
-// EncodedHash Base58Check encoded tagged hash
-// swagger:model EncodedHash
-type EncodedHash string
+// Uint64 uint64
+// swagger:model UInt64
+type Uint64 uint64
 
-// Validate validates this encoded hash
-func (m EncodedHash) Validate(formats strfmt.Registry) error {
+// Validate validates this uint64
+func (m Uint64) Validate(formats strfmt.Registry) error {
 	return nil
 }

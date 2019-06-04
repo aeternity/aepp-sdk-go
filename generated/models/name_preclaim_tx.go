@@ -20,21 +20,21 @@ type NamePreclaimTx struct {
 
 	// account id
 	// Required: true
-	AccountID EncodedHash `json:"account_id"`
+	AccountID EncodedPubkey `json:"account_id"`
 
 	// commitment id
 	// Required: true
-	CommitmentID EncodedHash `json:"commitment_id"`
+	CommitmentID EncodedValue `json:"commitment_id"`
 
 	// fee
 	// Required: true
 	Fee utils.BigInt `json:"fee"`
 
 	// nonce
-	Nonce uint64 `json:"nonce,omitempty"`
+	Nonce Uint64 `json:"nonce,omitempty"`
 
 	// ttl
-	TTL uint64 `json:"ttl,omitempty"`
+	TTL Uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this name preclaim tx
@@ -50,6 +50,14 @@ func (m *NamePreclaimTx) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateFee(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateNonce(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateTTL(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -88,6 +96,38 @@ func (m *NamePreclaimTx) validateFee(formats strfmt.Registry) error {
 	if err := m.Fee.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("fee")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *NamePreclaimTx) validateNonce(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Nonce) { // not required
+		return nil
+	}
+
+	if err := m.Nonce.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("nonce")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *NamePreclaimTx) validateTTL(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.TTL) { // not required
+		return nil
+	}
+
+	if err := m.TTL.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("ttl")
 		}
 		return err
 	}

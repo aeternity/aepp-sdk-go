@@ -10,9 +10,10 @@ import (
 	"io"
 
 	"github.com/go-openapi/runtime"
-	"github.com/go-openapi/swag"
 
 	strfmt "github.com/go-openapi/strfmt"
+
+	models "github.com/aeternity/aepp-sdk-go/generated/models"
 )
 
 // GetPeerPubkeyReader is a Reader for the GetPeerPubkey structure.
@@ -46,7 +47,7 @@ func NewGetPeerPubkeyOK() *GetPeerPubkeyOK {
 Successful operation
 */
 type GetPeerPubkeyOK struct {
-	Payload *GetPeerPubkeyOKBody
+	Payload *models.PeerPubKey
 }
 
 func (o *GetPeerPubkeyOK) Error() string {
@@ -55,44 +56,12 @@ func (o *GetPeerPubkeyOK) Error() string {
 
 func (o *GetPeerPubkeyOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(GetPeerPubkeyOKBody)
+	o.Payload = new(models.PeerPubKey)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
 		return err
 	}
 
-	return nil
-}
-
-/*GetPeerPubkeyOKBody get peer pubkey o k body
-swagger:model GetPeerPubkeyOKBody
-*/
-type GetPeerPubkeyOKBody struct {
-
-	// pubkey
-	Pubkey string `json:"pubkey,omitempty"`
-}
-
-// Validate validates this get peer pubkey o k body
-func (o *GetPeerPubkeyOKBody) Validate(formats strfmt.Registry) error {
-	return nil
-}
-
-// MarshalBinary interface implementation
-func (o *GetPeerPubkeyOKBody) MarshalBinary() ([]byte, error) {
-	if o == nil {
-		return nil, nil
-	}
-	return swag.WriteJSON(o)
-}
-
-// UnmarshalBinary interface implementation
-func (o *GetPeerPubkeyOKBody) UnmarshalBinary(b []byte) error {
-	var res GetPeerPubkeyOKBody
-	if err := swag.ReadJSON(b, &res); err != nil {
-		return err
-	}
-	*o = res
 	return nil
 }

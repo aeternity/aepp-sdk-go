@@ -10,7 +10,6 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 
 	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
@@ -20,9 +19,8 @@ import (
 type ContractCallTx struct {
 
 	// ABI version
-	// Maximum: 65535
-	// Minimum: 0
-	AbiVersion *uint64 `json:"abi_version,omitempty"`
+	// Required: true
+	AbiVersion Uint16 `json:"abi_version"`
 
 	// amount
 	// Required: true
@@ -34,11 +32,11 @@ type ContractCallTx struct {
 
 	// Contract caller pub_key
 	// Required: true
-	CallerID EncodedHash `json:"caller_id"`
+	CallerID EncodedPubkey `json:"caller_id"`
 
 	// Contract's pub_key
 	// Required: true
-	ContractID EncodedHash `json:"contract_id"`
+	ContractID EncodedPubkey `json:"contract_id"`
 
 	// fee
 	// Required: true
@@ -46,23 +44,17 @@ type ContractCallTx struct {
 
 	// gas
 	// Required: true
-	Gas utils.BigInt `json:"gas"`
+	Gas Uint64 `json:"gas"`
 
 	// gas price
 	// Required: true
 	GasPrice utils.BigInt `json:"gas_price"`
 
 	// Caller's nonce
-	Nonce uint64 `json:"nonce,omitempty"`
+	Nonce Uint64 `json:"nonce,omitempty"`
 
-	// Transaction TTL
-	// Minimum: 0
-	TTL *uint64 `json:"ttl,omitempty"`
-
-	// VM version
-	// Maximum: 65535
-	// Minimum: 0
-	VMVersion *uint64 `json:"vm_version,omitempty"`
+	// ttl
+	TTL Uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this contract call tx
@@ -101,11 +93,11 @@ func (m *ContractCallTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateTTL(formats); err != nil {
+	if err := m.validateNonce(formats); err != nil {
 		res = append(res, err)
 	}
 
-	if err := m.validateVMVersion(formats); err != nil {
+	if err := m.validateTTL(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -117,15 +109,10 @@ func (m *ContractCallTx) Validate(formats strfmt.Registry) error {
 
 func (m *ContractCallTx) validateAbiVersion(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.AbiVersion) { // not required
-		return nil
-	}
-
-	if err := validate.MinimumInt("abi_version", "body", int64(*m.AbiVersion), 0, false); err != nil {
-		return err
-	}
-
-	if err := validate.MaximumInt("abi_version", "body", int64(*m.AbiVersion), 65535, false); err != nil {
+	if err := m.AbiVersion.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("abi_version")
+		}
 		return err
 	}
 
@@ -216,30 +203,32 @@ func (m *ContractCallTx) validateGasPrice(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractCallTx) validateTTL(formats strfmt.Registry) error {
+func (m *ContractCallTx) validateNonce(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.TTL) { // not required
+	if swag.IsZero(m.Nonce) { // not required
 		return nil
 	}
 
-	if err := validate.MinimumInt("ttl", "body", int64(*m.TTL), 0, false); err != nil {
+	if err := m.Nonce.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("nonce")
+		}
 		return err
 	}
 
 	return nil
 }
 
-func (m *ContractCallTx) validateVMVersion(formats strfmt.Registry) error {
+func (m *ContractCallTx) validateTTL(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.VMVersion) { // not required
+	if swag.IsZero(m.TTL) { // not required
 		return nil
 	}
 
-	if err := validate.MinimumInt("vm_version", "body", int64(*m.VMVersion), 0, false); err != nil {
-		return err
-	}
-
-	if err := validate.MaximumInt("vm_version", "body", int64(*m.VMVersion), 65535, false); err != nil {
+	if err := m.TTL.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("ttl")
+		}
 		return err
 	}
 

@@ -25,11 +25,11 @@ type OracleQuery struct {
 
 	// id
 	// Required: true
-	ID EncodedHash `json:"id"`
+	ID EncodedValue `json:"id"`
 
 	// oracle id
 	// Required: true
-	OracleID EncodedHash `json:"oracle_id"`
+	OracleID EncodedPubkey `json:"oracle_id"`
 
 	// query
 	// Required: true
@@ -45,16 +45,15 @@ type OracleQuery struct {
 
 	// sender id
 	// Required: true
-	SenderID EncodedHash `json:"sender_id"`
+	SenderID EncodedPubkey `json:"sender_id"`
 
 	// sender nonce
 	// Required: true
-	// Minimum: 0
-	SenderNonce *uint64 `json:"sender_nonce"`
+	SenderNonce Uint64 `json:"sender_nonce"`
 
 	// ttl
 	// Required: true
-	TTL *uint64 `json:"ttl"`
+	TTL Uint64 `json:"ttl"`
 }
 
 // Validate validates this oracle query
@@ -189,11 +188,10 @@ func (m *OracleQuery) validateSenderID(formats strfmt.Registry) error {
 
 func (m *OracleQuery) validateSenderNonce(formats strfmt.Registry) error {
 
-	if err := validate.Required("sender_nonce", "body", m.SenderNonce); err != nil {
-		return err
-	}
-
-	if err := validate.MinimumInt("sender_nonce", "body", int64(*m.SenderNonce), 0, false); err != nil {
+	if err := m.SenderNonce.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("sender_nonce")
+		}
 		return err
 	}
 
@@ -202,7 +200,10 @@ func (m *OracleQuery) validateSenderNonce(formats strfmt.Registry) error {
 
 func (m *OracleQuery) validateTTL(formats strfmt.Registry) error {
 
-	if err := validate.Required("ttl", "body", m.TTL); err != nil {
+	if err := m.TTL.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("ttl")
+		}
 		return err
 	}
 

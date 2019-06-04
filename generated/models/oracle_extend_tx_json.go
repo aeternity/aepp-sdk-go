@@ -13,20 +13,19 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 )
 
 // OracleExtendTxJSON oracle extend tx JSON
 // swagger:model OracleExtendTxJSON
 type OracleExtendTxJSON struct {
-	versionField *uint64
+	versionField Uint32
 
 	OracleExtendTx
 }
 
 // Type gets the type of this subtype
 func (m *OracleExtendTxJSON) Type() string {
-	return "OracleExtendTx"
+	return "OracleExtendTxJSON"
 }
 
 // SetType sets the type of this subtype
@@ -35,12 +34,12 @@ func (m *OracleExtendTxJSON) SetType(val string) {
 }
 
 // Version gets the version of this subtype
-func (m *OracleExtendTxJSON) Version() *uint64 {
+func (m *OracleExtendTxJSON) Version() Uint32 {
 	return m.versionField
 }
 
 // SetVersion sets the version of this subtype
-func (m *OracleExtendTxJSON) SetVersion(val *uint64) {
+func (m *OracleExtendTxJSON) SetVersion(val Uint32) {
 	m.versionField = val
 }
 
@@ -62,7 +61,7 @@ func (m *OracleExtendTxJSON) UnmarshalJSON(raw []byte) error {
 
 		Type string `json:"type"`
 
-		Version *uint64 `json:"version"`
+		Version Uint32 `json:"version"`
 	}
 	buf = bytes.NewBuffer(raw)
 	dec = json.NewDecoder(buf)
@@ -105,7 +104,7 @@ func (m OracleExtendTxJSON) MarshalJSON() ([]byte, error) {
 	b2, err = json.Marshal(struct {
 		Type string `json:"type"`
 
-		Version *uint64 `json:"version"`
+		Version Uint32 `json:"version"`
 	}{
 
 		Type: m.Type(),
@@ -141,7 +140,10 @@ func (m *OracleExtendTxJSON) Validate(formats strfmt.Registry) error {
 
 func (m *OracleExtendTxJSON) validateVersion(formats strfmt.Registry) error {
 
-	if err := validate.Required("version", "body", m.Version()); err != nil {
+	if err := m.Version().Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("version")
+		}
 		return err
 	}
 
