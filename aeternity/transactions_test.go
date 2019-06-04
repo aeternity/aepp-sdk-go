@@ -445,7 +445,6 @@ func TestOracleRegisterTx_RLP(t *testing.T) {
 		oracleTTLType  uint64
 		oracleTTLValue uint64
 		abiVersion     uint64
-		vmVersion      uint64
 		txFee          big.Int
 		txTTL          uint64
 	}
@@ -466,7 +465,6 @@ func TestOracleRegisterTx_RLP(t *testing.T) {
 				oracleTTLType:  uint64(0),
 				oracleTTLValue: uint64(100),
 				abiVersion:     uint64(0),
-				vmVersion:      uint64(0),
 				txFee:          *utils.NewIntFromUint64(0),
 				txTTL:          500,
 			},
@@ -484,7 +482,6 @@ func TestOracleRegisterTx_RLP(t *testing.T) {
 				oracleTTLType:  0,
 				oracleTTLValue: uint64(100),
 				abiVersion:     uint64(1),
-				vmVersion:      uint64(0),
 				txFee:          *utils.RequireIntFromString("200000000000000"),
 				txTTL:          500,
 			},
@@ -503,7 +500,6 @@ func TestOracleRegisterTx_RLP(t *testing.T) {
 				oracleTTLType:  0,
 				oracleTTLValue: uint64(100),
 				abiVersion:     uint64(0),
-				vmVersion:      uint64(0),
 				txFee:          Config.Client.Fee,
 				txTTL:          uint64(50000),
 			},
@@ -523,7 +519,6 @@ func TestOracleRegisterTx_RLP(t *testing.T) {
 				tt.fields.oracleTTLType,
 				tt.fields.oracleTTLValue,
 				tt.fields.abiVersion,
-				tt.fields.vmVersion,
 				tt.fields.txFee,
 				tt.fields.txTTL,
 			)
@@ -773,7 +768,7 @@ func TestContractCreateTx_RLP(t *testing.T) {
 		Code         string
 		VMVersion    uint64
 		AbiVersion   uint64
-		Deposit      uint64
+		Deposit      big.Int
 		Amount       big.Int
 		Gas          big.Int
 		GasPrice     big.Int
@@ -796,7 +791,7 @@ func TestContractCreateTx_RLP(t *testing.T) {
 				Code:       `cb_+QP1RgKgpVq1Ib2r2ug+UktHvfWSQ8P35HJQHM6qikqBu1DwgtT5Avv5ASqgaPJnYzj/UIg5q6R3Se/6i+h+8oTyB/s9mZhwHNU4h8WEbWFpbrjAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKD//////////////////////////////////////////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+QHLoLnJVvKLMUmp9Zh6pQXz2hsiCcxXOSNABiu2wb2fn5nqhGluaXS4YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//////////////////////////////////////////7kBQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEA//////////////////////////////////////////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA///////////////////////////////////////////uMxiAABkYgAAhJGAgIBRf7nJVvKLMUmp9Zh6pQXz2hsiCcxXOSNABiu2wb2fn5nqFGIAAMBXUIBRf2jyZ2M4/1CIOaukd0nv+ovofvKE8gf7PZmYcBzVOIfFFGIAAK9XUGABGVEAW2AAGVlgIAGQgVJgIJADYAOBUpBZYABRWVJgAFJgAPNbYACAUmAA81tZWWAgAZCBUmAgkANgABlZYCABkIFSYCCQA2ADgVKBUpBWW2AgAVFRWVCAkVBQgJBQkFZbUFCCkVBQYgAAjFaFMi4xLjBJtQib`,
 				VMVersion:  uint64(3),
 				AbiVersion: uint64(1),
-				Deposit:    0,
+				Deposit:    *new(big.Int),
 				Amount:     *new(big.Int),
 				Gas:        *utils.NewIntFromUint64(1e9),
 				GasPrice:   *utils.NewIntFromUint64(1e9),
@@ -816,7 +811,7 @@ func TestContractCreateTx_RLP(t *testing.T) {
 				Code:       `cb_+QP1RgKgpVq1Ib2r2ug+UktHvfWSQ8P35HJQHM6qikqBu1DwgtT5Avv5ASqgaPJnYzj/UIg5q6R3Se/6i+h+8oTyB/s9mZhwHNU4h8WEbWFpbrjAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKD//////////////////////////////////////////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+QHLoLnJVvKLMUmp9Zh6pQXz2hsiCcxXOSNABiu2wb2fn5nqhGluaXS4YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//////////////////////////////////////////7kBQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEA//////////////////////////////////////////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA///////////////////////////////////////////uMxiAABkYgAAhJGAgIBRf7nJVvKLMUmp9Zh6pQXz2hsiCcxXOSNABiu2wb2fn5nqFGIAAMBXUIBRf2jyZ2M4/1CIOaukd0nv+ovofvKE8gf7PZmYcBzVOIfFFGIAAK9XUGABGVEAW2AAGVlgIAGQgVJgIJADYAOBUpBZYABRWVJgAFJgAPNbYACAUmAA81tZWWAgAZCBUmAgkANgABlZYCABkIFSYCCQA2ADgVKBUpBWW2AgAVFRWVCAkVBQgJBQkFZbUFCCkVBQYgAAjFaFMi4xLjBJtQib`,
 				VMVersion:  uint64(4),
 				AbiVersion: uint64(1),
-				Deposit:    0,
+				Deposit:    *new(big.Int),
 				Amount:     *new(big.Int),
 				Gas:        *utils.NewIntFromUint64(1e9),
 				GasPrice:   *utils.NewIntFromUint64(1e9),
@@ -887,7 +882,7 @@ func TestContractCreateTx_FeeEstimate(t *testing.T) {
 		Code         string
 		VMVersion    uint64
 		AbiVersion   uint64
-		Deposit      uint64
+		Deposit      big.Int
 		Amount       big.Int
 		Gas          big.Int
 		GasPrice     big.Int
@@ -909,7 +904,7 @@ func TestContractCreateTx_FeeEstimate(t *testing.T) {
 				Code:       `cb_+QYYRgKgf6Gy7VnRXycsYSiFGAUHhMs+Oeg+RJvmPzCSAnxk8LT5BKX5AUmgOoWULXtHOgf10E7h2cFqXOqxa3kc6pKJYRpEw/nlugeDc2V0uMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoP//////////////////////////////////////////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC4YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///////////////////////////////////////////jJoEnsSQdsAgNxJqQzA+rc5DsuLDKUV7ETxQp+ItyJgJS3g2dldLhgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA///////////////////////////////////////////uEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+QKLoOIjHWzfyTkW3kyzqYV79lz0D8JW9KFJiz9+fJgMGZNEhGluaXS4wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACg//////////////////////////////////////////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALkBoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEA//////////////////////////////////////////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYD//////////////////////////////////////////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuQFEYgAAj2IAAMKRgICAUX9J7EkHbAIDcSakMwPq3OQ7LiwylFexE8UKfiLciYCUtxRiAAE5V1CAgFF/4iMdbN/JORbeTLOphXv2XPQPwlb0oUmLP358mAwZk0QUYgAA0VdQgFF/OoWULXtHOgf10E7h2cFqXOqxa3kc6pKJYRpEw/nlugcUYgABG1dQYAEZUQBbYAAZWWAgAZCBUmAgkANgAFmQgVKBUllgIAGQgVJgIJADYAOBUpBZYABRWVJgAFJgAPNbYACAUmAA81tgAFFRkFZbYCABUVGQUIOSUICRUFCAWZCBUllgIAGQgVJgIJADYAAZWWAgAZCBUmAgkANgAFmQgVKBUllgIAGQgVJgIJADYAOBUoFSkFCQVltgIAFRUVlQgJFQUGAAUYFZkIFSkFBgAFJZkFCQVltQUFlQUGIAAMpWhTIuMS4w4SWVhA==`,
 				VMVersion:  3,
 				AbiVersion: 1,
-				Deposit:    0,
+				Deposit:    *new(big.Int),
 				Amount:     *new(big.Int),
 				Gas:        *utils.NewIntFromUint64(1e9),
 				GasPrice:   *utils.NewIntFromUint64(1e9),
@@ -959,7 +954,6 @@ func TestContractCallTx_RLP(t *testing.T) {
 		Gas          big.Int
 		GasPrice     big.Int
 		AbiVersion   uint64
-		VMVersion    uint64
 		CallData     string
 		Fee          big.Int
 		TTL          uint64
@@ -980,7 +974,6 @@ func TestContractCallTx_RLP(t *testing.T) {
 				Gas:          *utils.NewIntFromUint64(10),
 				GasPrice:     *utils.NewIntFromUint64(10),
 				AbiVersion:   uint64(3),
-				VMVersion:    uint64(1),
 				CallData:     "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACDiIx1s38k5Ft5Ms6mFe/Zc9A/CVvShSYs/fnyYDBmTRAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACo7j+li",
 				Fee:          *utils.RequireIntFromString("200000000000000"),
 				TTL:          500,
@@ -998,7 +991,6 @@ func TestContractCallTx_RLP(t *testing.T) {
 				Gas:          *utils.NewIntFromUint64(1e9),
 				GasPrice:     *utils.NewIntFromUint64(1e9),
 				AbiVersion:   uint64(4),
-				VMVersion:    uint64(1),
 				CallData:     "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACDiIx1s38k5Ft5Ms6mFe/Zc9A/CVvShSYs/fnyYDBmTRAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACo7j+li",
 				Fee:          *utils.RequireIntFromString("200000000000000"),
 				TTL:          500,
@@ -1016,7 +1008,6 @@ func TestContractCallTx_RLP(t *testing.T) {
 				Gas:          Config.Client.Contracts.Gas,
 				GasPrice:     Config.Client.Contracts.GasPrice,
 				AbiVersion:   Config.Client.Contracts.ABIVersion,
-				VMVersion:    Config.Client.Contracts.VMVersion,
 				CallData:     "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACDiIx1s38k5Ft5Ms6mFe/Zc9A/CVvShSYs/fnyYDBmTRAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACo7j+li",
 				Fee:          Config.Client.Fee,
 				TTL:          Config.Client.TTL,
@@ -1035,7 +1026,6 @@ func TestContractCallTx_RLP(t *testing.T) {
 				Gas:          tt.fields.Gas,
 				GasPrice:     tt.fields.GasPrice,
 				AbiVersion:   tt.fields.AbiVersion,
-				VMVersion:    tt.fields.VMVersion,
 				CallData:     tt.fields.CallData,
 				Fee:          tt.fields.Fee,
 				TTL:          tt.fields.TTL,
@@ -1085,7 +1075,6 @@ func TestContractCallTx_FeeEstimate(t *testing.T) {
 				Gas:          *utils.NewIntFromUint64(1e5),
 				GasPrice:     *utils.NewIntFromUint64(1e9),
 				AbiVersion:   uint64(4),
-				VMVersion:    uint64(1),
 				CallData:     "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACDiIx1s38k5Ft5Ms6mFe/Zc9A/CVvShSYs/fnyYDBmTRAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACo7j+li",
 				Fee:          *utils.NewIntFromUint64(2e9),
 				TTL:          0,
@@ -1103,7 +1092,6 @@ func TestContractCallTx_FeeEstimate(t *testing.T) {
 				Gas:          tt.fields.Gas,
 				GasPrice:     tt.fields.GasPrice,
 				AbiVersion:   tt.fields.AbiVersion,
-				VMVersion:    tt.fields.VMVersion,
 				CallData:     tt.fields.CallData,
 				Fee:          tt.fields.Fee,
 				TTL:          tt.fields.TTL,

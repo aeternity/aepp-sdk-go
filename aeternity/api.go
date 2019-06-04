@@ -32,7 +32,7 @@ func (ae *Client) APIPostTransaction(signedEncodedTx, signedEncodedTxHash string
 // postTransaction post a transaction to the chain
 func postTransaction(node *Client, signedEncodedTx, signedEncodedTxHash string) (err error) {
 	p := external.NewPostTransactionParams().WithBody(&models.Tx{
-		Tx: &signedEncodedTx,
+		Tx: models.EncodedByteArray(signedEncodedTx),
 	})
 	r, err := node.External.PostTransaction(p)
 	if err != nil {
@@ -56,10 +56,10 @@ func (ae *Client) APIGetHeight() (height uint64, err error) {
 		return
 	}
 	if tb.KeyBlock == nil {
-		height = *tb.MicroBlock.Height
+		height = uint64(tb.MicroBlock.Height)
 		return
 	}
-	height = *tb.KeyBlock.Height
+	height = uint64(tb.KeyBlock.Height)
 	return
 }
 
