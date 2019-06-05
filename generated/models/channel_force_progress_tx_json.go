@@ -25,7 +25,7 @@ type ChannelForceProgressTxJSON struct {
 
 // Type gets the type of this subtype
 func (m *ChannelForceProgressTxJSON) Type() string {
-	return "ChannelForceProgressTxJSON"
+	return "ChannelForceProgressTx"
 }
 
 // SetType sets the type of this subtype
