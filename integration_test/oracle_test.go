@@ -18,7 +18,7 @@ func TestOracleWorkflow(t *testing.T) {
 
 	// Register
 	queryFee := utils.NewIntFromUint64(1000)
-	register, err := oracleAlice.OracleRegisterTx("hello", "helloback", *queryFee, 0, 100, 0, 0)
+	register, err := oracleAlice.OracleRegisterTx("hello", "helloback", *queryFee, uint64(0), uint64(100), uint64(0))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -39,7 +39,7 @@ func TestOracleWorkflow(t *testing.T) {
 
 	// Extend
 	// save the oracle's initial TTL so we can compare it with after OracleExtendTx
-	oracleTTL := *oracle.TTL
+	oracleTTL := oracle.TTL
 	extend, err := oracleAlice.OracleExtendTx(oraclePubKey, 0, 1000)
 	if err != nil {
 		t.Fatal(err)
@@ -53,8 +53,8 @@ func TestOracleWorkflow(t *testing.T) {
 	if err != nil {
 		t.Fatalf("APIGetOracleByPubkey: %s", err)
 	}
-	if *oracle.TTL == oracleTTL {
-		t.Fatalf("The Oracle's TTL did not change after OracleExtendTx. Got %v but expected %v", *oracle.TTL, oracleTTL)
+	if oracle.TTL == oracleTTL {
+		t.Fatalf("The Oracle's TTL did not change after OracleExtendTx. Got %v but expected %v", oracle.TTL, oracleTTL)
 	}
 
 	// Query
