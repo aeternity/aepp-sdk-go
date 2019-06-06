@@ -21,7 +21,7 @@ func TestSpendTx(t *testing.T) {
 
 	// In case the recipient account already has funds, get recipient's account info. If it exists, expectedAmount = existing balance + amount + fee
 	expected := new(big.Int)
-	bobState, err := node.APIGetAccount(bob.Address)
+	bobState, err := node.GetAccount(bob.Address)
 	if err != nil {
 		expected.Set(amount)
 	} else {
@@ -46,7 +46,7 @@ func TestSpendTx(t *testing.T) {
 	// check the recipient's balance
 
 	getBobsAccount := func() {
-		bobState, err = node.APIGetAccount(bob.Address)
+		bobState, err = node.GetAccount(bob.Address)
 		if err != nil {
 			t.Fatalf("Couldn't get Bob's account data: %v", err)
 		}

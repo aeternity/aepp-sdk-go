@@ -62,7 +62,7 @@ func delay(f delayableCode) {
 }
 
 func getHeight(aeClient *aeternity.Client) (h uint64) {
-	h, err := aeClient.APIGetHeight()
+	h, err := aeClient.GetHeight()
 	if err != nil {
 		fmt.Println("Could not retrieve chain height")
 		return

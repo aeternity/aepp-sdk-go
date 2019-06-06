@@ -33,7 +33,7 @@ func TestContracts(t *testing.T) {
 
 	// Confirm that contract was created
 	getContract := func() {
-		_, err = aeClient.APIGetContractByID(ctID)
+		_, err = aeClient.GetContractByID(ctID)
 		if err != nil {
 			t.Fatal(err)
 		}

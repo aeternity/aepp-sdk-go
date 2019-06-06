@@ -30,7 +30,7 @@ func TestOracleWorkflow(t *testing.T) {
 	oraclePubKey := strings.Replace(alice.Address, "ak_", "ok_", 1)
 	var oracle *models.RegisteredOracle
 	getOracle := func() {
-		oracle, err = client.APIGetOracleByPubkey(oraclePubKey)
+		oracle, err = client.GetOracleByPubkey(oraclePubKey)
 		if err != nil {
 			t.Fatalf("APIGetOracleByPubkey: %s", err)
 		}
@@ -49,7 +49,7 @@ func TestOracleWorkflow(t *testing.T) {
 	_ = waitForTransaction(client, extendHash)
 
 	// Confirm that the oracle's TTL changed
-	oracle, err = client.APIGetOracleByPubkey(oraclePubKey)
+	oracle, err = client.GetOracleByPubkey(oraclePubKey)
 	if err != nil {
 		t.Fatalf("APIGetOracleByPubkey: %s", err)
 	}
@@ -71,7 +71,7 @@ func TestOracleWorkflow(t *testing.T) {
 
 	var oracleQueries *models.OracleQueries
 	getOracleQueries := func() {
-		oracleQueries, err = client.APIGetOracleQueriesByPubkey(oraclePubKey)
+		oracleQueries, err = client.GetOracleQueriesByPubkey(oraclePubKey)
 		if err != nil {
 			t.Fatalf("APIGetOracleQueriesByPubkey: %s", err)
 		}
