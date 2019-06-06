@@ -71,7 +71,7 @@ func inspectFunc(cmd *cobra.Command, args []string) (err error) {
 		}
 		// name
 		if strings.HasSuffix(object, ".aet") {
-			v, err := aeCli.APIGetNameEntryByName(object)
+			v, err := aeCli.GetNameEntryByName(object)
 			if err != nil {
 				return err
 			}
@@ -82,7 +82,7 @@ func inspectFunc(cmd *cobra.Command, args []string) (err error) {
 		switch aeternity.GetHashPrefix(object) {
 		case aeternity.PrefixAccountPubkey:
 			// account balance
-			v, err := aeCli.APIGetAccount(object)
+			v, err := aeCli.GetAccount(object)
 			if err != nil {
 				return err
 			}
@@ -90,12 +90,12 @@ func inspectFunc(cmd *cobra.Command, args []string) (err error) {
 			printResult("account", v, err)
 
 		case aeternity.PrefixMicroBlockHash:
-			v, err := aeCli.APIGetMicroBlockHeaderByHash(object)
+			v, err := aeCli.GetMicroBlockHeaderByHash(object)
 			if err != nil {
 				return err
 			}
 			printResult("block", v, err)
-			v1, err := aeCli.APIGetMicroBlockTransactionsByHash(object)
+			v1, err := aeCli.GetMicroBlockTransactionsByHash(object)
 			if err != nil {
 				return err
 			}
@@ -103,7 +103,7 @@ func inspectFunc(cmd *cobra.Command, args []string) (err error) {
 
 		case aeternity.PrefixKeyBlockHash:
 			// block
-			v, err := aeCli.APIGetKeyBlockByHash(object)
+			v, err := aeCli.GetKeyBlockByHash(object)
 			if err != nil {
 				return err
 			}
@@ -111,7 +111,7 @@ func inspectFunc(cmd *cobra.Command, args []string) (err error) {
 
 		case aeternity.PrefixTransactionHash:
 			// transaction
-			v, err := aeCli.APIGetTransactionByHash(object)
+			v, err := aeCli.GetTransactionByHash(object)
 			if err != nil {
 				return err
 			}
@@ -119,7 +119,7 @@ func inspectFunc(cmd *cobra.Command, args []string) (err error) {
 
 		case aeternity.PrefixOraclePubkey:
 			// oracle
-			v, err := aeCli.APIGetOracleByPubkey(object)
+			v, err := aeCli.GetOracleByPubkey(object)
 			if err != nil {
 				return err
 			}

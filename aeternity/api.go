@@ -7,11 +7,8 @@ import (
 	"github.com/aeternity/aepp-sdk-go/generated/models"
 )
 
-// Ae.API*() methods are the stable interface to Go code that uses this SDK.
-// Logic implementation is handled by the unexported functions.
-
-// APIGetStatus post transaction
-func (ae *Client) APIGetStatus() (status *models.Status, err error) {
+// GetStatus post transaction
+func (ae *Client) GetStatus() (status *models.Status, err error) {
 	return getStatus(ae)
 }
 
@@ -24,8 +21,8 @@ func getStatus(node *Client) (status *models.Status, err error) {
 	return
 }
 
-// APIPostTransaction post transaction
-func (ae *Client) APIPostTransaction(signedEncodedTx, signedEncodedTxHash string) (err error) {
+// PostTransaction post transaction
+func (ae *Client) PostTransaction(signedEncodedTx, signedEncodedTxHash string) (err error) {
 	return postTransaction(ae, signedEncodedTx, signedEncodedTxHash)
 }
 
@@ -44,13 +41,13 @@ func postTransaction(node *Client, signedEncodedTx, signedEncodedTxHash string) 
 	return
 }
 
-// APIGetTopBlock get the top block of the chain
-func (ae *Client) APIGetTopBlock() (kb *models.KeyBlockOrMicroBlockHeader, err error) {
+// GetTopBlock get the top block of the chain
+func (ae *Client) GetTopBlock() (kb *models.KeyBlockOrMicroBlockHeader, err error) {
 	return getTopBlock(ae)
 }
 
-// APIGetHeight get the height of the chain
-func (ae *Client) APIGetHeight() (height uint64, err error) {
+// GetHeight get the height of the chain
+func (ae *Client) GetHeight() (height uint64, err error) {
 	tb, err := getTopBlock(ae)
 	if err != nil {
 		return
@@ -75,8 +72,8 @@ func getTopBlock(node *Client) (kb *models.KeyBlockOrMicroBlockHeader, err error
 	return
 }
 
-// APIGetCurrentKeyBlock get current key block
-func (ae *Client) APIGetCurrentKeyBlock() (kb *models.KeyBlock, err error) {
+// GetCurrentKeyBlock get current key block
+func (ae *Client) GetCurrentKeyBlock() (kb *models.KeyBlock, err error) {
 	return getCurrentKeyBlock(ae)
 }
 
@@ -90,8 +87,8 @@ func getCurrentKeyBlock(node *Client) (kb *models.KeyBlock, err error) {
 	return
 }
 
-// APIGetAccount return the account
-func (ae *Client) APIGetAccount(accountID string) (account *models.Account, err error) {
+// GetAccount return the account
+func (ae *Client) GetAccount(accountID string) (account *models.Account, err error) {
 	return getAccount(ae, accountID)
 }
 
@@ -108,8 +105,8 @@ func getAccount(node *Client, accountID string) (account *models.Account, err er
 	return
 }
 
-// APIGetNameEntryByName return the name entry
-func (ae *Client) APIGetNameEntryByName(name string) (nameEntry *models.NameEntry, err error) {
+// GetNameEntryByName return the name entry
+func (ae *Client) GetNameEntryByName(name string) (nameEntry *models.NameEntry, err error) {
 	return getNameEntryByName(ae, name)
 }
 
@@ -126,8 +123,8 @@ func getNameEntryByName(node *Client, name string) (nameEntry *models.NameEntry,
 	return
 }
 
-// APIGetMicroBlockTransactionsByHash get the transactions of a microblock
-func (ae *Client) APIGetMicroBlockTransactionsByHash(microBlockID string) (txs *models.GenericTxs, err error) {
+// GetMicroBlockTransactionsByHash get the transactions of a microblock
+func (ae *Client) GetMicroBlockTransactionsByHash(microBlockID string) (txs *models.GenericTxs, err error) {
 	return getMicroBlockTransactionsByHash(ae, microBlockID)
 }
 
@@ -142,8 +139,8 @@ func getMicroBlockTransactionsByHash(node *Client, microBlockID string) (txs *mo
 	return
 }
 
-// APIGetMicroBlockHeaderByHash get the header of a micro block
-func (ae *Client) APIGetMicroBlockHeaderByHash(microBlockID string) (txs *models.MicroBlockHeader, err error) {
+// GetMicroBlockHeaderByHash get the header of a micro block
+func (ae *Client) GetMicroBlockHeaderByHash(microBlockID string) (txs *models.MicroBlockHeader, err error) {
 	return getMicroBlockHeaderByHash(ae, microBlockID)
 }
 
@@ -158,8 +155,8 @@ func getMicroBlockHeaderByHash(node *Client, microBlockID string) (txs *models.M
 	return
 }
 
-// APIGetKeyBlockByHash get a key block by its hash
-func (ae *Client) APIGetKeyBlockByHash(keyBlockID string) (txs *models.KeyBlock, err error) {
+// GetKeyBlockByHash get a key block by its hash
+func (ae *Client) GetKeyBlockByHash(keyBlockID string) (txs *models.KeyBlock, err error) {
 	return getKeyBlockByHash(ae, keyBlockID)
 }
 
@@ -174,8 +171,8 @@ func getKeyBlockByHash(node *Client, keyBlockID string) (txs *models.KeyBlock, e
 	return
 }
 
-// APIGetTransactionByHash get a transaction by it's hash
-func (ae *Client) APIGetTransactionByHash(txHash string) (tx *models.GenericSignedTx, err error) {
+// GetTransactionByHash get a transaction by it's hash
+func (ae *Client) GetTransactionByHash(txHash string) (tx *models.GenericSignedTx, err error) {
 	return getTransactionByHash(ae, txHash)
 }
 
@@ -191,8 +188,8 @@ func getTransactionByHash(node *Client, txHash string) (tx *models.GenericSigned
 	return
 }
 
-// APIGetOracleByPubkey get an oracle by it's public key
-func (ae *Client) APIGetOracleByPubkey(pubkey string) (oracle *models.RegisteredOracle, err error) {
+// GetOracleByPubkey get an oracle by it's public key
+func (ae *Client) GetOracleByPubkey(pubkey string) (oracle *models.RegisteredOracle, err error) {
 	return getOracleByPubkey(ae, pubkey)
 }
 
@@ -208,8 +205,8 @@ func getOracleByPubkey(node *Client, pubkey string) (oracle *models.RegisteredOr
 	return
 }
 
-// APIGetOracleQueriesByPubkey get a list of queries made to a particular oracle
-func (ae *Client) APIGetOracleQueriesByPubkey(pubkey string) (oracleQueries *models.OracleQueries, err error) {
+// GetOracleQueriesByPubkey get a list of queries made to a particular oracle
+func (ae *Client) GetOracleQueriesByPubkey(pubkey string) (oracleQueries *models.OracleQueries, err error) {
 	return getOracleQueriesByPubkey(ae, pubkey)
 }
 
@@ -225,8 +222,8 @@ func getOracleQueriesByPubkey(node *Client, pubkey string) (oracleQueries *model
 	return
 }
 
-// APIGetContractByID gets a contract by ct_ ID
-func (ae *Client) APIGetContractByID(ctID string) (contract *models.ContractObject, err error) {
+// GetContractByID gets a contract by ct_ ID
+func (ae *Client) GetContractByID(ctID string) (contract *models.ContractObject, err error) {
 	return getContractByID(ae, ctID)
 }
 

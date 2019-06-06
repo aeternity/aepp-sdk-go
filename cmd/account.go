@@ -136,7 +136,7 @@ func balanceFunc(cmd *cobra.Command, args []string) (err error) {
 		return err
 	}
 
-	a, err := aeCli.APIGetAccount(account.Address)
+	a, err := aeCli.GetAccount(account.Address)
 	if err != nil {
 		return err
 	}

@@ -11,7 +11,7 @@ import (
 )
 
 func getNameEntry(t *testing.T, node *aeternity.Client, name string) (responseJSON string) {
-	response, err := node.APIGetNameEntryByName(name)
+	response, err := node.GetNameEntryByName(name)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -38,7 +38,7 @@ var topCmd = &cobra.Command{
 
 func topFunc(cmd *cobra.Command, args []string) (err error) {
 	aeCli := NewAeCli()
-	v, err := aeCli.APIGetTopBlock()
+	v, err := aeCli.GetTopBlock()
 	if err != nil {
 		return err
 	}
@@ -55,7 +55,7 @@ var statusCmd = &cobra.Command{
 
 func statusFunc(cmd *cobra.Command, args []string) (err error) {
 	aeCli := NewAeCli()
-	v, err := aeCli.APIGetStatus()
+	v, err := aeCli.GetStatus()
 	if err != nil {
 		return err
 	}
@@ -73,7 +73,7 @@ var playCmd = &cobra.Command{
 
 func playFunc(cmd *cobra.Command, args []string) (err error) {
 	aeCli := NewAeCli()
-	blockHeight, err := aeCli.APIGetHeight()
+	blockHeight, err := aeCli.GetHeight()
 	if err != nil {
 		return err
 	}
@@ -141,7 +141,7 @@ var ttlCmd = &cobra.Command{
 
 func ttlFunc(cmd *cobra.Command, args []string) (err error) {
 	ae := NewAeCli()
-	height, err := ae.APIGetHeight()
+	height, err := ae.GetHeight()
 	if err != nil {
 		errFinal := fmt.Errorf("Error getting height from the node: %v", err)
 		return errFinal
@@ -160,7 +160,7 @@ var networkIDCmd = &cobra.Command{
 
 func networkIDFunc(cmd *cobra.Command, args []string) (err error) {
 	ae := NewAeCli()
-	resp, err := ae.APIGetStatus()
+	resp, err := ae.GetStatus()
 	if err != nil {
 		errFinal := fmt.Errorf("Error getting status information from the node: %v", err)
 		return errFinal
