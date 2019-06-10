@@ -6,23 +6,10 @@ import (
 	"math/big"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/aeternity/aepp-sdk-go/generated/models"
 )
-
-func urlComponents(url string) (host string, schemas []string) {
-	p := strings.Split(url, "://")
-	if len(p) == 1 {
-		host = p[0]
-		schemas = []string{"http"}
-		return
-	}
-	host = p[1]
-	schemas = []string{p[0]}
-	return
-}
 
 type getHeighter interface {
 	GetHeight() (uint64, error)
@@ -276,6 +263,7 @@ func (o *Oracle) OracleRespondTx(OracleID string, QueryID string, Response strin
 	return tx, nil
 }
 
+// ContractCreateTx returns a transaction for creating a contract on the chain
 func (c *Contract) ContractCreateTx(Code string, CallData string, VMVersion, AbiVersion uint64, Deposit, Amount, Gas, GasPrice, Fee big.Int) (tx ContractCreateTx, err error) {
 	ttl, nonce, err := GetTTLNonce(c.Client, c.Account.Address, Config.Client.TTL)
 	if err != nil {
@@ -286,6 +274,7 @@ func (c *Contract) ContractCreateTx(Code string, CallData string, VMVersion, Abi
 	return tx, nil
 }
 
+// ContractCallTx returns a transaction for calling a contract on the chain
 func (c *Contract) ContractCallTx(ContractID, CallData string, AbiVersion uint64, Amount, Gas, GasPrice, Fee big.Int) (tx ContractCallTx, err error) {
 	ttl, nonce, err := GetTTLNonce(c.Client, c.Account.Address, Config.Client.TTL)
 	if err != nil {
