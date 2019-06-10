@@ -1,6 +1,8 @@
 package aeternity
 
 import (
+	"strings"
+
 	apiclient "github.com/aeternity/aepp-sdk-go/generated/client"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
@@ -36,6 +38,18 @@ type Contract struct {
 type Oracle struct {
 	Client  *Client
 	Account *Account
+}
+
+func urlComponents(url string) (host string, schemas []string) {
+	p := strings.Split(url, "://")
+	if len(p) == 1 {
+		host = p[0]
+		schemas = []string{"http"}
+		return
+	}
+	host = p[1]
+	schemas = []string{p[0]}
+	return
 }
 
 // NewClient obtain a new nodeClient instance

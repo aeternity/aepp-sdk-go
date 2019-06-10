@@ -1088,6 +1088,7 @@ func (tx *ContractCallTx) FeeEstimate() (*big.Int, error) {
 	return estimatedFee, nil
 }
 
+// NewContractCallTx is a constructor for a ContractCallTx struct
 func NewContractCallTx(CallerID string, AccountNonce uint64, ContractID string, Amount, Gas, GasPrice big.Int, AbiVersion uint64, CallData string, Fee big.Int, TTL uint64) ContractCallTx {
 	return ContractCallTx{
 		CallerID:     CallerID,
