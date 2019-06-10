@@ -87,7 +87,8 @@ func printIf(title string, v interface{}) {
 		default:
 			if len(n) > 0 {
 				if n == "Time" {
-					PpI(dept, n, time.Unix(0, v.Int()*int64(time.Millisecond)).Format(time.RFC3339))
+					t := v.Uint() * uint64(time.Millisecond)
+					PpI(dept, n, time.Unix(0, int64(t)).Format(time.RFC3339))
 				} else {
 					PpI(dept, n, v)
 				}
