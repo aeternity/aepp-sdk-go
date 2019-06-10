@@ -122,7 +122,7 @@ func broadcastFunc(cmd *cobra.Command, args []string) (err error) {
 	}
 
 	aeCli := NewAeCli()
-	err = aeCli.BroadcastTransaction(txSignedBase64)
+	err = aeternity.BroadcastTransaction(aeCli, txSignedBase64)
 	if err != nil {
 		errFinal := fmt.Errorf("Error while broadcasting transaction: %v", err)
 		return errFinal

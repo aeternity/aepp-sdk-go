@@ -60,7 +60,7 @@ func txSpendFunc(cmd *cobra.Command, args []string) (err error) {
 	// Connect to the node to find out sender nonce only
 	if nonce == 0 {
 		client := aeternity.NewClient(aeternity.Config.Node.URL, false)
-		nonce, err = client.GetNextNonce(sender)
+		nonce, err = aeternity.GetNextNonce(client, sender)
 		if err != nil {
 			return err
 		}

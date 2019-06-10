@@ -45,7 +45,7 @@ func signBroadcast(t *testing.T, tx aeternity.Tx, acc *aeternity.Account, aeClie
 		t.Fatal(err)
 	}
 
-	err = aeClient.BroadcastTransaction(signedTxStr)
+	err = aeternity.BroadcastTransaction(aeClient, signedTxStr)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -74,11 +74,11 @@ func getHeight(aeClient *aeternity.Client) (h uint64) {
 func waitForTransaction(aeClient *aeternity.Client, hash string) (err error) {
 	height := getHeight(aeClient)
 	// fmt.Println("Waiting for", hash)
-	height, _, _, _, err = aeClient.WaitForTransactionUntilHeight(height+10, hash)
+	height, blockHash, err := aeternity.WaitForTransactionUntilHeight(aeClient, hash, height+10)
 	if err != nil {
 		// Sometimes, the tests want the tx to fail. Return the err to let them know.
 		return err
 	}
-	// fmt.Println("Transaction was found at", height, "blockhash", blockHash, "microBlockHash", microBlockHash, "err", err)
+	fmt.Println("Transaction was found at", height, "blockhash", blockHash, "err", err)
 	return nil
 }

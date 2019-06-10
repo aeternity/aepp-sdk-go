@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/aeternity/aepp-sdk-go/generated/client/external"
 	"github.com/aeternity/aepp-sdk-go/generated/models"
 )
 
@@ -25,23 +24,34 @@ func urlComponents(url string) (host string, schemas []string) {
 	return
 }
 
-func getTTL(node *Client, offset uint64) (height uint64, err error) {
-	kb, err := getTopBlock(node)
+type getHeighter interface {
+	GetHeight() (uint64, error)
+}
+
+type getAccounter interface {
+	GetAccount(string) (*models.Account, error)
+}
+
+type getHeightAccounter interface {
+	getHeighter
+	getAccounter
+}
+
+// GetTTL returns the chain height + offset
+func GetTTL(c getHeighter, offset uint64) (ttl uint64, err error) {
+	height, err := c.GetHeight()
 	if err != nil {
 		return
 	}
 
-	if kb.KeyBlock == nil {
-		height = uint64(kb.MicroBlock.Height) + offset
-	} else {
-		height = uint64(kb.KeyBlock.Height) + offset
-	}
+	ttl = height + offset
 
 	return
 }
 
-func getNextNonce(node *Client, accountID string) (nextNonce uint64, err error) {
-	a, err := getAccount(node, accountID)
+// GetNextNonce retrieves the current accountNonce and adds 1 to it for use in transaction building
+func GetNextNonce(c getAccounter, accountID string) (nextNonce uint64, err error) {
+	a, err := c.GetAccount(accountID)
 	if err != nil {
 		return
 	}
@@ -49,48 +59,58 @@ func getNextNonce(node *Client, accountID string) (nextNonce uint64, err error) 
 	return
 }
 
-func getTTLNonce(node *Client, accountID string, offset uint64) (height uint64, nonce uint64, err error) {
-	height, err = getTTL(node, offset)
+// GetTTLNonce combines the commonly used together functions of GetTTL and GetNextNonce
+func GetTTLNonce(c getHeightAccounter, accountID string, offset uint64) (height uint64, nonce uint64, err error) {
+	height, err = GetTTL(c, offset)
 	if err != nil {
 		return
 	}
 
-	nonce, err = getNextNonce(node, accountID)
+	nonce, err = GetNextNonce(c, accountID)
 	if err != nil {
 		return
 	}
 	return
 }
 
-// waitForTransaction to appear on the chain
-func waitForTransaction(nodeClient *Client, txHash string) (blockHeight uint64, blockHash string, err error) {
-	// caclulate the date for the timeout
-	ctm := Config.Tuning.ChainTimeout
-	tm := time.Now().Add(time.Millisecond * time.Duration(ctm))
-	// start querying the transaction
-	for {
-		if time.Now().After(tm) {
-			// TODO: should use the chain height instead of a timeout
-			err = fmt.Errorf("Timeout waiting for the transaction to appear")
-			break // timeout execed
-		}
-		tx, err := getTransactionByHash(nodeClient, txHash)
+type getTransactionByHasher interface {
+	GetTransactionByHash(string) (*models.GenericSignedTx, error)
+}
+type getTransactionByHashHeighter interface {
+	getTransactionByHasher
+	getHeighter
+}
+
+// WaitForTransactionUntilHeight waits for a transaction until heightLimit (inclusive) is reached
+func WaitForTransactionUntilHeight(c getTransactionByHashHeighter, txHash string, untilHeight uint64) (blockHeight uint64, blockHash string, err error) {
+	var nodeHeight uint64
+	for nodeHeight <= untilHeight {
+		nodeHeight, err = c.GetHeight()
 		if err != nil {
-			break
+			return 0, "", err
 		}
-		if len(tx.BlockHash) > 0 {
-			txbh := big.Int(tx.BlockHeight)
-			blockHeight = txbh.Uint64()
-			blockHash = fmt.Sprint(tx.BlockHash)
-			break
+		tx, err := c.GetTransactionByHash(txHash)
+		if err != nil {
+			return 0, "", err
+		}
+
+		if tx.BlockHeight.LargerThanZero() {
+			bh := big.Int(tx.BlockHeight)
+			return bh.Uint64(), string(tx.BlockHash), nil
 		}
 		time.Sleep(time.Millisecond * time.Duration(Config.Tuning.ChainPollInteval))
 	}
-	return
+	return 0, "", fmt.Errorf("It is already height %v and %v still isn't in a block", nodeHeight, txHash)
 }
 
-// BroadcastTransaction recalculates the transaction hash and sends the transaction to the node.
-func (client *Client) BroadcastTransaction(txSignedBase64 string) (err error) {
+type transactionPoster interface {
+	PostTransaction(string, string) (err error)
+}
+
+// BroadcastTransaction differs from Client.PostTransaction() in that the latter just handles
+// the HTTP request via swagger, the former recalculates the txhash and compares it to the node's
+//  response after POSTing the transaction.
+func BroadcastTransaction(c transactionPoster, txSignedBase64 string) (err error) {
 	// Get back to RLP to calculate txhash
 	txRLP, _ := Decode(txSignedBase64)
 
@@ -100,127 +120,41 @@ func (client *Client) BroadcastTransaction(txSignedBase64 string) (err error) {
 	signedEncodedTxHash := Encode(PrefixTransactionHash, rlpTxHashRaw)
 
 	// send it to the network
-	err = postTransaction(client, txSignedBase64, signedEncodedTxHash)
+	err = c.PostTransaction(txSignedBase64, signedEncodedTxHash)
 	return
 }
 
-// GetTTL returns the chain height + offset
-func (client *Client) GetTTL(offset uint64) (height uint64, err error) {
-	return getTTL(client, offset)
-}
-
-// GetNextNonce retrieves the current accountNonce for an account + 1
-func (client *Client) GetNextNonce(accountID string) (nextNonce uint64, err error) {
-	return getNextNonce(client, accountID)
-}
-
 // PrintGenerationByHeight utility function to print a generation by it's height
-func (client *Client) PrintGenerationByHeight(height uint64) {
-	p := external.NewGetGenerationByHeightParams().WithHeight(height)
-	if r, err := client.External.GetGenerationByHeight(p); err == nil {
-		PrintObject("generation", r.Payload)
+// TODO this belongs in cmd and needs to be tested with error cases
+func (c *Client) PrintGenerationByHeight(height uint64) {
+	r, err := c.GetGenerationByHeight(height)
+	if err == nil {
+		PrintObject("generation", r)
 		// search for transaction in the microblocks
-		for _, mbh := range r.Payload.MicroBlocks {
+		for _, mbh := range r.MicroBlocks {
 			// get the microblok
 			mbhs := fmt.Sprint(mbh)
-			p := external.NewGetMicroBlockTransactionsByHashParams().WithHash(mbhs)
-			r, err := client.External.GetMicroBlockTransactionsByHash(p)
+			r, err := c.GetMicroBlockTransactionsByHash(mbhs)
 			if err != nil {
 				Pp("Error:", err)
 			}
 			// go through all the hashes
-			for _, btx := range r.Payload.Transactions {
-				p := external.NewGetTransactionByHashParams().WithHash(fmt.Sprint(btx.Hash))
-				if r, err := client.External.GetTransactionByHash(p); err == nil {
-					PrintObject("transaction", r.Payload)
+			for _, btx := range r.Transactions {
+				p, err := c.GetTransactionByHash(fmt.Sprint(btx.Hash))
+				if err == nil {
+					PrintObject("transaction", p)
 				}
 			}
 		}
 	} else {
-		switch err.(type) {
-		case *external.GetGenerationByHashBadRequest:
-			PrintError("Bad request:", err.(*external.GetGenerationByHashBadRequest).Payload)
-		case *external.GetGenerationByHashNotFound:
-			PrintError("Block not found:", err.(*external.GetGenerationByHashNotFound).Payload)
-		}
+		fmt.Println("Something went wrong in PrintGenerationByHeight")
 	}
-}
-
-// WaitForTransactionUntilHeight waits for a transaction until heightLimit (inclusive) is reached
-func (client *Client) WaitForTransactionUntilHeight(height uint64, txHash string) (blockHeight uint64, blockHash, microBlockHash string, tx *models.GenericSignedTx, err error) {
-	kb, err := getCurrentKeyBlock(client)
-	if err != nil {
-		return
-	}
-	// current height
-	targetHeight := uint64(kb.Height)
-	nextHeight := uint64(kb.Height)
-	// hold the generation
-	var g *models.Generation
-
-Main:
-	for {
-		// check the top height
-		if targetHeight > height {
-			err = fmt.Errorf("Transaction %s not found, height %d", txHash, height)
-			break
-		}
-		// get the generation of the targetHeight
-		p := external.NewGetGenerationByHeightParams().WithHeight(targetHeight)
-		r, err := client.External.GetGenerationByHeight(p)
-		if err != nil {
-			break
-		}
-		g = r.Payload
-		// search for transaction in the microblocks
-		for _, mbh := range g.MicroBlocks {
-			// get the microblok
-			mbhs := fmt.Sprint(mbh)
-			p := external.NewGetMicroBlockTransactionsByHashParams().WithHash(mbhs)
-			r, mErr := client.External.GetMicroBlockTransactionsByHash(p)
-			if mErr != nil {
-				// TODO: err will still be nil outside this scope. Consider refactoring whole function.
-				err = mErr
-				break Main
-			}
-			// go through all the hashes
-			for _, btx := range r.Payload.Transactions {
-				if fmt.Sprint(btx.Hash) == txHash {
-					// transaction found !!
-					blockHash = fmt.Sprint(g.KeyBlock.Hash)
-					blockHeight = uint64(g.KeyBlock.Height)
-					microBlockHash = mbhs
-					tx = btx
-					break Main
-				}
-			}
-		}
-		// here we want to query one more time the current generation
-		// before switching to the next one in case microblocks have been added meanwhile
-		// update targetHeight
-		if nextHeight > targetHeight {
-			targetHeight = nextHeight
-		}
-		// update nextHeight
-		kb, err = getCurrentKeyBlock(client)
-		if err != nil {
-			break
-		}
-		nextHeight = uint64(kb.Height)
-	}
-
-	return
-}
-
-// GetTTLNonce is a convenience function that combines GetTTL() and GetNextNonce()
-func (client *Client) GetTTLNonce(accountID string, offset uint64) (txTTL, accountNonce uint64, err error) {
-	return getTTLNonce(client, accountID, offset)
 }
 
 // NamePreclaimTx creates a name preclaim transaction and salt (required for claiming)
 // It should return the Tx struct, not the base64 encoded RLP, to ease subsequent inspection.
 func (n *Aens) NamePreclaimTx(name string, fee big.Int) (tx NamePreclaimTx, nameSalt *big.Int, err error) {
-	txTTL, accountNonce, err := getTTLNonce(n.Client, n.Account.Address, Config.Client.TTL)
+	txTTL, accountNonce, err := GetTTLNonce(n.Client, n.Account.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -243,7 +177,7 @@ func (n *Aens) NamePreclaimTx(name string, fee big.Int) (tx NamePreclaimTx, name
 
 // NameClaimTx creates a claim transaction
 func (n *Aens) NameClaimTx(name string, nameSalt big.Int, fee big.Int) (tx NameClaimTx, err error) {
-	txTTL, accountNonce, err := getTTLNonce(n.Client, n.Account.Address, Config.Client.TTL)
+	txTTL, accountNonce, err := GetTTLNonce(n.Client, n.Account.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -256,13 +190,13 @@ func (n *Aens) NameClaimTx(name string, nameSalt big.Int, fee big.Int) (tx NameC
 
 // NameUpdateTx perform a name update
 func (n *Aens) NameUpdateTx(name string, targetAddress string) (tx NameUpdateTx, err error) {
-	txTTL, accountNonce, err := getTTLNonce(n.Client, n.Account.Address, Config.Client.TTL)
+	txTTL, accountNonce, err := GetTTLNonce(n.Client, n.Account.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
 
 	encodedNameHash := Encode(PrefixName, Namehash(name))
-	absNameTTL, err := getTTL(n.Client, Config.Client.Names.NameTTL)
+	absNameTTL, err := GetTTL(n.Client, Config.Client.Names.NameTTL)
 	if err != nil {
 		return NameUpdateTx{}, err
 	}
@@ -274,7 +208,7 @@ func (n *Aens) NameUpdateTx(name string, targetAddress string) (tx NameUpdateTx,
 
 // NameTransferTx transfer a name to another owner
 func (n *Aens) NameTransferTx(name string, recipientAddress string) (tx NameTransferTx, err error) {
-	txTTL, accountNonce, err := getTTLNonce(n.Client, n.Account.Address, Config.Client.TTL)
+	txTTL, accountNonce, err := GetTTLNonce(n.Client, n.Account.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -287,7 +221,7 @@ func (n *Aens) NameTransferTx(name string, recipientAddress string) (tx NameTran
 
 // NameRevokeTx revoke a name
 func (n *Aens) NameRevokeTx(name string, recipientAddress string) (tx NameRevokeTx, err error) {
-	txTTL, accountNonce, err := getTTLNonce(n.Client, n.Account.Address, Config.Client.TTL)
+	txTTL, accountNonce, err := GetTTLNonce(n.Client, n.Account.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -300,7 +234,7 @@ func (n *Aens) NameRevokeTx(name string, recipientAddress string) (tx NameRevoke
 
 // OracleRegisterTx create a new oracle
 func (o *Oracle) OracleRegisterTx(querySpec, responseSpec string, queryFee big.Int, oracleTTLType, oracleTTLValue, abiVersion uint64) (tx OracleRegisterTx, err error) {
-	ttl, nonce, err := getTTLNonce(o.Client, o.Account.Address, Config.Client.TTL)
+	ttl, nonce, err := GetTTLNonce(o.Client, o.Account.Address, Config.Client.TTL)
 	if err != nil {
 		return OracleRegisterTx{}, err
 	}
@@ -311,7 +245,7 @@ func (o *Oracle) OracleRegisterTx(querySpec, responseSpec string, queryFee big.I
 
 // OracleExtendTx extend the lifetime of an existing oracle
 func (o *Oracle) OracleExtendTx(oracleID string, ttlType, ttlValue uint64) (tx OracleExtendTx, err error) {
-	ttl, nonce, err := getTTLNonce(o.Client, o.Account.Address, Config.Client.TTL)
+	ttl, nonce, err := GetTTLNonce(o.Client, o.Account.Address, Config.Client.TTL)
 	if err != nil {
 		return OracleExtendTx{}, err
 	}
@@ -322,7 +256,7 @@ func (o *Oracle) OracleExtendTx(oracleID string, ttlType, ttlValue uint64) (tx O
 
 // OracleQueryTx ask something of an oracle
 func (o *Oracle) OracleQueryTx(OracleID, Query string, QueryFee big.Int, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64) (tx OracleQueryTx, err error) {
-	ttl, nonce, err := getTTLNonce(o.Client, o.Account.Address, Config.Client.TTL)
+	ttl, nonce, err := GetTTLNonce(o.Client, o.Account.Address, Config.Client.TTL)
 	if err != nil {
 		return OracleQueryTx{}, err
 	}
@@ -333,7 +267,7 @@ func (o *Oracle) OracleQueryTx(OracleID, Query string, QueryFee big.Int, QueryTT
 
 // OracleRespondTx the oracle responds by sending this transaction
 func (o *Oracle) OracleRespondTx(OracleID string, QueryID string, Response string, TTLType uint64, TTLValue uint64) (tx OracleRespondTx, err error) {
-	ttl, nonce, err := getTTLNonce(o.Client, o.Account.Address, Config.Client.TTL)
+	ttl, nonce, err := GetTTLNonce(o.Client, o.Account.Address, Config.Client.TTL)
 	if err != nil {
 		return OracleRespondTx{}, err
 	}
@@ -343,7 +277,7 @@ func (o *Oracle) OracleRespondTx(OracleID string, QueryID string, Response strin
 }
 
 func (c *Contract) ContractCreateTx(Code string, CallData string, VMVersion, AbiVersion uint64, Deposit, Amount, Gas, GasPrice, Fee big.Int) (tx ContractCreateTx, err error) {
-	ttl, nonce, err := getTTLNonce(c.Client, c.Account.Address, Config.Client.TTL)
+	ttl, nonce, err := GetTTLNonce(c.Client, c.Account.Address, Config.Client.TTL)
 	if err != nil {
 		return ContractCreateTx{}, err
 	}
@@ -353,7 +287,7 @@ func (c *Contract) ContractCreateTx(Code string, CallData string, VMVersion, Abi
 }
 
 func (c *Contract) ContractCallTx(ContractID, CallData string, AbiVersion uint64, Amount, Gas, GasPrice, Fee big.Int) (tx ContractCallTx, err error) {
-	ttl, nonce, err := getTTLNonce(c.Client, c.Account.Address, Config.Client.TTL)
+	ttl, nonce, err := GetTTLNonce(c.Client, c.Account.Address, Config.Client.TTL)
 	if err != nil {
 		return ContractCallTx{}, err
 	}

@@ -29,7 +29,7 @@ func TestSpendTx(t *testing.T) {
 		expected.Add(&bS, amount)
 	}
 
-	ttl, nonce, err := node.GetTTLNonce(sender, aeternity.Config.Client.TTL)
+	ttl, nonce, err := aeternity.GetTTLNonce(node, sender, aeternity.Config.Client.TTL)
 	if err != nil {
 		t.Fatalf("Error in GetTTLNonce(): %v", err)
 	}
