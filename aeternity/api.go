@@ -8,12 +8,8 @@ import (
 )
 
 // GetStatus post transaction
-func (ae *Client) GetStatus() (status *models.Status, err error) {
-	return getStatus(ae)
-}
-
-func getStatus(node *Client) (status *models.Status, err error) {
-	r, err := node.External.GetStatus(nil)
+func (c *Client) GetStatus() (status *models.Status, err error) {
+	r, err := c.External.GetStatus(nil)
 	if err != nil {
 		return
 	}
@@ -22,16 +18,11 @@ func getStatus(node *Client) (status *models.Status, err error) {
 }
 
 // PostTransaction post transaction
-func (ae *Client) PostTransaction(signedEncodedTx, signedEncodedTxHash string) (err error) {
-	return postTransaction(ae, signedEncodedTx, signedEncodedTxHash)
-}
-
-// postTransaction post a transaction to the chain
-func postTransaction(node *Client, signedEncodedTx, signedEncodedTxHash string) (err error) {
+func (c *Client) PostTransaction(signedEncodedTx, signedEncodedTxHash string) (err error) {
 	p := external.NewPostTransactionParams().WithBody(&models.Tx{
 		Tx: models.EncodedByteArray(signedEncodedTx),
 	})
-	r, err := node.External.PostTransaction(p)
+	r, err := c.External.PostTransaction(p)
 	if err != nil {
 		return
 	}
@@ -42,13 +33,18 @@ func postTransaction(node *Client, signedEncodedTx, signedEncodedTxHash string) 
 }
 
 // GetTopBlock get the top block of the chain
-func (ae *Client) GetTopBlock() (kb *models.KeyBlockOrMicroBlockHeader, err error) {
-	return getTopBlock(ae)
+func (c *Client) GetTopBlock() (kb *models.KeyBlockOrMicroBlockHeader, err error) {
+	r, err := c.External.GetTopBlock(nil)
+	if err != nil {
+		return
+	}
+	kb = r.Payload
+	return
 }
 
 // GetHeight get the height of the chain
-func (ae *Client) GetHeight() (height uint64, err error) {
-	tb, err := getTopBlock(ae)
+func (c *Client) GetHeight() (height uint64, err error) {
+	tb, err := c.GetTopBlock()
 	if err != nil {
 		return
 	}
@@ -60,25 +56,9 @@ func (ae *Client) GetHeight() (height uint64, err error) {
 	return
 }
 
-// getTopBlock get the top block of the chain
-// wraps the generated code to avoid too much changes
-// in case of the swagger api call changes
-func getTopBlock(node *Client) (kb *models.KeyBlockOrMicroBlockHeader, err error) {
-	r, err := node.External.GetTopBlock(nil)
-	if err != nil {
-		return
-	}
-	kb = r.Payload
-	return
-}
-
 // GetCurrentKeyBlock get current key block
-func (ae *Client) GetCurrentKeyBlock() (kb *models.KeyBlock, err error) {
-	return getCurrentKeyBlock(ae)
-}
-
-func getCurrentKeyBlock(node *Client) (kb *models.KeyBlock, err error) {
-	r, err := node.External.GetCurrentKeyBlock(nil)
+func (c *Client) GetCurrentKeyBlock() (kb *models.KeyBlock, err error) {
+	r, err := c.External.GetCurrentKeyBlock(nil)
 	if err != nil {
 		err = fmt.Errorf("Error: %v", getErrorReason(err))
 		return
@@ -87,16 +67,11 @@ func getCurrentKeyBlock(node *Client) (kb *models.KeyBlock, err error) {
 	return
 }
 
-// GetAccount return the account
-func (ae *Client) GetAccount(accountID string) (account *models.Account, err error) {
-	return getAccount(ae, accountID)
-}
-
-// getAccount retrieve an account by its address (public key)
+// GetAccount retrieve an account by its address (public key)
 // it is particularly useful to obtain the nonce for spending transactions
-func getAccount(node *Client, accountID string) (account *models.Account, err error) {
+func (c *Client) GetAccount(accountID string) (account *models.Account, err error) {
 	p := external.NewGetAccountByPubkeyParams().WithPubkey(accountID)
-	r, err := node.External.GetAccountByPubkey(p)
+	r, err := c.External.GetAccountByPubkey(p)
 	if err != nil {
 		err = fmt.Errorf("Error: %v", getErrorReason(err))
 		return
@@ -106,13 +81,9 @@ func getAccount(node *Client, accountID string) (account *models.Account, err er
 }
 
 // GetNameEntryByName return the name entry
-func (ae *Client) GetNameEntryByName(name string) (nameEntry *models.NameEntry, err error) {
-	return getNameEntryByName(ae, name)
-}
-
-func getNameEntryByName(node *Client, name string) (nameEntry *models.NameEntry, err error) {
+func (c *Client) GetNameEntryByName(name string) (nameEntry *models.NameEntry, err error) {
 	p := external.NewGetNameEntryByNameParams().WithName(name)
-	r, err := node.External.GetNameEntryByName(p)
+	r, err := c.External.GetNameEntryByName(p)
 
 	if err != nil {
 		err = fmt.Errorf("Error: %v", getErrorReason(err))
@@ -123,14 +94,22 @@ func getNameEntryByName(node *Client, name string) (nameEntry *models.NameEntry,
 	return
 }
 
-// GetMicroBlockTransactionsByHash get the transactions of a microblock
-func (ae *Client) GetMicroBlockTransactionsByHash(microBlockID string) (txs *models.GenericTxs, err error) {
-	return getMicroBlockTransactionsByHash(ae, microBlockID)
+// GetGenerationByHeight gets the keyblock and all its microblocks
+func (c *Client) GetGenerationByHeight(height uint64) (g *models.Generation, err error) {
+	p := external.NewGetGenerationByHeightParams().WithHeight(height)
+	r, err := c.External.GetGenerationByHeight(p)
+	if err != nil {
+		err = fmt.Errorf("Error: %v", getErrorReason(err))
+		return
+	}
+	g = r.Payload
+	return
 }
 
-func getMicroBlockTransactionsByHash(node *Client, microBlockID string) (txs *models.GenericTxs, err error) {
+// GetMicroBlockTransactionsByHash get the transactions of a microblock
+func (c *Client) GetMicroBlockTransactionsByHash(microBlockID string) (txs *models.GenericTxs, err error) {
 	p := external.NewGetMicroBlockTransactionsByHashParams().WithHash(microBlockID)
-	r, err := node.External.GetMicroBlockTransactionsByHash(p)
+	r, err := c.External.GetMicroBlockTransactionsByHash(p)
 	if err != nil {
 		err = fmt.Errorf("Error: %v", getErrorReason(err))
 		return
@@ -140,13 +119,9 @@ func getMicroBlockTransactionsByHash(node *Client, microBlockID string) (txs *mo
 }
 
 // GetMicroBlockHeaderByHash get the header of a micro block
-func (ae *Client) GetMicroBlockHeaderByHash(microBlockID string) (txs *models.MicroBlockHeader, err error) {
-	return getMicroBlockHeaderByHash(ae, microBlockID)
-}
-
-func getMicroBlockHeaderByHash(node *Client, microBlockID string) (txs *models.MicroBlockHeader, err error) {
+func (c *Client) GetMicroBlockHeaderByHash(microBlockID string) (txs *models.MicroBlockHeader, err error) {
 	p := external.NewGetMicroBlockHeaderByHashParams().WithHash(microBlockID)
-	r, err := node.External.GetMicroBlockHeaderByHash(p)
+	r, err := c.External.GetMicroBlockHeaderByHash(p)
 	if err != nil {
 		err = fmt.Errorf("Error: %v", getErrorReason(err))
 		return
@@ -156,13 +131,9 @@ func getMicroBlockHeaderByHash(node *Client, microBlockID string) (txs *models.M
 }
 
 // GetKeyBlockByHash get a key block by its hash
-func (ae *Client) GetKeyBlockByHash(keyBlockID string) (txs *models.KeyBlock, err error) {
-	return getKeyBlockByHash(ae, keyBlockID)
-}
-
-func getKeyBlockByHash(node *Client, keyBlockID string) (txs *models.KeyBlock, err error) {
+func (c *Client) GetKeyBlockByHash(keyBlockID string) (txs *models.KeyBlock, err error) {
 	p := external.NewGetKeyBlockByHashParams().WithHash(keyBlockID)
-	r, err := node.External.GetKeyBlockByHash(p)
+	r, err := c.External.GetKeyBlockByHash(p)
 	if err != nil {
 		err = fmt.Errorf("Error: %v", getErrorReason(err))
 		return
@@ -172,14 +143,9 @@ func getKeyBlockByHash(node *Client, keyBlockID string) (txs *models.KeyBlock, e
 }
 
 // GetTransactionByHash get a transaction by it's hash
-func (ae *Client) GetTransactionByHash(txHash string) (tx *models.GenericSignedTx, err error) {
-	return getTransactionByHash(ae, txHash)
-}
-
-// getTransactionByHash retrieve a transaction by it's hash
-func getTransactionByHash(node *Client, txHash string) (tx *models.GenericSignedTx, err error) {
+func (c *Client) GetTransactionByHash(txHash string) (tx *models.GenericSignedTx, err error) {
 	p := external.NewGetTransactionByHashParams().WithHash(txHash)
-	r, err := node.External.GetTransactionByHash(p)
+	r, err := c.External.GetTransactionByHash(p)
 	if err != nil {
 		err = fmt.Errorf("Error: %v", getErrorReason(err))
 		return
@@ -189,14 +155,9 @@ func getTransactionByHash(node *Client, txHash string) (tx *models.GenericSigned
 }
 
 // GetOracleByPubkey get an oracle by it's public key
-func (ae *Client) GetOracleByPubkey(pubkey string) (oracle *models.RegisteredOracle, err error) {
-	return getOracleByPubkey(ae, pubkey)
-}
-
-// getOracleByPubkey get an oracle by it's public key
-func getOracleByPubkey(node *Client, pubkey string) (oracle *models.RegisteredOracle, err error) {
+func (c *Client) GetOracleByPubkey(pubkey string) (oracle *models.RegisteredOracle, err error) {
 	p := external.NewGetOracleByPubkeyParams().WithPubkey(pubkey)
-	r, err := node.External.GetOracleByPubkey(p)
+	r, err := c.External.GetOracleByPubkey(p)
 	if err != nil {
 		err = fmt.Errorf("Error: %v", getErrorReason(err))
 		return
@@ -206,14 +167,9 @@ func getOracleByPubkey(node *Client, pubkey string) (oracle *models.RegisteredOr
 }
 
 // GetOracleQueriesByPubkey get a list of queries made to a particular oracle
-func (ae *Client) GetOracleQueriesByPubkey(pubkey string) (oracleQueries *models.OracleQueries, err error) {
-	return getOracleQueriesByPubkey(ae, pubkey)
-}
-
-// getOracleQueriesByPubkey get a list of queries made to a particular oracle
-func getOracleQueriesByPubkey(node *Client, pubkey string) (oracleQueries *models.OracleQueries, err error) {
+func (c *Client) GetOracleQueriesByPubkey(pubkey string) (oracleQueries *models.OracleQueries, err error) {
 	p := external.NewGetOracleQueriesByPubkeyParams().WithPubkey(pubkey)
-	r, err := node.External.GetOracleQueriesByPubkey(p)
+	r, err := c.External.GetOracleQueriesByPubkey(p)
 	if err != nil {
 		err = fmt.Errorf("Error: %v", getErrorReason(err))
 		return
@@ -223,14 +179,9 @@ func getOracleQueriesByPubkey(node *Client, pubkey string) (oracleQueries *model
 }
 
 // GetContractByID gets a contract by ct_ ID
-func (ae *Client) GetContractByID(ctID string) (contract *models.ContractObject, err error) {
-	return getContractByID(ae, ctID)
-}
-
-// getContractByID get a contract by ct_ ID
-func getContractByID(node *Client, ctID string) (contract *models.ContractObject, err error) {
+func (c *Client) GetContractByID(ctID string) (contract *models.ContractObject, err error) {
 	p := external.NewGetContractParams().WithPubkey(ctID)
-	r, err := node.External.GetContract(p)
+	r, err := c.External.GetContract(p)
 	if err != nil {
 		err = fmt.Errorf("Error: %v", getErrorReason(err))
 		return
