@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // PostTxResponse post tx response
@@ -18,7 +19,7 @@ type PostTxResponse struct {
 
 	// Hash of a signed transaction
 	// Required: true
-	TxHash EncodedHash `json:"tx_hash"`
+	TxHash *string `json:"tx_hash"`
 }
 
 // Validate validates this post tx response
@@ -37,10 +38,7 @@ func (m *PostTxResponse) Validate(formats strfmt.Registry) error {
 
 func (m *PostTxResponse) validateTxHash(formats strfmt.Registry) error {
 
-	if err := m.TxHash.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("tx_hash")
-		}
+	if err := validate.Required("tx_hash", "body", m.TxHash); err != nil {
 		return err
 	}
 

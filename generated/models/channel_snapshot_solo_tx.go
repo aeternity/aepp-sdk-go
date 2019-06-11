@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 
 	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
@@ -20,7 +21,7 @@ type ChannelSnapshotSoloTx struct {
 
 	// channel id
 	// Required: true
-	ChannelID EncodedPubkey `json:"channel_id"`
+	ChannelID *string `json:"channel_id"`
 
 	// fee
 	// Required: true
@@ -28,14 +29,14 @@ type ChannelSnapshotSoloTx struct {
 
 	// from id
 	// Required: true
-	FromID EncodedPubkey `json:"from_id"`
+	FromID *string `json:"from_id"`
 
 	// nonce
 	Nonce uint64 `json:"nonce,omitempty"`
 
 	// payload
 	// Required: true
-	Payload EncodedByteArray `json:"payload"`
+	Payload *string `json:"payload"`
 
 	// ttl
 	TTL uint64 `json:"ttl,omitempty"`
@@ -69,10 +70,7 @@ func (m *ChannelSnapshotSoloTx) Validate(formats strfmt.Registry) error {
 
 func (m *ChannelSnapshotSoloTx) validateChannelID(formats strfmt.Registry) error {
 
-	if err := m.ChannelID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("channel_id")
-		}
+	if err := validate.Required("channel_id", "body", m.ChannelID); err != nil {
 		return err
 	}
 
@@ -93,10 +91,7 @@ func (m *ChannelSnapshotSoloTx) validateFee(formats strfmt.Registry) error {
 
 func (m *ChannelSnapshotSoloTx) validateFromID(formats strfmt.Registry) error {
 
-	if err := m.FromID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("from_id")
-		}
+	if err := validate.Required("from_id", "body", m.FromID); err != nil {
 		return err
 	}
 
@@ -105,10 +100,7 @@ func (m *ChannelSnapshotSoloTx) validateFromID(formats strfmt.Registry) error {
 
 func (m *ChannelSnapshotSoloTx) validatePayload(formats strfmt.Registry) error {
 
-	if err := m.Payload.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("payload")
-		}
+	if err := validate.Required("payload", "body", m.Payload); err != nil {
 		return err
 	}
 

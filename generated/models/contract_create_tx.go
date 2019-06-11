@@ -29,11 +29,11 @@ type ContractCreateTx struct {
 
 	// Contract call data
 	// Required: true
-	CallData EncodedByteArray `json:"call_data"`
+	CallData *string `json:"call_data"`
 
 	// Contract's code
 	// Required: true
-	Code EncodedByteArray `json:"code"`
+	Code *string `json:"code"`
 
 	// deposit
 	// Required: true
@@ -56,7 +56,7 @@ type ContractCreateTx struct {
 
 	// Contract owner pub_key
 	// Required: true
-	OwnerID EncodedPubkey `json:"owner_id"`
+	OwnerID *string `json:"owner_id"`
 
 	// ttl
 	TTL uint64 `json:"ttl,omitempty"`
@@ -139,10 +139,7 @@ func (m *ContractCreateTx) validateAmount(formats strfmt.Registry) error {
 
 func (m *ContractCreateTx) validateCallData(formats strfmt.Registry) error {
 
-	if err := m.CallData.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("call_data")
-		}
+	if err := validate.Required("call_data", "body", m.CallData); err != nil {
 		return err
 	}
 
@@ -151,10 +148,7 @@ func (m *ContractCreateTx) validateCallData(formats strfmt.Registry) error {
 
 func (m *ContractCreateTx) validateCode(formats strfmt.Registry) error {
 
-	if err := m.Code.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("code")
-		}
+	if err := validate.Required("code", "body", m.Code); err != nil {
 		return err
 	}
 
@@ -208,10 +202,7 @@ func (m *ContractCreateTx) validateGasPrice(formats strfmt.Registry) error {
 
 func (m *ContractCreateTx) validateOwnerID(formats strfmt.Registry) error {
 
-	if err := m.OwnerID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("owner_id")
-		}
+	if err := validate.Required("owner_id", "body", m.OwnerID); err != nil {
 		return err
 	}
 

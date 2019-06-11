@@ -25,7 +25,7 @@ type Status struct {
 
 	// genesis key block hash
 	// Required: true
-	GenesisKeyBlockHash EncodedHash `json:"genesis_key_block_hash"`
+	GenesisKeyBlockHash *string `json:"genesis_key_block_hash"`
 
 	// listening
 	// Required: true
@@ -138,10 +138,7 @@ func (m *Status) validateDifficulty(formats strfmt.Registry) error {
 
 func (m *Status) validateGenesisKeyBlockHash(formats strfmt.Registry) error {
 
-	if err := m.GenesisKeyBlockHash.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("genesis_key_block_hash")
-		}
+	if err := validate.Required("genesis_key_block_hash", "body", m.GenesisKeyBlockHash); err != nil {
 		return err
 	}
 

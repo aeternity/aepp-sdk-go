@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 
 	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
@@ -20,7 +21,7 @@ type NameRevokeTx struct {
 
 	// account id
 	// Required: true
-	AccountID EncodedPubkey `json:"account_id"`
+	AccountID *string `json:"account_id"`
 
 	// fee
 	// Required: true
@@ -28,7 +29,7 @@ type NameRevokeTx struct {
 
 	// name id
 	// Required: true
-	NameID EncodedValue `json:"name_id"`
+	NameID *string `json:"name_id"`
 
 	// nonce
 	Nonce uint64 `json:"nonce,omitempty"`
@@ -61,10 +62,7 @@ func (m *NameRevokeTx) Validate(formats strfmt.Registry) error {
 
 func (m *NameRevokeTx) validateAccountID(formats strfmt.Registry) error {
 
-	if err := m.AccountID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("account_id")
-		}
+	if err := validate.Required("account_id", "body", m.AccountID); err != nil {
 		return err
 	}
 
@@ -85,10 +83,7 @@ func (m *NameRevokeTx) validateFee(formats strfmt.Registry) error {
 
 func (m *NameRevokeTx) validateNameID(formats strfmt.Registry) error {
 
-	if err := m.NameID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("name_id")
-		}
+	if err := validate.Required("name_id", "body", m.NameID); err != nil {
 		return err
 	}
 

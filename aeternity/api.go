@@ -20,14 +20,14 @@ func (c *Client) GetStatus() (status *models.Status, err error) {
 // PostTransaction post transaction
 func (c *Client) PostTransaction(signedEncodedTx, signedEncodedTxHash string) (err error) {
 	p := external.NewPostTransactionParams().WithBody(&models.Tx{
-		Tx: models.EncodedByteArray(signedEncodedTx),
+		Tx: &signedEncodedTx,
 	})
 	r, err := c.External.PostTransaction(p)
 	if err != nil {
 		return
 	}
-	if r.Payload.TxHash != models.EncodedHash(signedEncodedTxHash) {
-		err = fmt.Errorf("Transaction hash mismatch, expected %s got %s", signedEncodedTxHash, r.Payload.TxHash)
+	if *r.Payload.TxHash != signedEncodedTxHash {
+		err = fmt.Errorf("Transaction hash mismatch, expected %s got %s", signedEncodedTxHash, *r.Payload.TxHash)
 	}
 	return
 }

@@ -19,7 +19,7 @@ type NamePointer struct {
 
 	// id
 	// Required: true
-	ID EncodedPubkey `json:"id"`
+	ID *string `json:"id"`
 
 	// key
 	// Required: true
@@ -46,10 +46,7 @@ func (m *NamePointer) Validate(formats strfmt.Registry) error {
 
 func (m *NamePointer) validateID(formats strfmt.Registry) error {
 
-	if err := m.ID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("id")
-		}
+	if err := validate.Required("id", "body", m.ID); err != nil {
 		return err
 	}
 

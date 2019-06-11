@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 
 	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
@@ -20,7 +21,7 @@ type NameTransferTx struct {
 
 	// account id
 	// Required: true
-	AccountID EncodedPubkey `json:"account_id"`
+	AccountID *string `json:"account_id"`
 
 	// fee
 	// Required: true
@@ -28,14 +29,14 @@ type NameTransferTx struct {
 
 	// name id
 	// Required: true
-	NameID EncodedValue `json:"name_id"`
+	NameID *string `json:"name_id"`
 
 	// nonce
 	Nonce uint64 `json:"nonce,omitempty"`
 
 	// recipient id
 	// Required: true
-	RecipientID EncodedPubkey `json:"recipient_id"`
+	RecipientID *string `json:"recipient_id"`
 
 	// ttl
 	TTL uint64 `json:"ttl,omitempty"`
@@ -69,10 +70,7 @@ func (m *NameTransferTx) Validate(formats strfmt.Registry) error {
 
 func (m *NameTransferTx) validateAccountID(formats strfmt.Registry) error {
 
-	if err := m.AccountID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("account_id")
-		}
+	if err := validate.Required("account_id", "body", m.AccountID); err != nil {
 		return err
 	}
 
@@ -93,10 +91,7 @@ func (m *NameTransferTx) validateFee(formats strfmt.Registry) error {
 
 func (m *NameTransferTx) validateNameID(formats strfmt.Registry) error {
 
-	if err := m.NameID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("name_id")
-		}
+	if err := validate.Required("name_id", "body", m.NameID); err != nil {
 		return err
 	}
 
@@ -105,10 +100,7 @@ func (m *NameTransferTx) validateNameID(formats strfmt.Registry) error {
 
 func (m *NameTransferTx) validateRecipientID(formats strfmt.Registry) error {
 
-	if err := m.RecipientID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("recipient_id")
-		}
+	if err := validate.Required("recipient_id", "body", m.RecipientID); err != nil {
 		return err
 	}
 

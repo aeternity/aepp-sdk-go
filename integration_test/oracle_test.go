@@ -77,10 +77,10 @@ func TestOracleWorkflow(t *testing.T) {
 		}
 	}
 	delay(getOracleQueries)
-	oqID := string(oracleQueries.OracleQueries[0].ID)
+	oqID := oracleQueries.OracleQueries[0].ID
 
 	// Respond
-	respond, err := oracleAlice.OracleRespondTx(oraclePubKey, oqID, "My day was fine thank you", 0, 100)
+	respond, err := oracleAlice.OracleRespondTx(oraclePubKey, *oqID, "My day was fine thank you", 0, 100)
 	fmt.Printf("Respond %+v\n", respond)
 	respondHash := signBroadcast(t, &respond, alice, client)
 	_ = waitForTransaction(client, respondHash)

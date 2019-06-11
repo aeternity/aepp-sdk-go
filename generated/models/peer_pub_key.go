@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // PeerPubKey peer pub key
@@ -18,7 +19,7 @@ type PeerPubKey struct {
 
 	// pubkey
 	// Required: true
-	Pubkey EncodedPubkey `json:"pubkey"`
+	Pubkey *string `json:"pubkey"`
 }
 
 // Validate validates this peer pub key
@@ -37,10 +38,7 @@ func (m *PeerPubKey) Validate(formats strfmt.Registry) error {
 
 func (m *PeerPubKey) validatePubkey(formats strfmt.Registry) error {
 
-	if err := m.Pubkey.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("pubkey")
-		}
+	if err := validate.Required("pubkey", "body", m.Pubkey); err != nil {
 		return err
 	}
 

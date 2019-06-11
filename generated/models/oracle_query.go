@@ -25,11 +25,11 @@ type OracleQuery struct {
 
 	// id
 	// Required: true
-	ID EncodedValue `json:"id"`
+	ID *string `json:"id"`
 
 	// oracle id
 	// Required: true
-	OracleID EncodedPubkey `json:"oracle_id"`
+	OracleID *string `json:"oracle_id"`
 
 	// query
 	// Required: true
@@ -45,7 +45,7 @@ type OracleQuery struct {
 
 	// sender id
 	// Required: true
-	SenderID EncodedPubkey `json:"sender_id"`
+	SenderID *string `json:"sender_id"`
 
 	// sender nonce
 	// Required: true
@@ -116,10 +116,7 @@ func (m *OracleQuery) validateFee(formats strfmt.Registry) error {
 
 func (m *OracleQuery) validateID(formats strfmt.Registry) error {
 
-	if err := m.ID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("id")
-		}
+	if err := validate.Required("id", "body", m.ID); err != nil {
 		return err
 	}
 
@@ -128,10 +125,7 @@ func (m *OracleQuery) validateID(formats strfmt.Registry) error {
 
 func (m *OracleQuery) validateOracleID(formats strfmt.Registry) error {
 
-	if err := m.OracleID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("oracle_id")
-		}
+	if err := validate.Required("oracle_id", "body", m.OracleID); err != nil {
 		return err
 	}
 
@@ -176,10 +170,7 @@ func (m *OracleQuery) validateResponseTTL(formats strfmt.Registry) error {
 
 func (m *OracleQuery) validateSenderID(formats strfmt.Registry) error {
 
-	if err := m.SenderID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("sender_id")
-		}
+	if err := validate.Required("sender_id", "body", m.SenderID); err != nil {
 		return err
 	}
 

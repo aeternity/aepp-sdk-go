@@ -33,7 +33,7 @@ type ChannelCreateTx struct {
 
 	// initiator id
 	// Required: true
-	InitiatorID EncodedPubkey `json:"initiator_id"`
+	InitiatorID *string `json:"initiator_id"`
 
 	// lock period
 	// Required: true
@@ -52,11 +52,11 @@ type ChannelCreateTx struct {
 
 	// responder id
 	// Required: true
-	ResponderID EncodedPubkey `json:"responder_id"`
+	ResponderID *string `json:"responder_id"`
 
 	// Root hash of the channel's internal state tree
 	// Required: true
-	StateHash EncodedHash `json:"state_hash"`
+	StateHash *string `json:"state_hash"`
 
 	// ttl
 	TTL uint64 `json:"ttl,omitempty"`
@@ -146,10 +146,7 @@ func (m *ChannelCreateTx) validateInitiatorAmount(formats strfmt.Registry) error
 
 func (m *ChannelCreateTx) validateInitiatorID(formats strfmt.Registry) error {
 
-	if err := m.InitiatorID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("initiator_id")
-		}
+	if err := validate.Required("initiator_id", "body", m.InitiatorID); err != nil {
 		return err
 	}
 
@@ -191,10 +188,7 @@ func (m *ChannelCreateTx) validateResponderAmount(formats strfmt.Registry) error
 
 func (m *ChannelCreateTx) validateResponderID(formats strfmt.Registry) error {
 
-	if err := m.ResponderID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("responder_id")
-		}
+	if err := validate.Required("responder_id", "body", m.ResponderID); err != nil {
 		return err
 	}
 
@@ -203,10 +197,7 @@ func (m *ChannelCreateTx) validateResponderID(formats strfmt.Registry) error {
 
 func (m *ChannelCreateTx) validateStateHash(formats strfmt.Registry) error {
 
-	if err := m.StateHash.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("state_hash")
-		}
+	if err := validate.Required("state_hash", "body", m.StateHash); err != nil {
 		return err
 	}
 

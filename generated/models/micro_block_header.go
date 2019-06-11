@@ -19,7 +19,7 @@ type MicroBlockHeader struct {
 
 	// hash
 	// Required: true
-	Hash EncodedHash `json:"hash"`
+	Hash *string `json:"hash"`
 
 	// height
 	// Required: true
@@ -27,23 +27,23 @@ type MicroBlockHeader struct {
 
 	// "no_fraud" | api encoded Proof of Fraud hash
 	// Required: true
-	PofHash EncodedHash `json:"pof_hash"`
+	PofHash *string `json:"pof_hash"`
 
 	// prev hash
 	// Required: true
-	PrevHash EncodedHash `json:"prev_hash"`
+	PrevHash *string `json:"prev_hash"`
 
 	// prev key hash
 	// Required: true
-	PrevKeyHash EncodedHash `json:"prev_key_hash"`
+	PrevKeyHash *string `json:"prev_key_hash"`
 
 	// signature
 	// Required: true
-	Signature EncodedValue `json:"signature"`
+	Signature *string `json:"signature"`
 
 	// state hash
 	// Required: true
-	StateHash EncodedHash `json:"state_hash"`
+	StateHash *string `json:"state_hash"`
 
 	// time
 	// Required: true
@@ -51,7 +51,7 @@ type MicroBlockHeader struct {
 
 	// txs hash
 	// Required: true
-	TxsHash EncodedHash `json:"txs_hash"`
+	TxsHash *string `json:"txs_hash"`
 
 	// version
 	// Required: true
@@ -110,10 +110,7 @@ func (m *MicroBlockHeader) Validate(formats strfmt.Registry) error {
 
 func (m *MicroBlockHeader) validateHash(formats strfmt.Registry) error {
 
-	if err := m.Hash.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("hash")
-		}
+	if err := validate.Required("hash", "body", m.Hash); err != nil {
 		return err
 	}
 
@@ -131,10 +128,7 @@ func (m *MicroBlockHeader) validateHeight(formats strfmt.Registry) error {
 
 func (m *MicroBlockHeader) validatePofHash(formats strfmt.Registry) error {
 
-	if err := m.PofHash.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("pof_hash")
-		}
+	if err := validate.Required("pof_hash", "body", m.PofHash); err != nil {
 		return err
 	}
 
@@ -143,10 +137,7 @@ func (m *MicroBlockHeader) validatePofHash(formats strfmt.Registry) error {
 
 func (m *MicroBlockHeader) validatePrevHash(formats strfmt.Registry) error {
 
-	if err := m.PrevHash.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("prev_hash")
-		}
+	if err := validate.Required("prev_hash", "body", m.PrevHash); err != nil {
 		return err
 	}
 
@@ -155,10 +146,7 @@ func (m *MicroBlockHeader) validatePrevHash(formats strfmt.Registry) error {
 
 func (m *MicroBlockHeader) validatePrevKeyHash(formats strfmt.Registry) error {
 
-	if err := m.PrevKeyHash.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("prev_key_hash")
-		}
+	if err := validate.Required("prev_key_hash", "body", m.PrevKeyHash); err != nil {
 		return err
 	}
 
@@ -167,10 +155,7 @@ func (m *MicroBlockHeader) validatePrevKeyHash(formats strfmt.Registry) error {
 
 func (m *MicroBlockHeader) validateSignature(formats strfmt.Registry) error {
 
-	if err := m.Signature.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("signature")
-		}
+	if err := validate.Required("signature", "body", m.Signature); err != nil {
 		return err
 	}
 
@@ -179,10 +164,7 @@ func (m *MicroBlockHeader) validateSignature(formats strfmt.Registry) error {
 
 func (m *MicroBlockHeader) validateStateHash(formats strfmt.Registry) error {
 
-	if err := m.StateHash.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("state_hash")
-		}
+	if err := validate.Required("state_hash", "body", m.StateHash); err != nil {
 		return err
 	}
 
@@ -200,10 +182,7 @@ func (m *MicroBlockHeader) validateTime(formats strfmt.Registry) error {
 
 func (m *MicroBlockHeader) validateTxsHash(formats strfmt.Registry) error {
 
-	if err := m.TxsHash.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("txs_hash")
-		}
+	if err := validate.Required("txs_hash", "body", m.TxsHash); err != nil {
 		return err
 	}
 

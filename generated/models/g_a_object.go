@@ -21,7 +21,7 @@ type GAObject struct {
 
 	// caller id
 	// Required: true
-	CallerID EncodedPubkey `json:"caller_id"`
+	CallerID *string `json:"caller_id"`
 
 	// gas price
 	// Required: true
@@ -44,7 +44,7 @@ type GAObject struct {
 
 	// return value
 	// Required: true
-	ReturnValue EncodedByteArray `json:"return_value"`
+	ReturnValue *string `json:"return_value"`
 }
 
 // Validate validates this g a object
@@ -87,10 +87,7 @@ func (m *GAObject) Validate(formats strfmt.Registry) error {
 
 func (m *GAObject) validateCallerID(formats strfmt.Registry) error {
 
-	if err := m.CallerID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("caller_id")
-		}
+	if err := validate.Required("caller_id", "body", m.CallerID); err != nil {
 		return err
 	}
 
@@ -156,10 +153,7 @@ func (m *GAObject) validateReturnType(formats strfmt.Registry) error {
 
 func (m *GAObject) validateReturnValue(formats strfmt.Registry) error {
 
-	if err := m.ReturnValue.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("return_value")
-		}
+	if err := validate.Required("return_value", "body", m.ReturnValue); err != nil {
 		return err
 	}
 

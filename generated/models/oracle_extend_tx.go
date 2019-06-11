@@ -28,7 +28,7 @@ type OracleExtendTx struct {
 
 	// oracle id
 	// Required: true
-	OracleID EncodedPubkey `json:"oracle_id"`
+	OracleID *string `json:"oracle_id"`
 
 	// oracle ttl
 	// Required: true
@@ -74,10 +74,7 @@ func (m *OracleExtendTx) validateFee(formats strfmt.Registry) error {
 
 func (m *OracleExtendTx) validateOracleID(formats strfmt.Registry) error {
 
-	if err := m.OracleID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("oracle_id")
-		}
+	if err := validate.Required("oracle_id", "body", m.OracleID); err != nil {
 		return err
 	}
 

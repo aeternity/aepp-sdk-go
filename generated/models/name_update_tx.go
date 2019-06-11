@@ -23,7 +23,7 @@ type NameUpdateTx struct {
 
 	// account id
 	// Required: true
-	AccountID EncodedPubkey `json:"account_id"`
+	AccountID *string `json:"account_id"`
 
 	// client ttl
 	// Required: true
@@ -35,7 +35,7 @@ type NameUpdateTx struct {
 
 	// name id
 	// Required: true
-	NameID EncodedValue `json:"name_id"`
+	NameID *string `json:"name_id"`
 
 	// name ttl
 	// Required: true
@@ -88,10 +88,7 @@ func (m *NameUpdateTx) Validate(formats strfmt.Registry) error {
 
 func (m *NameUpdateTx) validateAccountID(formats strfmt.Registry) error {
 
-	if err := m.AccountID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("account_id")
-		}
+	if err := validate.Required("account_id", "body", m.AccountID); err != nil {
 		return err
 	}
 
@@ -121,10 +118,7 @@ func (m *NameUpdateTx) validateFee(formats strfmt.Registry) error {
 
 func (m *NameUpdateTx) validateNameID(formats strfmt.Registry) error {
 
-	if err := m.NameID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("name_id")
-		}
+	if err := validate.Required("name_id", "body", m.NameID); err != nil {
 		return err
 	}
 

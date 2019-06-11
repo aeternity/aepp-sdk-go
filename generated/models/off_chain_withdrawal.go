@@ -13,6 +13,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 
 	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
@@ -27,7 +28,7 @@ type OffChainWithdrawal struct {
 
 	// Withdrawer of tokens
 	// Required: true
-	To EncodedPubkey `json:"to"`
+	To *string `json:"to"`
 }
 
 // Op gets the op of this subtype
@@ -54,7 +55,7 @@ func (m *OffChainWithdrawal) UnmarshalJSON(raw []byte) error {
 
 		// Withdrawer of tokens
 		// Required: true
-		To EncodedPubkey `json:"to"`
+		To *string `json:"to"`
 	}
 	buf := bytes.NewBuffer(raw)
 	dec := json.NewDecoder(buf)
@@ -105,7 +106,7 @@ func (m OffChainWithdrawal) MarshalJSON() ([]byte, error) {
 
 		// Withdrawer of tokens
 		// Required: true
-		To EncodedPubkey `json:"to"`
+		To *string `json:"to"`
 	}{
 
 		Amount: m.Amount,
@@ -162,10 +163,7 @@ func (m *OffChainWithdrawal) validateAmount(formats strfmt.Registry) error {
 
 func (m *OffChainWithdrawal) validateTo(formats strfmt.Registry) error {
 
-	if err := m.To.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("to")
-		}
+	if err := validate.Required("to", "body", m.To); err != nil {
 		return err
 	}
 

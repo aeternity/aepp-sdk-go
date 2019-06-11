@@ -21,7 +21,7 @@ type ChannelCloseMutualTx struct {
 
 	// channel id
 	// Required: true
-	ChannelID EncodedPubkey `json:"channel_id"`
+	ChannelID *string `json:"channel_id"`
 
 	// fee
 	// Required: true
@@ -29,7 +29,7 @@ type ChannelCloseMutualTx struct {
 
 	// from id
 	// Required: true
-	FromID EncodedPubkey `json:"from_id"`
+	FromID *string `json:"from_id"`
 
 	// initiator amount final
 	// Required: true
@@ -83,10 +83,7 @@ func (m *ChannelCloseMutualTx) Validate(formats strfmt.Registry) error {
 
 func (m *ChannelCloseMutualTx) validateChannelID(formats strfmt.Registry) error {
 
-	if err := m.ChannelID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("channel_id")
-		}
+	if err := validate.Required("channel_id", "body", m.ChannelID); err != nil {
 		return err
 	}
 
@@ -104,10 +101,7 @@ func (m *ChannelCloseMutualTx) validateFee(formats strfmt.Registry) error {
 
 func (m *ChannelCloseMutualTx) validateFromID(formats strfmt.Registry) error {
 
-	if err := m.FromID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("from_id")
-		}
+	if err := validate.Required("from_id", "body", m.FromID); err != nil {
 		return err
 	}
 

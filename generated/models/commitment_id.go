@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // CommitmentID commitment Id
@@ -18,7 +19,7 @@ type CommitmentID struct {
 
 	// commitment id
 	// Required: true
-	CommitmentID EncodedValue `json:"commitment_id"`
+	CommitmentID *string `json:"commitment_id"`
 }
 
 // Validate validates this commitment Id
@@ -37,10 +38,7 @@ func (m *CommitmentID) Validate(formats strfmt.Registry) error {
 
 func (m *CommitmentID) validateCommitmentID(formats strfmt.Registry) error {
 
-	if err := m.CommitmentID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("commitment_id")
-		}
+	if err := validate.Required("commitment_id", "body", m.CommitmentID); err != nil {
 		return err
 	}
 

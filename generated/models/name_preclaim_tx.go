@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 
 	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
@@ -20,11 +21,11 @@ type NamePreclaimTx struct {
 
 	// account id
 	// Required: true
-	AccountID EncodedPubkey `json:"account_id"`
+	AccountID *string `json:"account_id"`
 
 	// commitment id
 	// Required: true
-	CommitmentID EncodedValue `json:"commitment_id"`
+	CommitmentID *string `json:"commitment_id"`
 
 	// fee
 	// Required: true
@@ -61,10 +62,7 @@ func (m *NamePreclaimTx) Validate(formats strfmt.Registry) error {
 
 func (m *NamePreclaimTx) validateAccountID(formats strfmt.Registry) error {
 
-	if err := m.AccountID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("account_id")
-		}
+	if err := validate.Required("account_id", "body", m.AccountID); err != nil {
 		return err
 	}
 
@@ -73,10 +71,7 @@ func (m *NamePreclaimTx) validateAccountID(formats strfmt.Registry) error {
 
 func (m *NamePreclaimTx) validateCommitmentID(formats strfmt.Registry) error {
 
-	if err := m.CommitmentID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("commitment_id")
-		}
+	if err := validate.Required("commitment_id", "body", m.CommitmentID); err != nil {
 		return err
 	}
 

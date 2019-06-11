@@ -23,7 +23,7 @@ type ContractCallObject struct {
 
 	// caller id
 	// Required: true
-	CallerID EncodedPubkey `json:"caller_id"`
+	CallerID *string `json:"caller_id"`
 
 	// caller nonce
 	// Required: true
@@ -31,7 +31,7 @@ type ContractCallObject struct {
 
 	// contract id
 	// Required: true
-	ContractID EncodedPubkey `json:"contract_id"`
+	ContractID *string `json:"contract_id"`
 
 	// gas price
 	// Required: true
@@ -55,7 +55,7 @@ type ContractCallObject struct {
 
 	// return value
 	// Required: true
-	ReturnValue EncodedByteArray `json:"return_value"`
+	ReturnValue *string `json:"return_value"`
 }
 
 // Validate validates this contract call object
@@ -106,10 +106,7 @@ func (m *ContractCallObject) Validate(formats strfmt.Registry) error {
 
 func (m *ContractCallObject) validateCallerID(formats strfmt.Registry) error {
 
-	if err := m.CallerID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("caller_id")
-		}
+	if err := validate.Required("caller_id", "body", m.CallerID); err != nil {
 		return err
 	}
 
@@ -127,10 +124,7 @@ func (m *ContractCallObject) validateCallerNonce(formats strfmt.Registry) error 
 
 func (m *ContractCallObject) validateContractID(formats strfmt.Registry) error {
 
-	if err := m.ContractID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("contract_id")
-		}
+	if err := validate.Required("contract_id", "body", m.ContractID); err != nil {
 		return err
 	}
 
@@ -203,10 +197,7 @@ func (m *ContractCallObject) validateReturnType(formats strfmt.Registry) error {
 
 func (m *ContractCallObject) validateReturnValue(formats strfmt.Registry) error {
 
-	if err := m.ReturnValue.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("return_value")
-		}
+	if err := validate.Required("return_value", "body", m.ReturnValue); err != nil {
 		return err
 	}
 

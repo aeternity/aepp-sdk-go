@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // UnsignedTx unsigned tx
@@ -18,7 +19,7 @@ type UnsignedTx struct {
 
 	// Unsigned transaction object
 	// Required: true
-	Tx EncodedByteArray `json:"tx"`
+	Tx *string `json:"tx"`
 }
 
 // Validate validates this unsigned tx
@@ -37,10 +38,7 @@ func (m *UnsignedTx) Validate(formats strfmt.Registry) error {
 
 func (m *UnsignedTx) validateTx(formats strfmt.Registry) error {
 
-	if err := m.Tx.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("tx")
-		}
+	if err := validate.Required("tx", "body", m.Tx); err != nil {
 		return err
 	}
 

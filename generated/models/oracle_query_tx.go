@@ -28,7 +28,7 @@ type OracleQueryTx struct {
 
 	// oracle id
 	// Required: true
-	OracleID EncodedPubkey `json:"oracle_id"`
+	OracleID *string `json:"oracle_id"`
 
 	// query
 	// Required: true
@@ -48,7 +48,7 @@ type OracleQueryTx struct {
 
 	// sender id
 	// Required: true
-	SenderID EncodedPubkey `json:"sender_id"`
+	SenderID *string `json:"sender_id"`
 
 	// ttl
 	TTL uint64 `json:"ttl,omitempty"`
@@ -106,10 +106,7 @@ func (m *OracleQueryTx) validateFee(formats strfmt.Registry) error {
 
 func (m *OracleQueryTx) validateOracleID(formats strfmt.Registry) error {
 
-	if err := m.OracleID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("oracle_id")
-		}
+	if err := validate.Required("oracle_id", "body", m.OracleID); err != nil {
 		return err
 	}
 
@@ -175,10 +172,7 @@ func (m *OracleQueryTx) validateResponseTTL(formats strfmt.Registry) error {
 
 func (m *OracleQueryTx) validateSenderID(formats strfmt.Registry) error {
 
-	if err := m.SenderID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("sender_id")
-		}
+	if err := validate.Required("sender_id", "body", m.SenderID); err != nil {
 		return err
 	}
 
