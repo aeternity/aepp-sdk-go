@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 
 	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
@@ -36,14 +37,14 @@ type ChannelSettleTx struct {
 
 	// nonce
 	// Required: true
-	Nonce Uint64 `json:"nonce"`
+	Nonce *uint64 `json:"nonce"`
 
 	// responder amount final
 	// Required: true
 	ResponderAmountFinal utils.BigInt `json:"responder_amount_final"`
 
 	// ttl
-	TTL Uint64 `json:"ttl,omitempty"`
+	TTL uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this channel settle tx
@@ -71,10 +72,6 @@ func (m *ChannelSettleTx) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateResponderAmountFinal(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateTTL(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -134,10 +131,7 @@ func (m *ChannelSettleTx) validateInitiatorAmountFinal(formats strfmt.Registry) 
 
 func (m *ChannelSettleTx) validateNonce(formats strfmt.Registry) error {
 
-	if err := m.Nonce.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("nonce")
-		}
+	if err := validate.Required("nonce", "body", m.Nonce); err != nil {
 		return err
 	}
 
@@ -149,22 +143,6 @@ func (m *ChannelSettleTx) validateResponderAmountFinal(formats strfmt.Registry) 
 	if err := m.ResponderAmountFinal.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("responder_amount_final")
-		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *ChannelSettleTx) validateTTL(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.TTL) { // not required
-		return nil
-	}
-
-	if err := m.TTL.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("ttl")
 		}
 		return err
 	}

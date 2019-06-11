@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 
 	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
@@ -20,7 +21,7 @@ type ContractCreateTx struct {
 
 	// ABI version
 	// Required: true
-	AbiVersion Uint16 `json:"abi_version"`
+	AbiVersion *uint16 `json:"abi_version"`
 
 	// amount
 	// Required: true
@@ -44,25 +45,25 @@ type ContractCreateTx struct {
 
 	// gas
 	// Required: true
-	Gas Uint64 `json:"gas"`
+	Gas *uint64 `json:"gas"`
 
 	// gas price
 	// Required: true
 	GasPrice utils.BigInt `json:"gas_price"`
 
 	// Owner's nonce
-	Nonce Uint64 `json:"nonce,omitempty"`
+	Nonce uint64 `json:"nonce,omitempty"`
 
 	// Contract owner pub_key
 	// Required: true
 	OwnerID EncodedPubkey `json:"owner_id"`
 
 	// ttl
-	TTL Uint64 `json:"ttl,omitempty"`
+	TTL uint64 `json:"ttl,omitempty"`
 
 	// Virtual machine's version
 	// Required: true
-	VMVersion Uint16 `json:"vm_version"`
+	VMVersion *uint16 `json:"vm_version"`
 }
 
 // Validate validates this contract create tx
@@ -101,15 +102,7 @@ func (m *ContractCreateTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateNonce(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.validateOwnerID(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateTTL(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -125,10 +118,7 @@ func (m *ContractCreateTx) Validate(formats strfmt.Registry) error {
 
 func (m *ContractCreateTx) validateAbiVersion(formats strfmt.Registry) error {
 
-	if err := m.AbiVersion.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("abi_version")
-		}
+	if err := validate.Required("abi_version", "body", m.AbiVersion); err != nil {
 		return err
 	}
 
@@ -197,10 +187,7 @@ func (m *ContractCreateTx) validateFee(formats strfmt.Registry) error {
 
 func (m *ContractCreateTx) validateGas(formats strfmt.Registry) error {
 
-	if err := m.Gas.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("gas")
-		}
+	if err := validate.Required("gas", "body", m.Gas); err != nil {
 		return err
 	}
 
@@ -212,22 +199,6 @@ func (m *ContractCreateTx) validateGasPrice(formats strfmt.Registry) error {
 	if err := m.GasPrice.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("gas_price")
-		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *ContractCreateTx) validateNonce(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.Nonce) { // not required
-		return nil
-	}
-
-	if err := m.Nonce.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("nonce")
 		}
 		return err
 	}
@@ -247,28 +218,9 @@ func (m *ContractCreateTx) validateOwnerID(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractCreateTx) validateTTL(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.TTL) { // not required
-		return nil
-	}
-
-	if err := m.TTL.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("ttl")
-		}
-		return err
-	}
-
-	return nil
-}
-
 func (m *ContractCreateTx) validateVMVersion(formats strfmt.Registry) error {
 
-	if err := m.VMVersion.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("vm_version")
-		}
+	if err := validate.Required("vm_version", "body", m.VMVersion); err != nil {
 		return err
 	}
 

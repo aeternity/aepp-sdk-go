@@ -31,14 +31,14 @@ type NameTransferTx struct {
 	NameID EncodedValue `json:"name_id"`
 
 	// nonce
-	Nonce Uint64 `json:"nonce,omitempty"`
+	Nonce uint64 `json:"nonce,omitempty"`
 
 	// recipient id
 	// Required: true
 	RecipientID EncodedPubkey `json:"recipient_id"`
 
 	// ttl
-	TTL Uint64 `json:"ttl,omitempty"`
+	TTL uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this name transfer tx
@@ -57,15 +57,7 @@ func (m *NameTransferTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateNonce(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.validateRecipientID(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateTTL(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -111,43 +103,11 @@ func (m *NameTransferTx) validateNameID(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *NameTransferTx) validateNonce(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.Nonce) { // not required
-		return nil
-	}
-
-	if err := m.Nonce.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("nonce")
-		}
-		return err
-	}
-
-	return nil
-}
-
 func (m *NameTransferTx) validateRecipientID(formats strfmt.Registry) error {
 
 	if err := m.RecipientID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("recipient_id")
-		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *NameTransferTx) validateTTL(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.TTL) { // not required
-		return nil
-	}
-
-	if err := m.TTL.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("ttl")
 		}
 		return err
 	}

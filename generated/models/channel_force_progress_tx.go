@@ -15,6 +15,7 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 
 	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
@@ -36,7 +37,7 @@ type ChannelForceProgressTx struct {
 	FromID EncodedPubkey `json:"from_id"`
 
 	// nonce
-	Nonce Uint64 `json:"nonce,omitempty"`
+	Nonce uint64 `json:"nonce,omitempty"`
 
 	// The whole set of off-chain state trees
 	OffchainTrees EncodedByteArray `json:"offchain_trees,omitempty"`
@@ -47,14 +48,14 @@ type ChannelForceProgressTx struct {
 
 	// Channel's next round
 	// Required: true
-	Round Uint64 `json:"round"`
+	Round *uint64 `json:"round"`
 
 	// Channel's next state_hash
 	// Required: true
 	StateHash EncodedHash `json:"state_hash"`
 
 	// ttl
-	TTL Uint64 `json:"ttl,omitempty"`
+	TTL uint64 `json:"ttl,omitempty"`
 
 	updateField OffChainUpdate
 }
@@ -78,17 +79,17 @@ func (m *ChannelForceProgressTx) UnmarshalJSON(raw []byte) error {
 
 		FromID EncodedPubkey `json:"from_id"`
 
-		Nonce Uint64 `json:"nonce,omitempty"`
+		Nonce uint64 `json:"nonce,omitempty"`
 
 		OffchainTrees EncodedByteArray `json:"offchain_trees,omitempty"`
 
 		Payload EncodedByteArray `json:"payload"`
 
-		Round Uint64 `json:"round"`
+		Round *uint64 `json:"round"`
 
 		StateHash EncodedHash `json:"state_hash"`
 
-		TTL Uint64 `json:"ttl,omitempty"`
+		TTL uint64 `json:"ttl,omitempty"`
 
 		Update json.RawMessage `json:"update"`
 	}
@@ -153,17 +154,17 @@ func (m ChannelForceProgressTx) MarshalJSON() ([]byte, error) {
 
 		FromID EncodedPubkey `json:"from_id"`
 
-		Nonce Uint64 `json:"nonce,omitempty"`
+		Nonce uint64 `json:"nonce,omitempty"`
 
 		OffchainTrees EncodedByteArray `json:"offchain_trees,omitempty"`
 
 		Payload EncodedByteArray `json:"payload"`
 
-		Round Uint64 `json:"round"`
+		Round *uint64 `json:"round"`
 
 		StateHash EncodedHash `json:"state_hash"`
 
-		TTL Uint64 `json:"ttl,omitempty"`
+		TTL uint64 `json:"ttl,omitempty"`
 	}{
 
 		ChannelID: m.ChannelID,
@@ -218,10 +219,6 @@ func (m *ChannelForceProgressTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateNonce(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.validateOffchainTrees(formats); err != nil {
 		res = append(res, err)
 	}
@@ -235,10 +232,6 @@ func (m *ChannelForceProgressTx) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateStateHash(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateTTL(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -288,22 +281,6 @@ func (m *ChannelForceProgressTx) validateFromID(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ChannelForceProgressTx) validateNonce(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.Nonce) { // not required
-		return nil
-	}
-
-	if err := m.Nonce.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("nonce")
-		}
-		return err
-	}
-
-	return nil
-}
-
 func (m *ChannelForceProgressTx) validateOffchainTrees(formats strfmt.Registry) error {
 
 	if swag.IsZero(m.OffchainTrees) { // not required
@@ -334,10 +311,7 @@ func (m *ChannelForceProgressTx) validatePayload(formats strfmt.Registry) error 
 
 func (m *ChannelForceProgressTx) validateRound(formats strfmt.Registry) error {
 
-	if err := m.Round.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("round")
-		}
+	if err := validate.Required("round", "body", m.Round); err != nil {
 		return err
 	}
 
@@ -349,22 +323,6 @@ func (m *ChannelForceProgressTx) validateStateHash(formats strfmt.Registry) erro
 	if err := m.StateHash.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("state_hash")
-		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *ChannelForceProgressTx) validateTTL(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.TTL) { // not required
-		return nil
-	}
-
-	if err := m.TTL.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("ttl")
 		}
 		return err
 	}

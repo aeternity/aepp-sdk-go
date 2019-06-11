@@ -41,7 +41,7 @@ type Account struct {
 
 	// Nonce
 	// Required: true
-	Nonce Uint64 `json:"nonce"`
+	Nonce *uint64 `json:"nonce"`
 }
 
 // Validate validates this account
@@ -159,10 +159,7 @@ func (m *Account) validateKind(formats strfmt.Registry) error {
 
 func (m *Account) validateNonce(formats strfmt.Registry) error {
 
-	if err := m.Nonce.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("nonce")
-		}
+	if err := validate.Required("nonce", "body", m.Nonce); err != nil {
 		return err
 	}
 

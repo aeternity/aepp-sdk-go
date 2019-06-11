@@ -49,10 +49,10 @@ func (c *Client) GetHeight() (height uint64, err error) {
 		return
 	}
 	if tb.KeyBlock == nil {
-		height = uint64(tb.MicroBlock.Height)
+		height = *tb.MicroBlock.Height
 		return
 	}
-	height = uint64(tb.KeyBlock.Height)
+	height = *tb.KeyBlock.Height
 	return
 }
 

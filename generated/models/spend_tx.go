@@ -27,7 +27,7 @@ type SpendTx struct {
 	Fee utils.BigInt `json:"fee"`
 
 	// nonce
-	Nonce Uint64 `json:"nonce,omitempty"`
+	Nonce uint64 `json:"nonce,omitempty"`
 
 	// payload
 	// Required: true
@@ -42,7 +42,7 @@ type SpendTx struct {
 	SenderID EncodedPubkey `json:"sender_id"`
 
 	// ttl
-	TTL Uint64 `json:"ttl,omitempty"`
+	TTL uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this spend tx
@@ -57,10 +57,6 @@ func (m *SpendTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateNonce(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.validatePayload(formats); err != nil {
 		res = append(res, err)
 	}
@@ -70,10 +66,6 @@ func (m *SpendTx) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateSenderID(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateTTL(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -100,22 +92,6 @@ func (m *SpendTx) validateFee(formats strfmt.Registry) error {
 	if err := m.Fee.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("fee")
-		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *SpendTx) validateNonce(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.Nonce) { // not required
-		return nil
-	}
-
-	if err := m.Nonce.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("nonce")
 		}
 		return err
 	}
@@ -152,22 +128,6 @@ func (m *SpendTx) validateSenderID(formats strfmt.Registry) error {
 	if err := m.SenderID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("sender_id")
-		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *SpendTx) validateTTL(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.TTL) { // not required
-		return nil
-	}
-
-	if err := m.TTL.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("ttl")
 		}
 		return err
 	}

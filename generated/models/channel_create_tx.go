@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 
 	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
@@ -36,10 +37,10 @@ type ChannelCreateTx struct {
 
 	// lock period
 	// Required: true
-	LockPeriod Uint64 `json:"lock_period"`
+	LockPeriod *uint64 `json:"lock_period"`
 
 	// nonce
-	Nonce Uint64 `json:"nonce,omitempty"`
+	Nonce uint64 `json:"nonce,omitempty"`
 
 	// push amount
 	// Required: true
@@ -58,7 +59,7 @@ type ChannelCreateTx struct {
 	StateHash EncodedHash `json:"state_hash"`
 
 	// ttl
-	TTL Uint64 `json:"ttl,omitempty"`
+	TTL uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this channel create tx
@@ -85,10 +86,6 @@ func (m *ChannelCreateTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateNonce(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.validatePushAmount(formats); err != nil {
 		res = append(res, err)
 	}
@@ -102,10 +99,6 @@ func (m *ChannelCreateTx) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateStateHash(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateTTL(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -165,26 +158,7 @@ func (m *ChannelCreateTx) validateInitiatorID(formats strfmt.Registry) error {
 
 func (m *ChannelCreateTx) validateLockPeriod(formats strfmt.Registry) error {
 
-	if err := m.LockPeriod.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("lock_period")
-		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *ChannelCreateTx) validateNonce(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.Nonce) { // not required
-		return nil
-	}
-
-	if err := m.Nonce.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("nonce")
-		}
+	if err := validate.Required("lock_period", "body", m.LockPeriod); err != nil {
 		return err
 	}
 
@@ -232,22 +206,6 @@ func (m *ChannelCreateTx) validateStateHash(formats strfmt.Registry) error {
 	if err := m.StateHash.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("state_hash")
-		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *ChannelCreateTx) validateTTL(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.TTL) { // not required
-		return nil
-	}
-
-	if err := m.TTL.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("ttl")
 		}
 		return err
 	}

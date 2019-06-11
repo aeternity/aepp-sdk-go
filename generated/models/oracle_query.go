@@ -49,11 +49,11 @@ type OracleQuery struct {
 
 	// sender nonce
 	// Required: true
-	SenderNonce Uint64 `json:"sender_nonce"`
+	SenderNonce *uint64 `json:"sender_nonce"`
 
 	// ttl
 	// Required: true
-	TTL Uint64 `json:"ttl"`
+	TTL *uint64 `json:"ttl"`
 }
 
 // Validate validates this oracle query
@@ -188,10 +188,7 @@ func (m *OracleQuery) validateSenderID(formats strfmt.Registry) error {
 
 func (m *OracleQuery) validateSenderNonce(formats strfmt.Registry) error {
 
-	if err := m.SenderNonce.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("sender_nonce")
-		}
+	if err := validate.Required("sender_nonce", "body", m.SenderNonce); err != nil {
 		return err
 	}
 
@@ -200,10 +197,7 @@ func (m *OracleQuery) validateSenderNonce(formats strfmt.Registry) error {
 
 func (m *OracleQuery) validateTTL(formats strfmt.Registry) error {
 
-	if err := m.TTL.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("ttl")
-		}
+	if err := validate.Required("ttl", "body", m.TTL); err != nil {
 		return err
 	}
 

@@ -27,7 +27,7 @@ type ContractCallObject struct {
 
 	// caller nonce
 	// Required: true
-	CallerNonce Uint64 `json:"caller_nonce"`
+	CallerNonce *uint64 `json:"caller_nonce"`
 
 	// contract id
 	// Required: true
@@ -39,11 +39,11 @@ type ContractCallObject struct {
 
 	// gas used
 	// Required: true
-	GasUsed Uint64 `json:"gas_used"`
+	GasUsed *uint64 `json:"gas_used"`
 
 	// height
 	// Required: true
-	Height Uint64 `json:"height"`
+	Height *uint64 `json:"height"`
 
 	// log
 	// Required: true
@@ -118,10 +118,7 @@ func (m *ContractCallObject) validateCallerID(formats strfmt.Registry) error {
 
 func (m *ContractCallObject) validateCallerNonce(formats strfmt.Registry) error {
 
-	if err := m.CallerNonce.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("caller_nonce")
-		}
+	if err := validate.Required("caller_nonce", "body", m.CallerNonce); err != nil {
 		return err
 	}
 
@@ -154,10 +151,7 @@ func (m *ContractCallObject) validateGasPrice(formats strfmt.Registry) error {
 
 func (m *ContractCallObject) validateGasUsed(formats strfmt.Registry) error {
 
-	if err := m.GasUsed.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("gas_used")
-		}
+	if err := validate.Required("gas_used", "body", m.GasUsed); err != nil {
 		return err
 	}
 
@@ -166,10 +160,7 @@ func (m *ContractCallObject) validateGasUsed(formats strfmt.Registry) error {
 
 func (m *ContractCallObject) validateHeight(formats strfmt.Registry) error {
 
-	if err := m.Height.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("height")
-		}
+	if err := validate.Required("height", "body", m.Height); err != nil {
 		return err
 	}
 

@@ -8,7 +8,6 @@ package models
 import (
 	strfmt "github.com/go-openapi/strfmt"
 
-	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 )
 
@@ -17,36 +16,11 @@ import (
 type InlineResponse2002 struct {
 
 	// Count
-	Count Uint32 `json:"count,omitempty"`
+	Count uint32 `json:"count,omitempty"`
 }
 
 // Validate validates this inline response 200 2
 func (m *InlineResponse2002) Validate(formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.validateCount(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *InlineResponse2002) validateCount(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.Count) { // not required
-		return nil
-	}
-
-	if err := m.Count.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("count")
-		}
-		return err
-	}
-
 	return nil
 }
 

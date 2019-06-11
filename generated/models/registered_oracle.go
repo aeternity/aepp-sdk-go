@@ -21,7 +21,7 @@ type RegisteredOracle struct {
 
 	// abi version
 	// Required: true
-	AbiVersion Uint16 `json:"abi_version"`
+	AbiVersion *uint16 `json:"abi_version"`
 
 	// id
 	// Required: true
@@ -41,7 +41,7 @@ type RegisteredOracle struct {
 
 	// ttl
 	// Required: true
-	TTL Uint64 `json:"ttl"`
+	TTL *uint64 `json:"ttl"`
 }
 
 // Validate validates this registered oracle
@@ -80,10 +80,7 @@ func (m *RegisteredOracle) Validate(formats strfmt.Registry) error {
 
 func (m *RegisteredOracle) validateAbiVersion(formats strfmt.Registry) error {
 
-	if err := m.AbiVersion.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("abi_version")
-		}
+	if err := validate.Required("abi_version", "body", m.AbiVersion); err != nil {
 		return err
 	}
 
@@ -134,10 +131,7 @@ func (m *RegisteredOracle) validateResponseFormat(formats strfmt.Registry) error
 
 func (m *RegisteredOracle) validateTTL(formats strfmt.Registry) error {
 
-	if err := m.TTL.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("ttl")
-		}
+	if err := validate.Required("ttl", "body", m.TTL); err != nil {
 		return err
 	}
 

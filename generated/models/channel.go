@@ -47,11 +47,11 @@ type Channel struct {
 
 	// lock period
 	// Required: true
-	LockPeriod Uint64 `json:"lock_period"`
+	LockPeriod *uint64 `json:"lock_period"`
 
 	// locked until
 	// Required: true
-	LockedUntil Uint64 `json:"locked_until"`
+	LockedUntil *uint64 `json:"locked_until"`
 
 	// responder amount
 	// Required: true
@@ -63,11 +63,11 @@ type Channel struct {
 
 	// round
 	// Required: true
-	Round Uint64 `json:"round"`
+	Round *uint64 `json:"round"`
 
 	// solo round
 	// Required: true
-	SoloRound Uint64 `json:"solo_round"`
+	SoloRound *uint64 `json:"solo_round"`
 
 	// state hash
 	// Required: true
@@ -218,10 +218,7 @@ func (m *Channel) validateInitiatorID(formats strfmt.Registry) error {
 
 func (m *Channel) validateLockPeriod(formats strfmt.Registry) error {
 
-	if err := m.LockPeriod.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("lock_period")
-		}
+	if err := validate.Required("lock_period", "body", m.LockPeriod); err != nil {
 		return err
 	}
 
@@ -230,10 +227,7 @@ func (m *Channel) validateLockPeriod(formats strfmt.Registry) error {
 
 func (m *Channel) validateLockedUntil(formats strfmt.Registry) error {
 
-	if err := m.LockedUntil.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("locked_until")
-		}
+	if err := validate.Required("locked_until", "body", m.LockedUntil); err != nil {
 		return err
 	}
 
@@ -266,10 +260,7 @@ func (m *Channel) validateResponderID(formats strfmt.Registry) error {
 
 func (m *Channel) validateRound(formats strfmt.Registry) error {
 
-	if err := m.Round.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("round")
-		}
+	if err := validate.Required("round", "body", m.Round); err != nil {
 		return err
 	}
 
@@ -278,10 +269,7 @@ func (m *Channel) validateRound(formats strfmt.Registry) error {
 
 func (m *Channel) validateSoloRound(formats strfmt.Registry) error {
 
-	if err := m.SoloRound.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("solo_round")
-		}
+	if err := validate.Required("solo_round", "body", m.SoloRound); err != nil {
 		return err
 	}
 

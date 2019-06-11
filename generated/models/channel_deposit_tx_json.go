@@ -13,19 +13,20 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // ChannelDepositTxJSON channel deposit tx JSON
 // swagger:model ChannelDepositTxJSON
 type ChannelDepositTxJSON struct {
-	versionField Uint32
+	versionField *uint32
 
 	ChannelDepositTx
 }
 
 // Type gets the type of this subtype
 func (m *ChannelDepositTxJSON) Type() string {
-	return "ChannelDepositTx"
+	return "ChannelDepositTxJSON"
 }
 
 // SetType sets the type of this subtype
@@ -34,12 +35,12 @@ func (m *ChannelDepositTxJSON) SetType(val string) {
 }
 
 // Version gets the version of this subtype
-func (m *ChannelDepositTxJSON) Version() Uint32 {
+func (m *ChannelDepositTxJSON) Version() *uint32 {
 	return m.versionField
 }
 
 // SetVersion sets the version of this subtype
-func (m *ChannelDepositTxJSON) SetVersion(val Uint32) {
+func (m *ChannelDepositTxJSON) SetVersion(val *uint32) {
 	m.versionField = val
 }
 
@@ -61,7 +62,7 @@ func (m *ChannelDepositTxJSON) UnmarshalJSON(raw []byte) error {
 
 		Type string `json:"type"`
 
-		Version Uint32 `json:"version"`
+		Version *uint32 `json:"version"`
 	}
 	buf = bytes.NewBuffer(raw)
 	dec = json.NewDecoder(buf)
@@ -104,7 +105,7 @@ func (m ChannelDepositTxJSON) MarshalJSON() ([]byte, error) {
 	b2, err = json.Marshal(struct {
 		Type string `json:"type"`
 
-		Version Uint32 `json:"version"`
+		Version *uint32 `json:"version"`
 	}{
 
 		Type: m.Type(),
@@ -140,10 +141,7 @@ func (m *ChannelDepositTxJSON) Validate(formats strfmt.Registry) error {
 
 func (m *ChannelDepositTxJSON) validateVersion(formats strfmt.Registry) error {
 
-	if err := m.Version().Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("version")
-		}
+	if err := validate.Required("version", "body", m.Version()); err != nil {
 		return err
 	}
 

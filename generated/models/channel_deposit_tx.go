@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 
 	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
@@ -36,18 +37,18 @@ type ChannelDepositTx struct {
 
 	// nonce
 	// Required: true
-	Nonce Uint64 `json:"nonce"`
+	Nonce *uint64 `json:"nonce"`
 
 	// Channel's next round
 	// Required: true
-	Round Uint64 `json:"round"`
+	Round *uint64 `json:"round"`
 
 	// Root hash of the channel's internal state tree after the deposit had been applied to it
 	// Required: true
 	StateHash EncodedHash `json:"state_hash"`
 
 	// ttl
-	TTL Uint64 `json:"ttl,omitempty"`
+	TTL uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this channel deposit tx
@@ -79,10 +80,6 @@ func (m *ChannelDepositTx) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateStateHash(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateTTL(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -142,10 +139,7 @@ func (m *ChannelDepositTx) validateFromID(formats strfmt.Registry) error {
 
 func (m *ChannelDepositTx) validateNonce(formats strfmt.Registry) error {
 
-	if err := m.Nonce.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("nonce")
-		}
+	if err := validate.Required("nonce", "body", m.Nonce); err != nil {
 		return err
 	}
 
@@ -154,10 +148,7 @@ func (m *ChannelDepositTx) validateNonce(formats strfmt.Registry) error {
 
 func (m *ChannelDepositTx) validateRound(formats strfmt.Registry) error {
 
-	if err := m.Round.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("round")
-		}
+	if err := validate.Required("round", "body", m.Round); err != nil {
 		return err
 	}
 
@@ -169,22 +160,6 @@ func (m *ChannelDepositTx) validateStateHash(formats strfmt.Registry) error {
 	if err := m.StateHash.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("state_hash")
-		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *ChannelDepositTx) validateTTL(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.TTL) { // not required
-		return nil
-	}
-
-	if err := m.TTL.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("ttl")
 		}
 		return err
 	}

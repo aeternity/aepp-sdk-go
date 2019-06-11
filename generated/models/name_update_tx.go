@@ -27,7 +27,7 @@ type NameUpdateTx struct {
 
 	// client ttl
 	// Required: true
-	ClientTTL Uint64 `json:"client_ttl"`
+	ClientTTL *uint64 `json:"client_ttl"`
 
 	// fee
 	// Required: true
@@ -39,17 +39,17 @@ type NameUpdateTx struct {
 
 	// name ttl
 	// Required: true
-	NameTTL Uint64 `json:"name_ttl"`
+	NameTTL *uint64 `json:"name_ttl"`
 
 	// nonce
-	Nonce Uint64 `json:"nonce,omitempty"`
+	Nonce uint64 `json:"nonce,omitempty"`
 
 	// pointers
 	// Required: true
 	Pointers []*NamePointer `json:"pointers"`
 
 	// ttl
-	TTL Uint64 `json:"ttl,omitempty"`
+	TTL uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this name update tx
@@ -76,15 +76,7 @@ func (m *NameUpdateTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateNonce(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.validatePointers(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateTTL(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -108,10 +100,7 @@ func (m *NameUpdateTx) validateAccountID(formats strfmt.Registry) error {
 
 func (m *NameUpdateTx) validateClientTTL(formats strfmt.Registry) error {
 
-	if err := m.ClientTTL.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("client_ttl")
-		}
+	if err := validate.Required("client_ttl", "body", m.ClientTTL); err != nil {
 		return err
 	}
 
@@ -144,26 +133,7 @@ func (m *NameUpdateTx) validateNameID(formats strfmt.Registry) error {
 
 func (m *NameUpdateTx) validateNameTTL(formats strfmt.Registry) error {
 
-	if err := m.NameTTL.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("name_ttl")
-		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *NameUpdateTx) validateNonce(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.Nonce) { // not required
-		return nil
-	}
-
-	if err := m.Nonce.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("nonce")
-		}
+	if err := validate.Required("name_ttl", "body", m.NameTTL); err != nil {
 		return err
 	}
 
@@ -190,22 +160,6 @@ func (m *NameUpdateTx) validatePointers(formats strfmt.Registry) error {
 			}
 		}
 
-	}
-
-	return nil
-}
-
-func (m *NameUpdateTx) validateTTL(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.TTL) { // not required
-		return nil
-	}
-
-	if err := m.TTL.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("ttl")
-		}
-		return err
 	}
 
 	return nil
