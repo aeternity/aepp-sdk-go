@@ -83,7 +83,7 @@ func WaitForTransactionUntilHeight(c getTransactionByHashHeighter, txHash string
 
 		if tx.BlockHeight.LargerThanZero() {
 			bh := big.Int(tx.BlockHeight)
-			return bh.Uint64(), string(tx.BlockHash), nil
+			return bh.Uint64(), *tx.BlockHash, nil
 		}
 		time.Sleep(time.Millisecond * time.Duration(Config.Tuning.ChainPollInteval))
 	}

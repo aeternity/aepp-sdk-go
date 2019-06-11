@@ -29,11 +29,11 @@ type Account struct {
 	Balance utils.BigInt `json:"balance"`
 
 	// Id of authorization contract for generalized account
-	ContractID EncodedPubkey `json:"contract_id,omitempty"`
+	ContractID string `json:"contract_id,omitempty"`
 
 	// Public key
 	// Required: true
-	ID EncodedPubkey `json:"id"`
+	ID *string `json:"id"`
 
 	// kind
 	// Enum: [basic generalized]
@@ -49,10 +49,6 @@ func (m *Account) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateBalance(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateContractID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -86,28 +82,9 @@ func (m *Account) validateBalance(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Account) validateContractID(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.ContractID) { // not required
-		return nil
-	}
-
-	if err := m.ContractID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("contract_id")
-		}
-		return err
-	}
-
-	return nil
-}
-
 func (m *Account) validateID(formats strfmt.Registry) error {
 
-	if err := m.ID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("id")
-		}
+	if err := validate.Required("id", "body", m.ID); err != nil {
 		return err
 	}
 

@@ -182,9 +182,9 @@ func (tx *SpendTx) JSON() (string, error) {
 		Amount:      utils.BigInt(tx.Amount),
 		Fee:         utils.BigInt(tx.Fee),
 		Nonce:       tx.Nonce,
-		Payload:     models.EncodedByteArray(tx.Payload),
-		RecipientID: models.EncodedPubkey(tx.RecipientID),
-		SenderID:    models.EncodedPubkey(tx.SenderID),
+		Payload:     &tx.Payload,
+		RecipientID: &tx.RecipientID,
+		SenderID:    &tx.SenderID,
 		TTL:         tx.TTL,
 	}
 	output, err := swaggerT.MarshalBinary()
@@ -247,8 +247,8 @@ func (tx *NamePreclaimTx) RLP() (rlpRawMsg []byte, err error) {
 // JSON representation of a Tx is useful for querying the node's debug endpoint
 func (tx *NamePreclaimTx) JSON() (string, error) {
 	swaggerT := models.NamePreclaimTx{
-		AccountID:    models.EncodedPubkey(tx.AccountID),
-		CommitmentID: models.EncodedValue(tx.CommitmentID),
+		AccountID:    &tx.AccountID,
+		CommitmentID: &tx.CommitmentID,
 		Fee:          utils.BigInt(tx.Fee),
 		Nonce:        tx.AccountNonce,
 		TTL:          tx.TTL,
@@ -316,7 +316,7 @@ func (tx *NameClaimTx) JSON() (string, error) {
 	// (base58), not namehash-ed.
 	nameAPIEncoded := Encode(PrefixName, []byte(tx.Name))
 	swaggerT := models.NameClaimTx{
-		AccountID: models.EncodedPubkey(tx.AccountID),
+		AccountID: &tx.AccountID,
 		Fee:       utils.BigInt(tx.Fee),
 		Name:      &nameAPIEncoded,
 		NameSalt:  utils.BigInt(tx.NameSalt),
@@ -354,13 +354,13 @@ type NamePointer struct {
 }
 
 // EncodeRLP implements rlp.Encoder interface.
-func (tx *NamePointer) EncodeRLP(w io.Writer) (err error) {
-	accountID, err := buildIDTag(IDTagAccount, string(tx.NamePointer.ID))
+func (np *NamePointer) EncodeRLP(w io.Writer) (err error) {
+	accountID, err := buildIDTag(IDTagAccount, *np.NamePointer.ID)
 	if err != nil {
 		return
 	}
 
-	err = rlp.Encode(w, []interface{}{tx.Key, accountID})
+	err = rlp.Encode(w, []interface{}{np.Key, accountID})
 	if err != nil {
 		return
 	}
@@ -370,7 +370,7 @@ func (tx *NamePointer) EncodeRLP(w io.Writer) (err error) {
 // NewNamePointer is a constructor for a swagger generated NamePointer struct.
 // It returns a pointer because
 func NewNamePointer(key string, id string) *NamePointer {
-	np := models.NamePointer{ID: models.EncodedPubkey(id), Key: &key}
+	np := models.NamePointer{ID: &id, Key: &key}
 	return &NamePointer{
 		NamePointer: &np,
 	}
@@ -434,10 +434,10 @@ func (tx *NameUpdateTx) JSON() (string, error) {
 	}
 
 	swaggerT := models.NameUpdateTx{
-		AccountID: models.EncodedPubkey(tx.AccountID),
+		AccountID: &tx.AccountID,
 		ClientTTL: &tx.ClientTTL,
 		Fee:       utils.BigInt(tx.Fee),
-		NameID:    models.EncodedValue(tx.NameID),
+		NameID:    &tx.NameID,
 		NameTTL:   &tx.NameTTL,
 		Nonce:     tx.AccountNonce,
 		Pointers:  swaggerNamePointers,
@@ -508,9 +508,9 @@ func (tx *NameRevokeTx) RLP() (rlpRawMsg []byte, err error) {
 // JSON representation of a Tx is useful for querying the node's debug endpoint
 func (tx *NameRevokeTx) JSON() (string, error) {
 	swaggerT := models.NameRevokeTx{
-		AccountID: models.EncodedPubkey(tx.AccountID),
+		AccountID: &tx.AccountID,
 		Fee:       utils.BigInt(tx.Fee),
-		NameID:    models.EncodedValue(tx.NameID),
+		NameID:    &tx.NameID,
 		Nonce:     tx.AccountNonce,
 		TTL:       tx.TTL,
 	}
@@ -586,11 +586,11 @@ func (tx *NameTransferTx) RLP() (rlpRawMsg []byte, err error) {
 // JSON representation of a Tx is useful for querying the node's debug endpoint
 func (tx *NameTransferTx) JSON() (string, error) {
 	swaggerT := models.NameTransferTx{
-		AccountID:   models.EncodedPubkey(tx.AccountID),
+		AccountID:   &tx.AccountID,
 		Fee:         utils.BigInt(tx.Fee),
-		NameID:      models.EncodedValue(tx.NameID),
+		NameID:      &tx.NameID,
 		Nonce:       tx.AccountNonce,
-		RecipientID: models.EncodedPubkey(tx.RecipientID),
+		RecipientID: &tx.RecipientID,
 		TTL:         tx.TTL,
 	}
 
@@ -679,7 +679,7 @@ func (tx *OracleRegisterTx) JSON() (string, error) {
 
 	swaggerT := models.OracleRegisterTx{
 		AbiVersion: tx.AbiVersion,
-		AccountID:  models.EncodedPubkey(tx.AccountID),
+		AccountID:  &tx.AccountID,
 		Fee:        utils.BigInt(tx.Fee),
 		Nonce:      tx.AccountNonce,
 		OracleTTL: &models.TTL{
@@ -736,7 +736,7 @@ func (tx *OracleExtendTx) JSON() (string, error) {
 	swaggerT := models.OracleExtendTx{
 		Fee:      utils.BigInt(tx.Fee),
 		Nonce:    tx.AccountNonce,
-		OracleID: models.EncodedPubkey(tx.OracleID),
+		OracleID: &tx.OracleID,
 		OracleTTL: &models.RelativeTTL{
 			Type:  &oracleTTLTypeStr,
 			Value: &tx.OracleTTLValue,
@@ -805,7 +805,7 @@ func (tx *OracleQueryTx) JSON() (string, error) {
 	swaggerT := models.OracleQueryTx{
 		Fee:      utils.BigInt(tx.Fee),
 		Nonce:    tx.AccountNonce,
-		OracleID: models.EncodedPubkey(tx.OracleID),
+		OracleID: &tx.OracleID,
 		Query:    &tx.Query,
 		QueryFee: utils.BigInt(tx.QueryFee),
 		QueryTTL: &models.TTL{
@@ -816,7 +816,7 @@ func (tx *OracleQueryTx) JSON() (string, error) {
 			Type:  &responseTTLTypeStr,
 			Value: &tx.ResponseTTLValue,
 		},
-		SenderID: models.EncodedPubkey(tx.SenderID),
+		SenderID: &tx.SenderID,
 		TTL:      tx.TTL,
 	}
 
@@ -873,8 +873,8 @@ func (tx *OracleRespondTx) JSON() (string, error) {
 	swaggerT := models.OracleRespondTx{
 		Fee:      utils.BigInt(tx.Fee),
 		Nonce:    tx.AccountNonce,
-		OracleID: models.EncodedPubkey(tx.OracleID),
-		QueryID:  models.EncodedValue(tx.QueryID),
+		OracleID: &tx.OracleID,
+		QueryID:  &tx.QueryID,
 		Response: &tx.Response,
 		ResponseTTL: &models.RelativeTTL{
 			Type:  &responseTTLTypeStr,
@@ -954,9 +954,9 @@ func (tx *ContractCreateTx) RLP() (rlpRawMsg []byte, err error) {
 func (tx *ContractCreateTx) JSON() (string, error) {
 	g := tx.Gas.Uint64()
 	swaggerT := models.ContractCreateTx{
-		OwnerID:    models.EncodedPubkey(tx.OwnerID),
+		OwnerID:    &tx.OwnerID,
 		Nonce:      tx.AccountNonce,
-		Code:       models.EncodedByteArray(tx.Code),
+		Code:       &tx.Code,
 		VMVersion:  &tx.VMVersion,
 		AbiVersion: &tx.AbiVersion,
 		Deposit:    utils.BigInt(tx.Deposit),
@@ -965,7 +965,7 @@ func (tx *ContractCreateTx) JSON() (string, error) {
 		GasPrice:   utils.BigInt(tx.GasPrice),
 		Fee:        utils.BigInt(tx.Fee),
 		TTL:        tx.TTL,
-		CallData:   models.EncodedByteArray(tx.CallData),
+		CallData:   &tx.CallData,
 	}
 	output, err := swaggerT.MarshalBinary()
 	return string(output), err
@@ -1028,14 +1028,14 @@ type ContractCallTx struct {
 func (tx *ContractCallTx) JSON() (string, error) {
 	gas := tx.Gas.Uint64()
 	swaggerT := models.ContractCallTx{
-		CallerID:   models.EncodedPubkey(tx.CallerID),
+		CallerID:   &tx.CallerID,
 		Nonce:      tx.AccountNonce,
-		ContractID: models.EncodedPubkey(tx.ContractID),
+		ContractID: &tx.ContractID,
 		Amount:     utils.BigInt(tx.Amount),
 		Gas:        &gas,
 		GasPrice:   utils.BigInt(tx.GasPrice),
 		AbiVersion: &tx.AbiVersion,
-		CallData:   models.EncodedByteArray(tx.CallData),
+		CallData:   &tx.CallData,
 		Fee:        utils.BigInt(tx.Fee),
 		TTL:        tx.TTL,
 	}

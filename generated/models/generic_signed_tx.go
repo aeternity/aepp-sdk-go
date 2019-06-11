@@ -9,7 +9,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
-	"strconv"
 
 	strfmt "github.com/go-openapi/strfmt"
 
@@ -27,7 +26,7 @@ type GenericSignedTx struct {
 
 	// Value "none" means no block in the chain includes the transaction
 	// Required: true
-	BlockHash EncodedHash `json:"block_hash"`
+	BlockHash *string `json:"block_hash"`
 
 	// block height
 	// Required: true
@@ -35,11 +34,11 @@ type GenericSignedTx struct {
 
 	// hash
 	// Required: true
-	Hash EncodedHash `json:"hash"`
+	Hash *string `json:"hash"`
 
 	// signatures required unless for Generalized Account Meta transactions
 	// Min Items: 1
-	Signatures []EncodedValue `json:"signatures"`
+	Signatures []string `json:"signatures"`
 
 	txField GenericTx
 }
@@ -57,13 +56,13 @@ func (m *GenericSignedTx) SetTx(val GenericTx) {
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
 func (m *GenericSignedTx) UnmarshalJSON(raw []byte) error {
 	var data struct {
-		BlockHash EncodedHash `json:"block_hash"`
+		BlockHash *string `json:"block_hash"`
 
 		BlockHeight utils.BigInt `json:"block_height"`
 
-		Hash EncodedHash `json:"hash"`
+		Hash *string `json:"hash"`
 
-		Signatures []EncodedValue `json:"signatures"`
+		Signatures []string `json:"signatures"`
 
 		Tx json.RawMessage `json:"tx"`
 	}
@@ -107,13 +106,13 @@ func (m GenericSignedTx) MarshalJSON() ([]byte, error) {
 	var b1, b2, b3 []byte
 	var err error
 	b1, err = json.Marshal(struct {
-		BlockHash EncodedHash `json:"block_hash"`
+		BlockHash *string `json:"block_hash"`
 
 		BlockHeight utils.BigInt `json:"block_height"`
 
-		Hash EncodedHash `json:"hash"`
+		Hash *string `json:"hash"`
 
-		Signatures []EncodedValue `json:"signatures"`
+		Signatures []string `json:"signatures"`
 	}{
 
 		BlockHash: m.BlockHash,
@@ -174,10 +173,7 @@ func (m *GenericSignedTx) Validate(formats strfmt.Registry) error {
 
 func (m *GenericSignedTx) validateBlockHash(formats strfmt.Registry) error {
 
-	if err := m.BlockHash.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("block_hash")
-		}
+	if err := validate.Required("block_hash", "body", m.BlockHash); err != nil {
 		return err
 	}
 
@@ -198,10 +194,7 @@ func (m *GenericSignedTx) validateBlockHeight(formats strfmt.Registry) error {
 
 func (m *GenericSignedTx) validateHash(formats strfmt.Registry) error {
 
-	if err := m.Hash.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("hash")
-		}
+	if err := validate.Required("hash", "body", m.Hash); err != nil {
 		return err
 	}
 
@@ -218,17 +211,6 @@ func (m *GenericSignedTx) validateSignatures(formats strfmt.Registry) error {
 
 	if err := validate.MinItems("signatures", "body", iSignaturesSize, 1); err != nil {
 		return err
-	}
-
-	for i := 0; i < len(m.Signatures); i++ {
-
-		if err := m.Signatures[i].Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("signatures" + "." + strconv.Itoa(i))
-			}
-			return err
-		}
-
 	}
 
 	return nil

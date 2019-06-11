@@ -21,10 +21,11 @@ func (m *mockClient) GetTransactionByHash(hash string) (tx *models.GenericSigned
 	unminedHeight, _ := utils.NewIntFromString("-1")
 	minedHeight, _ := utils.NewIntFromString("9")
 
+	bh := "bh_someblockhash"
 	tx = &models.GenericSignedTx{
-		BlockHash:   "bh_someblockhash",
+		BlockHash:   &bh,
 		BlockHeight: utils.BigInt{},
-		Hash:        "th_transactionhash",
+		Hash:        &hash,
 		Signatures:  nil,
 	}
 

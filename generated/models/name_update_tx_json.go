@@ -26,7 +26,7 @@ type NameUpdateTxJSON struct {
 
 // Type gets the type of this subtype
 func (m *NameUpdateTxJSON) Type() string {
-	return "NameUpdateTxJSON"
+	return "NameUpdateTx"
 }
 
 // SetType sets the type of this subtype

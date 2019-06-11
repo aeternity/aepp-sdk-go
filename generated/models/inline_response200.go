@@ -8,7 +8,6 @@ package models
 import (
 	strfmt "github.com/go-openapi/strfmt"
 
-	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 )
 
@@ -17,36 +16,11 @@ import (
 type InlineResponse200 struct {
 
 	// hash
-	Hash EncodedHash `json:"hash,omitempty"`
+	Hash string `json:"hash,omitempty"`
 }
 
 // Validate validates this inline response 200
 func (m *InlineResponse200) Validate(formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.validateHash(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *InlineResponse200) validateHash(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.Hash) { // not required
-		return nil
-	}
-
-	if err := m.Hash.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("hash")
-		}
-		return err
-	}
-
 	return nil
 }
 

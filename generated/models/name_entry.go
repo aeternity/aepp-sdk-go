@@ -21,7 +21,7 @@ type NameEntry struct {
 
 	// id
 	// Required: true
-	ID EncodedValue `json:"id"`
+	ID *string `json:"id"`
 
 	// pointers
 	// Required: true
@@ -56,10 +56,7 @@ func (m *NameEntry) Validate(formats strfmt.Registry) error {
 
 func (m *NameEntry) validateID(formats strfmt.Registry) error {
 
-	if err := m.ID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("id")
-		}
+	if err := validate.Required("id", "body", m.ID); err != nil {
 		return err
 	}
 

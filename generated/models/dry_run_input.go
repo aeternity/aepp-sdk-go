@@ -23,11 +23,11 @@ type DryRunInput struct {
 	Accounts []*DryRunAccount `json:"accounts"`
 
 	// top
-	Top EncodedHash `json:"top,omitempty"`
+	Top string `json:"top,omitempty"`
 
 	// Txs
 	// Required: true
-	Txs []EncodedByteArray `json:"txs"`
+	Txs []string `json:"txs"`
 }
 
 // Validate validates this dry run input
@@ -35,10 +35,6 @@ func (m *DryRunInput) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateAccounts(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateTop(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -77,37 +73,10 @@ func (m *DryRunInput) validateAccounts(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *DryRunInput) validateTop(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.Top) { // not required
-		return nil
-	}
-
-	if err := m.Top.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("top")
-		}
-		return err
-	}
-
-	return nil
-}
-
 func (m *DryRunInput) validateTxs(formats strfmt.Registry) error {
 
 	if err := validate.Required("txs", "body", m.Txs); err != nil {
 		return err
-	}
-
-	for i := 0; i < len(m.Txs); i++ {
-
-		if err := m.Txs[i].Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("txs" + "." + strconv.Itoa(i))
-			}
-			return err
-		}
-
 	}
 
 	return nil

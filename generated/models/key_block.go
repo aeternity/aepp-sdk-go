@@ -19,11 +19,11 @@ type KeyBlock struct {
 
 	// beneficiary
 	// Required: true
-	Beneficiary EncodedPubkey `json:"beneficiary"`
+	Beneficiary *string `json:"beneficiary"`
 
 	// hash
 	// Required: true
-	Hash EncodedHash `json:"hash"`
+	Hash *string `json:"hash"`
 
 	// height
 	// Required: true
@@ -31,11 +31,11 @@ type KeyBlock struct {
 
 	// info
 	// Required: true
-	Info EncodedByteArray `json:"info"`
+	Info *string `json:"info"`
 
 	// miner
 	// Required: true
-	Miner EncodedPubkey `json:"miner"`
+	Miner *string `json:"miner"`
 
 	// nonce
 	Nonce uint64 `json:"nonce,omitempty"`
@@ -45,15 +45,15 @@ type KeyBlock struct {
 
 	// prev hash
 	// Required: true
-	PrevHash EncodedHash `json:"prev_hash"`
+	PrevHash *string `json:"prev_hash"`
 
 	// prev key hash
 	// Required: true
-	PrevKeyHash EncodedHash `json:"prev_key_hash"`
+	PrevKeyHash *string `json:"prev_key_hash"`
 
 	// state hash
 	// Required: true
-	StateHash EncodedHash `json:"state_hash"`
+	StateHash *string `json:"state_hash"`
 
 	// target
 	// Required: true
@@ -128,10 +128,7 @@ func (m *KeyBlock) Validate(formats strfmt.Registry) error {
 
 func (m *KeyBlock) validateBeneficiary(formats strfmt.Registry) error {
 
-	if err := m.Beneficiary.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("beneficiary")
-		}
+	if err := validate.Required("beneficiary", "body", m.Beneficiary); err != nil {
 		return err
 	}
 
@@ -140,10 +137,7 @@ func (m *KeyBlock) validateBeneficiary(formats strfmt.Registry) error {
 
 func (m *KeyBlock) validateHash(formats strfmt.Registry) error {
 
-	if err := m.Hash.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("hash")
-		}
+	if err := validate.Required("hash", "body", m.Hash); err != nil {
 		return err
 	}
 
@@ -161,10 +155,7 @@ func (m *KeyBlock) validateHeight(formats strfmt.Registry) error {
 
 func (m *KeyBlock) validateInfo(formats strfmt.Registry) error {
 
-	if err := m.Info.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("info")
-		}
+	if err := validate.Required("info", "body", m.Info); err != nil {
 		return err
 	}
 
@@ -173,10 +164,7 @@ func (m *KeyBlock) validateInfo(formats strfmt.Registry) error {
 
 func (m *KeyBlock) validateMiner(formats strfmt.Registry) error {
 
-	if err := m.Miner.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("miner")
-		}
+	if err := validate.Required("miner", "body", m.Miner); err != nil {
 		return err
 	}
 
@@ -201,10 +189,7 @@ func (m *KeyBlock) validatePow(formats strfmt.Registry) error {
 
 func (m *KeyBlock) validatePrevHash(formats strfmt.Registry) error {
 
-	if err := m.PrevHash.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("prev_hash")
-		}
+	if err := validate.Required("prev_hash", "body", m.PrevHash); err != nil {
 		return err
 	}
 
@@ -213,10 +198,7 @@ func (m *KeyBlock) validatePrevHash(formats strfmt.Registry) error {
 
 func (m *KeyBlock) validatePrevKeyHash(formats strfmt.Registry) error {
 
-	if err := m.PrevKeyHash.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("prev_key_hash")
-		}
+	if err := validate.Required("prev_key_hash", "body", m.PrevKeyHash); err != nil {
 		return err
 	}
 
@@ -225,10 +207,7 @@ func (m *KeyBlock) validatePrevKeyHash(formats strfmt.Registry) error {
 
 func (m *KeyBlock) validateStateHash(formats strfmt.Registry) error {
 
-	if err := m.StateHash.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("state_hash")
-		}
+	if err := validate.Required("state_hash", "body", m.StateHash); err != nil {
 		return err
 	}
 

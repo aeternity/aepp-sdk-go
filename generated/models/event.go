@@ -23,11 +23,11 @@ type Event struct {
 
 	// Contract address
 	// Required: true
-	Address EncodedPubkey `json:"address"`
+	Address *string `json:"address"`
 
 	// Log event data (as contract byte array).
 	// Required: true
-	Data EncodedByteArray `json:"data"`
+	Data *string `json:"data"`
 
 	// Event topics
 	// Required: true
@@ -58,10 +58,7 @@ func (m *Event) Validate(formats strfmt.Registry) error {
 
 func (m *Event) validateAddress(formats strfmt.Registry) error {
 
-	if err := m.Address.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("address")
-		}
+	if err := validate.Required("address", "body", m.Address); err != nil {
 		return err
 	}
 
@@ -70,10 +67,7 @@ func (m *Event) validateAddress(formats strfmt.Registry) error {
 
 func (m *Event) validateData(formats strfmt.Registry) error {
 
-	if err := m.Data.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("data")
-		}
+	if err := validate.Required("data", "body", m.Data); err != nil {
 		return err
 	}
 

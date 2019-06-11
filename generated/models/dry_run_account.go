@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 
 	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
@@ -24,7 +25,7 @@ type DryRunAccount struct {
 
 	// pub key
 	// Required: true
-	PubKey EncodedPubkey `json:"pub_key"`
+	PubKey *string `json:"pub_key"`
 }
 
 // Validate validates this dry run account
@@ -59,10 +60,7 @@ func (m *DryRunAccount) validateAmount(formats strfmt.Registry) error {
 
 func (m *DryRunAccount) validatePubKey(formats strfmt.Registry) error {
 
-	if err := m.PubKey.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("pub_key")
-		}
+	if err := validate.Required("pub_key", "body", m.PubKey); err != nil {
 		return err
 	}
 

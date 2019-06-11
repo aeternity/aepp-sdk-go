@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 
 	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
@@ -20,7 +21,7 @@ type ChannelSLASHTx struct {
 
 	// channel id
 	// Required: true
-	ChannelID EncodedPubkey `json:"channel_id"`
+	ChannelID *string `json:"channel_id"`
 
 	// fee
 	// Required: true
@@ -28,18 +29,18 @@ type ChannelSLASHTx struct {
 
 	// from id
 	// Required: true
-	FromID EncodedPubkey `json:"from_id"`
+	FromID *string `json:"from_id"`
 
 	// nonce
 	Nonce uint64 `json:"nonce,omitempty"`
 
 	// payload
 	// Required: true
-	Payload EncodedByteArray `json:"payload"`
+	Payload *string `json:"payload"`
 
 	// Proof of inclusion containing information for closing the channel
 	// Required: true
-	Poi EncodedByteArray `json:"poi"`
+	Poi *string `json:"poi"`
 
 	// ttl
 	TTL uint64 `json:"ttl,omitempty"`
@@ -77,10 +78,7 @@ func (m *ChannelSLASHTx) Validate(formats strfmt.Registry) error {
 
 func (m *ChannelSLASHTx) validateChannelID(formats strfmt.Registry) error {
 
-	if err := m.ChannelID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("channel_id")
-		}
+	if err := validate.Required("channel_id", "body", m.ChannelID); err != nil {
 		return err
 	}
 
@@ -101,10 +99,7 @@ func (m *ChannelSLASHTx) validateFee(formats strfmt.Registry) error {
 
 func (m *ChannelSLASHTx) validateFromID(formats strfmt.Registry) error {
 
-	if err := m.FromID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("from_id")
-		}
+	if err := validate.Required("from_id", "body", m.FromID); err != nil {
 		return err
 	}
 
@@ -113,10 +108,7 @@ func (m *ChannelSLASHTx) validateFromID(formats strfmt.Registry) error {
 
 func (m *ChannelSLASHTx) validatePayload(formats strfmt.Registry) error {
 
-	if err := m.Payload.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("payload")
-		}
+	if err := validate.Required("payload", "body", m.Payload); err != nil {
 		return err
 	}
 
@@ -125,10 +117,7 @@ func (m *ChannelSLASHTx) validatePayload(formats strfmt.Registry) error {
 
 func (m *ChannelSLASHTx) validatePoi(formats strfmt.Registry) error {
 
-	if err := m.Poi.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("poi")
-		}
+	if err := validate.Required("poi", "body", m.Poi); err != nil {
 		return err
 	}
 

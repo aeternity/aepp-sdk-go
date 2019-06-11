@@ -25,7 +25,7 @@ type RegisteredOracle struct {
 
 	// id
 	// Required: true
-	ID EncodedPubkey `json:"id"`
+	ID *string `json:"id"`
 
 	// query fee
 	// Required: true
@@ -89,10 +89,7 @@ func (m *RegisteredOracle) validateAbiVersion(formats strfmt.Registry) error {
 
 func (m *RegisteredOracle) validateID(formats strfmt.Registry) error {
 
-	if err := m.ID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("id")
-		}
+	if err := validate.Required("id", "body", m.ID); err != nil {
 		return err
 	}
 

@@ -24,7 +24,7 @@ type OracleRegisterTx struct {
 
 	// account id
 	// Required: true
-	AccountID EncodedPubkey `json:"account_id"`
+	AccountID *string `json:"account_id"`
 
 	// fee
 	// Required: true
@@ -89,10 +89,7 @@ func (m *OracleRegisterTx) Validate(formats strfmt.Registry) error {
 
 func (m *OracleRegisterTx) validateAccountID(formats strfmt.Registry) error {
 
-	if err := m.AccountID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("account_id")
-		}
+	if err := validate.Required("account_id", "body", m.AccountID); err != nil {
 		return err
 	}
 

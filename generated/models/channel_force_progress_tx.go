@@ -26,7 +26,7 @@ type ChannelForceProgressTx struct {
 
 	// channel id
 	// Required: true
-	ChannelID EncodedPubkey `json:"channel_id"`
+	ChannelID *string `json:"channel_id"`
 
 	// fee
 	// Required: true
@@ -34,17 +34,17 @@ type ChannelForceProgressTx struct {
 
 	// from id
 	// Required: true
-	FromID EncodedPubkey `json:"from_id"`
+	FromID *string `json:"from_id"`
 
 	// nonce
 	Nonce uint64 `json:"nonce,omitempty"`
 
 	// The whole set of off-chain state trees
-	OffchainTrees EncodedByteArray `json:"offchain_trees,omitempty"`
+	OffchainTrees string `json:"offchain_trees,omitempty"`
 
 	// payload
 	// Required: true
-	Payload EncodedByteArray `json:"payload"`
+	Payload *string `json:"payload"`
 
 	// Channel's next round
 	// Required: true
@@ -52,7 +52,7 @@ type ChannelForceProgressTx struct {
 
 	// Channel's next state_hash
 	// Required: true
-	StateHash EncodedHash `json:"state_hash"`
+	StateHash *string `json:"state_hash"`
 
 	// ttl
 	TTL uint64 `json:"ttl,omitempty"`
@@ -73,21 +73,21 @@ func (m *ChannelForceProgressTx) SetUpdate(val OffChainUpdate) {
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
 func (m *ChannelForceProgressTx) UnmarshalJSON(raw []byte) error {
 	var data struct {
-		ChannelID EncodedPubkey `json:"channel_id"`
+		ChannelID *string `json:"channel_id"`
 
 		Fee utils.BigInt `json:"fee"`
 
-		FromID EncodedPubkey `json:"from_id"`
+		FromID *string `json:"from_id"`
 
 		Nonce uint64 `json:"nonce,omitempty"`
 
-		OffchainTrees EncodedByteArray `json:"offchain_trees,omitempty"`
+		OffchainTrees string `json:"offchain_trees,omitempty"`
 
-		Payload EncodedByteArray `json:"payload"`
+		Payload *string `json:"payload"`
 
 		Round *uint64 `json:"round"`
 
-		StateHash EncodedHash `json:"state_hash"`
+		StateHash *string `json:"state_hash"`
 
 		TTL uint64 `json:"ttl,omitempty"`
 
@@ -148,21 +148,21 @@ func (m ChannelForceProgressTx) MarshalJSON() ([]byte, error) {
 	var b1, b2, b3 []byte
 	var err error
 	b1, err = json.Marshal(struct {
-		ChannelID EncodedPubkey `json:"channel_id"`
+		ChannelID *string `json:"channel_id"`
 
 		Fee utils.BigInt `json:"fee"`
 
-		FromID EncodedPubkey `json:"from_id"`
+		FromID *string `json:"from_id"`
 
 		Nonce uint64 `json:"nonce,omitempty"`
 
-		OffchainTrees EncodedByteArray `json:"offchain_trees,omitempty"`
+		OffchainTrees string `json:"offchain_trees,omitempty"`
 
-		Payload EncodedByteArray `json:"payload"`
+		Payload *string `json:"payload"`
 
 		Round *uint64 `json:"round"`
 
-		StateHash EncodedHash `json:"state_hash"`
+		StateHash *string `json:"state_hash"`
 
 		TTL uint64 `json:"ttl,omitempty"`
 	}{
@@ -219,10 +219,6 @@ func (m *ChannelForceProgressTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateOffchainTrees(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.validatePayload(formats); err != nil {
 		res = append(res, err)
 	}
@@ -247,10 +243,7 @@ func (m *ChannelForceProgressTx) Validate(formats strfmt.Registry) error {
 
 func (m *ChannelForceProgressTx) validateChannelID(formats strfmt.Registry) error {
 
-	if err := m.ChannelID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("channel_id")
-		}
+	if err := validate.Required("channel_id", "body", m.ChannelID); err != nil {
 		return err
 	}
 
@@ -271,26 +264,7 @@ func (m *ChannelForceProgressTx) validateFee(formats strfmt.Registry) error {
 
 func (m *ChannelForceProgressTx) validateFromID(formats strfmt.Registry) error {
 
-	if err := m.FromID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("from_id")
-		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *ChannelForceProgressTx) validateOffchainTrees(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.OffchainTrees) { // not required
-		return nil
-	}
-
-	if err := m.OffchainTrees.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("offchain_trees")
-		}
+	if err := validate.Required("from_id", "body", m.FromID); err != nil {
 		return err
 	}
 
@@ -299,10 +273,7 @@ func (m *ChannelForceProgressTx) validateOffchainTrees(formats strfmt.Registry) 
 
 func (m *ChannelForceProgressTx) validatePayload(formats strfmt.Registry) error {
 
-	if err := m.Payload.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("payload")
-		}
+	if err := validate.Required("payload", "body", m.Payload); err != nil {
 		return err
 	}
 
@@ -320,10 +291,7 @@ func (m *ChannelForceProgressTx) validateRound(formats strfmt.Registry) error {
 
 func (m *ChannelForceProgressTx) validateStateHash(formats strfmt.Registry) error {
 
-	if err := m.StateHash.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("state_hash")
-		}
+	if err := validate.Required("state_hash", "body", m.StateHash); err != nil {
 		return err
 	}
 

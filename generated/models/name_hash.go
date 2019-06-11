@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // NameHash name hash
@@ -18,7 +19,7 @@ type NameHash struct {
 
 	// name id
 	// Required: true
-	NameID EncodedValue `json:"name_id"`
+	NameID *string `json:"name_id"`
 }
 
 // Validate validates this name hash
@@ -37,10 +38,7 @@ func (m *NameHash) Validate(formats strfmt.Registry) error {
 
 func (m *NameHash) validateNameID(formats strfmt.Registry) error {
 
-	if err := m.NameID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("name_id")
-		}
+	if err := validate.Required("name_id", "body", m.NameID); err != nil {
 		return err
 	}
 

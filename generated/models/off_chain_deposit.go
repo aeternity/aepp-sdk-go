@@ -13,6 +13,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 
 	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
@@ -27,7 +28,7 @@ type OffChainDeposit struct {
 
 	// Depositor of tokens
 	// Required: true
-	From EncodedPubkey `json:"from"`
+	From *string `json:"from"`
 }
 
 // Op gets the op of this subtype
@@ -54,7 +55,7 @@ func (m *OffChainDeposit) UnmarshalJSON(raw []byte) error {
 
 		// Depositor of tokens
 		// Required: true
-		From EncodedPubkey `json:"from"`
+		From *string `json:"from"`
 	}
 	buf := bytes.NewBuffer(raw)
 	dec := json.NewDecoder(buf)
@@ -105,7 +106,7 @@ func (m OffChainDeposit) MarshalJSON() ([]byte, error) {
 
 		// Depositor of tokens
 		// Required: true
-		From EncodedPubkey `json:"from"`
+		From *string `json:"from"`
 	}{
 
 		Amount: m.Amount,
@@ -162,10 +163,7 @@ func (m *OffChainDeposit) validateAmount(formats strfmt.Registry) error {
 
 func (m *OffChainDeposit) validateFrom(formats strfmt.Registry) error {
 
-	if err := m.From.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("from")
-		}
+	if err := validate.Required("from", "body", m.From); err != nil {
 		return err
 	}
 

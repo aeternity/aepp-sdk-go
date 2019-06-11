@@ -6,8 +6,6 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"strconv"
-
 	strfmt "github.com/go-openapi/strfmt"
 
 	"github.com/go-openapi/errors"
@@ -31,11 +29,11 @@ type Channel struct {
 
 	// delegate ids
 	// Required: true
-	DelegateIds []EncodedPubkey `json:"delegate_ids"`
+	DelegateIds []string `json:"delegate_ids"`
 
 	// id
 	// Required: true
-	ID EncodedPubkey `json:"id"`
+	ID *string `json:"id"`
 
 	// initiator amount
 	// Required: true
@@ -43,7 +41,7 @@ type Channel struct {
 
 	// initiator id
 	// Required: true
-	InitiatorID EncodedPubkey `json:"initiator_id"`
+	InitiatorID *string `json:"initiator_id"`
 
 	// lock period
 	// Required: true
@@ -59,7 +57,7 @@ type Channel struct {
 
 	// responder id
 	// Required: true
-	ResponderID EncodedPubkey `json:"responder_id"`
+	ResponderID *string `json:"responder_id"`
 
 	// round
 	// Required: true
@@ -71,7 +69,7 @@ type Channel struct {
 
 	// state hash
 	// Required: true
-	StateHash EncodedHash `json:"state_hash"`
+	StateHash *string `json:"state_hash"`
 }
 
 // Validate validates this channel
@@ -166,26 +164,12 @@ func (m *Channel) validateDelegateIds(formats strfmt.Registry) error {
 		return err
 	}
 
-	for i := 0; i < len(m.DelegateIds); i++ {
-
-		if err := m.DelegateIds[i].Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("delegate_ids" + "." + strconv.Itoa(i))
-			}
-			return err
-		}
-
-	}
-
 	return nil
 }
 
 func (m *Channel) validateID(formats strfmt.Registry) error {
 
-	if err := m.ID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("id")
-		}
+	if err := validate.Required("id", "body", m.ID); err != nil {
 		return err
 	}
 
@@ -206,10 +190,7 @@ func (m *Channel) validateInitiatorAmount(formats strfmt.Registry) error {
 
 func (m *Channel) validateInitiatorID(formats strfmt.Registry) error {
 
-	if err := m.InitiatorID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("initiator_id")
-		}
+	if err := validate.Required("initiator_id", "body", m.InitiatorID); err != nil {
 		return err
 	}
 
@@ -248,10 +229,7 @@ func (m *Channel) validateResponderAmount(formats strfmt.Registry) error {
 
 func (m *Channel) validateResponderID(formats strfmt.Registry) error {
 
-	if err := m.ResponderID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("responder_id")
-		}
+	if err := validate.Required("responder_id", "body", m.ResponderID); err != nil {
 		return err
 	}
 
@@ -278,10 +256,7 @@ func (m *Channel) validateSoloRound(formats strfmt.Registry) error {
 
 func (m *Channel) validateStateHash(formats strfmt.Registry) error {
 
-	if err := m.StateHash.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("state_hash")
-		}
+	if err := validate.Required("state_hash", "body", m.StateHash); err != nil {
 		return err
 	}
 

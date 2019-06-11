@@ -28,11 +28,11 @@ type OracleRespondTx struct {
 
 	// oracle id
 	// Required: true
-	OracleID EncodedPubkey `json:"oracle_id"`
+	OracleID *string `json:"oracle_id"`
 
 	// query id
 	// Required: true
-	QueryID EncodedValue `json:"query_id"`
+	QueryID *string `json:"query_id"`
 
 	// response
 	// Required: true
@@ -90,10 +90,7 @@ func (m *OracleRespondTx) validateFee(formats strfmt.Registry) error {
 
 func (m *OracleRespondTx) validateOracleID(formats strfmt.Registry) error {
 
-	if err := m.OracleID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("oracle_id")
-		}
+	if err := validate.Required("oracle_id", "body", m.OracleID); err != nil {
 		return err
 	}
 
@@ -102,10 +99,7 @@ func (m *OracleRespondTx) validateOracleID(formats strfmt.Registry) error {
 
 func (m *OracleRespondTx) validateQueryID(formats strfmt.Registry) error {
 
-	if err := m.QueryID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("query_id")
-		}
+	if err := validate.Required("query_id", "body", m.QueryID); err != nil {
 		return err
 	}
 

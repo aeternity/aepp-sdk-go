@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // CreateContractUnsignedTx create contract unsigned tx
@@ -19,7 +20,7 @@ type CreateContractUnsignedTx struct {
 
 	// Address of the contract to be created
 	// Required: true
-	ContractID EncodedPubkey `json:"contract_id"`
+	ContractID *string `json:"contract_id"`
 }
 
 // UnmarshalJSON unmarshals this object from a JSON structure
@@ -33,7 +34,7 @@ func (m *CreateContractUnsignedTx) UnmarshalJSON(raw []byte) error {
 
 	// AO1
 	var dataAO1 struct {
-		ContractID EncodedPubkey `json:"contract_id"`
+		ContractID *string `json:"contract_id"`
 	}
 	if err := swag.ReadJSON(raw, &dataAO1); err != nil {
 		return err
@@ -55,7 +56,7 @@ func (m CreateContractUnsignedTx) MarshalJSON() ([]byte, error) {
 	_parts = append(_parts, aO0)
 
 	var dataAO1 struct {
-		ContractID EncodedPubkey `json:"contract_id"`
+		ContractID *string `json:"contract_id"`
 	}
 
 	dataAO1.ContractID = m.ContractID
@@ -90,10 +91,7 @@ func (m *CreateContractUnsignedTx) Validate(formats strfmt.Registry) error {
 
 func (m *CreateContractUnsignedTx) validateContractID(formats strfmt.Registry) error {
 
-	if err := m.ContractID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("contract_id")
-		}
+	if err := validate.Required("contract_id", "body", m.ContractID); err != nil {
 		return err
 	}
 

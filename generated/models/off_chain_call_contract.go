@@ -32,15 +32,15 @@ type OffChainCallContract struct {
 
 	// Contract call data
 	// Required: true
-	CallData EncodedByteArray `json:"call_data"`
+	CallData *string `json:"call_data"`
 
 	// Contract caller
 	// Required: true
-	Caller EncodedPubkey `json:"caller"`
+	Caller *string `json:"caller"`
 
 	// Contract address
 	// Required: true
-	Contract EncodedPubkey `json:"contract"`
+	Contract *string `json:"contract"`
 
 	// gas
 	// Required: true
@@ -89,15 +89,15 @@ func (m *OffChainCallContract) UnmarshalJSON(raw []byte) error {
 
 		// Contract call data
 		// Required: true
-		CallData EncodedByteArray `json:"call_data"`
+		CallData *string `json:"call_data"`
 
 		// Contract caller
 		// Required: true
-		Caller EncodedPubkey `json:"caller"`
+		Caller *string `json:"caller"`
 
 		// Contract address
 		// Required: true
-		Contract EncodedPubkey `json:"contract"`
+		Contract *string `json:"contract"`
 
 		// gas
 		// Required: true
@@ -170,15 +170,15 @@ func (m OffChainCallContract) MarshalJSON() ([]byte, error) {
 
 		// Contract call data
 		// Required: true
-		CallData EncodedByteArray `json:"call_data"`
+		CallData *string `json:"call_data"`
 
 		// Contract caller
 		// Required: true
-		Caller EncodedPubkey `json:"caller"`
+		Caller *string `json:"caller"`
 
 		// Contract address
 		// Required: true
-		Contract EncodedPubkey `json:"contract"`
+		Contract *string `json:"contract"`
 
 		// gas
 		// Required: true
@@ -282,10 +282,7 @@ func (m *OffChainCallContract) validateAmount(formats strfmt.Registry) error {
 
 func (m *OffChainCallContract) validateCallData(formats strfmt.Registry) error {
 
-	if err := m.CallData.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("call_data")
-		}
+	if err := validate.Required("call_data", "body", m.CallData); err != nil {
 		return err
 	}
 
@@ -294,10 +291,7 @@ func (m *OffChainCallContract) validateCallData(formats strfmt.Registry) error {
 
 func (m *OffChainCallContract) validateCaller(formats strfmt.Registry) error {
 
-	if err := m.Caller.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("caller")
-		}
+	if err := validate.Required("caller", "body", m.Caller); err != nil {
 		return err
 	}
 
@@ -306,10 +300,7 @@ func (m *OffChainCallContract) validateCaller(formats strfmt.Registry) error {
 
 func (m *OffChainCallContract) validateContract(formats strfmt.Registry) error {
 
-	if err := m.Contract.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("contract")
-		}
+	if err := validate.Required("contract", "body", m.Contract); err != nil {
 		return err
 	}
 

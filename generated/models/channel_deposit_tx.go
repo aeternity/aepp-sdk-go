@@ -25,7 +25,7 @@ type ChannelDepositTx struct {
 
 	// channel id
 	// Required: true
-	ChannelID EncodedPubkey `json:"channel_id"`
+	ChannelID *string `json:"channel_id"`
 
 	// fee
 	// Required: true
@@ -33,7 +33,7 @@ type ChannelDepositTx struct {
 
 	// from id
 	// Required: true
-	FromID EncodedPubkey `json:"from_id"`
+	FromID *string `json:"from_id"`
 
 	// nonce
 	// Required: true
@@ -45,7 +45,7 @@ type ChannelDepositTx struct {
 
 	// Root hash of the channel's internal state tree after the deposit had been applied to it
 	// Required: true
-	StateHash EncodedHash `json:"state_hash"`
+	StateHash *string `json:"state_hash"`
 
 	// ttl
 	TTL uint64 `json:"ttl,omitempty"`
@@ -103,10 +103,7 @@ func (m *ChannelDepositTx) validateAmount(formats strfmt.Registry) error {
 
 func (m *ChannelDepositTx) validateChannelID(formats strfmt.Registry) error {
 
-	if err := m.ChannelID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("channel_id")
-		}
+	if err := validate.Required("channel_id", "body", m.ChannelID); err != nil {
 		return err
 	}
 
@@ -127,10 +124,7 @@ func (m *ChannelDepositTx) validateFee(formats strfmt.Registry) error {
 
 func (m *ChannelDepositTx) validateFromID(formats strfmt.Registry) error {
 
-	if err := m.FromID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("from_id")
-		}
+	if err := validate.Required("from_id", "body", m.FromID); err != nil {
 		return err
 	}
 
@@ -157,10 +151,7 @@ func (m *ChannelDepositTx) validateRound(formats strfmt.Registry) error {
 
 func (m *ChannelDepositTx) validateStateHash(formats strfmt.Registry) error {
 
-	if err := m.StateHash.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("state_hash")
-		}
+	if err := validate.Required("state_hash", "body", m.StateHash); err != nil {
 		return err
 	}
 

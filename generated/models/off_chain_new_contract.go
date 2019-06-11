@@ -28,7 +28,7 @@ type OffChainNewContract struct {
 
 	// Contract call data
 	// Required: true
-	CallData EncodedByteArray `json:"call_data"`
+	CallData *string `json:"call_data"`
 
 	// code
 	// Required: true
@@ -40,7 +40,7 @@ type OffChainNewContract struct {
 
 	// Contract owner
 	// Required: true
-	Owner EncodedPubkey `json:"owner"`
+	Owner *string `json:"owner"`
 
 	// vm version
 	// Required: true
@@ -79,7 +79,7 @@ func (m *OffChainNewContract) UnmarshalJSON(raw []byte) error {
 
 		// Contract call data
 		// Required: true
-		CallData EncodedByteArray `json:"call_data"`
+		CallData *string `json:"call_data"`
 
 		// code
 		// Required: true
@@ -91,7 +91,7 @@ func (m *OffChainNewContract) UnmarshalJSON(raw []byte) error {
 
 		// Contract owner
 		// Required: true
-		Owner EncodedPubkey `json:"owner"`
+		Owner *string `json:"owner"`
 
 		// vm version
 		// Required: true
@@ -154,7 +154,7 @@ func (m OffChainNewContract) MarshalJSON() ([]byte, error) {
 
 		// Contract call data
 		// Required: true
-		CallData EncodedByteArray `json:"call_data"`
+		CallData *string `json:"call_data"`
 
 		// code
 		// Required: true
@@ -166,7 +166,7 @@ func (m OffChainNewContract) MarshalJSON() ([]byte, error) {
 
 		// Contract owner
 		// Required: true
-		Owner EncodedPubkey `json:"owner"`
+		Owner *string `json:"owner"`
 
 		// vm version
 		// Required: true
@@ -248,10 +248,7 @@ func (m *OffChainNewContract) validateAbiVersion(formats strfmt.Registry) error 
 
 func (m *OffChainNewContract) validateCallData(formats strfmt.Registry) error {
 
-	if err := m.CallData.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("call_data")
-		}
+	if err := validate.Required("call_data", "body", m.CallData); err != nil {
 		return err
 	}
 
@@ -290,10 +287,7 @@ func (m *OffChainNewContract) validateDeposit(formats strfmt.Registry) error {
 
 func (m *OffChainNewContract) validateOwner(formats strfmt.Registry) error {
 
-	if err := m.Owner.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("owner")
-		}
+	if err := validate.Required("owner", "body", m.Owner); err != nil {
 		return err
 	}
 

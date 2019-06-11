@@ -13,6 +13,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 
 	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
@@ -27,11 +28,11 @@ type OffChainTransfer struct {
 
 	// Sender of tokens
 	// Required: true
-	From EncodedPubkey `json:"from"`
+	From *string `json:"from"`
 
 	// Receiver of tokens
 	// Required: true
-	To EncodedPubkey `json:"to"`
+	To *string `json:"to"`
 }
 
 // Op gets the op of this subtype
@@ -60,11 +61,11 @@ func (m *OffChainTransfer) UnmarshalJSON(raw []byte) error {
 
 		// Sender of tokens
 		// Required: true
-		From EncodedPubkey `json:"from"`
+		From *string `json:"from"`
 
 		// Receiver of tokens
 		// Required: true
-		To EncodedPubkey `json:"to"`
+		To *string `json:"to"`
 	}
 	buf := bytes.NewBuffer(raw)
 	dec := json.NewDecoder(buf)
@@ -117,11 +118,11 @@ func (m OffChainTransfer) MarshalJSON() ([]byte, error) {
 
 		// Sender of tokens
 		// Required: true
-		From EncodedPubkey `json:"from"`
+		From *string `json:"from"`
 
 		// Receiver of tokens
 		// Required: true
-		To EncodedPubkey `json:"to"`
+		To *string `json:"to"`
 	}{
 
 		Amount: m.Amount,
@@ -184,10 +185,7 @@ func (m *OffChainTransfer) validateAmount(formats strfmt.Registry) error {
 
 func (m *OffChainTransfer) validateFrom(formats strfmt.Registry) error {
 
-	if err := m.From.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("from")
-		}
+	if err := validate.Required("from", "body", m.From); err != nil {
 		return err
 	}
 
@@ -196,10 +194,7 @@ func (m *OffChainTransfer) validateFrom(formats strfmt.Registry) error {
 
 func (m *OffChainTransfer) validateTo(formats strfmt.Registry) error {
 
-	if err := m.To.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("to")
-		}
+	if err := validate.Required("to", "body", m.To); err != nil {
 		return err
 	}
 

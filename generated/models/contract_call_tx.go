@@ -29,15 +29,15 @@ type ContractCallTx struct {
 
 	// Contract call data
 	// Required: true
-	CallData EncodedByteArray `json:"call_data"`
+	CallData *string `json:"call_data"`
 
 	// Contract caller pub_key
 	// Required: true
-	CallerID EncodedPubkey `json:"caller_id"`
+	CallerID *string `json:"caller_id"`
 
 	// Contract's pub_key
 	// Required: true
-	ContractID EncodedPubkey `json:"contract_id"`
+	ContractID *string `json:"contract_id"`
 
 	// fee
 	// Required: true
@@ -123,10 +123,7 @@ func (m *ContractCallTx) validateAmount(formats strfmt.Registry) error {
 
 func (m *ContractCallTx) validateCallData(formats strfmt.Registry) error {
 
-	if err := m.CallData.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("call_data")
-		}
+	if err := validate.Required("call_data", "body", m.CallData); err != nil {
 		return err
 	}
 
@@ -135,10 +132,7 @@ func (m *ContractCallTx) validateCallData(formats strfmt.Registry) error {
 
 func (m *ContractCallTx) validateCallerID(formats strfmt.Registry) error {
 
-	if err := m.CallerID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("caller_id")
-		}
+	if err := validate.Required("caller_id", "body", m.CallerID); err != nil {
 		return err
 	}
 
@@ -147,10 +141,7 @@ func (m *ContractCallTx) validateCallerID(formats strfmt.Registry) error {
 
 func (m *ContractCallTx) validateContractID(formats strfmt.Registry) error {
 
-	if err := m.ContractID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("contract_id")
-		}
+	if err := validate.Required("contract_id", "body", m.ContractID); err != nil {
 		return err
 	}
 

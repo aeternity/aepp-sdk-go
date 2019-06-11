@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // PoI po i
@@ -18,7 +19,7 @@ type PoI struct {
 
 	// Proof of inclusion
 	// Required: true
-	Poi EncodedByteArray `json:"poi"`
+	Poi *string `json:"poi"`
 }
 
 // Validate validates this po i
@@ -37,10 +38,7 @@ func (m *PoI) Validate(formats strfmt.Registry) error {
 
 func (m *PoI) validatePoi(formats strfmt.Registry) error {
 
-	if err := m.Poi.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("poi")
-		}
+	if err := validate.Required("poi", "body", m.Poi); err != nil {
 		return err
 	}
 

@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 
 	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
@@ -31,15 +32,15 @@ type SpendTx struct {
 
 	// payload
 	// Required: true
-	Payload EncodedByteArray `json:"payload"`
+	Payload *string `json:"payload"`
 
 	// recipient id
 	// Required: true
-	RecipientID EncodedPubkey `json:"recipient_id"`
+	RecipientID *string `json:"recipient_id"`
 
 	// sender id
 	// Required: true
-	SenderID EncodedPubkey `json:"sender_id"`
+	SenderID *string `json:"sender_id"`
 
 	// ttl
 	TTL uint64 `json:"ttl,omitempty"`
@@ -101,10 +102,7 @@ func (m *SpendTx) validateFee(formats strfmt.Registry) error {
 
 func (m *SpendTx) validatePayload(formats strfmt.Registry) error {
 
-	if err := m.Payload.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("payload")
-		}
+	if err := validate.Required("payload", "body", m.Payload); err != nil {
 		return err
 	}
 
@@ -113,10 +111,7 @@ func (m *SpendTx) validatePayload(formats strfmt.Registry) error {
 
 func (m *SpendTx) validateRecipientID(formats strfmt.Registry) error {
 
-	if err := m.RecipientID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("recipient_id")
-		}
+	if err := validate.Required("recipient_id", "body", m.RecipientID); err != nil {
 		return err
 	}
 
@@ -125,10 +120,7 @@ func (m *SpendTx) validateRecipientID(formats strfmt.Registry) error {
 
 func (m *SpendTx) validateSenderID(formats strfmt.Registry) error {
 
-	if err := m.SenderID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("sender_id")
-		}
+	if err := validate.Required("sender_id", "body", m.SenderID); err != nil {
 		return err
 	}
 

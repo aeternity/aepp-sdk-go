@@ -6,8 +6,6 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"strconv"
-
 	strfmt "github.com/go-openapi/strfmt"
 
 	"github.com/go-openapi/errors"
@@ -33,15 +31,15 @@ type ContractObject struct {
 
 	// id
 	// Required: true
-	ID EncodedPubkey `json:"id"`
+	ID *string `json:"id"`
 
 	// owner id
 	// Required: true
-	OwnerID EncodedPubkey `json:"owner_id"`
+	OwnerID *string `json:"owner_id"`
 
 	// referrer ids
 	// Required: true
-	ReferrerIds []EncodedPubkey `json:"referrer_ids"`
+	ReferrerIds []string `json:"referrer_ids"`
 
 	// vm version
 	// Required: true
@@ -115,10 +113,7 @@ func (m *ContractObject) validateDeposit(formats strfmt.Registry) error {
 
 func (m *ContractObject) validateID(formats strfmt.Registry) error {
 
-	if err := m.ID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("id")
-		}
+	if err := validate.Required("id", "body", m.ID); err != nil {
 		return err
 	}
 
@@ -127,10 +122,7 @@ func (m *ContractObject) validateID(formats strfmt.Registry) error {
 
 func (m *ContractObject) validateOwnerID(formats strfmt.Registry) error {
 
-	if err := m.OwnerID.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("owner_id")
-		}
+	if err := validate.Required("owner_id", "body", m.OwnerID); err != nil {
 		return err
 	}
 
@@ -141,17 +133,6 @@ func (m *ContractObject) validateReferrerIds(formats strfmt.Registry) error {
 
 	if err := validate.Required("referrer_ids", "body", m.ReferrerIds); err != nil {
 		return err
-	}
-
-	for i := 0; i < len(m.ReferrerIds); i++ {
-
-		if err := m.ReferrerIds[i].Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("referrer_ids" + "." + strconv.Itoa(i))
-			}
-			return err
-		}
-
 	}
 
 	return nil

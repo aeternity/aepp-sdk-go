@@ -4,7 +4,7 @@ The node's `swagger.json` cannot be used out of the box.
 CAVEATS
 `/generations/height/{height}` has an integer inside a list, cannot be targeted, have to replace by hand
 `OffChain*` `allOf` is a list, this script cannot target amounts and fees in there
-3. The node replies with a Generic Transaction but specifies type: "SpendTx" instead of "SpendTxJSON", so the stock generic_tx.go does not pick it up.
+2. The node replies with a Generic Transaction but specifies type: "SpendTx" instead of "SpendTxJSON", so the stock generic_tx.go does not pick it up.
 TODO: investigate why Python and JS SDKs have no problem with this
 `python api/generic_tx_json_fix.py generated/models/` to bulk edit all `_tx_json.go` files: their `Type()` should return "*Tx" instead of "*TxJSON"
 Manually add `generic_tx.go unmarshalGenericTx()`: `case "ChannelCloseMutualTxJSON": add "ChannelCloseMutualTx"` etc for other Tx types
