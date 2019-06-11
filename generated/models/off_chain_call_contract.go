@@ -13,6 +13,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 
 	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
@@ -23,7 +24,7 @@ type OffChainCallContract struct {
 
 	// abi version
 	// Required: true
-	AbiVersion Uint16 `json:"abi_version"`
+	AbiVersion *uint16 `json:"abi_version"`
 
 	// amount
 	// Required: true
@@ -43,7 +44,7 @@ type OffChainCallContract struct {
 
 	// gas
 	// Required: true
-	Gas Uint64 `json:"gas"`
+	Gas *uint64 `json:"gas"`
 
 	// gas price
 	// Required: true
@@ -80,7 +81,7 @@ func (m *OffChainCallContract) UnmarshalJSON(raw []byte) error {
 
 		// abi version
 		// Required: true
-		AbiVersion Uint16 `json:"abi_version"`
+		AbiVersion *uint16 `json:"abi_version"`
 
 		// amount
 		// Required: true
@@ -100,7 +101,7 @@ func (m *OffChainCallContract) UnmarshalJSON(raw []byte) error {
 
 		// gas
 		// Required: true
-		Gas Uint64 `json:"gas"`
+		Gas *uint64 `json:"gas"`
 
 		// gas price
 		// Required: true
@@ -161,7 +162,7 @@ func (m OffChainCallContract) MarshalJSON() ([]byte, error) {
 
 		// abi version
 		// Required: true
-		AbiVersion Uint16 `json:"abi_version"`
+		AbiVersion *uint16 `json:"abi_version"`
 
 		// amount
 		// Required: true
@@ -181,7 +182,7 @@ func (m OffChainCallContract) MarshalJSON() ([]byte, error) {
 
 		// gas
 		// Required: true
-		Gas Uint64 `json:"gas"`
+		Gas *uint64 `json:"gas"`
 
 		// gas price
 		// Required: true
@@ -260,10 +261,7 @@ func (m *OffChainCallContract) Validate(formats strfmt.Registry) error {
 
 func (m *OffChainCallContract) validateAbiVersion(formats strfmt.Registry) error {
 
-	if err := m.AbiVersion.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("abi_version")
-		}
+	if err := validate.Required("abi_version", "body", m.AbiVersion); err != nil {
 		return err
 	}
 
@@ -320,10 +318,7 @@ func (m *OffChainCallContract) validateContract(formats strfmt.Registry) error {
 
 func (m *OffChainCallContract) validateGas(formats strfmt.Registry) error {
 
-	if err := m.Gas.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("gas")
-		}
+	if err := validate.Required("gas", "body", m.Gas); err != nil {
 		return err
 	}
 

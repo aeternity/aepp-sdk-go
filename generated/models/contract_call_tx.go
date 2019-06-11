@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 
 	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
@@ -20,7 +21,7 @@ type ContractCallTx struct {
 
 	// ABI version
 	// Required: true
-	AbiVersion Uint16 `json:"abi_version"`
+	AbiVersion *uint16 `json:"abi_version"`
 
 	// amount
 	// Required: true
@@ -44,17 +45,17 @@ type ContractCallTx struct {
 
 	// gas
 	// Required: true
-	Gas Uint64 `json:"gas"`
+	Gas *uint64 `json:"gas"`
 
 	// gas price
 	// Required: true
 	GasPrice utils.BigInt `json:"gas_price"`
 
 	// Caller's nonce
-	Nonce Uint64 `json:"nonce,omitempty"`
+	Nonce uint64 `json:"nonce,omitempty"`
 
 	// ttl
-	TTL Uint64 `json:"ttl,omitempty"`
+	TTL uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this contract call tx
@@ -93,14 +94,6 @@ func (m *ContractCallTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateNonce(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateTTL(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -109,10 +102,7 @@ func (m *ContractCallTx) Validate(formats strfmt.Registry) error {
 
 func (m *ContractCallTx) validateAbiVersion(formats strfmt.Registry) error {
 
-	if err := m.AbiVersion.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("abi_version")
-		}
+	if err := validate.Required("abi_version", "body", m.AbiVersion); err != nil {
 		return err
 	}
 
@@ -181,10 +171,7 @@ func (m *ContractCallTx) validateFee(formats strfmt.Registry) error {
 
 func (m *ContractCallTx) validateGas(formats strfmt.Registry) error {
 
-	if err := m.Gas.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("gas")
-		}
+	if err := validate.Required("gas", "body", m.Gas); err != nil {
 		return err
 	}
 
@@ -196,38 +183,6 @@ func (m *ContractCallTx) validateGasPrice(formats strfmt.Registry) error {
 	if err := m.GasPrice.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("gas_price")
-		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *ContractCallTx) validateNonce(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.Nonce) { // not required
-		return nil
-	}
-
-	if err := m.Nonce.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("nonce")
-		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *ContractCallTx) validateTTL(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.TTL) { // not required
-		return nil
-	}
-
-	if err := m.TTL.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("ttl")
 		}
 		return err
 	}

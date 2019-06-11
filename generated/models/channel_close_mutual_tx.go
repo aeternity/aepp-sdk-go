@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 
 	utils "github.com/aeternity/aepp-sdk-go/utils"
 )
@@ -24,7 +25,7 @@ type ChannelCloseMutualTx struct {
 
 	// fee
 	// Required: true
-	Fee Uint64 `json:"fee"`
+	Fee *uint64 `json:"fee"`
 
 	// from id
 	// Required: true
@@ -36,14 +37,14 @@ type ChannelCloseMutualTx struct {
 
 	// nonce
 	// Required: true
-	Nonce Uint64 `json:"nonce"`
+	Nonce *uint64 `json:"nonce"`
 
 	// responder amount final
 	// Required: true
 	ResponderAmountFinal utils.BigInt `json:"responder_amount_final"`
 
 	// ttl
-	TTL Uint64 `json:"ttl,omitempty"`
+	TTL uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this channel close mutual tx
@@ -74,10 +75,6 @@ func (m *ChannelCloseMutualTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateTTL(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -98,10 +95,7 @@ func (m *ChannelCloseMutualTx) validateChannelID(formats strfmt.Registry) error 
 
 func (m *ChannelCloseMutualTx) validateFee(formats strfmt.Registry) error {
 
-	if err := m.Fee.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("fee")
-		}
+	if err := validate.Required("fee", "body", m.Fee); err != nil {
 		return err
 	}
 
@@ -134,10 +128,7 @@ func (m *ChannelCloseMutualTx) validateInitiatorAmountFinal(formats strfmt.Regis
 
 func (m *ChannelCloseMutualTx) validateNonce(formats strfmt.Registry) error {
 
-	if err := m.Nonce.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("nonce")
-		}
+	if err := validate.Required("nonce", "body", m.Nonce); err != nil {
 		return err
 	}
 
@@ -149,22 +140,6 @@ func (m *ChannelCloseMutualTx) validateResponderAmountFinal(formats strfmt.Regis
 	if err := m.ResponderAmountFinal.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("responder_amount_final")
-		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *ChannelCloseMutualTx) validateTTL(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.TTL) { // not required
-		return nil
-	}
-
-	if err := m.TTL.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("ttl")
 		}
 		return err
 	}

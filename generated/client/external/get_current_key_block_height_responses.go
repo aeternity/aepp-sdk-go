@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/swag"
 
@@ -110,16 +109,11 @@ swagger:model GetCurrentKeyBlockHeightOKBody
 type GetCurrentKeyBlockHeightOKBody struct {
 
 	// height
-	Height models.Uint64 `json:"height,omitempty"`
+	Height uint64 `json:"height,omitempty"`
 }
 
 // Validate validates this get current key block height o k body
 func (o *GetCurrentKeyBlockHeightOKBody) Validate(formats strfmt.Registry) error {
-	var res []error
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
 	return nil
 }
 

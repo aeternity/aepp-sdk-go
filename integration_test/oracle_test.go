@@ -18,7 +18,7 @@ func TestOracleWorkflow(t *testing.T) {
 
 	// Register
 	queryFee := utils.NewIntFromUint64(1000)
-	register, err := oracleAlice.OracleRegisterTx("hello", "helloback", *queryFee, uint64(0), uint64(100), uint64(0))
+	register, err := oracleAlice.OracleRegisterTx("hello", "helloback", *queryFee, uint64(0), uint64(100), 0)
 	if err != nil {
 		t.Fatal(err)
 	}

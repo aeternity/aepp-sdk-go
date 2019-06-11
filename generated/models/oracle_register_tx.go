@@ -20,7 +20,7 @@ import (
 type OracleRegisterTx struct {
 
 	// abi version
-	AbiVersion Uint16 `json:"abi_version,omitempty"`
+	AbiVersion uint16 `json:"abi_version,omitempty"`
 
 	// account id
 	// Required: true
@@ -31,7 +31,7 @@ type OracleRegisterTx struct {
 	Fee utils.BigInt `json:"fee"`
 
 	// nonce
-	Nonce Uint64 `json:"nonce,omitempty"`
+	Nonce uint64 `json:"nonce,omitempty"`
 
 	// oracle ttl
 	// Required: true
@@ -50,26 +50,18 @@ type OracleRegisterTx struct {
 	ResponseFormat *string `json:"response_format"`
 
 	// ttl
-	TTL Uint64 `json:"ttl,omitempty"`
+	TTL uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this oracle register tx
 func (m *OracleRegisterTx) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateAbiVersion(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.validateAccountID(formats); err != nil {
 		res = append(res, err)
 	}
 
 	if err := m.validateFee(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateNonce(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -89,29 +81,9 @@ func (m *OracleRegisterTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateTTL(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
-	return nil
-}
-
-func (m *OracleRegisterTx) validateAbiVersion(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.AbiVersion) { // not required
-		return nil
-	}
-
-	if err := m.AbiVersion.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("abi_version")
-		}
-		return err
-	}
-
 	return nil
 }
 
@@ -132,22 +104,6 @@ func (m *OracleRegisterTx) validateFee(formats strfmt.Registry) error {
 	if err := m.Fee.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("fee")
-		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *OracleRegisterTx) validateNonce(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.Nonce) { // not required
-		return nil
-	}
-
-	if err := m.Nonce.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("nonce")
 		}
 		return err
 	}
@@ -197,22 +153,6 @@ func (m *OracleRegisterTx) validateQueryFormat(formats strfmt.Registry) error {
 func (m *OracleRegisterTx) validateResponseFormat(formats strfmt.Registry) error {
 
 	if err := validate.Required("response_format", "body", m.ResponseFormat); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *OracleRegisterTx) validateTTL(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.TTL) { // not required
-		return nil
-	}
-
-	if err := m.TTL.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("ttl")
-		}
 		return err
 	}
 

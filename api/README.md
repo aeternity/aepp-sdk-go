@@ -1,7 +1,6 @@
 # Updating the swagger.json for newer node versions
 The node's `swagger.json` cannot be used out of the box.
-1. Manually replace all int64s with uint64s in swagger.json except for time (because go's `time.Unix()` accepts `int64`, not `uint64`)
-2. `python3 updatedict.py` adds `Fee/Balance/Amount/NameSalt BigInt` in definitions and replaces all fees and amounts with references to these definitions. Will also make sure there are no implicit int64s left ("type": "integer" without a "format" key)
+1. Replace UInt16, UInt32, UInt64 with `"type": "integer", "format": "uint16/32/64"`
 CAVEATS
 `/generations/height/{height}` has an integer inside a list, cannot be targeted, have to replace by hand
 `OffChain*` `allOf` is a list, this script cannot target amounts and fees in there

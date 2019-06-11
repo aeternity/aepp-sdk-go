@@ -21,7 +21,7 @@ type ContractObject struct {
 
 	// abi version
 	// Required: true
-	AbiVersion Uint16 `json:"abi_version"`
+	AbiVersion *uint16 `json:"abi_version"`
 
 	// active
 	// Required: true
@@ -29,7 +29,7 @@ type ContractObject struct {
 
 	// deposit
 	// Required: true
-	Deposit Uint64 `json:"deposit"`
+	Deposit *uint64 `json:"deposit"`
 
 	// id
 	// Required: true
@@ -45,7 +45,7 @@ type ContractObject struct {
 
 	// vm version
 	// Required: true
-	VMVersion Uint16 `json:"vm_version"`
+	VMVersion *uint16 `json:"vm_version"`
 }
 
 // Validate validates this contract object
@@ -88,10 +88,7 @@ func (m *ContractObject) Validate(formats strfmt.Registry) error {
 
 func (m *ContractObject) validateAbiVersion(formats strfmt.Registry) error {
 
-	if err := m.AbiVersion.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("abi_version")
-		}
+	if err := validate.Required("abi_version", "body", m.AbiVersion); err != nil {
 		return err
 	}
 
@@ -109,10 +106,7 @@ func (m *ContractObject) validateActive(formats strfmt.Registry) error {
 
 func (m *ContractObject) validateDeposit(formats strfmt.Registry) error {
 
-	if err := m.Deposit.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("deposit")
-		}
+	if err := validate.Required("deposit", "body", m.Deposit); err != nil {
 		return err
 	}
 
@@ -165,10 +159,7 @@ func (m *ContractObject) validateReferrerIds(formats strfmt.Registry) error {
 
 func (m *ContractObject) validateVMVersion(formats strfmt.Registry) error {
 
-	if err := m.VMVersion.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("vm_version")
-		}
+	if err := validate.Required("vm_version", "body", m.VMVersion); err != nil {
 		return err
 	}
 

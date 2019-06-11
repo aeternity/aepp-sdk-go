@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // MicroBlockHeader micro block header
@@ -22,7 +23,7 @@ type MicroBlockHeader struct {
 
 	// height
 	// Required: true
-	Height Uint64 `json:"height"`
+	Height *uint64 `json:"height"`
 
 	// "no_fraud" | api encoded Proof of Fraud hash
 	// Required: true
@@ -46,7 +47,7 @@ type MicroBlockHeader struct {
 
 	// time
 	// Required: true
-	Time Uint64 `json:"time"`
+	Time *uint64 `json:"time"`
 
 	// txs hash
 	// Required: true
@@ -54,7 +55,7 @@ type MicroBlockHeader struct {
 
 	// version
 	// Required: true
-	Version Uint32 `json:"version"`
+	Version *uint32 `json:"version"`
 }
 
 // Validate validates this micro block header
@@ -121,10 +122,7 @@ func (m *MicroBlockHeader) validateHash(formats strfmt.Registry) error {
 
 func (m *MicroBlockHeader) validateHeight(formats strfmt.Registry) error {
 
-	if err := m.Height.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("height")
-		}
+	if err := validate.Required("height", "body", m.Height); err != nil {
 		return err
 	}
 
@@ -193,10 +191,7 @@ func (m *MicroBlockHeader) validateStateHash(formats strfmt.Registry) error {
 
 func (m *MicroBlockHeader) validateTime(formats strfmt.Registry) error {
 
-	if err := m.Time.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("time")
-		}
+	if err := validate.Required("time", "body", m.Time); err != nil {
 		return err
 	}
 
@@ -217,10 +212,7 @@ func (m *MicroBlockHeader) validateTxsHash(formats strfmt.Registry) error {
 
 func (m *MicroBlockHeader) validateVersion(formats strfmt.Registry) error {
 
-	if err := m.Version.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("version")
-		}
+	if err := validate.Required("version", "body", m.Version); err != nil {
 		return err
 	}
 

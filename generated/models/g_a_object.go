@@ -29,11 +29,11 @@ type GAObject struct {
 
 	// gas used
 	// Required: true
-	GasUsed Uint64 `json:"gas_used"`
+	GasUsed *uint64 `json:"gas_used"`
 
 	// height
 	// Required: true
-	Height Uint64 `json:"height"`
+	Height *uint64 `json:"height"`
 
 	// inner object
 	InnerObject *TxInfoObject `json:"inner_object,omitempty"`
@@ -111,10 +111,7 @@ func (m *GAObject) validateGasPrice(formats strfmt.Registry) error {
 
 func (m *GAObject) validateGasUsed(formats strfmt.Registry) error {
 
-	if err := m.GasUsed.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("gas_used")
-		}
+	if err := validate.Required("gas_used", "body", m.GasUsed); err != nil {
 		return err
 	}
 
@@ -123,10 +120,7 @@ func (m *GAObject) validateGasUsed(formats strfmt.Registry) error {
 
 func (m *GAObject) validateHeight(formats strfmt.Registry) error {
 
-	if err := m.Height.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("height")
-		}
+	if err := validate.Required("height", "body", m.Height); err != nil {
 		return err
 	}
 

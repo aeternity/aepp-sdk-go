@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // KeyBlock key block
@@ -26,7 +27,7 @@ type KeyBlock struct {
 
 	// height
 	// Required: true
-	Height Uint64 `json:"height"`
+	Height *uint64 `json:"height"`
 
 	// info
 	// Required: true
@@ -37,7 +38,7 @@ type KeyBlock struct {
 	Miner EncodedPubkey `json:"miner"`
 
 	// nonce
-	Nonce Uint64 `json:"nonce,omitempty"`
+	Nonce uint64 `json:"nonce,omitempty"`
 
 	// pow
 	Pow Pow `json:"pow,omitempty"`
@@ -56,15 +57,15 @@ type KeyBlock struct {
 
 	// target
 	// Required: true
-	Target Uint32 `json:"target"`
+	Target *uint32 `json:"target"`
 
 	// time
 	// Required: true
-	Time Uint64 `json:"time"`
+	Time *uint64 `json:"time"`
 
 	// version
 	// Required: true
-	Version Uint32 `json:"version"`
+	Version *uint32 `json:"version"`
 }
 
 // Validate validates this key block
@@ -88,10 +89,6 @@ func (m *KeyBlock) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateMiner(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateNonce(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -155,10 +152,7 @@ func (m *KeyBlock) validateHash(formats strfmt.Registry) error {
 
 func (m *KeyBlock) validateHeight(formats strfmt.Registry) error {
 
-	if err := m.Height.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("height")
-		}
+	if err := validate.Required("height", "body", m.Height); err != nil {
 		return err
 	}
 
@@ -182,22 +176,6 @@ func (m *KeyBlock) validateMiner(formats strfmt.Registry) error {
 	if err := m.Miner.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("miner")
-		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *KeyBlock) validateNonce(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.Nonce) { // not required
-		return nil
-	}
-
-	if err := m.Nonce.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("nonce")
 		}
 		return err
 	}
@@ -259,10 +237,7 @@ func (m *KeyBlock) validateStateHash(formats strfmt.Registry) error {
 
 func (m *KeyBlock) validateTarget(formats strfmt.Registry) error {
 
-	if err := m.Target.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("target")
-		}
+	if err := validate.Required("target", "body", m.Target); err != nil {
 		return err
 	}
 
@@ -271,10 +246,7 @@ func (m *KeyBlock) validateTarget(formats strfmt.Registry) error {
 
 func (m *KeyBlock) validateTime(formats strfmt.Registry) error {
 
-	if err := m.Time.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("time")
-		}
+	if err := validate.Required("time", "body", m.Time); err != nil {
 		return err
 	}
 
@@ -283,10 +255,7 @@ func (m *KeyBlock) validateTime(formats strfmt.Registry) error {
 
 func (m *KeyBlock) validateVersion(formats strfmt.Registry) error {
 
-	if err := m.Version.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("version")
-		}
+	if err := validate.Required("version", "body", m.Version); err != nil {
 		return err
 	}
 

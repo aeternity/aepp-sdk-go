@@ -24,7 +24,7 @@ type OffChainNewContract struct {
 
 	// abi version
 	// Required: true
-	AbiVersion Uint16 `json:"abi_version"`
+	AbiVersion *uint16 `json:"abi_version"`
 
 	// Contract call data
 	// Required: true
@@ -44,7 +44,7 @@ type OffChainNewContract struct {
 
 	// vm version
 	// Required: true
-	VMVersion Uint16 `json:"vm_version"`
+	VMVersion *uint16 `json:"vm_version"`
 }
 
 // Op gets the op of this subtype
@@ -75,7 +75,7 @@ func (m *OffChainNewContract) UnmarshalJSON(raw []byte) error {
 
 		// abi version
 		// Required: true
-		AbiVersion Uint16 `json:"abi_version"`
+		AbiVersion *uint16 `json:"abi_version"`
 
 		// Contract call data
 		// Required: true
@@ -95,7 +95,7 @@ func (m *OffChainNewContract) UnmarshalJSON(raw []byte) error {
 
 		// vm version
 		// Required: true
-		VMVersion Uint16 `json:"vm_version"`
+		VMVersion *uint16 `json:"vm_version"`
 	}
 	buf := bytes.NewBuffer(raw)
 	dec := json.NewDecoder(buf)
@@ -150,7 +150,7 @@ func (m OffChainNewContract) MarshalJSON() ([]byte, error) {
 
 		// abi version
 		// Required: true
-		AbiVersion Uint16 `json:"abi_version"`
+		AbiVersion *uint16 `json:"abi_version"`
 
 		// Contract call data
 		// Required: true
@@ -170,7 +170,7 @@ func (m OffChainNewContract) MarshalJSON() ([]byte, error) {
 
 		// vm version
 		// Required: true
-		VMVersion Uint16 `json:"vm_version"`
+		VMVersion *uint16 `json:"vm_version"`
 	}{
 
 		AbiVersion: m.AbiVersion,
@@ -239,10 +239,7 @@ func (m *OffChainNewContract) Validate(formats strfmt.Registry) error {
 
 func (m *OffChainNewContract) validateAbiVersion(formats strfmt.Registry) error {
 
-	if err := m.AbiVersion.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("abi_version")
-		}
+	if err := validate.Required("abi_version", "body", m.AbiVersion); err != nil {
 		return err
 	}
 
@@ -305,10 +302,7 @@ func (m *OffChainNewContract) validateOwner(formats strfmt.Registry) error {
 
 func (m *OffChainNewContract) validateVMVersion(formats strfmt.Registry) error {
 
-	if err := m.VMVersion.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("vm_version")
-		}
+	if err := validate.Required("vm_version", "body", m.VMVersion); err != nil {
 		return err
 	}
 

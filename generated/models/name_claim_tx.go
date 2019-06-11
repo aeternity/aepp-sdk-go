@@ -36,10 +36,10 @@ type NameClaimTx struct {
 	NameSalt utils.BigInt `json:"name_salt"`
 
 	// nonce
-	Nonce Uint64 `json:"nonce,omitempty"`
+	Nonce uint64 `json:"nonce,omitempty"`
 
 	// ttl
-	TTL Uint64 `json:"ttl,omitempty"`
+	TTL uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this name claim tx
@@ -59,14 +59,6 @@ func (m *NameClaimTx) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateNameSalt(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateNonce(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateTTL(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -114,38 +106,6 @@ func (m *NameClaimTx) validateNameSalt(formats strfmt.Registry) error {
 	if err := m.NameSalt.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("name_salt")
-		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *NameClaimTx) validateNonce(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.Nonce) { // not required
-		return nil
-	}
-
-	if err := m.Nonce.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("nonce")
-		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *NameClaimTx) validateTTL(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.TTL) { // not required
-		return nil
-	}
-
-	if err := m.TTL.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("ttl")
 		}
 		return err
 	}

@@ -42,7 +42,7 @@ func GetNextNonce(c getAccounter, accountID string) (nextNonce uint64, err error
 	if err != nil {
 		return
 	}
-	nextNonce = uint64(a.Nonce) + 1
+	nextNonce = *a.Nonce + 1
 	return
 }
 
@@ -220,7 +220,7 @@ func (n *Aens) NameRevokeTx(name string, recipientAddress string) (tx NameRevoke
 }
 
 // OracleRegisterTx create a new oracle
-func (o *Oracle) OracleRegisterTx(querySpec, responseSpec string, queryFee big.Int, oracleTTLType, oracleTTLValue, abiVersion uint64) (tx OracleRegisterTx, err error) {
+func (o *Oracle) OracleRegisterTx(querySpec, responseSpec string, queryFee big.Int, oracleTTLType, oracleTTLValue uint64, abiVersion uint16) (tx OracleRegisterTx, err error) {
 	ttl, nonce, err := GetTTLNonce(o.Client, o.Account.Address, Config.Client.TTL)
 	if err != nil {
 		return OracleRegisterTx{}, err
@@ -264,7 +264,7 @@ func (o *Oracle) OracleRespondTx(OracleID string, QueryID string, Response strin
 }
 
 // ContractCreateTx returns a transaction for creating a contract on the chain
-func (c *Contract) ContractCreateTx(Code string, CallData string, VMVersion, AbiVersion uint64, Deposit, Amount, Gas, GasPrice, Fee big.Int) (tx ContractCreateTx, err error) {
+func (c *Contract) ContractCreateTx(Code string, CallData string, VMVersion, AbiVersion uint16, Deposit, Amount, Gas, GasPrice, Fee big.Int) (tx ContractCreateTx, err error) {
 	ttl, nonce, err := GetTTLNonce(c.Client, c.Account.Address, Config.Client.TTL)
 	if err != nil {
 		return ContractCreateTx{}, err
@@ -275,7 +275,7 @@ func (c *Contract) ContractCreateTx(Code string, CallData string, VMVersion, Abi
 }
 
 // ContractCallTx returns a transaction for calling a contract on the chain
-func (c *Contract) ContractCallTx(ContractID, CallData string, AbiVersion uint64, Amount, Gas, GasPrice, Fee big.Int) (tx ContractCallTx, err error) {
+func (c *Contract) ContractCallTx(ContractID, CallData string, AbiVersion uint16, Amount, Gas, GasPrice, Fee big.Int) (tx ContractCallTx, err error) {
 	ttl, nonce, err := GetTTLNonce(c.Client, c.Account.Address, Config.Client.TTL)
 	if err != nil {
 		return ContractCallTx{}, err

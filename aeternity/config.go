@@ -34,8 +34,8 @@ type ContractConfig struct {
 	GasPrice   big.Int `json:"gas_price" yaml:"gas_price" mapstructure:"gas_price"`
 	Amount     big.Int `json:"amount" yaml:"amount" mapstructure:"amount"`
 	Deposit    big.Int `json:"deposit" yaml:"deposit" mapstructure:"deposit"`
-	VMVersion  uint64  `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
-	ABIVersion uint64  `json:"abi_version" yaml:"abi_version" mapstructure:"abi_version"`
+	VMVersion  uint16  `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
+	ABIVersion uint16  `json:"abi_version" yaml:"abi_version" mapstructure:"abi_version"`
 }
 
 // OracleConfig configurations for contracts

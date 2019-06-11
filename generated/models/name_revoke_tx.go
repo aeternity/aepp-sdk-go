@@ -31,10 +31,10 @@ type NameRevokeTx struct {
 	NameID EncodedValue `json:"name_id"`
 
 	// nonce
-	Nonce Uint64 `json:"nonce,omitempty"`
+	Nonce uint64 `json:"nonce,omitempty"`
 
 	// ttl
-	TTL Uint64 `json:"ttl,omitempty"`
+	TTL uint64 `json:"ttl,omitempty"`
 }
 
 // Validate validates this name revoke tx
@@ -50,14 +50,6 @@ func (m *NameRevokeTx) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateNameID(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateNonce(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateTTL(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -96,38 +88,6 @@ func (m *NameRevokeTx) validateNameID(formats strfmt.Registry) error {
 	if err := m.NameID.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("name_id")
-		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *NameRevokeTx) validateNonce(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.Nonce) { // not required
-		return nil
-	}
-
-	if err := m.Nonce.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("nonce")
-		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *NameRevokeTx) validateTTL(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.TTL) { // not required
-		return nil
-	}
-
-	if err := m.TTL.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("ttl")
 		}
 		return err
 	}

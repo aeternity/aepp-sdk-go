@@ -13,19 +13,20 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // ChannelCloseMutualTxJSON channel close mutual tx JSON
 // swagger:model ChannelCloseMutualTxJSON
 type ChannelCloseMutualTxJSON struct {
-	versionField Uint32
+	versionField *uint32
 
 	ChannelCloseMutualTx
 }
 
 // Type gets the type of this subtype
 func (m *ChannelCloseMutualTxJSON) Type() string {
-	return "ChannelCloseMutualTx"
+	return "ChannelCloseMutualTxJSON"
 }
 
 // SetType sets the type of this subtype
@@ -34,12 +35,12 @@ func (m *ChannelCloseMutualTxJSON) SetType(val string) {
 }
 
 // Version gets the version of this subtype
-func (m *ChannelCloseMutualTxJSON) Version() Uint32 {
+func (m *ChannelCloseMutualTxJSON) Version() *uint32 {
 	return m.versionField
 }
 
 // SetVersion sets the version of this subtype
-func (m *ChannelCloseMutualTxJSON) SetVersion(val Uint32) {
+func (m *ChannelCloseMutualTxJSON) SetVersion(val *uint32) {
 	m.versionField = val
 }
 
@@ -61,7 +62,7 @@ func (m *ChannelCloseMutualTxJSON) UnmarshalJSON(raw []byte) error {
 
 		Type string `json:"type"`
 
-		Version Uint32 `json:"version"`
+		Version *uint32 `json:"version"`
 	}
 	buf = bytes.NewBuffer(raw)
 	dec = json.NewDecoder(buf)
@@ -104,7 +105,7 @@ func (m ChannelCloseMutualTxJSON) MarshalJSON() ([]byte, error) {
 	b2, err = json.Marshal(struct {
 		Type string `json:"type"`
 
-		Version Uint32 `json:"version"`
+		Version *uint32 `json:"version"`
 	}{
 
 		Type: m.Type(),
@@ -140,10 +141,7 @@ func (m *ChannelCloseMutualTxJSON) Validate(formats strfmt.Registry) error {
 
 func (m *ChannelCloseMutualTxJSON) validateVersion(formats strfmt.Registry) error {
 
-	if err := m.Version().Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("version")
-		}
+	if err := validate.Required("version", "body", m.Version()); err != nil {
 		return err
 	}
 

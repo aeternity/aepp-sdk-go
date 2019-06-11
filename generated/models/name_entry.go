@@ -29,7 +29,7 @@ type NameEntry struct {
 
 	// ttl
 	// Required: true
-	TTL Uint64 `json:"ttl"`
+	TTL *uint64 `json:"ttl"`
 }
 
 // Validate validates this name entry
@@ -93,10 +93,7 @@ func (m *NameEntry) validatePointers(formats strfmt.Registry) error {
 
 func (m *NameEntry) validateTTL(formats strfmt.Registry) error {
 
-	if err := m.TTL.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("ttl")
-		}
+	if err := validate.Required("ttl", "body", m.TTL); err != nil {
 		return err
 	}
 
