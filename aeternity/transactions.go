@@ -6,7 +6,7 @@ import (
 	"math/big"
 
 	"github.com/aeternity/aepp-sdk-go/generated/models"
-	"github.com/aeternity/aepp-sdk-go/rlp"
+	rlp "github.com/randomshinichi/rlpae"
 	"github.com/aeternity/aepp-sdk-go/utils"
 )
 
