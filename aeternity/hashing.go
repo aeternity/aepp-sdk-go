@@ -8,7 +8,7 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/aeternity/aepp-sdk-go/rlp"
+	rlp "github.com/randomshinichi/rlpae"
 	"github.com/aeternity/aepp-sdk-go/utils"
 	"github.com/btcsuite/btcutil/base58"
 	uuid "github.com/satori/go.uuid"
@@ -145,10 +145,9 @@ func Namehash(name string) []byte {
 	return buf
 }
 
-// randomBytes returns securely generated random bytes.
-// It will return an error if the system's secure random
-// number generator fails to function correctly, in which
-// case the caller should not continue.
+// randomBytes returns securely generated random bytes. It will return an error
+// if the system's secure random number generator fails to function correctly,
+// in which case the caller should not continue.
 func randomBytes(n int) ([]byte, error) {
 	b := make([]byte, n)
 	_, err := rand.Read(b)
@@ -164,9 +163,10 @@ func uuidV4() (u string) {
 	return fmt.Sprint(uuid.NewV4())
 }
 
-// since the salt is a uint256, which Erlang handles well, but Go has nothing similar to it,
-// it is imperative that the salt be kept as a bytearray unless you really have to convert it
-// into an integer. Which you usually don't, because it's a salt.
+// since the salt is a uint256, which Erlang handles well, but Go has nothing
+// similar to it, it is imperative that the salt be kept as a bytearray unless
+// you really have to convert it into an integer. Which you usually don't,
+// because it's a salt.
 func generateCommitmentID(name string) (ch string, salt *big.Int, err error) {
 	saltBytes, err := randomBytes(32)
 	if err != nil {
@@ -199,8 +199,8 @@ func buildRLPMessage(tag uint, version uint, fields ...interface{}) (rlpRawMsg [
 	return
 }
 
-// buildIDTag assemble an id() object
-// see https://github.com/aeternity/protocol/blob/epoch-v0.22.0/serializations.md#the-id-type
+// buildIDTag assemble an id() object see
+// https://github.com/aeternity/protocol/blob/epoch-v0.22.0/serializations.md#the-id-type
 func buildIDTag(IDTag uint8, encodedHash string) (v []uint8, err error) {
 	raw, err := Decode(encodedHash)
 	v = []uint8{IDTag}
@@ -210,7 +210,8 @@ func buildIDTag(IDTag uint8, encodedHash string) (v []uint8, err error) {
 	return
 }
 
-// DecodeRLPMessage transforms a plain stream of bytes into a structure of bytes that represents the object that was serialized
+// DecodeRLPMessage transforms a plain stream of bytes into a structure of bytes
+// that represents the object that was serialized
 func DecodeRLPMessage(rawBytes []byte) []interface{} {
 	res := []interface{}{}
 	rlp.DecodeBytes(rawBytes, &res)
