@@ -24,7 +24,7 @@ func TestContracts(t *testing.T) {
 		t.Fatal(err)
 	}
 	ctID, _ = create.ContractID()
-	fmt.Printf("Create %s, %#v\n", ctID, create)
+	fmt.Printf("Create %s, %+v\n", ctID, create)
 	txHash = signBroadcast(t, &create, alice, aeClient)
 	_, _, err = waitForTransaction(aeClient, txHash)
 	if err != nil {
@@ -45,7 +45,7 @@ func TestContracts(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	fmt.Printf("Call %#v\n", callTx)
+	fmt.Printf("Call %+v\n", callTx)
 	txHash = signBroadcast(t, &callTx, alice, aeClient)
 
 	_, _, err = waitForTransaction(aeClient, txHash)

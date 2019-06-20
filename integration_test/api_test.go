@@ -218,7 +218,7 @@ func TestAPI(t *testing.T) {
 	t.Logf("%+v\n", sentTxs)
 	t.Run("GetStatus", func(t *testing.T) {
 		gotStatus, err := privateNet.GetStatus()
-		// t.Logf("%#v\n", gotStatus)
+		// t.Logf("%+v\n", gotStatus)
 		if *gotStatus.NetworkID != "ae_docker" {
 			t.Errorf("Client.GetStatus(): Client testsuite should be run on private testnet (ae_docker), not %s", *gotStatus.NetworkID)
 		}
@@ -229,7 +229,7 @@ func TestAPI(t *testing.T) {
 	})
 	t.Run("GetTopBlock", func(t *testing.T) {
 		_, err := privateNet.GetTopBlock()
-		// t.Logf("%#v\n", gotTopBlock)
+		// t.Logf("%+v\n", gotTopBlock)
 		if err != nil {
 			t.Errorf("Client.GetTopBlock() error = %v", err)
 			return
@@ -248,7 +248,7 @@ func TestAPI(t *testing.T) {
 	})
 	t.Run("GetCurrentKeyBlock", func(t *testing.T) {
 		_, err := privateNet.GetCurrentKeyBlock()
-		// t.Logf("%#v\n", gotCurrentKeyBlock)
+		// t.Logf("%+v\n", gotCurrentKeyBlock)
 		if err != nil {
 			t.Errorf("Client.GetCurrentKeyBlock() error = %v", err)
 			return
@@ -258,7 +258,7 @@ func TestAPI(t *testing.T) {
 	t.Run("GetAccount", func(t *testing.T) {
 		var account = "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"
 		_, err := privateNet.GetAccount(account)
-		// t.Logf("%#v\n", gotAccount)
+		// t.Logf("%+v\n", gotAccount)
 		if err != nil {
 			t.Errorf("Client.GetAccount() error = %v", err)
 			return
@@ -271,7 +271,7 @@ func TestAPI(t *testing.T) {
 			t.Error(err)
 		}
 		_, err = privateNet.GetGenerationByHeight(height)
-		// t.Logf("%#v\n", gotGenerationByHeight)
+		// t.Logf("%+v\n", gotGenerationByHeight)
 		if err != nil {
 			t.Errorf("Client.GetGenerationByHeight() error = %v", err)
 			return
@@ -280,7 +280,7 @@ func TestAPI(t *testing.T) {
 
 	t.Run("GetMicroBlockHeaderByHash", func(t *testing.T) {
 		_, err := privateNet.GetMicroBlockHeaderByHash(sentTxs.SpendTx.mbHash)
-		// t.Logf("%#v\n", gotMicroBlockHeaderByHash)
+		// t.Logf("%+v\n", gotMicroBlockHeaderByHash)
 		if err != nil {
 			t.Errorf("Client.GetMicroBlockHeaderByHash() error = %v", err)
 			return
@@ -292,7 +292,7 @@ func TestAPI(t *testing.T) {
 			t.Skip("-testnet not specified: skipping test")
 		}
 		_, err := testNet.GetKeyBlockByHash("kh_2ZPK9GGvXKJ8vfwapBLztd2F8DSr9QdphZRHSdJH8MR298Guao")
-		// t.Logf("%#v\n", gotKeyBlockByHash)
+		// t.Logf("%+v\n", gotKeyBlockByHash)
 		if err != nil {
 			t.Errorf("Client.GetKeyBlockByHash() error = %v", err)
 			return
@@ -300,7 +300,7 @@ func TestAPI(t *testing.T) {
 	})
 	t.Run("GetMicroBlockTransactionsByHash", func(t *testing.T) {
 		_, err := privateNet.GetMicroBlockTransactionsByHash(sentTxs.SpendTx.mbHash)
-		// t.Logf("%#v\n", gotMicroBlockTransactionsByHash)
+		// t.Logf("%+v\n", gotMicroBlockTransactionsByHash)
 		if err != nil {
 			t.Errorf("Client.GetMicroBlockTransactionsByHash() error = %v", err)
 			return
@@ -431,7 +431,7 @@ func TestAPI(t *testing.T) {
 	})
 	t.Run("GetName", func(t *testing.T) {
 		_, err := privateNet.GetNameEntryByName(sentTxs.name)
-		// t.Logf("%#v\n", gotName)
+		// t.Logf("%+v\n", gotName)
 		if err != nil {
 			t.Errorf("Client.GetName() error = %v", err)
 			return
@@ -439,7 +439,7 @@ func TestAPI(t *testing.T) {
 	})
 	t.Run("GetOracleByPubkey", func(t *testing.T) {
 		_, err := privateNet.GetOracleByPubkey(sentTxs.oracleID)
-		// t.Logf("%#v\n", gotOracleByPubkey)
+		// t.Logf("%+v\n", gotOracleByPubkey)
 		if err != nil {
 			t.Errorf("Client.GetOracleByPubkey() error = %v", err)
 			return
@@ -447,7 +447,7 @@ func TestAPI(t *testing.T) {
 	})
 	t.Run("GetOracleQueriesByPubkey", func(t *testing.T) {
 		_, err := privateNet.GetOracleQueriesByPubkey(sentTxs.oracleID)
-		// t.Logf("%#v\n", gotOracleQueriesByPubkey)
+		// t.Logf("%+v\n", gotOracleQueriesByPubkey)
 		if err != nil {
 			t.Errorf("Client.GetOracleQueriesByPubkey() error = %v", err)
 			return
@@ -455,7 +455,7 @@ func TestAPI(t *testing.T) {
 	})
 	// t.Run("GetContractByID", func(t *testing.T) {
 	// 	_, err := privateNet.GetContractByID(sentTxs.contractID)
-	// 	// t.Logf("%#v\n", gotContractByID)
+	// 	// t.Logf("%+v\n", gotContractByID)
 	// 	if err != nil {
 	// 		t.Errorf("Client.GetContractByID() error = %v", err)
 	// 		return
