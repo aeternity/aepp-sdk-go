@@ -192,10 +192,10 @@ func buildRLPMessage(tag uint, version uint, fields ...interface{}) (rlpRawMsg [
 	// create a message of the transaction and signature
 	data := []interface{}{tag, version}
 	data = append(data, fields...)
-	// fmt.Printf("TX %#v\n\n", data)
+	// fmt.Printf("TX %+v\n\n", data)
 	// encode the message using rlp
 	rlpRawMsg, err = rlp.EncodeToBytes(data)
-	// fmt.Printf("ENCODED %#v\n\n", data)
+	// fmt.Printf("ENCODED %+v\n\n", data)
 	return
 }
 

@@ -43,7 +43,7 @@ func TestBigIntLargerOrEqualToZero(t *testing.T) {
 		amountc := BigInt(*amount)
 		err := amountc.LargerOrEqualToZero()
 		if reflect.TypeOf(err) != reflect.TypeOf(test.expected) {
-			t.Errorf("Test Failed: %v inputted, %v expected, %#v received", test.input, test.expected, err)
+			t.Errorf("Test Failed: %v inputted, %v expected, %+v received", test.input, test.expected, err)
 		}
 	}
 }
@@ -66,7 +66,7 @@ func TestBigIntLargerThanZero(t *testing.T) {
 		amountc := BigInt(*amount)
 		err := amountc.LargerThanZero()
 		if reflect.TypeOf(err) != reflect.TypeOf(test.expected) {
-			t.Errorf("Test Failed: %v inputted, %v expected, %#v received", test.input, test.expected, err)
+			t.Errorf("Test Failed: %v inputted, %v expected, %+v received", test.input, test.expected, err)
 		}
 	}
 }
