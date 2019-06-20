@@ -34,7 +34,7 @@ func randomName(length int) string {
 }
 
 func TestAENSWorkflow(t *testing.T) {
-	node := setupNetwork(t)
+	node := setupNetwork(t, privatenetURL)
 	alice, bob := setupAccounts(t)
 	aensAlice := aeternity.Aens{Client: node, Account: alice}
 
@@ -48,7 +48,7 @@ func TestAENSWorkflow(t *testing.T) {
 	hash := signBroadcast(t, &preclaimTx, alice, node)
 
 	// Wait for a bit
-	_ = waitForTransaction(node, hash)
+	_, _, _ = waitForTransaction(node, hash)
 
 	// Claim the name
 	claimTx, err := aensAlice.NameClaimTx(name, *salt, aeternity.Config.Client.Fee)
@@ -59,7 +59,7 @@ func TestAENSWorkflow(t *testing.T) {
 	hash = signBroadcast(t, &claimTx, alice, node)
 
 	// Wait for a bit
-	_ = waitForTransaction(node, hash)
+	_, _, _ = waitForTransaction(node, hash)
 
 	// Verify that the name exists
 	var nameEntry string
@@ -92,7 +92,7 @@ func TestAENSWorkflow(t *testing.T) {
 	hash = signBroadcast(t, &transferTx, alice, node)
 
 	// Wait for a bit
-	_ = waitForTransaction(node, hash)
+	_, _, _ = waitForTransaction(node, hash)
 
 	// Receiver updates the name, makes it point to himself
 	aensBob := aeternity.Aens{Client: node, Account: bob}
@@ -113,7 +113,7 @@ func TestAENSWorkflow(t *testing.T) {
 	hash = signBroadcast(t, &revokeTx, alice, node)
 
 	// Wait for a bit
-	revokeTxShouldHaveFailed := waitForTransaction(node, hash)
+	_, _, revokeTxShouldHaveFailed := waitForTransaction(node, hash)
 	if revokeTxShouldHaveFailed == nil {
 		t.Fatal("After transferring the name to Recipient, the Sender should not have been able to revoke the name")
 	} else {
@@ -121,13 +121,13 @@ func TestAENSWorkflow(t *testing.T) {
 	}
 
 	// Revoke the name - signed by the recipient
-	revokeTx2, err := aensBob.NameRevokeTx(name, bob.Address)
+	revokeTx2, err := aensBob.NameRevokeTx(name)
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Printf("Revoke Signed By Recipient %+v\n", revokeTx2)
 	hash = signBroadcast(t, &revokeTx2, bob, node)
 	// Wait for a bit
-	_ = waitForTransaction(node, hash)
+	_, _, _ = waitForTransaction(node, hash)
 
 }

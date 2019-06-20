@@ -12,10 +12,11 @@ import (
 var sender = "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"
 var senderPrivateKey = os.Getenv("INTEGRATION_TEST_SENDER_PRIVATE_KEY")
 var recipientPrivateKey = os.Getenv("INTEGRATION_TEST_RECEIVER_PRIVATE_KEY")
-var nodeURL = "http://localhost:3013"
+var privatenetURL = "http://localhost:3013"
+var testnetURL = "http://sdk-testnet.aepps.com"
 var networkID = "ae_docker"
 
-func setupNetwork(t *testing.T) *aeternity.Client {
+func setupNetwork(t *testing.T, nodeURL string) *aeternity.Client {
 	aeternity.Config.Node.NetworkID = networkID
 	client := aeternity.NewClient(nodeURL, false)
 	t.Logf("nodeURL: %s, networkID: %s", nodeURL, aeternity.Config.Node.NetworkID)
@@ -71,14 +72,14 @@ func getHeight(aeClient *aeternity.Client) (h uint64) {
 	return
 }
 
-func waitForTransaction(aeClient *aeternity.Client, hash string) (err error) {
-	height := getHeight(aeClient)
+func waitForTransaction(aeClient *aeternity.Client, hash string) (height uint64, microblockHash string, err error) {
+	height = getHeight(aeClient)
 	// fmt.Println("Waiting for", hash)
-	height, blockHash, err := aeternity.WaitForTransactionUntilHeight(aeClient, hash, height+10)
+	height, microblockHash, err = aeternity.WaitForTransactionUntilHeight(aeClient, hash, height+10)
 	if err != nil {
 		// Sometimes, the tests want the tx to fail. Return the err to let them know.
-		return err
+		return 0, "", err
 	}
-	fmt.Println("Transaction was found at", height, "blockhash", blockHash, "err", err)
-	return nil
+	fmt.Println("Transaction was found at", height, "microblockHash", microblockHash, "err", err)
+	return height, microblockHash, err
 }

@@ -12,7 +12,7 @@ import (
 // Tests for 2 things: sending an amount that is max uint64, and that the node accepts the minimum fee
 // that is calculated via tx.EstimateFee().
 func TestSpendTx(t *testing.T) {
-	node := setupNetwork(t)
+	node := setupNetwork(t, privatenetURL)
 	alice, bob := setupAccounts(t)
 
 	amount := utils.RequireIntFromString("18446744073709551615") // max uint64

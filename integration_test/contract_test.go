@@ -10,7 +10,7 @@ import (
 
 func TestContracts(t *testing.T) {
 	alice, _ := setupAccounts(t)
-	aeClient := setupNetwork(t)
+	aeClient := setupNetwork(t, privatenetURL)
 	contractsAlice := aeternity.Contract{Client: aeClient, Account: alice}
 
 	var ctID string
@@ -26,7 +26,7 @@ func TestContracts(t *testing.T) {
 	ctID, _ = create.ContractID()
 	fmt.Printf("Create %s, %#v\n", ctID, create)
 	txHash = signBroadcast(t, &create, alice, aeClient)
-	err = waitForTransaction(aeClient, txHash)
+	_, _, err = waitForTransaction(aeClient, txHash)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -48,7 +48,7 @@ func TestContracts(t *testing.T) {
 	fmt.Printf("Call %#v\n", callTx)
 	txHash = signBroadcast(t, &callTx, alice, aeClient)
 
-	err = waitForTransaction(aeClient, txHash)
+	_, _, err = waitForTransaction(aeClient, txHash)
 	if err != nil {
 		t.Fatal(err)
 	}
