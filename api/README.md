@@ -1,4 +1,4 @@
-# Updating the swagger.json for newer node versions
+# Node
 The node's `swagger.json` cannot be used out of the box.
 1. Replace UInt16, UInt32, UInt64 with `"type": "integer", "format": "uint16/32/64"`
 CAVEATS
@@ -18,5 +18,10 @@ curl  https://sdk-testnet.aepps.com/api -o api/swagger.json
 generate the client (using [go-swagger](https://github.com/go-swagger/go-swagger))
 
 ```
-rm -rf generated/* && swagger generate client -f api/swagger.json -A node  --with-flatten=minimal --target generated  --tags=external --api-package=operations --client-package=client
+rm -rf swagguard/node/* && swagger generate client -f api/swagger.json -A node  --with-flatten=minimal --target swagguard/node  --tags=external --api-package=operations --client-package=client
+```
+
+# Compiler
+```
+rm -rf swagguard/compiler/* && swagger generate client -f api/compiler.json -A compiler --with-flatten=minimal --target swagguard/compiler
 ```
