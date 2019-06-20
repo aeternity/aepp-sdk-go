@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
-	"github.com/aeternity/aepp-sdk-go/generated/models"
+	"github.com/aeternity/aepp-sdk-go/swagguard/node/models"
 	"github.com/aeternity/aepp-sdk-go/utils"
 )
 

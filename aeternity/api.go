@@ -3,8 +3,8 @@ package aeternity
 import (
 	"fmt"
 
-	"github.com/aeternity/aepp-sdk-go/generated/client/external"
-	"github.com/aeternity/aepp-sdk-go/generated/models"
+	"github.com/aeternity/aepp-sdk-go/swagguard/node/client/external"
+	"github.com/aeternity/aepp-sdk-go/swagguard/node/models"
 )
 
 // GetStatus post transaction
