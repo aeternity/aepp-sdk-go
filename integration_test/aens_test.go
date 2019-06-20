@@ -105,7 +105,7 @@ func TestAENSWorkflow(t *testing.T) {
 	_ = signBroadcast(t, &updateTx2, bob, node)
 
 	// Revoke the name - shouldn't work because it is signed by the sender, who no longer owns the address
-	revokeTx, err := aensAlice.NameRevokeTx(name, alice.Address)
+	revokeTx, err := aensAlice.NameRevokeTx(name)
 	if err != nil {
 		t.Fatal(err)
 	}
