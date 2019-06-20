@@ -207,7 +207,7 @@ func (n *Aens) NameTransferTx(name string, recipientAddress string) (tx NameTran
 }
 
 // NameRevokeTx revoke a name
-func (n *Aens) NameRevokeTx(name string, recipientAddress string) (tx NameRevokeTx, err error) {
+func (n *Aens) NameRevokeTx(name string) (tx NameRevokeTx, err error) {
 	txTTL, accountNonce, err := GetTTLNonce(n.Client, n.Account.Address, Config.Client.TTL)
 	if err != nil {
 		return
