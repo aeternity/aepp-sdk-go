@@ -62,3 +62,7 @@ func (m *Error) UnmarshalBinary(b []byte) error {
 	*m = res
 	return nil
 }
+
+func (m *Error) String() string {
+	return *m.Reason
+}
