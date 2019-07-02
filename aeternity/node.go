@@ -29,9 +29,10 @@ type Aens struct {
 
 // Contract is a account-specific helper that stores state relevant to smtart contract execution
 type Contract struct {
-	Client  *Client
-	Account *Account
-	source  string
+	Client   *Client
+	Compiler *Compiler
+	Account  *Account
+	source   string
 }
 
 // Oracle is a account-specific helper that stores state relevant to oracles

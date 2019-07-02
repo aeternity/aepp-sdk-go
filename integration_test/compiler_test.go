@@ -1,7 +1,6 @@
 package integrationtest
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
@@ -9,12 +8,17 @@ import (
 
 func TestCompiler(t *testing.T) {
 	c := aeternity.NewCompiler("http://localhost:3080", false)
-	t.Run("GetAPIVersion", func(t *testing.T) {
-		r, err := c.GetAPIVersion()
+	t.Run("APIVersion", func(t *testing.T) {
+		_, err := c.APIVersion()
 		if err != nil {
-			t.Fatal(err)
+			t.Error(err)
 		}
-		fmt.Println(r)
+	})
+	t.Run("CompileContract", func(t *testing.T) {
+		_, err := c.CompileContract("contract Identity =\n  type state = ()\n  function main(z : int) = z")
+		if err != nil {
+			t.Error(err)
+		}
 	})
 
 }
