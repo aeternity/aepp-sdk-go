@@ -115,7 +115,7 @@ func (c *Compiler) DecodeData(data string, sophiaType string) (decodedData *mode
 }
 
 // TODO how is this function supposed to be used?
-func (c *Compiler) EncodeCalldata(args []string, function string, source string) (callData *models.Calldata, err error) {
+func (c *Compiler) EncodeCalldata(source string, function string, args []string) (callData string, err error) {
 	f := &models.FunctionCallInput{
 		Arguments: args,
 		Function:  &function,
@@ -127,7 +127,8 @@ func (c *Compiler) EncodeCalldata(args []string, function string, source string)
 		return
 	}
 
-	return result.Payload, err
+	s := string(result.Payload.Calldata)
+	return s, err
 }
 
 // TODO how is this function supposed to be used?
