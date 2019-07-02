@@ -71,6 +71,7 @@ func readSource(path string) (s string, err error) {
 	b, err := ioutil.ReadAll(file)
 	return string(b), err
 }
+
 func init() {
 	RootCmd.AddCommand(contractCmd)
 	contractCmd.AddCommand(compileCmd)
