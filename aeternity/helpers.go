@@ -113,7 +113,7 @@ func BroadcastTransaction(c transactionPoster, txSignedBase64 string) (err error
 
 // PrintGenerationByHeight utility function to print a generation by it's height
 // TODO this belongs in cmd and needs to be tested with error cases
-func (c *Client) PrintGenerationByHeight(height uint64) {
+func (c *Node) PrintGenerationByHeight(height uint64) {
 	r, err := c.GetGenerationByHeight(height)
 	if err == nil {
 		PrintObject("generation", r)

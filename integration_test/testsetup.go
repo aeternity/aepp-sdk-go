@@ -16,9 +16,9 @@ var privatenetURL = "http://localhost:3013"
 var testnetURL = "http://sdk-testnet.aepps.com"
 var networkID = "ae_docker"
 
-func setupNetwork(t *testing.T, nodeURL string) *aeternity.Client {
+func setupNetwork(t *testing.T, nodeURL string) *aeternity.Node {
 	aeternity.Config.Node.NetworkID = networkID
-	client := aeternity.NewClient(nodeURL, false)
+	client := aeternity.NewNode(nodeURL, false)
 	t.Logf("nodeURL: %s, networkID: %s", nodeURL, aeternity.Config.Node.NetworkID)
 	return client
 }
@@ -37,7 +37,7 @@ func setupAccounts(t *testing.T) (*aeternity.Account, *aeternity.Account) {
 	return alice, bob
 }
 
-func signBroadcast(t *testing.T, tx aeternity.Tx, acc *aeternity.Account, aeClient *aeternity.Client) (hash string) {
+func signBroadcast(t *testing.T, tx aeternity.Tx, acc *aeternity.Account, aeNode *aeternity.Node) (hash string) {
 	txB64, _ := aeternity.BaseEncodeTx(tx)
 	// t.Log(txB64)
 
@@ -46,7 +46,7 @@ func signBroadcast(t *testing.T, tx aeternity.Tx, acc *aeternity.Account, aeClie
 		t.Fatal(err)
 	}
 
-	err = aeternity.BroadcastTransaction(aeClient, signedTxStr)
+	err = aeternity.BroadcastTransaction(aeNode, signedTxStr)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -62,8 +62,8 @@ func delay(f delayableCode) {
 	f()
 }
 
-func getHeight(aeClient *aeternity.Client) (h uint64) {
-	h, err := aeClient.GetHeight()
+func getHeight(aeNode *aeternity.Node) (h uint64) {
+	h, err := aeNode.GetHeight()
 	if err != nil {
 		fmt.Println("Could not retrieve chain height")
 		return
@@ -72,10 +72,10 @@ func getHeight(aeClient *aeternity.Client) (h uint64) {
 	return
 }
 
-func waitForTransaction(aeClient *aeternity.Client, hash string) (height uint64, microblockHash string, err error) {
-	height = getHeight(aeClient)
+func waitForTransaction(aeNode *aeternity.Node, hash string) (height uint64, microblockHash string, err error) {
+	height = getHeight(aeNode)
 	// fmt.Println("Waiting for", hash)
-	height, microblockHash, err = aeternity.WaitForTransactionUntilHeight(aeClient, hash, height+10)
+	height, microblockHash, err = aeternity.WaitForTransactionUntilHeight(aeNode, hash, height+10)
 	if err != nil {
 		// Sometimes, the tests want the tx to fail. Return the err to let them know.
 		return 0, "", err

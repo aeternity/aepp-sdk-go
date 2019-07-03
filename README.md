@@ -17,7 +17,7 @@ if err != nil {
     fmt.Println(err)
     return
 }
-aeClient := aeternity.NewCli("http://localhost:3013", false).WithAccount(acc)
+aeNode := aeternity.NewCli("http://localhost:3013", false).WithAccount(acc)
 ```
 
 Most parameters are set by modifying the variables in `config.go` in this manner:
@@ -25,7 +25,7 @@ Most parameters are set by modifying the variables in `config.go` in this manner
 
 When using the `Ae/Aens/Contract/Oracle` struct helper functions in `helpers.go`, chores like getting the TTL, Account Nonce, encoding of the AENS claim etc are done automatically.
 ```
-preclaimTx, salt, err := aeClient.Aens.NamePreclaimTx("fdsa.test", aeternity.Config.Client.Fee)
+preclaimTx, salt, err := aeNode.Aens.NamePreclaimTx("fdsa.test", aeternity.Config.Client.Fee)
 if err != nil {
     fmt.Println(err)
     return
@@ -38,7 +38,7 @@ if err != nil {
     return
 }
 
-err = aeClient.BroadcastTransaction(signedTxStr)
+err = aeNode.BroadcastTransaction(signedTxStr)
 if err != nil {
     panic(err)
 }

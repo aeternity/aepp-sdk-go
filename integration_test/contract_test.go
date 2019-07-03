@@ -10,8 +10,8 @@ import (
 
 func TestContracts(t *testing.T) {
 	alice, _ := setupAccounts(t)
-	aeClient := setupNetwork(t, privatenetURL)
-	contractsAlice := aeternity.Contract{Client: aeClient, Owner: alice.Address}
+	aeNode := setupNetwork(t, privatenetURL)
+	contractsAlice := aeternity.Contract{Client: aeNode, Owner: alice.Address}
 
 	var ctID string
 	var callData string
@@ -25,15 +25,15 @@ func TestContracts(t *testing.T) {
 	}
 	ctID, _ = create.ContractID()
 	fmt.Printf("Create %s, %+v\n", ctID, create)
-	txHash = signBroadcast(t, &create, alice, aeClient)
-	_, _, err = waitForTransaction(aeClient, txHash)
+	txHash = signBroadcast(t, &create, alice, aeNode)
+	_, _, err = waitForTransaction(aeNode, txHash)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Confirm that contract was created
 	getContract := func() {
-		_, err = aeClient.GetContractByID(ctID)
+		_, err = aeNode.GetContractByID(ctID)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -46,9 +46,9 @@ func TestContracts(t *testing.T) {
 		t.Fatal(err)
 	}
 	fmt.Printf("Call %+v\n", callTx)
-	txHash = signBroadcast(t, &callTx, alice, aeClient)
+	txHash = signBroadcast(t, &callTx, alice, aeNode)
 
-	_, _, err = waitForTransaction(aeClient, txHash)
+	_, _, err = waitForTransaction(aeNode, txHash)
 	if err != nil {
 		t.Fatal(err)
 	}
