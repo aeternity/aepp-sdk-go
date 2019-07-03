@@ -2,10 +2,38 @@ package aeternity
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/aeternity/aepp-sdk-go/swagguard/node/client/external"
 	"github.com/aeternity/aepp-sdk-go/swagguard/node/models"
 )
+
+func getErrorReason(v interface{}) (msg string) {
+	var p func(v reflect.Value) (msg string)
+	p = func(v reflect.Value) (msg string) {
+		switch v.Kind() {
+		// If it is a pointer we need to unwrap and call once again
+		case reflect.Ptr:
+			if v.IsValid() {
+				msg = p(v.Elem())
+			}
+		case reflect.Struct:
+			if v.Type() == reflect.TypeOf(models.Error{}) {
+				msg = fmt.Sprint(reflect.Indirect(v.FieldByName("Reason")))
+				break
+			}
+			for i := 0; i < v.NumField(); i++ {
+				msg = p(v.Field(i))
+			}
+		}
+		return
+	}
+	msg = p(reflect.ValueOf(v))
+	if len(msg) == 0 {
+		msg = fmt.Sprint(v)
+	}
+	return
+}
 
 // GetStatus post transaction
 func (c *Node) GetStatus() (status *models.Status, err error) {

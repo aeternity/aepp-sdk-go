@@ -76,10 +76,10 @@ func addressFunc(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	aeternity.Pp("Account address", account.Address)
+	Pp("Account address", account.Address)
 	if printPrivateKey {
 		if AskYes("Are you sure you want to print your private key? This could be insecure.", false) {
-			aeternity.Pp("Account private key", account.SigningKeyToHexString())
+			Pp("Account private key", account.SigningKeyToHexString())
 		}
 	}
 
@@ -109,7 +109,7 @@ func createFunc(cmd *cobra.Command, args []string) (err error) {
 		return err
 	}
 
-	aeternity.Pp(
+	Pp(
 		"Wallet path", f,
 		"Account address", account.Address,
 	)
@@ -141,7 +141,7 @@ func balanceFunc(cmd *cobra.Command, args []string) (err error) {
 		return err
 	}
 
-	aeternity.PrintObject("account", a)
+	PrintObject("account", a)
 	return nil
 }
 
@@ -169,7 +169,7 @@ func signFunc(cmd *cobra.Command, args []string) (err error) {
 		return err
 	}
 
-	aeternity.Pp(
+	Pp(
 		"Signing account address", account.Address,
 		"Signature", signature,
 		"Unsigned", txUnsignedBase64,
@@ -202,7 +202,7 @@ func saveFunc(cmd *cobra.Command, args []string) (err error) {
 		return err
 	}
 
-	aeternity.Pp("Keystore path ", f)
+	Pp("Keystore path ", f)
 
 	return nil
 }
