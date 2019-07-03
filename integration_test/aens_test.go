@@ -10,7 +10,7 @@ import (
 	"github.com/aeternity/aepp-sdk-go/aeternity"
 )
 
-func getNameEntry(t *testing.T, node *aeternity.Client, name string) (responseJSON string) {
+func getNameEntry(t *testing.T, node *aeternity.Node, name string) (responseJSON string) {
 	response, err := node.GetNameEntryByName(name)
 	if err != nil {
 		t.Fatal(err)

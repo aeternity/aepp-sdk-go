@@ -37,8 +37,8 @@ var topCmd = &cobra.Command{
 }
 
 func topFunc(cmd *cobra.Command, args []string) (err error) {
-	aeCli := NewAeCli()
-	v, err := aeCli.GetTopBlock()
+	aeNode := NewAeNode()
+	v, err := aeNode.GetTopBlock()
 	if err != nil {
 		return err
 	}
@@ -54,8 +54,8 @@ var statusCmd = &cobra.Command{
 }
 
 func statusFunc(cmd *cobra.Command, args []string) (err error) {
-	aeCli := NewAeCli()
-	v, err := aeCli.GetStatus()
+	aeNode := NewAeNode()
+	v, err := aeNode.GetStatus()
 	if err != nil {
 		return err
 	}
@@ -72,8 +72,8 @@ var playCmd = &cobra.Command{
 }
 
 func playFunc(cmd *cobra.Command, args []string) (err error) {
-	aeCli := NewAeCli()
-	blockHeight, err := aeCli.GetHeight()
+	aeNode := NewAeNode()
+	blockHeight, err := aeNode.GetHeight()
 	if err != nil {
 		return err
 	}
@@ -97,7 +97,7 @@ func playFunc(cmd *cobra.Command, args []string) (err error) {
 	}
 	// run the play
 	for ; blockHeight > targetHeight; blockHeight-- {
-		aeCli.PrintGenerationByHeight(blockHeight)
+		aeNode.PrintGenerationByHeight(blockHeight)
 		fmt.Println("")
 	}
 
@@ -121,8 +121,8 @@ func broadcastFunc(cmd *cobra.Command, args []string) (err error) {
 		return err
 	}
 
-	aeCli := NewAeCli()
-	err = aeternity.BroadcastTransaction(aeCli, txSignedBase64)
+	aeNode := NewAeNode()
+	err = aeternity.BroadcastTransaction(aeNode, txSignedBase64)
 	if err != nil {
 		errFinal := fmt.Errorf("Error while broadcasting transaction: %v", err)
 		return errFinal
@@ -140,7 +140,7 @@ var ttlCmd = &cobra.Command{
 }
 
 func ttlFunc(cmd *cobra.Command, args []string) (err error) {
-	ae := NewAeCli()
+	ae := NewAeNode()
 	height, err := ae.GetHeight()
 	if err != nil {
 		errFinal := fmt.Errorf("Error getting height from the node: %v", err)
@@ -159,7 +159,7 @@ var networkIDCmd = &cobra.Command{
 }
 
 func networkIDFunc(cmd *cobra.Command, args []string) (err error) {
-	ae := NewAeCli()
+	ae := NewAeNode()
 	resp, err := ae.GetStatus()
 	if err != nil {
 		errFinal := fmt.Errorf("Error getting status information from the node: %v", err)

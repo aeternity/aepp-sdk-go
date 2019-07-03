@@ -61,17 +61,17 @@ func printResult(title string, v interface{}, err error) {
 }
 
 func inspectFunc(cmd *cobra.Command, args []string) (err error) {
-	aeCli := NewAeCli()
+	aeNode := NewAeNode()
 	for _, object := range args {
 		// height
 		if matched, _ := regexp.MatchString(`^\d+$`, object); matched {
 			height, _ := strconv.ParseUint(object, 10, 64)
-			aeCli.PrintGenerationByHeight(height)
+			aeNode.PrintGenerationByHeight(height)
 			continue
 		}
 		// name
 		if strings.HasSuffix(object, ".aet") {
-			v, err := aeCli.GetNameEntryByName(object)
+			v, err := aeNode.GetNameEntryByName(object)
 			if err != nil {
 				return err
 			}
@@ -82,7 +82,7 @@ func inspectFunc(cmd *cobra.Command, args []string) (err error) {
 		switch aeternity.GetHashPrefix(object) {
 		case aeternity.PrefixAccountPubkey:
 			// account balance
-			v, err := aeCli.GetAccount(object)
+			v, err := aeNode.GetAccount(object)
 			if err != nil {
 				return err
 			}
@@ -90,12 +90,12 @@ func inspectFunc(cmd *cobra.Command, args []string) (err error) {
 			printResult("account", v, err)
 
 		case aeternity.PrefixMicroBlockHash:
-			v, err := aeCli.GetMicroBlockHeaderByHash(object)
+			v, err := aeNode.GetMicroBlockHeaderByHash(object)
 			if err != nil {
 				return err
 			}
 			printResult("block", v, err)
-			v1, err := aeCli.GetMicroBlockTransactionsByHash(object)
+			v1, err := aeNode.GetMicroBlockTransactionsByHash(object)
 			if err != nil {
 				return err
 			}
@@ -103,7 +103,7 @@ func inspectFunc(cmd *cobra.Command, args []string) (err error) {
 
 		case aeternity.PrefixKeyBlockHash:
 			// block
-			v, err := aeCli.GetKeyBlockByHash(object)
+			v, err := aeNode.GetKeyBlockByHash(object)
 			if err != nil {
 				return err
 			}
@@ -111,7 +111,7 @@ func inspectFunc(cmd *cobra.Command, args []string) (err error) {
 
 		case aeternity.PrefixTransactionHash:
 			// transaction
-			v, err := aeCli.GetTransactionByHash(object)
+			v, err := aeNode.GetTransactionByHash(object)
 			if err != nil {
 				return err
 			}
@@ -119,7 +119,7 @@ func inspectFunc(cmd *cobra.Command, args []string) (err error) {
 
 		case aeternity.PrefixOraclePubkey:
 			// oracle
-			v, err := aeCli.GetOracleByPubkey(object)
+			v, err := aeNode.GetOracleByPubkey(object)
 			if err != nil {
 				return err
 			}

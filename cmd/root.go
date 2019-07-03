@@ -45,12 +45,12 @@ func Execute(v string) {
 	}
 }
 
-// NewAeCli is just a helper function that gives you a aeCli so that
-// you don't have to maintain a aeCli global variable (which needs the
+// NewAeNode is just a helper function that gives you a Node so that
+// you don't have to maintain a Node global variable (which needs the
 // config vars to be read immediately, with this helper function you can
 // defer the reading of the variables until the subcommand's execution)
-func NewAeCli() *aeternity.Client {
-	return aeternity.NewClient(aeternity.Config.Node.URL, debug)
+func NewAeNode() *aeternity.Node {
+	return aeternity.NewNode(aeternity.Config.Node.URL, debug)
 }
 
 func init() {

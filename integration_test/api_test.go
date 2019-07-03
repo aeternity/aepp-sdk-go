@@ -51,7 +51,7 @@ type txTypes struct {
 var sentTxs txTypes
 var useTestNet bool
 
-func signBroadcastWaitForTransaction(t *testing.T, tx aeternity.Tx, acc *aeternity.Account, node *aeternity.Client) (height uint64, txHash string, mbHash string) {
+func signBroadcastWaitForTransaction(t *testing.T, tx aeternity.Tx, acc *aeternity.Account, node *aeternity.Node) (height uint64, txHash string, mbHash string) {
 	txHash = signBroadcast(t, tx, acc, node)
 	height, mbHash, err := waitForTransaction(node, txHash)
 	if err != nil {
