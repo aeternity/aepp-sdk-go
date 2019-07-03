@@ -44,10 +44,10 @@ func txSpendFunc(cmd *cobra.Command, args []string) (err error) {
 	feeBigInt, _ = utils.NewIntFromString(fee)
 
 	// Validate arguments
-	if len(sender) == 0 {
+	if !IsAddress(sender) {
 		return errors.New("Error, missing or invalid sender address")
 	}
-	if len(recipient) == 0 {
+	if !IsAddress(recipient) {
 		return errors.New("Error, missing or invalid recipient address")
 	}
 	if amount.Cmp(big.NewInt(0)) == -1 {
@@ -89,6 +89,70 @@ func txSpendFunc(cmd *cobra.Command, args []string) (err error) {
 	return nil
 }
 
+var txContractCreateCmd = &cobra.Command{
+	Use:   "deploy OWNER_ID CONTRACT_BYTECODE INIT_CALLDATA",
+	Short: "Create a smart contract on the blockchain",
+	Long:  ``,
+	Args:  cobra.ExactArgs(3),
+	RunE:  txContractCreateFunc,
+}
+
+func txContractCreateFunc(cmd *cobra.Command, args []string) (err error) {
+	var (
+		owner    string
+		contract string
+		calldata string
+	)
+
+	// Load variables from arguments
+	owner = args[0]
+	if !IsAddress(owner) {
+		return errors.New("Error, missing or invalid owner address")
+	}
+	contract = args[1]
+	if !IsBytecode(contract) {
+		return errors.New("Error, missing or invalid contract bytecode")
+	}
+	calldata = args[2]
+	if !IsBytecode(calldata) {
+		return errors.New("Error, missing or invalid init calldata bytecode")
+	}
+
+	c := aeternity.Contract{
+		Client:   aeternity.NewClient(aeternity.Config.Node.URL, debug),
+		Compiler: nil,
+		Owner:    owner,
+	}
+
+	tx, err := c.ContractCreateTx(contract, calldata, aeternity.Config.Client.Contracts.VMVersion, aeternity.Config.Client.Contracts.ABIVersion, aeternity.Config.Client.Contracts.Deposit, aeternity.Config.Client.Contracts.Amount, aeternity.Config.Client.Contracts.Gas, aeternity.Config.Client.Contracts.GasPrice, aeternity.Config.Client.Fee)
+
+	if err != nil {
+		return err
+	}
+	txStr, err := aeternity.BaseEncodeTx(&tx)
+	if err != nil {
+		return err
+	}
+
+	aeternity.Pp(
+		"OwnerID", tx.OwnerID,
+		"AccountNonce", tx.AccountNonce,
+		"Code", tx.Code,
+		"VMVersion", tx.VMVersion,
+		"ABIVersion", tx.AbiVersion,
+		"Deposit", tx.Deposit,
+		"Amount", tx.Amount,
+		"Gas", tx.Gas,
+		"GasPrice", tx.GasPrice,
+		"TTL", tx.TTL,
+		"Fee", tx.Fee,
+		"CallData", tx.CallData,
+		"Encoded", txStr,
+	)
+
+	return
+}
+
 // txVerifyCmd implements the tx verify subcommand.
 // It verfies the signature of a signed transaction
 var txVerifyCmd = &cobra.Command{
@@ -105,10 +169,10 @@ func txVerifyFunc(cmd *cobra.Command, args []string) (err error) {
 	sender := args[0]
 	txSignedBase64 := args[1]
 
-	if len(sender) == 0 {
+	if !IsAddress(sender) {
 		return errors.New("Error, missing or invalid sender address")
 	}
-	if len(txSignedBase64) == 0 || txSignedBase64[0:3] != "tx_" {
+	if !IsTransaction(txSignedBase64) {
 		return errors.New("Error, missing or invalid base64 encoded transaction")
 	}
 	valid, err := aeternity.VerifySignedTx(sender, txSignedBase64, aeternity.Config.Node.NetworkID)
@@ -138,6 +202,9 @@ var txDumpRawCmd = &cobra.Command{
 
 func txDumpRawFunc(cmd *cobra.Command, args []string) (err error) {
 	tx := args[0]
+	if !IsTransaction(tx) {
+		return errors.New("Error, missing or invalid base64 encoded transaction")
+	}
 	txRaw, err := aeternity.Decode(tx)
 	if err != nil {
 		return err
@@ -150,6 +217,7 @@ func txDumpRawFunc(cmd *cobra.Command, args []string) (err error) {
 func init() {
 	RootCmd.AddCommand(txCmd)
 	txCmd.AddCommand(txSpendCmd)
+	txCmd.AddCommand(txContractCreateCmd)
 	txCmd.AddCommand(txVerifyCmd)
 	txCmd.AddCommand(txDumpRawCmd)
 

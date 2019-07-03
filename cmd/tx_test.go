@@ -7,26 +7,26 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var alice = "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"
+var bob = "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v"
+
 func TestTxSpend(t *testing.T) {
-	sender := "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"
-	recipient := "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v"
 	emptyCmd := cobra.Command{}
 
-	err := txSpendFunc(&emptyCmd, []string{sender, recipient, "10"})
+	err := txSpendFunc(&emptyCmd, []string{alice, bob, "10"})
 	if err != nil {
 		t.Error(err)
 	}
 }
 
 func TestTxVerify(t *testing.T) {
-	sender := "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"
 	// unsigned tx_+FMMAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vOhAR8To7CL8AFABmKmi2nYdfeAPOxMCGR/btXYTHiXvVCjCoa15iD0gACCAfQBgIHqJ/Y=
 	// sign with ae_mainnet
 	signedTx := "tx_+J0LAfhCuEBcvwtyCo3FYqmINcP6lHLH/dRDcj5rUiKDqYKhPpiQ+1SBQ66rF3gdVQ1IcANcw/IayK//YgK2dsDF1VtroQEAuFX4UwwBoQHOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+86EBHxOjsIvwAUAGYqaLadh194A87EwIZH9u1dhMeJe9UKMKhrXmIPSAAIIB9AGAx+EjLg=="
 	aeternity.Config.Node.NetworkID = "ae_mainnet"
 	emptyCmd := cobra.Command{}
 
-	err := txVerifyFunc(&emptyCmd, []string{sender, signedTx})
+	err := txVerifyFunc(&emptyCmd, []string{alice, signedTx})
 	if err != nil {
 		t.Error(err)
 	}
@@ -39,5 +39,33 @@ func TestTxDumpRaw(t *testing.T) {
 	err := txDumpRawFunc(&emptyCmd, []string{tx})
 	if err != nil {
 		t.Error(err)
+	}
+}
+
+func Test_txContractCreateFunc(t *testing.T) {
+	type args struct {
+		cmd  *cobra.Command
+		args []string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Deploy SimpleStorage with alice (unsigned)",
+			args: args{
+				cmd:  &cobra.Command{},
+				args: []string{alice, contractSimpleStorageBytecode, contractSimpleStorageInitCalldata},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := txContractCreateFunc(tt.args.cmd, tt.args.args); (err != nil) != tt.wantErr {
+				t.Errorf("txContractCreateFunc() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
 	}
 }
