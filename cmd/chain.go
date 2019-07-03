@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
+	"github.com/aeternity/aepp-sdk-go/swagguard/node/models"
 	"github.com/spf13/cobra"
 )
 
@@ -38,12 +39,21 @@ var topCmd = &cobra.Command{
 
 func topFunc(cmd *cobra.Command, args []string) (err error) {
 	aeNode := NewAeNode()
-	v, err := aeNode.GetTopBlock()
+	v, err := topDo(aeNode)
 	if err != nil {
 		return err
 	}
 	aeternity.PrintObject("block", v)
 	return nil
+}
+
+type getTopBlocker interface {
+	GetTopBlock() (kb *models.KeyBlockOrMicroBlockHeader, err error)
+}
+
+func topDo(conn getTopBlocker) (kb *models.KeyBlockOrMicroBlockHeader, err error) {
+	kb, err = conn.GetTopBlock()
+	return
 }
 
 var statusCmd = &cobra.Command{
@@ -53,14 +63,23 @@ var statusCmd = &cobra.Command{
 	RunE:  statusFunc,
 }
 
+type getStatuser interface {
+	GetStatus() (status *models.Status, err error)
+}
+
 func statusFunc(cmd *cobra.Command, args []string) (err error) {
 	aeNode := NewAeNode()
-	v, err := aeNode.GetStatus()
+	v, err := statusDo(aeNode)
 	if err != nil {
 		return err
 	}
 	aeternity.PrintObject("node", v)
 	return nil
+}
+
+func statusDo(conn getStatuser) (status *models.Status, err error) {
+	status, err = conn.GetStatus()
+	return
 }
 
 var limit, startFromHeight uint64
@@ -141,13 +160,26 @@ var ttlCmd = &cobra.Command{
 
 func ttlFunc(cmd *cobra.Command, args []string) (err error) {
 	ae := NewAeNode()
-	height, err := ae.GetHeight()
+	ans, err := ttlDo(ae)
+	if err != nil {
+		return
+	}
+	fmt.Println(ans)
+	return nil
+}
+
+type getHeighter interface {
+	GetHeight() (uint64, error)
+}
+
+func ttlDo(conn getHeighter) (ttl uint64, err error) {
+	height, err := conn.GetHeight()
 	if err != nil {
 		errFinal := fmt.Errorf("Error getting height from the node: %v", err)
-		return errFinal
+		return 0, errFinal
 	}
-	fmt.Println(height + aeternity.Config.Client.TTL)
-	return nil
+	ttl = height + aeternity.Config.Client.TTL
+	return
 }
 
 var networkIDCmd = &cobra.Command{
@@ -160,13 +192,22 @@ var networkIDCmd = &cobra.Command{
 
 func networkIDFunc(cmd *cobra.Command, args []string) (err error) {
 	ae := NewAeNode()
-	resp, err := ae.GetStatus()
+	nID, err := networkIDDo(ae)
+	if err != nil {
+		return err
+	}
+	fmt.Println(nID)
+	return nil
+}
+
+func networkIDDo(conn getStatuser) (networkID string, err error) {
+	resp, err := conn.GetStatus()
 	if err != nil {
 		errFinal := fmt.Errorf("Error getting status information from the node: %v", err)
-		return errFinal
+		return "", errFinal
 	}
-	fmt.Println(*resp.NetworkID)
-	return nil
+	networkID = *resp.NetworkID
+	return
 }
 
 func init() {

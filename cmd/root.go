@@ -45,12 +45,22 @@ func Execute(v string) {
 	}
 }
 
-// NewAeNode is just a helper function that gives you a Node so that
-// you don't have to maintain a Node global variable (which needs the
-// config vars to be read immediately, with this helper function you can
-// defer the reading of the variables until the subcommand's execution)
-func NewAeNode() *aeternity.Node {
+// NewAeNode is just a helper function that gives you a Node so that you don't
+// have to maintain a Node global variable (which needs the config vars to be
+// read immediately, with this helper function you can defer the reading of the
+// variables until the subcommand's execution) Defined as a var so unittests can
+// mock this function out.
+var NewAeNode = func() *aeternity.Node {
 	return aeternity.NewNode(aeternity.Config.Node.URL, debug)
+}
+
+// NewCompiler is just a helper function that gives you a Compiler so that you don't
+// have to maintain a Compiler global variable (which needs the config vars to be
+// read immediately, with this helper function you can defer the reading of the
+// variables until the subcommand's execution) Defined as a var so unittests can
+// mock this function out.
+var NewCompiler = func() *aeternity.Compiler {
+	return aeternity.NewCompiler(compilerURL, debug)
 }
 
 func init() {
