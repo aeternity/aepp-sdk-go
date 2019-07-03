@@ -1,4 +1,4 @@
-package aeternity
+package cmd
 
 import (
 	"fmt"

@@ -1,4 +1,4 @@
-package aeternity
+package cmd
 
 import (
 	"encoding/json"
@@ -8,6 +8,7 @@ import (
 
 	"time"
 
+	"github.com/aeternity/aepp-sdk-go/aeternity"
 	"github.com/aeternity/aepp-sdk-go/swagguard/node/models"
 )
 
@@ -98,41 +99,9 @@ func printIf(title string, v interface{}) {
 	p(title, "", reflect.ValueOf(v), 0)
 }
 
-func getErrorReason(v interface{}) (msg string) {
-	var p func(v reflect.Value) (msg string)
-	p = func(v reflect.Value) (msg string) {
-		switch v.Kind() {
-		// If it is a pointer we need to unwrap and call once again
-		case reflect.Ptr:
-			if v.IsValid() {
-				msg = p(v.Elem())
-			}
-		case reflect.Struct:
-			if v.Type() == reflect.TypeOf(models.Error{}) {
-				msg = fmt.Sprint(reflect.Indirect(v.FieldByName("Reason")))
-				break
-			}
-			for i := 0; i < v.NumField(); i++ {
-				msg = p(v.Field(i))
-			}
-		}
-		return
-	}
-	msg = p(reflect.ValueOf(v))
-	if len(msg) == 0 {
-		msg = fmt.Sprint(v)
-	}
-	return
-}
-
-// PrintError print error
-func PrintError(code string, e *models.Error) {
-	Pp(code, e.Reason)
-}
-
 // PrintObject pretty print an object obtained from the api with a title
 func PrintObject(title string, i interface{}) {
-	if Config.Tuning.OutputFormatJSON {
+	if aeternity.Config.Tuning.OutputFormatJSON {
 		j, _ := json.MarshalIndent(i, "", "  ")
 		fmt.Printf("%s\n", j)
 		return
@@ -141,4 +110,37 @@ func PrintObject(title string, i interface{}) {
 	printIf(title, i)
 	print("\n")
 
+}
+
+type getGenerationMicroBlockTransactioner interface {
+	GetGenerationByHeight(height uint64) (g *models.Generation, err error)
+	GetMicroBlockTransactionsByHash(microBlockID string) (txs *models.GenericTxs, err error)
+	GetTransactionByHash(txHash string) (tx *models.GenericSignedTx, err error)
+}
+
+// PrintGenerationByHeight utility function to print a generation by it's height
+// TODO needs to be tested with error cases
+func PrintGenerationByHeight(c getGenerationMicroBlockTransactioner, height uint64) {
+	r, err := c.GetGenerationByHeight(height)
+	if err == nil {
+		PrintObject("generation", r)
+		// search for transaction in the microblocks
+		for _, mbh := range r.MicroBlocks {
+			// get the microblok
+			mbhs := fmt.Sprint(mbh)
+			r, err := c.GetMicroBlockTransactionsByHash(mbhs)
+			if err != nil {
+				Pp("Error:", err)
+			}
+			// go through all the hashes
+			for _, btx := range r.Transactions {
+				p, err := c.GetTransactionByHash(fmt.Sprint(btx.Hash))
+				if err == nil {
+					PrintObject("transaction", p)
+				}
+			}
+		}
+	} else {
+		fmt.Println("Something went wrong in PrintGenerationByHeight")
+	}
 }

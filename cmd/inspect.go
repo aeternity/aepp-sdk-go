@@ -57,7 +57,7 @@ func printResult(title string, v interface{}, err error) {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	aeternity.PrintObject(title, v)
+	PrintObject(title, v)
 }
 
 func inspectFunc(cmd *cobra.Command, args []string) (err error) {
@@ -66,7 +66,7 @@ func inspectFunc(cmd *cobra.Command, args []string) (err error) {
 		// height
 		if matched, _ := regexp.MatchString(`^\d+$`, object); matched {
 			height, _ := strconv.ParseUint(object, 10, 64)
-			aeNode.PrintGenerationByHeight(height)
+			PrintGenerationByHeight(aeNode, height)
 			continue
 		}
 		// name

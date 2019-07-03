@@ -111,33 +111,6 @@ func BroadcastTransaction(c transactionPoster, txSignedBase64 string) (err error
 	return
 }
 
-// PrintGenerationByHeight utility function to print a generation by it's height
-// TODO this belongs in cmd and needs to be tested with error cases
-func (c *Node) PrintGenerationByHeight(height uint64) {
-	r, err := c.GetGenerationByHeight(height)
-	if err == nil {
-		PrintObject("generation", r)
-		// search for transaction in the microblocks
-		for _, mbh := range r.MicroBlocks {
-			// get the microblok
-			mbhs := fmt.Sprint(mbh)
-			r, err := c.GetMicroBlockTransactionsByHash(mbhs)
-			if err != nil {
-				Pp("Error:", err)
-			}
-			// go through all the hashes
-			for _, btx := range r.Transactions {
-				p, err := c.GetTransactionByHash(fmt.Sprint(btx.Hash))
-				if err == nil {
-					PrintObject("transaction", p)
-				}
-			}
-		}
-	} else {
-		fmt.Println("Something went wrong in PrintGenerationByHeight")
-	}
-}
-
 // Context stores relevant context (node connection, account address) that one might not want to spell out each time one creates a transaction
 type Context struct {
 	Client  *Node

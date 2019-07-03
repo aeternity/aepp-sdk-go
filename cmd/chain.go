@@ -43,7 +43,7 @@ func topFunc(cmd *cobra.Command, args []string) (err error) {
 	if err != nil {
 		return err
 	}
-	aeternity.PrintObject("block", v)
+	PrintObject("block", v)
 	return nil
 }
 
@@ -73,7 +73,7 @@ func statusFunc(cmd *cobra.Command, args []string) (err error) {
 	if err != nil {
 		return err
 	}
-	aeternity.PrintObject("node", v)
+	PrintObject("node", v)
 	return nil
 }
 
@@ -116,7 +116,7 @@ func playFunc(cmd *cobra.Command, args []string) (err error) {
 	}
 	// run the play
 	for ; blockHeight > targetHeight; blockHeight-- {
-		aeNode.PrintGenerationByHeight(blockHeight)
+		PrintGenerationByHeight(aeNode, blockHeight)
 		fmt.Println("")
 	}
 

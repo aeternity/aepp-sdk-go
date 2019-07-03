@@ -73,7 +73,7 @@ func txSpendFunc(cmd *cobra.Command, args []string) (err error) {
 	}
 
 	// Sender, Recipient, Amount, Ttl, Fee, Nonce, Payload, Encoded
-	aeternity.Pp(
+	Pp(
 		"Sender acount", sender,
 		"Recipient account", recipient,
 		"Amount", amount,
@@ -130,7 +130,7 @@ func txContractCreateFunc(cmd *cobra.Command, args []string) (err error) {
 		return err
 	}
 
-	aeternity.Pp(
+	Pp(
 		"OwnerID", tx.OwnerID,
 		"AccountNonce", tx.AccountNonce,
 		"Code", tx.Code,
