@@ -36,7 +36,7 @@ func randomName(length int) string {
 func TestAENSWorkflow(t *testing.T) {
 	node := setupNetwork(t, privatenetURL)
 	alice, bob := setupAccounts(t)
-	aensAlice := aeternity.Aens{Client: node, Account: alice}
+	aensAlice := aeternity.Context{Client: node, Address: alice.Address}
 
 	name := randomName(6)
 	// Preclaim the name
@@ -95,7 +95,7 @@ func TestAENSWorkflow(t *testing.T) {
 	_, _, _ = waitForTransaction(node, hash)
 
 	// Receiver updates the name, makes it point to himself
-	aensBob := aeternity.Aens{Client: node, Account: bob}
+	aensBob := aeternity.Context{Client: node, Address: bob.Address}
 
 	updateTx2, err := aensBob.NameUpdateTx(name, bob.Address)
 	if err != nil {

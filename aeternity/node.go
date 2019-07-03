@@ -13,33 +13,6 @@ type Node struct {
 	*apiclient.Node
 }
 
-// Wallet is a account-specific helper that stores state relevant to spending operations
-type Wallet struct {
-	Client  *Node
-	Account *Account
-}
-
-// Aens ais a account-specific helper that stores state relevant to AENS operations
-type Aens struct {
-	Client       *Node
-	Account      *Account
-	name         string
-	preClaimSalt []byte
-}
-
-// Oracle is a account-specific helper that stores state relevant to oracles
-type Oracle struct {
-	Client  *Node
-	Account *Account
-}
-
-// Contract is a account-specific helper that stores state relevant to smtart contract execution
-type Contract struct {
-	Client   *Node
-	Compiler *Compiler
-	Owner    string
-}
-
 func urlComponents(url string) (host string, schemas []string) {
 	p := strings.Split(url, "://")
 	if len(p) == 1 {
