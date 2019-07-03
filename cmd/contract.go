@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/aeternity/aepp-sdk-go/aeternity"
 	"github.com/spf13/cobra"
 )
 
@@ -26,7 +25,7 @@ var compileCmd = &cobra.Command{
 }
 
 func compileFunc(cmd *cobra.Command, args []string) (err error) {
-	compiler := aeternity.NewCompiler(compilerURL, debug)
+	compiler := NewCompiler()
 	s, err := readSource(args[0])
 	if err != nil {
 		return err
@@ -47,7 +46,7 @@ var encodeCalldataCmd = &cobra.Command{
 }
 
 func encodeCalldataFunc(cmd *cobra.Command, args []string) (err error) {
-	compiler := aeternity.NewCompiler(compilerURL, debug)
+	compiler := NewCompiler()
 
 	s, err := readSource(args[0])
 	if err != nil {
@@ -72,7 +71,7 @@ var decodeCalldataCmd = &cobra.Command{
 }
 
 func decodeCalldataFunc(cmd *cobra.Command, args []string) (err error) {
-	compiler := aeternity.NewCompiler(compilerURL, debug)
+	compiler := NewCompiler()
 
 	var decodeWithSource = func(path string, callData string) (function string, arguments []interface{}, err error) {
 		source, err := readSource(path)
