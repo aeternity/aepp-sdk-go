@@ -31,8 +31,7 @@ type Aens struct {
 type Contract struct {
 	Client   *Client
 	Compiler *Compiler
-	Account  *Account
-	source   string
+	Owner    string
 }
 
 // Oracle is a account-specific helper that stores state relevant to oracles

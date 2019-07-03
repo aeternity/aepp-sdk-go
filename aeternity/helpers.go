@@ -265,23 +265,23 @@ func (o *Oracle) OracleRespondTx(OracleID string, QueryID string, Response strin
 
 // ContractCreateTx returns a transaction for creating a contract on the chain
 func (c *Contract) ContractCreateTx(Code string, CallData string, VMVersion, AbiVersion uint16, Deposit, Amount, Gas, GasPrice, Fee big.Int) (tx ContractCreateTx, err error) {
-	ttl, nonce, err := GetTTLNonce(c.Client, c.Account.Address, Config.Client.TTL)
+	ttl, nonce, err := GetTTLNonce(c.Client, c.Owner, Config.Client.TTL)
 	if err != nil {
 		return ContractCreateTx{}, err
 	}
 
-	tx = NewContractCreateTx(c.Account.Address, nonce, Code, VMVersion, AbiVersion, Deposit, Amount, Gas, GasPrice, Fee, ttl, CallData)
+	tx = NewContractCreateTx(c.Owner, nonce, Code, VMVersion, AbiVersion, Deposit, Amount, Gas, GasPrice, Fee, ttl, CallData)
 	return tx, nil
 }
 
 // ContractCallTx returns a transaction for calling a contract on the chain
 func (c *Contract) ContractCallTx(ContractID, CallData string, AbiVersion uint16, Amount, Gas, GasPrice, Fee big.Int) (tx ContractCallTx, err error) {
-	ttl, nonce, err := GetTTLNonce(c.Client, c.Account.Address, Config.Client.TTL)
+	ttl, nonce, err := GetTTLNonce(c.Client, c.Owner, Config.Client.TTL)
 	if err != nil {
 		return ContractCallTx{}, err
 	}
 
-	tx = NewContractCallTx(c.Account.Address, nonce, ContractID, Amount, Gas, GasPrice, AbiVersion, CallData, Fee, ttl)
+	tx = NewContractCallTx(c.Owner, nonce, ContractID, Amount, Gas, GasPrice, AbiVersion, CallData, Fee, ttl)
 	return tx, nil
 }
 
