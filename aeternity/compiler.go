@@ -23,14 +23,14 @@ func NewCompiler(compilerURL string, debug bool) *Compiler {
 	host, schemas := urlComponents(compilerURL)
 	transport := httptransport.New(host, "", schemas)
 	transport.SetDebug(debug)
-	cClient := compiler_client.New(transport, strfmt.Default)
+	c := compiler_client.New(transport, strfmt.Default)
 	compiler := &Compiler{
-		Compiler: cClient,
+		Compiler: c,
 	}
 	return compiler
 }
 
-//  connects to the compiler and returns its version string, e.g.
+// APIVersion connects to the compiler and returns its version string, e.g.
 // 3.1.0
 func (c *Compiler) APIVersion() (version string, err error) {
 	result, err := c.Compiler.Operations.APIVersion(nil)
@@ -41,6 +41,7 @@ func (c *Compiler) APIVersion() (version string, err error) {
 	return
 }
 
+// CompileContract abstracts away the swagger specifics of posting to /compile
 func (c *Compiler) CompileContract(source string) (bytecode string, err error) {
 	contract := &models.Contract{Code: &source, Options: &models.CompileOpts{}}
 	params := operations.NewCompileContractParams().WithBody(contract)
@@ -52,7 +53,8 @@ func (c *Compiler) CompileContract(source string) (bytecode string, err error) {
 	return
 }
 
-// TODO how is this function supposed to be used?
+// DecodeCallResult abstracts away the swagger specifics of posting to
+// /decode-call-result
 func (c *Compiler) DecodeCallResult(callResult string, callValue string, function string, source string) (answer interface{}, err error) {
 	sophiaCallResultInput := &models.SophiaCallResultInput{
 		CallResult: &callResult,
@@ -69,7 +71,7 @@ func (c *Compiler) DecodeCallResult(callResult string, callValue string, functio
 	return result.Payload, err
 }
 
-// TODO how is this function supposed to be used?
+// DecodeCalldataBytecode abstracts away the swagger specifics of posting to /decode-calldata/bytecode
 func (c *Compiler) DecodeCalldataBytecode(bytecode string, calldata string) (decodedCallData *models.DecodedCalldata, err error) {
 	decodeCalldataBytecode := &models.DecodeCalldataBytecode{
 		Bytecode: models.EncodedByteArray(bytecode),
@@ -84,11 +86,11 @@ func (c *Compiler) DecodeCalldataBytecode(bytecode string, calldata string) (dec
 	return result.Payload, err
 }
 
-// TODO how is this function supposed to be used?
-func (c *Compiler) DecodeCalldataSource(callData string, source string) (decodedCallData *models.DecodedCalldata, err error) {
+// DecodeCalldataSource abstracts away the swagger specifics of posting to /decode-calldata/source
+func (c *Compiler) DecodeCalldataSource(source string, callData string) (decodedCallData *models.DecodedCalldata, err error) {
 	p := &models.DecodeCalldataSource{
-		Calldata: models.EncodedByteArray(callData),
 		Source:   source,
+		Calldata: models.EncodedByteArray(callData),
 	}
 	params := operations.NewDecodeCalldataSourceParams().WithBody(p)
 	result, err := c.Compiler.Operations.DecodeCalldataSource(params)
@@ -99,7 +101,7 @@ func (c *Compiler) DecodeCalldataSource(callData string, source string) (decoded
 	return result.Payload, err
 }
 
-// TODO how is this function supposed to be used?
+// DecodeData abstracts away the swagger specifics of posting to /decode-data
 func (c *Compiler) DecodeData(data string, sophiaType string) (decodedData *models.SophiaJSONData, err error) {
 	p := &models.SophiaBinaryData{
 		Data:       &data,
@@ -114,7 +116,7 @@ func (c *Compiler) DecodeData(data string, sophiaType string) (decodedData *mode
 	return result.Payload, err
 }
 
-// TODO how is this function supposed to be used?
+// EncodeCalldata abstracts away the swagger specifics of posting to /encode-calldata
 func (c *Compiler) EncodeCalldata(source string, function string, args []string) (callData string, err error) {
 	f := &models.FunctionCallInput{
 		Arguments: args,
@@ -131,7 +133,7 @@ func (c *Compiler) EncodeCalldata(source string, function string, args []string)
 	return s, err
 }
 
-// TODO how is this function supposed to be used?
+// GenerateACI abstracts away the swagger specifics of posting to /aci
 func (c *Compiler) GenerateACI(source string) (aci *models.ACI, err error) {
 	contract := &models.Contract{Code: &source, Options: &models.CompileOpts{}}
 	params := operations.NewGenerateACIParams().WithBody(contract)
@@ -143,7 +145,7 @@ func (c *Compiler) GenerateACI(source string) (aci *models.ACI, err error) {
 	return result.Payload, err
 }
 
-// TODO how is this function supposed to be used?
+// SophiaVersion abstracts away the swagger specifics of getting /version
 func (c *Compiler) SophiaVersion() (version string, err error) {
 	result, err := c.Compiler.Operations.Version(nil)
 	if err != nil {
