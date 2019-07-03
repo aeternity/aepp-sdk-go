@@ -116,8 +116,8 @@ func TestAPI(t *testing.T) {
 	_, _, _ = signBroadcastWaitForTransaction(t, &spendTx, alice, privateNet)
 
 	name := randomName(6)
-	aensAlice := aeternity.Aens{Client: privateNet, Account: alice}
-	aensBob := aeternity.Aens{Client: privateNet, Account: bob}
+	aensAlice := aeternity.Context{Client: privateNet, Address: alice.Address}
+	aensBob := aeternity.Context{Client: privateNet, Address: bob.Address}
 	// NamePreClaimTx
 	fmt.Println("NamePreClaimTx")
 	preclaimTx, salt, err := aensAlice.NamePreclaimTx(name, aeternity.Config.Client.Fee)
@@ -175,7 +175,7 @@ func TestAPI(t *testing.T) {
 	}
 	_, _, _ = signBroadcastWaitForTransaction(t, &claimTx, alice, privateNet)
 
-	oracleAlice := aeternity.Oracle{Client: privateNet, Account: alice}
+	oracleAlice := aeternity.Context{Client: privateNet, Address: alice.Address}
 	// OracleRegisterTx
 	fmt.Println("OracleRegisterTx")
 	register, err := oracleAlice.OracleRegisterTx("hello", "helloback", *big.NewInt(1000), uint64(0), uint64(100), 0)

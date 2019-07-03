@@ -14,7 +14,7 @@ func TestOracleWorkflow(t *testing.T) {
 	alice, _ := setupAccounts(t)
 	client := setupNetwork(t, privatenetURL)
 
-	oracleAlice := aeternity.Oracle{Client: client, Account: alice}
+	oracleAlice := aeternity.Context{Client: client, Address: alice.Address}
 
 	// Register
 	queryFee := utils.NewIntFromUint64(1000)

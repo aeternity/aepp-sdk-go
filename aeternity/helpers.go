@@ -138,10 +138,16 @@ func (c *Node) PrintGenerationByHeight(height uint64) {
 	}
 }
 
+// Context stores relevant context (node connection, account address) that one might not want to spell out each time one creates a transaction
+type Context struct {
+	Client  *Node
+	Address string
+}
+
 // NamePreclaimTx creates a name preclaim transaction and salt (required for claiming)
 // It should return the Tx struct, not the base64 encoded RLP, to ease subsequent inspection.
-func (n *Aens) NamePreclaimTx(name string, fee big.Int) (tx NamePreclaimTx, nameSalt *big.Int, err error) {
-	txTTL, accountNonce, err := GetTTLNonce(n.Client, n.Account.Address, Config.Client.TTL)
+func (c *Context) NamePreclaimTx(name string, fee big.Int) (tx NamePreclaimTx, nameSalt *big.Int, err error) {
+	txTTL, accountNonce, err := GetTTLNonce(c.Client, c.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -154,7 +160,7 @@ func (n *Aens) NamePreclaimTx(name string, fee big.Int) (tx NamePreclaimTx, name
 	}
 
 	// build the transaction
-	tx = NewNamePreclaimTx(n.Account.Address, cm, fee, txTTL, accountNonce)
+	tx = NewNamePreclaimTx(c.Address, cm, fee, txTTL, accountNonce)
 	if err != nil {
 		return NamePreclaimTx{}, new(big.Int), err
 	}
@@ -163,76 +169,76 @@ func (n *Aens) NamePreclaimTx(name string, fee big.Int) (tx NamePreclaimTx, name
 }
 
 // NameClaimTx creates a claim transaction
-func (n *Aens) NameClaimTx(name string, nameSalt big.Int, fee big.Int) (tx NameClaimTx, err error) {
-	txTTL, accountNonce, err := GetTTLNonce(n.Client, n.Account.Address, Config.Client.TTL)
+func (c *Context) NameClaimTx(name string, nameSalt big.Int, fee big.Int) (tx NameClaimTx, err error) {
+	txTTL, accountNonce, err := GetTTLNonce(c.Client, c.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
 
 	// create the transaction
-	tx = NewNameClaimTx(n.Account.Address, name, nameSalt, fee, txTTL, accountNonce)
+	tx = NewNameClaimTx(c.Address, name, nameSalt, fee, txTTL, accountNonce)
 
 	return tx, err
 }
 
 // NameUpdateTx perform a name update
-func (n *Aens) NameUpdateTx(name string, targetAddress string) (tx NameUpdateTx, err error) {
-	txTTL, accountNonce, err := GetTTLNonce(n.Client, n.Account.Address, Config.Client.TTL)
+func (c *Context) NameUpdateTx(name string, targetAddress string) (tx NameUpdateTx, err error) {
+	txTTL, accountNonce, err := GetTTLNonce(c.Client, c.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
 
 	encodedNameHash := Encode(PrefixName, Namehash(name))
-	absNameTTL, err := GetTTL(n.Client, Config.Client.Names.NameTTL)
+	absNameTTL, err := GetTTL(c.Client, Config.Client.Names.NameTTL)
 	if err != nil {
 		return NameUpdateTx{}, err
 	}
 	// create the transaction
-	tx = NewNameUpdateTx(n.Account.Address, encodedNameHash, []string{targetAddress}, absNameTTL, Config.Client.Names.ClientTTL, Config.Client.Names.UpdateFee, txTTL, accountNonce)
+	tx = NewNameUpdateTx(c.Address, encodedNameHash, []string{targetAddress}, absNameTTL, Config.Client.Names.ClientTTL, Config.Client.Names.UpdateFee, txTTL, accountNonce)
 
 	return
 }
 
 // NameTransferTx transfer a name to another owner
-func (n *Aens) NameTransferTx(name string, recipientAddress string) (tx NameTransferTx, err error) {
-	txTTL, accountNonce, err := GetTTLNonce(n.Client, n.Account.Address, Config.Client.TTL)
+func (c *Context) NameTransferTx(name string, recipientAddress string) (tx NameTransferTx, err error) {
+	txTTL, accountNonce, err := GetTTLNonce(c.Client, c.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
 
 	encodedNameHash := Encode(PrefixName, Namehash(name))
 
-	tx = NewNameTransferTx(n.Account.Address, encodedNameHash, recipientAddress, Config.Client.Fee, txTTL, accountNonce)
+	tx = NewNameTransferTx(c.Address, encodedNameHash, recipientAddress, Config.Client.Fee, txTTL, accountNonce)
 	return
 }
 
 // NameRevokeTx revoke a name
-func (n *Aens) NameRevokeTx(name string) (tx NameRevokeTx, err error) {
-	txTTL, accountNonce, err := GetTTLNonce(n.Client, n.Account.Address, Config.Client.TTL)
+func (c *Context) NameRevokeTx(name string) (tx NameRevokeTx, err error) {
+	txTTL, accountNonce, err := GetTTLNonce(c.Client, c.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
 
 	encodedNameHash := Encode(PrefixName, Namehash(name))
 
-	tx = NewNameRevokeTx(n.Account.Address, encodedNameHash, Config.Client.Fee, txTTL, accountNonce)
+	tx = NewNameRevokeTx(c.Address, encodedNameHash, Config.Client.Fee, txTTL, accountNonce)
 	return
 }
 
 // OracleRegisterTx create a new oracle
-func (o *Oracle) OracleRegisterTx(querySpec, responseSpec string, queryFee big.Int, oracleTTLType, oracleTTLValue uint64, abiVersion uint16) (tx OracleRegisterTx, err error) {
-	ttl, nonce, err := GetTTLNonce(o.Client, o.Account.Address, Config.Client.TTL)
+func (c *Context) OracleRegisterTx(querySpec, responseSpec string, queryFee big.Int, oracleTTLType, oracleTTLValue uint64, abiVersion uint16) (tx OracleRegisterTx, err error) {
+	ttl, nonce, err := GetTTLNonce(c.Client, c.Address, Config.Client.TTL)
 	if err != nil {
 		return OracleRegisterTx{}, err
 	}
 
-	tx = NewOracleRegisterTx(o.Account.Address, nonce, querySpec, responseSpec, queryFee, oracleTTLType, oracleTTLValue, abiVersion, Config.Client.Fee, ttl)
+	tx = NewOracleRegisterTx(c.Address, nonce, querySpec, responseSpec, queryFee, oracleTTLType, oracleTTLValue, abiVersion, Config.Client.Fee, ttl)
 	return tx, nil
 }
 
 // OracleExtendTx extend the lifetime of an existing oracle
-func (o *Oracle) OracleExtendTx(oracleID string, ttlType, ttlValue uint64) (tx OracleExtendTx, err error) {
-	ttl, nonce, err := GetTTLNonce(o.Client, o.Account.Address, Config.Client.TTL)
+func (c *Context) OracleExtendTx(oracleID string, ttlType, ttlValue uint64) (tx OracleExtendTx, err error) {
+	ttl, nonce, err := GetTTLNonce(c.Client, c.Address, Config.Client.TTL)
 	if err != nil {
 		return OracleExtendTx{}, err
 	}
@@ -242,19 +248,19 @@ func (o *Oracle) OracleExtendTx(oracleID string, ttlType, ttlValue uint64) (tx O
 }
 
 // OracleQueryTx ask something of an oracle
-func (o *Oracle) OracleQueryTx(OracleID, Query string, QueryFee big.Int, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64) (tx OracleQueryTx, err error) {
-	ttl, nonce, err := GetTTLNonce(o.Client, o.Account.Address, Config.Client.TTL)
+func (c *Context) OracleQueryTx(OracleID, Query string, QueryFee big.Int, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64) (tx OracleQueryTx, err error) {
+	ttl, nonce, err := GetTTLNonce(c.Client, c.Address, Config.Client.TTL)
 	if err != nil {
 		return OracleQueryTx{}, err
 	}
 
-	tx = NewOracleQueryTx(o.Account.Address, nonce, OracleID, Query, QueryFee, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue, Config.Client.Fee, ttl)
+	tx = NewOracleQueryTx(c.Address, nonce, OracleID, Query, QueryFee, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue, Config.Client.Fee, ttl)
 	return tx, nil
 }
 
 // OracleRespondTx the oracle responds by sending this transaction
-func (o *Oracle) OracleRespondTx(OracleID string, QueryID string, Response string, TTLType uint64, TTLValue uint64) (tx OracleRespondTx, err error) {
-	ttl, nonce, err := GetTTLNonce(o.Client, o.Account.Address, Config.Client.TTL)
+func (c *Context) OracleRespondTx(OracleID string, QueryID string, Response string, TTLType uint64, TTLValue uint64) (tx OracleRespondTx, err error) {
+	ttl, nonce, err := GetTTLNonce(c.Client, c.Address, Config.Client.TTL)
 	if err != nil {
 		return OracleRespondTx{}, err
 	}
@@ -264,24 +270,24 @@ func (o *Oracle) OracleRespondTx(OracleID string, QueryID string, Response strin
 }
 
 // ContractCreateTx returns a transaction for creating a contract on the chain
-func (c *Contract) ContractCreateTx(Code string, CallData string, VMVersion, AbiVersion uint16, Deposit, Amount, Gas, GasPrice, Fee big.Int) (tx ContractCreateTx, err error) {
-	ttl, nonce, err := GetTTLNonce(c.Client, c.Owner, Config.Client.TTL)
+func (c *Context) ContractCreateTx(Code string, CallData string, VMVersion, AbiVersion uint16, Deposit, Amount, Gas, GasPrice, Fee big.Int) (tx ContractCreateTx, err error) {
+	ttl, nonce, err := GetTTLNonce(c.Client, c.Address, Config.Client.TTL)
 	if err != nil {
 		return ContractCreateTx{}, err
 	}
 
-	tx = NewContractCreateTx(c.Owner, nonce, Code, VMVersion, AbiVersion, Deposit, Amount, Gas, GasPrice, Fee, ttl, CallData)
+	tx = NewContractCreateTx(c.Address, nonce, Code, VMVersion, AbiVersion, Deposit, Amount, Gas, GasPrice, Fee, ttl, CallData)
 	return tx, nil
 }
 
 // ContractCallTx returns a transaction for calling a contract on the chain
-func (c *Contract) ContractCallTx(ContractID, CallData string, AbiVersion uint16, Amount, Gas, GasPrice, Fee big.Int) (tx ContractCallTx, err error) {
-	ttl, nonce, err := GetTTLNonce(c.Client, c.Owner, Config.Client.TTL)
+func (c *Context) ContractCallTx(ContractID, CallData string, AbiVersion uint16, Amount, Gas, GasPrice, Fee big.Int) (tx ContractCallTx, err error) {
+	ttl, nonce, err := GetTTLNonce(c.Client, c.Address, Config.Client.TTL)
 	if err != nil {
 		return ContractCallTx{}, err
 	}
 
-	tx = NewContractCallTx(c.Owner, nonce, ContractID, Amount, Gas, GasPrice, AbiVersion, CallData, Fee, ttl)
+	tx = NewContractCallTx(c.Address, nonce, ContractID, Amount, Gas, GasPrice, AbiVersion, CallData, Fee, ttl)
 	return tx, nil
 }
 
