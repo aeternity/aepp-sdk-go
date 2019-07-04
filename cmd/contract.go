@@ -25,7 +25,7 @@ var compileCmd = &cobra.Command{
 }
 
 func compileFunc(cmd *cobra.Command, args []string) (err error) {
-	compiler := NewCompiler()
+	compiler := newCompiler()
 	s, err := readSource(args[0])
 	if err != nil {
 		return err
@@ -46,7 +46,7 @@ var encodeCalldataCmd = &cobra.Command{
 }
 
 func encodeCalldataFunc(cmd *cobra.Command, args []string) (err error) {
-	compiler := NewCompiler()
+	compiler := newCompiler()
 
 	s, err := readSource(args[0])
 	if err != nil {
@@ -71,7 +71,7 @@ var decodeCalldataCmd = &cobra.Command{
 }
 
 func decodeCalldataFunc(cmd *cobra.Command, args []string) (err error) {
-	compiler := NewCompiler()
+	compiler := newCompiler()
 
 	var decodeWithSource = func(path string, callData string) (function string, arguments []interface{}, err error) {
 		source, err := readSource(path)

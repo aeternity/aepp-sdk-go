@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
-	"github.com/aeternity/aepp-sdk-go/swagguard/node/models"
 )
 
 func times(str string, n int) (out string) {
@@ -113,9 +112,9 @@ func PrintObject(title string, i interface{}) {
 }
 
 type getGenerationMicroBlockTransactioner interface {
-	GetGenerationByHeight(height uint64) (g *models.Generation, err error)
-	GetMicroBlockTransactionsByHash(microBlockID string) (txs *models.GenericTxs, err error)
-	GetTransactionByHash(txHash string) (tx *models.GenericSignedTx, err error)
+	aeternity.GetTransactionByHasher
+	aeternity.GetMicroBlockTransactionsByHasher
+	aeternity.GetGenerationByHeighter
 }
 
 // PrintGenerationByHeight utility function to print a generation by it's height

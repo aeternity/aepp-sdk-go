@@ -60,12 +60,9 @@ func GetTTLNonce(c getHeightAccounter, accountID string, offset uint64) (height 
 	return
 }
 
-type getTransactionByHasher interface {
-	GetTransactionByHash(string) (*models.GenericSignedTx, error)
-}
 type getTransactionByHashHeighter interface {
-	getTransactionByHasher
-	getHeighter
+	GetTransactionByHasher
+	GetHeighter
 }
 
 // WaitForTransactionUntilHeight waits for a transaction until heightLimit (inclusive) is reached
@@ -90,14 +87,10 @@ func WaitForTransactionUntilHeight(c getTransactionByHashHeighter, txHash string
 	return 0, "", fmt.Errorf("It is already height %v and %v still isn't in a block", nodeHeight, txHash)
 }
 
-type transactionPoster interface {
-	PostTransaction(string, string) (err error)
-}
-
 // BroadcastTransaction differs from Client.PostTransaction() in that the latter just handles
 // the HTTP request via swagger, the former recalculates the txhash and compares it to the node's
 //  response after POSTing the transaction.
-func BroadcastTransaction(c transactionPoster, txSignedBase64 string) (err error) {
+func BroadcastTransaction(c PostTransactioner, txSignedBase64 string) (err error) {
 	// Get back to RLP to calculate txhash
 	txRLP, _ := Decode(txSignedBase64)
 

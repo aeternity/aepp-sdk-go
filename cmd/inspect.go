@@ -61,7 +61,7 @@ func printResult(title string, v interface{}, err error) {
 }
 
 func inspectFunc(cmd *cobra.Command, args []string) (err error) {
-	aeNode := NewAeNode()
+	aeNode := newAeNode()
 	for _, object := range args {
 		// height
 		if matched, _ := regexp.MatchString(`^\d+$`, object); matched {
