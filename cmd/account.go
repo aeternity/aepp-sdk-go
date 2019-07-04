@@ -127,7 +127,7 @@ var balanceCmd = &cobra.Command{
 }
 
 func balanceFunc(cmd *cobra.Command, args []string) (err error) {
-	aeNode := NewAeNode()
+	aeNode := newAeNode()
 	p, err := getPassword()
 
 	// load the account

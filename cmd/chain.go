@@ -38,7 +38,7 @@ var topCmd = &cobra.Command{
 }
 
 func topFunc(cmd *cobra.Command, args []string) (err error) {
-	aeNode := NewAeNode()
+	aeNode := newAeNode()
 	v, err := topDo(aeNode)
 	if err != nil {
 		return err
@@ -47,11 +47,7 @@ func topFunc(cmd *cobra.Command, args []string) (err error) {
 	return nil
 }
 
-type getTopBlocker interface {
-	GetTopBlock() (kb *models.KeyBlockOrMicroBlockHeader, err error)
-}
-
-func topDo(conn getTopBlocker) (kb *models.KeyBlockOrMicroBlockHeader, err error) {
+func topDo(conn aeternity.GetTopBlocker) (kb *models.KeyBlockOrMicroBlockHeader, err error) {
 	kb, err = conn.GetTopBlock()
 	return
 }
@@ -63,12 +59,8 @@ var statusCmd = &cobra.Command{
 	RunE:  statusFunc,
 }
 
-type getStatuser interface {
-	GetStatus() (status *models.Status, err error)
-}
-
 func statusFunc(cmd *cobra.Command, args []string) (err error) {
-	aeNode := NewAeNode()
+	aeNode := newAeNode()
 	v, err := statusDo(aeNode)
 	if err != nil {
 		return err
@@ -77,7 +69,7 @@ func statusFunc(cmd *cobra.Command, args []string) (err error) {
 	return nil
 }
 
-func statusDo(conn getStatuser) (status *models.Status, err error) {
+func statusDo(conn aeternity.GetStatuser) (status *models.Status, err error) {
 	status, err = conn.GetStatus()
 	return
 }
@@ -91,7 +83,7 @@ var playCmd = &cobra.Command{
 }
 
 func playFunc(cmd *cobra.Command, args []string) (err error) {
-	aeNode := NewAeNode()
+	aeNode := newAeNode()
 	blockHeight, err := aeNode.GetHeight()
 	if err != nil {
 		return err
@@ -140,7 +132,7 @@ func broadcastFunc(cmd *cobra.Command, args []string) (err error) {
 		return err
 	}
 
-	aeNode := NewAeNode()
+	aeNode := newAeNode()
 	err = aeternity.BroadcastTransaction(aeNode, txSignedBase64)
 	if err != nil {
 		errFinal := fmt.Errorf("Error while broadcasting transaction: %v", err)
@@ -159,7 +151,7 @@ var ttlCmd = &cobra.Command{
 }
 
 func ttlFunc(cmd *cobra.Command, args []string) (err error) {
-	ae := NewAeNode()
+	ae := newAeNode()
 	ans, err := ttlDo(ae)
 	if err != nil {
 		return
@@ -168,11 +160,7 @@ func ttlFunc(cmd *cobra.Command, args []string) (err error) {
 	return nil
 }
 
-type getHeighter interface {
-	GetHeight() (uint64, error)
-}
-
-func ttlDo(conn getHeighter) (ttl uint64, err error) {
+func ttlDo(conn aeternity.GetHeighter) (ttl uint64, err error) {
 	height, err := conn.GetHeight()
 	if err != nil {
 		errFinal := fmt.Errorf("Error getting height from the node: %v", err)
@@ -191,7 +179,7 @@ var networkIDCmd = &cobra.Command{
 }
 
 func networkIDFunc(cmd *cobra.Command, args []string) (err error) {
-	ae := NewAeNode()
+	ae := newAeNode()
 	nID, err := networkIDDo(ae)
 	if err != nil {
 		return err
@@ -200,7 +188,7 @@ func networkIDFunc(cmd *cobra.Command, args []string) (err error) {
 	return nil
 }
 
-func networkIDDo(conn getStatuser) (networkID string, err error) {
+func networkIDDo(conn aeternity.GetStatuser) (networkID string, err error) {
 	resp, err := conn.GetStatus()
 	if err != nil {
 		errFinal := fmt.Errorf("Error getting status information from the node: %v", err)

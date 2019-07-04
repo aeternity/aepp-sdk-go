@@ -35,6 +35,25 @@ func getErrorReason(v interface{}) (msg string) {
 	return
 }
 
+type NodeInterface interface {
+	GetAccounter
+	GetTopBlocker
+	GetStatuser
+	GetHeighter
+	GetKeyBlockByHasher
+	GetOracleByPubkeyer
+	GetGenerationByHeighter
+	GetTransactionByHasher
+	GetNameEntryByNamer
+	GetMicroBlockHeaderByHasher
+	GetMicroBlockTransactionsByHasher
+	PostTransactioner
+}
+
+type GetStatuser interface {
+	GetStatus() (status *models.Status, err error)
+}
+
 // GetStatus post transaction
 func (c *Node) GetStatus() (status *models.Status, err error) {
 	r, err := c.External.GetStatus(nil)
@@ -43,6 +62,10 @@ func (c *Node) GetStatus() (status *models.Status, err error) {
 	}
 	status = r.Payload
 	return
+}
+
+type PostTransactioner interface {
+	PostTransaction(string, string) (err error)
 }
 
 // PostTransaction post transaction
@@ -60,6 +83,10 @@ func (c *Node) PostTransaction(signedEncodedTx, signedEncodedTxHash string) (err
 	return
 }
 
+type GetTopBlocker interface {
+	GetTopBlock() (kb *models.KeyBlockOrMicroBlockHeader, err error)
+}
+
 // GetTopBlock get the top block of the chain
 func (c *Node) GetTopBlock() (kb *models.KeyBlockOrMicroBlockHeader, err error) {
 	r, err := c.External.GetTopBlock(nil)
@@ -68,6 +95,10 @@ func (c *Node) GetTopBlock() (kb *models.KeyBlockOrMicroBlockHeader, err error) 
 	}
 	kb = r.Payload
 	return
+}
+
+type GetHeighter interface {
+	GetHeight() (uint64, error)
 }
 
 // GetHeight get the height of the chain
@@ -95,6 +126,10 @@ func (c *Node) GetCurrentKeyBlock() (kb *models.KeyBlock, err error) {
 	return
 }
 
+type GetAccounter interface {
+	GetAccount(accountID string) (account *models.Account, err error)
+}
+
 // GetAccount retrieve an account by its address (public key)
 // it is particularly useful to obtain the nonce for spending transactions
 func (c *Node) GetAccount(accountID string) (account *models.Account, err error) {
@@ -106,6 +141,10 @@ func (c *Node) GetAccount(accountID string) (account *models.Account, err error)
 	}
 	account = r.Payload
 	return
+}
+
+type GetNameEntryByNamer interface {
+	GetNameEntryByName(string) (*models.NameEntry, error)
 }
 
 // GetNameEntryByName return the name entry
@@ -122,6 +161,10 @@ func (c *Node) GetNameEntryByName(name string) (nameEntry *models.NameEntry, err
 	return
 }
 
+type GetGenerationByHeighter interface {
+	GetGenerationByHeight(height uint64) (g *models.Generation, err error)
+}
+
 // GetGenerationByHeight gets the keyblock and all its microblocks
 func (c *Node) GetGenerationByHeight(height uint64) (g *models.Generation, err error) {
 	p := external.NewGetGenerationByHeightParams().WithHeight(height)
@@ -132,6 +175,10 @@ func (c *Node) GetGenerationByHeight(height uint64) (g *models.Generation, err e
 	}
 	g = r.Payload
 	return
+}
+
+type GetMicroBlockTransactionsByHasher interface {
+	GetMicroBlockTransactionsByHash(microBlockID string) (txs *models.GenericTxs, err error)
 }
 
 // GetMicroBlockTransactionsByHash get the transactions of a microblock
@@ -146,6 +193,10 @@ func (c *Node) GetMicroBlockTransactionsByHash(microBlockID string) (txs *models
 	return
 }
 
+type GetMicroBlockHeaderByHasher interface {
+	GetMicroBlockHeaderByHash(microBlockID string) (txs *models.MicroBlockHeader, err error)
+}
+
 // GetMicroBlockHeaderByHash get the header of a micro block
 func (c *Node) GetMicroBlockHeaderByHash(microBlockID string) (txs *models.MicroBlockHeader, err error) {
 	p := external.NewGetMicroBlockHeaderByHashParams().WithHash(microBlockID)
@@ -156,6 +207,10 @@ func (c *Node) GetMicroBlockHeaderByHash(microBlockID string) (txs *models.Micro
 	}
 	txs = r.Payload
 	return
+}
+
+type GetKeyBlockByHasher interface {
+	GetKeyBlockByHash(keyBlockID string) (txs *models.KeyBlock, err error)
 }
 
 // GetKeyBlockByHash get a key block by its hash
@@ -170,6 +225,10 @@ func (c *Node) GetKeyBlockByHash(keyBlockID string) (txs *models.KeyBlock, err e
 	return
 }
 
+type GetTransactionByHasher interface {
+	GetTransactionByHash(txHash string) (tx *models.GenericSignedTx, err error)
+}
+
 // GetTransactionByHash get a transaction by it's hash
 func (c *Node) GetTransactionByHash(txHash string) (tx *models.GenericSignedTx, err error) {
 	p := external.NewGetTransactionByHashParams().WithHash(txHash)
@@ -180,6 +239,10 @@ func (c *Node) GetTransactionByHash(txHash string) (tx *models.GenericSignedTx, 
 	}
 	tx = r.Payload
 	return
+}
+
+type GetOracleByPubkeyer interface {
+	GetOracleByPubkey(pubkey string) (oracle *models.RegisteredOracle, err error)
 }
 
 // GetOracleByPubkey get an oracle by it's public key
