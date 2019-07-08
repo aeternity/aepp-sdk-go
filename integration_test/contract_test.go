@@ -11,7 +11,7 @@ import (
 func TestContracts(t *testing.T) {
 	alice, _ := setupAccounts(t)
 	aeNode := setupNetwork(t, privatenetURL)
-	contractsAlice := aeternity.Context{Client: aeNode, Address: alice.Address}
+	contractsAlice := aeternity.NewContext(aeNode, alice.Address)
 
 	var ctID string
 	var callData string

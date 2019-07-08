@@ -144,6 +144,24 @@ type Context struct {
 	Address string
 }
 
+// NewContext ensures that every field of a Context is filled out.
+func NewContext(client *Node, address string) Context {
+	return Context{Client: client, Address: address}
+}
+
+// SpendTx creates a spend transaction
+func (c *Context) SpendTx(senderID string, recipientID string, amount, fee big.Int, payload string) (tx SpendTx, err error) {
+	txTTL, accountNonce, err := GetTTLNonce(c.Client, c.Address, Config.Client.TTL)
+	if err != nil {
+		return
+	}
+
+	// create the transaction
+	tx = NewSpendTx(senderID, recipientID, amount, fee, payload, txTTL, accountNonce)
+
+	return tx, err
+}
+
 // NamePreclaimTx creates a name preclaim transaction and salt (required for claiming)
 // It should return the Tx struct, not the base64 encoded RLP, to ease subsequent inspection.
 func (c *Context) NamePreclaimTx(name string, fee big.Int) (tx NamePreclaimTx, nameSalt *big.Int, err error) {

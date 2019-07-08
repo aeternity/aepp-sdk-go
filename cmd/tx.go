@@ -118,10 +118,10 @@ func txContractCreateFunc(cmd *cobra.Command, args []string) (err error) {
 		return errors.New("Error, missing or invalid init calldata bytecode")
 	}
 
-	c := aeternity.Context{
-		Client:  aeternity.NewNode(aeternity.Config.Node.URL, debug),
-		Address: owner,
-	}
+	c := aeternity.NewContext(
+		aeternity.NewNode(aeternity.Config.Node.URL, debug),
+		owner,
+	)
 
 	tx, err := c.ContractCreateTx(contract, calldata, aeternity.Config.Client.Contracts.VMVersion, aeternity.Config.Client.Contracts.ABIVersion, aeternity.Config.Client.Contracts.Deposit, aeternity.Config.Client.Contracts.Amount, aeternity.Config.Client.Contracts.Gas, aeternity.Config.Client.Contracts.GasPrice, aeternity.Config.Client.Fee)
 
