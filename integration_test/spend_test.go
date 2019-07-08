@@ -43,8 +43,11 @@ func TestSpendTx(t *testing.T) {
 	tx.Fee = *est
 
 	// sign the transaction, output params for debugging
-	_ = signBroadcast(t, &tx, alice, node)
+	hash := signBroadcast(t, &tx, alice, node)
 	// check the recipient's balance
+
+	// Wait for a bit
+	_, _, _ = waitForTransaction(node, hash)
 
 	getBobsAccount := func() {
 		bobState, err = node.GetAccount(bob.Address)
