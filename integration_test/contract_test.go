@@ -10,7 +10,7 @@ import (
 
 func TestContracts(t *testing.T) {
 	alice, _ := setupAccounts(t)
-	aeNode := setupNetwork(t, privatenetURL)
+	aeNode := setupNetwork(t, privatenetURL, false)
 	contractsAlice := aeternity.NewContext(aeNode, alice.Address)
 
 	var ctID string

@@ -34,7 +34,7 @@ func randomName(length int) string {
 }
 
 func TestAENSWorkflow(t *testing.T) {
-	node := setupNetwork(t, privatenetURL)
+	node := setupNetwork(t, privatenetURL, false)
 	alice, bob := setupAccounts(t)
 	aensAlice := aeternity.NewContext(node, alice.Address)
 

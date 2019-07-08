@@ -12,7 +12,7 @@ import (
 
 func TestOracleWorkflow(t *testing.T) {
 	alice, _ := setupAccounts(t)
-	client := setupNetwork(t, privatenetURL)
+	client := setupNetwork(t, privatenetURL, false)
 
 	oracleAlice := aeternity.NewContext(client, alice.Address)
 

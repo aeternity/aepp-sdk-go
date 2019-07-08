@@ -101,8 +101,8 @@ func init() {
 }
 
 func TestAPI(t *testing.T) {
-	privateNet := setupNetwork(t, privatenetURL)
-	testNet := setupNetwork(t, testnetURL)
+	privateNet := setupNetwork(t, privatenetURL, false)
+	testNet := setupNetwork(t, testnetURL, false)
 
 	alice, bob := setupAccounts(t)
 
