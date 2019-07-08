@@ -59,6 +59,12 @@ func (b *BigInt) UnmarshalJSON(text []byte) error {
 	return nil
 }
 
+// MarshalJSON implements the json.Marshaler interface.
+func (b *BigInt) MarshalJSON() ([]byte, error) {
+	bc := new(big.Int)
+	return bc.MarshalJSON()
+}
+
 // Set makes a BigInt equal to a given big.Int.
 func (b *BigInt) Set(i *big.Int) *BigInt {
 	iB := BigInt(*i)
