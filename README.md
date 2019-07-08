@@ -17,29 +17,46 @@ if err != nil {
     fmt.Println(err)
     return
 }
-aeNode := aeternity.NewCli("http://localhost:3013", false).WithAccount(acc)
+aeNode := aeternity.NewNode("http://localhost:3013", false).WithAccount(acc)
 ```
 
 Most parameters are set by modifying the variables in `config.go` in this manner:
 `aeternity.Config.Client.Fee = *utils.RequireBigIntFromString("100000000000000")`
 
-When using the `Ae/Aens/Contract/Oracle` struct helper functions in `helpers.go`, chores like getting the TTL, Account Nonce, encoding of the AENS claim etc are done automatically.
+When using the `Context` struct helper functions in `helpers.go`, chores like getting the TTL, Account Nonce, encoding of the AENS claim etc are done automatically.
 ```
-preclaimTx, salt, err := aeNode.Aens.NamePreclaimTx("fdsa.test", aeternity.Config.Client.Fee)
-if err != nil {
-    fmt.Println(err)
-    return
-}
-preclaimTxStr, err := aeternity.BaseEncodeTx(&preclaimTx)
+import "github.com/aeternity/aepp-sdk-go/aeternity"
 
-signedTxStr, hash, signature, err := aeternity.SignEncodeTxStr(acc, preclaimTxStr, "ae_docker")
+...
+
+// create a Context for the address you're going to sign the transaction
+// with, and an aeternity node to talk to/query the address's nonce.
+ctx := aeternity.NewContext(node, alice.Address)
+
+// create the SpendTransaction
+tx, err := ctx.SpendTx(alice.Address, bob.Address, *amount, *fee, msg)
 if err != nil {
-    fmt.Println(err)
-    return
+    t.Error(err)
 }
 
-err = aeNode.BroadcastTransaction(signedTxStr)
+// optional: minimize the fee to save money!
+est, _ := tx.FeeEstimate()
+fmt.Println("Estimated vs Actual Fee:", est, tx.Fee)
+tx.Fee = *est
+
+// transform the tx into a tx_base64encodedstring
+txB64, err := aeternity.BaseEncodeTx(tx)
 if err != nil {
-    panic(err)
+    t.Error(err)
+}
+
+signedTxStr, hash, _, err := aeternity.SignEncodeTxStr(acc, txB64, aeternity.Config.Node.NetworkID)
+if err != nil {
+    t.Fatal(err)
+}
+
+err = aeternity.BroadcastTransaction(node, signedTxStr)
+if err != nil {
+    t.Fatal(err)
 }
 ```

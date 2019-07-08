@@ -29,6 +29,8 @@ func TestSpendTx(t *testing.T) {
 		expected.Add(&bS, amount)
 	}
 
+	// create a Context for the address you're going to sign the transaction
+	// with, and an aeternity node to talk to/query the address's nonce.
 	ctx := aeternity.NewContext(node, alice.Address)
 
 	// create the SpendTransaction
