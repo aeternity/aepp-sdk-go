@@ -16,9 +16,9 @@ var privatenetURL = "http://localhost:3013"
 var testnetURL = "http://sdk-testnet.aepps.com"
 var networkID = "ae_docker"
 
-func setupNetwork(t *testing.T, nodeURL string) *aeternity.Node {
+func setupNetwork(t *testing.T, nodeURL string, debug bool) *aeternity.Node {
 	aeternity.Config.Node.NetworkID = networkID
-	client := aeternity.NewNode(nodeURL, false)
+	client := aeternity.NewNode(nodeURL, debug)
 	t.Logf("nodeURL: %s, networkID: %s", nodeURL, aeternity.Config.Node.NetworkID)
 	return client
 }
