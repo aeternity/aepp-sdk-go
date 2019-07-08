@@ -66,7 +66,7 @@ func txSpendFunc(cmd *cobra.Command, args []string) (err error) {
 		}
 	}
 
-	tx := aeternity.NewSpendTx(sender, recipient, *amount, *feeBigInt, spendTxPayload, ttl, nonce)
+	tx, err := aeternity.NewSpendTx(sender, recipient, *amount, *feeBigInt, spendTxPayload, ttl, nonce)
 	if err != nil {
 		return err
 	}

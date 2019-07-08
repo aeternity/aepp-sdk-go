@@ -157,9 +157,7 @@ func (c *Context) SpendTx(senderID string, recipientID string, amount, fee big.I
 	}
 
 	// create the transaction
-	tx = NewSpendTx(senderID, recipientID, amount, fee, payload, txTTL, accountNonce)
-
-	return tx, err
+	return NewSpendTx(senderID, recipientID, amount, fee, payload, txTTL, accountNonce)
 }
 
 // NamePreclaimTx creates a name preclaim transaction and salt (required for claiming)

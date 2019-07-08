@@ -1,13 +1,15 @@
 package aeternity
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"math/big"
+	"unicode/utf8"
 
 	"github.com/aeternity/aepp-sdk-go/swagguard/node/models"
-	rlp "github.com/randomshinichi/rlpae"
 	"github.com/aeternity/aepp-sdk-go/utils"
+	rlp "github.com/randomshinichi/rlpae"
 )
 
 // SignEncodeTx sign and encode a transaction
@@ -207,8 +209,12 @@ func (tx *SpendTx) FeeEstimate() (*big.Int, error) {
 }
 
 // NewSpendTx is a constructor for a SpendTx struct
-func NewSpendTx(senderID, recipientID string, amount, fee big.Int, payload string, ttl, nonce uint64) SpendTx {
-	return SpendTx{senderID, recipientID, amount, fee, payload, ttl, nonce}
+func NewSpendTx(senderID, recipientID string, amount, fee big.Int, payload string, ttl, nonce uint64) (SpendTx, error) {
+	payloadValid := utf8.ValidString(payload)
+	if !payloadValid {
+		return SpendTx{}, errors.New("Error: SpendTx payload must be valid UTF-8")
+	}
+	return SpendTx{senderID, recipientID, amount, fee, payload, ttl, nonce}, nil
 }
 
 // NamePreclaimTx represents a transaction where one reserves a name on AENS without revealing it yet
