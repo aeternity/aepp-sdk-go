@@ -29,13 +29,14 @@ func TestSpendTx(t *testing.T) {
 		expected.Add(&bS, amount)
 	}
 
-	ttl, nonce, err := aeternity.GetTTLNonce(node, sender, aeternity.Config.Client.TTL)
-	if err != nil {
-		t.Fatalf("Error in GetTTLNonce(): %v", err)
-	}
+	ctx := aeternity.NewContext(node, alice.Address)
 
 	// create the SpendTransaction
-	tx := aeternity.NewSpendTx(sender, bob.Address, *amount, *fee, msg, ttl, nonce)
+	tx, err := ctx.SpendTx(alice.Address, bob.Address, *amount, *fee, msg)
+	if err != nil {
+		t.Error(err)
+	}
+
 	// minimize the fee to save money!
 	est, _ := tx.FeeEstimate()
 	fmt.Println("Estimated vs Actual Fee:", est, tx.Fee)
