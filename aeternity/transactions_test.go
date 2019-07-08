@@ -65,7 +65,7 @@ func TestSpendTx_RLP(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tx := NewSpendTx(tt.fields.senderID, tt.fields.recipientID,
+			tx, _ := NewSpendTx(tt.fields.senderID, tt.fields.recipientID,
 				tt.fields.amount,
 				tt.fields.fee,
 				tt.fields.payload,
