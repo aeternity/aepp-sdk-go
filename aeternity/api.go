@@ -51,7 +51,7 @@ type NodeInterface interface {
 }
 
 type GetStatuser interface {
-	GetStatus() (status *models.Status, err error)
+	GetStatus() (*models.Status, error)
 }
 
 // GetStatus post transaction
@@ -65,7 +65,7 @@ func (c *Node) GetStatus() (status *models.Status, err error) {
 }
 
 type PostTransactioner interface {
-	PostTransaction(string, string) (err error)
+	PostTransaction(string, string) error
 }
 
 // PostTransaction post transaction
@@ -84,7 +84,7 @@ func (c *Node) PostTransaction(signedEncodedTx, signedEncodedTxHash string) (err
 }
 
 type GetTopBlocker interface {
-	GetTopBlock() (kb *models.KeyBlockOrMicroBlockHeader, err error)
+	GetTopBlock() (*models.KeyBlockOrMicroBlockHeader, error)
 }
 
 // GetTopBlock get the top block of the chain
@@ -127,7 +127,7 @@ func (c *Node) GetCurrentKeyBlock() (kb *models.KeyBlock, err error) {
 }
 
 type GetAccounter interface {
-	GetAccount(accountID string) (account *models.Account, err error)
+	GetAccount(accountID string) (*models.Account, error)
 }
 
 // GetAccount retrieve an account by its address (public key)
@@ -162,7 +162,7 @@ func (c *Node) GetNameEntryByName(name string) (nameEntry *models.NameEntry, err
 }
 
 type GetGenerationByHeighter interface {
-	GetGenerationByHeight(height uint64) (g *models.Generation, err error)
+	GetGenerationByHeight(height uint64) (*models.Generation, error)
 }
 
 // GetGenerationByHeight gets the keyblock and all its microblocks
@@ -178,7 +178,7 @@ func (c *Node) GetGenerationByHeight(height uint64) (g *models.Generation, err e
 }
 
 type GetMicroBlockTransactionsByHasher interface {
-	GetMicroBlockTransactionsByHash(microBlockID string) (txs *models.GenericTxs, err error)
+	GetMicroBlockTransactionsByHash(string) (*models.GenericTxs, error)
 }
 
 // GetMicroBlockTransactionsByHash get the transactions of a microblock
@@ -194,7 +194,7 @@ func (c *Node) GetMicroBlockTransactionsByHash(microBlockID string) (txs *models
 }
 
 type GetMicroBlockHeaderByHasher interface {
-	GetMicroBlockHeaderByHash(microBlockID string) (txs *models.MicroBlockHeader, err error)
+	GetMicroBlockHeaderByHash(string) (*models.MicroBlockHeader, error)
 }
 
 // GetMicroBlockHeaderByHash get the header of a micro block
@@ -210,7 +210,7 @@ func (c *Node) GetMicroBlockHeaderByHash(microBlockID string) (txs *models.Micro
 }
 
 type GetKeyBlockByHasher interface {
-	GetKeyBlockByHash(keyBlockID string) (txs *models.KeyBlock, err error)
+	GetKeyBlockByHash(string) (*models.KeyBlock, error)
 }
 
 // GetKeyBlockByHash get a key block by its hash
@@ -226,7 +226,7 @@ func (c *Node) GetKeyBlockByHash(keyBlockID string) (txs *models.KeyBlock, err e
 }
 
 type GetTransactionByHasher interface {
-	GetTransactionByHash(txHash string) (tx *models.GenericSignedTx, err error)
+	GetTransactionByHash(string) (*models.GenericSignedTx, error)
 }
 
 // GetTransactionByHash get a transaction by it's hash
@@ -242,7 +242,7 @@ func (c *Node) GetTransactionByHash(txHash string) (tx *models.GenericSignedTx, 
 }
 
 type GetOracleByPubkeyer interface {
-	GetOracleByPubkey(pubkey string) (oracle *models.RegisteredOracle, err error)
+	GetOracleByPubkey(string) (*models.RegisteredOracle, error)
 }
 
 // GetOracleByPubkey get an oracle by it's public key
