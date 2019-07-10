@@ -35,6 +35,8 @@ func getErrorReason(v interface{}) (msg string) {
 	return
 }
 
+// NodeInterface collects together all the interfaces defined in this file to
+// describe the capabilities of a generic connection to an aeternity (or mock) node
 type NodeInterface interface {
 	GetAccounter
 	GetTopBlocker
@@ -50,11 +52,13 @@ type NodeInterface interface {
 	PostTransactioner
 }
 
+// GetStatuser guarantees that one can run a GetStatus() method on the
+// mocked/real network connection
 type GetStatuser interface {
 	GetStatus() (*models.Status, error)
 }
 
-// GetStatus post transaction
+// GetStatus returns a node's Status.
 func (c *Node) GetStatus() (status *models.Status, err error) {
 	r, err := c.External.GetStatus(nil)
 	if err != nil {
@@ -64,6 +68,8 @@ func (c *Node) GetStatus() (status *models.Status, err error) {
 	return
 }
 
+// PostTransactioner guarantees that one can run a PostTransaction() method on
+// the mocked/real network connection
 type PostTransactioner interface {
 	PostTransaction(string, string) error
 }
@@ -83,6 +89,8 @@ func (c *Node) PostTransaction(signedEncodedTx, signedEncodedTxHash string) (err
 	return
 }
 
+// GetTopBlocker guarantees that one can run a GetTopBlock() method on the
+// mocked/real network connection
 type GetTopBlocker interface {
 	GetTopBlock() (*models.KeyBlockOrMicroBlockHeader, error)
 }
@@ -97,6 +105,8 @@ func (c *Node) GetTopBlock() (kb *models.KeyBlockOrMicroBlockHeader, err error) 
 	return
 }
 
+// GetHeighter guarantees that one can run a GetHeight() method on the
+// mocked/real network connection
 type GetHeighter interface {
 	GetHeight() (uint64, error)
 }
@@ -126,12 +136,14 @@ func (c *Node) GetCurrentKeyBlock() (kb *models.KeyBlock, err error) {
 	return
 }
 
+// GetAccounter guarantees that one can run a GetAccount() method on the
+// mocked/real network connection
 type GetAccounter interface {
 	GetAccount(accountID string) (*models.Account, error)
 }
 
-// GetAccount retrieve an account by its address (public key)
-// it is particularly useful to obtain the nonce for spending transactions
+// GetAccount retrieve an account by its address (public key) it is particularly
+// useful to obtain the nonce for spending transactions
 func (c *Node) GetAccount(accountID string) (account *models.Account, err error) {
 	p := external.NewGetAccountByPubkeyParams().WithPubkey(accountID)
 	r, err := c.External.GetAccountByPubkey(p)
@@ -143,6 +155,8 @@ func (c *Node) GetAccount(accountID string) (account *models.Account, err error)
 	return
 }
 
+// GetNameEntryByNamer guarantees that one can run a GetNameEntryByName() method
+// on the mocked/real network connection
 type GetNameEntryByNamer interface {
 	GetNameEntryByName(string) (*models.NameEntry, error)
 }
@@ -161,6 +175,8 @@ func (c *Node) GetNameEntryByName(name string) (nameEntry *models.NameEntry, err
 	return
 }
 
+// GetGenerationByHeighter guarantees that one can run a GetGenerationByHeight()
+// method on the mocked/real network connection
 type GetGenerationByHeighter interface {
 	GetGenerationByHeight(height uint64) (*models.Generation, error)
 }
@@ -177,6 +193,9 @@ func (c *Node) GetGenerationByHeight(height uint64) (g *models.Generation, err e
 	return
 }
 
+// GetMicroBlockTransactionsByHasher guarantees that one can run a
+// GetMicroBlockTransactionsByHash() method on the mocked/real network
+// connection
 type GetMicroBlockTransactionsByHasher interface {
 	GetMicroBlockTransactionsByHash(string) (*models.GenericTxs, error)
 }
@@ -193,6 +212,8 @@ func (c *Node) GetMicroBlockTransactionsByHash(microBlockID string) (txs *models
 	return
 }
 
+// GetMicroBlockHeaderByHasher guarantees that one can run a
+// GetMicroBlockHeaderByHash() method on the mocked/real network connection
 type GetMicroBlockHeaderByHasher interface {
 	GetMicroBlockHeaderByHash(string) (*models.MicroBlockHeader, error)
 }
@@ -209,6 +230,8 @@ func (c *Node) GetMicroBlockHeaderByHash(microBlockID string) (txs *models.Micro
 	return
 }
 
+// GetKeyBlockByHasher guarantees that one can run a GetKeyBlockByHash() method
+// on the mocked/real network connection
 type GetKeyBlockByHasher interface {
 	GetKeyBlockByHash(string) (*models.KeyBlock, error)
 }
@@ -225,6 +248,8 @@ func (c *Node) GetKeyBlockByHash(keyBlockID string) (txs *models.KeyBlock, err e
 	return
 }
 
+// GetTransactionByHasher guarantees that one can run a GetTransactionByHash()
+// method on the mocked/real network connection
 type GetTransactionByHasher interface {
 	GetTransactionByHash(string) (*models.GenericSignedTx, error)
 }
@@ -241,6 +266,8 @@ func (c *Node) GetTransactionByHash(txHash string) (tx *models.GenericSignedTx, 
 	return
 }
 
+// GetOracleByPubkeyer guarantees that one can run a GetOracleByPubkey() method on the
+// mocked/real network connection
 type GetOracleByPubkeyer interface {
 	GetOracleByPubkey(string) (*models.RegisteredOracle, error)
 }
