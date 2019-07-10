@@ -123,11 +123,13 @@ var balanceCmd = &cobra.Command{
 	Short: "Get the balance of an account",
 	Long:  ``,
 	Args:  cobra.ExactArgs(1),
-	RunE:  balanceFunc,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		aeNode := newAeNode()
+		return balanceFunc(aeNode, args)
+	},
 }
 
-func balanceFunc(cmd *cobra.Command, args []string) (err error) {
-	aeNode := newAeNode()
+func balanceFunc(conn aeternity.GetAccounter, args []string) (err error) {
 	p, err := getPassword()
 
 	// load the account
@@ -136,7 +138,7 @@ func balanceFunc(cmd *cobra.Command, args []string) (err error) {
 		return err
 	}
 
-	a, err := aeNode.GetAccount(account.Address)
+	a, err := conn.GetAccount(account.Address)
 	if err != nil {
 		return err
 	}
