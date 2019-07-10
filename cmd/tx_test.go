@@ -10,12 +10,31 @@ import (
 var alice = "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"
 var bob = "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v"
 
-func TestTxSpend(t *testing.T) {
-	emptyCmd := cobra.Command{}
-
-	err := txSpendFunc(&emptyCmd, []string{alice, bob, "10"})
-	if err != nil {
-		t.Error(err)
+func Test_txSpendFunc(t *testing.T) {
+	type args struct {
+		conn aeternity.GetAccounter
+		args []string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Alice sends 10 to Bob",
+			args: args{
+				conn: &mockGetAccounter{account: `{"balance":1600000000000000077131306000000000000000,"id":"ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi","kind":"basic","nonce":0}`},
+				args: []string{alice, bob, "10"},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := txSpendFunc(tt.args.conn, tt.args.args); (err != nil) != tt.wantErr {
+				t.Errorf("txSpendFunc() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
 	}
 }
 
