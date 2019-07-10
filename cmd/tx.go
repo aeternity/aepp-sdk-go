@@ -26,10 +26,13 @@ var txSpendCmd = &cobra.Command{
 	Short: "Create a transaction to another account (unsigned)",
 	Long:  ``,
 	Args:  cobra.ExactArgs(3),
-	RunE:  txSpendFunc,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		aeNode := newAeNode()
+		return txSpendFunc(aeNode, args)
+	},
 }
 
-func txSpendFunc(cmd *cobra.Command, args []string) (err error) {
+func txSpendFunc(conn aeternity.GetAccounter, args []string) (err error) {
 	var (
 		sender    string
 		recipient string
@@ -59,8 +62,7 @@ func txSpendFunc(cmd *cobra.Command, args []string) (err error) {
 
 	// Connect to the node to find out sender nonce only
 	if nonce == 0 {
-		client := aeternity.NewNode(aeternity.Config.Node.URL, false)
-		nonce, err = aeternity.GetNextNonce(client, sender)
+		nonce, err = aeternity.GetNextNonce(conn, sender)
 		if err != nil {
 			return err
 		}
