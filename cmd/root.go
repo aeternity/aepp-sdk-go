@@ -34,6 +34,7 @@ var RootCmd = &cobra.Command{
 }
 
 var debug bool
+var online bool
 
 // Execute adds all child commands to the root command sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
@@ -48,8 +49,7 @@ func Execute(v string) {
 // newAeNode is just a helper function that gives you a Node so that you don't
 // have to maintain a Node global variable (which needs the config vars to be
 // read immediately, with this helper function you can defer the reading of the
-// variables until the subcommand's execution) Defined as a var so unittests can
-// mock this function out.
+// variables until the subcommand's execution)
 func newAeNode() aeternity.NodeInterface {
 	return aeternity.NewNode(aeternity.Config.Node.URL, debug)
 }
@@ -57,8 +57,7 @@ func newAeNode() aeternity.NodeInterface {
 // newCompiler is just a helper function that gives you a Compiler so that you don't
 // have to maintain a Compiler global variable (which needs the config vars to be
 // read immediately, with this helper function you can defer the reading of the
-// variables until the subcommand's execution) Defined as a var so unittests can
-// mock this function out.
+// variables until the subcommand's execution)
 func newCompiler() *aeternity.Compiler {
 	return aeternity.NewCompiler(compilerURL, debug)
 }

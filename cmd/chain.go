@@ -19,7 +19,6 @@ import (
 	"fmt"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
-	"github.com/aeternity/aepp-sdk-go/swagguard/node/models"
 	"github.com/spf13/cobra"
 )
 
@@ -34,12 +33,14 @@ var topCmd = &cobra.Command{
 	Use:   "top",
 	Short: "Query the top block of the chain",
 	Long:  ``,
-	RunE:  topFunc,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		aeNode := newAeNode()
+		return topFunc(aeNode, args)
+	},
 }
 
-func topFunc(cmd *cobra.Command, args []string) (err error) {
-	aeNode := newAeNode()
-	v, err := topDo(aeNode)
+func topFunc(conn aeternity.GetTopBlocker, args []string) error {
+	v, err := conn.GetTopBlock()
 	if err != nil {
 		return err
 	}
@@ -47,21 +48,18 @@ func topFunc(cmd *cobra.Command, args []string) (err error) {
 	return nil
 }
 
-func topDo(conn aeternity.GetTopBlocker) (kb *models.KeyBlockOrMicroBlockHeader, err error) {
-	kb, err = conn.GetTopBlock()
-	return
-}
-
 var statusCmd = &cobra.Command{
 	Use:   "status",
 	Short: "Get the status and status of the node running the chain",
 	Long:  ``,
-	RunE:  statusFunc,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		aeNode := newAeNode()
+		return statusFunc(aeNode, args)
+	},
 }
 
-func statusFunc(cmd *cobra.Command, args []string) (err error) {
-	aeNode := newAeNode()
-	v, err := statusDo(aeNode)
+func statusFunc(conn aeternity.GetStatuser, args []string) (err error) {
+	v, err := conn.GetStatus()
 	if err != nil {
 		return err
 	}
@@ -69,22 +67,24 @@ func statusFunc(cmd *cobra.Command, args []string) (err error) {
 	return nil
 }
 
-func statusDo(conn aeternity.GetStatuser) (status *models.Status, err error) {
-	status, err = conn.GetStatus()
-	return
-}
-
 var limit, startFromHeight uint64
 var playCmd = &cobra.Command{
 	Use:   "play",
 	Short: "Query the blocks of the chain one after the other",
 	Long:  ``,
-	RunE:  playFunc,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		aeNode := newAeNode()
+		return playFunc(aeNode, args)
+	},
 }
 
-func playFunc(cmd *cobra.Command, args []string) (err error) {
-	aeNode := newAeNode()
-	blockHeight, err := aeNode.GetHeight()
+type playFuncInterface interface {
+	aeternity.GetHeighter
+	getGenerationMicroBlockTransactioner
+}
+
+func playFunc(conn playFuncInterface, args []string) (err error) {
+	blockHeight, err := conn.GetHeight()
 	if err != nil {
 		return err
 	}
@@ -108,7 +108,7 @@ func playFunc(cmd *cobra.Command, args []string) (err error) {
 	}
 	// run the play
 	for ; blockHeight > targetHeight; blockHeight-- {
-		PrintGenerationByHeight(aeNode, blockHeight)
+		PrintGenerationByHeight(conn, blockHeight)
 		fmt.Println("")
 	}
 
@@ -120,10 +120,13 @@ var broadcastCmd = &cobra.Command{
 	Short: "Broadcast a transaction to the network",
 	Long:  ``,
 	Args:  cobra.ExactArgs(1),
-	RunE:  broadcastFunc,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		aeNode := newAeNode()
+		return broadcastFunc(aeNode, args)
+	},
 }
 
-func broadcastFunc(cmd *cobra.Command, args []string) (err error) {
+func broadcastFunc(conn aeternity.PostTransactioner, args []string) (err error) {
 	// Load variables from arguments
 	txSignedBase64 := args[0]
 
@@ -132,8 +135,7 @@ func broadcastFunc(cmd *cobra.Command, args []string) (err error) {
 		return err
 	}
 
-	aeNode := newAeNode()
-	err = aeternity.BroadcastTransaction(aeNode, txSignedBase64)
+	err = aeternity.BroadcastTransaction(conn, txSignedBase64)
 	if err != nil {
 		errFinal := fmt.Errorf("Error while broadcasting transaction: %v", err)
 		return errFinal
@@ -147,27 +149,21 @@ var ttlCmd = &cobra.Command{
 	Short: "Get the absolute TTL for a Transaction",
 	Long:  `Get the absolute TTL (node's height + recommended TTL offset) for a Transaction`,
 	Args:  cobra.ExactArgs(0),
-	RunE:  ttlFunc,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		aeNode := newAeNode()
+		return ttlFunc(aeNode, args)
+	},
 }
 
-func ttlFunc(cmd *cobra.Command, args []string) (err error) {
-	ae := newAeNode()
-	ans, err := ttlDo(ae)
-	if err != nil {
-		return
-	}
-	fmt.Println(ans)
-	return nil
-}
-
-func ttlDo(conn aeternity.GetHeighter) (ttl uint64, err error) {
+func ttlFunc(conn aeternity.GetHeighter, args []string) (err error) {
 	height, err := conn.GetHeight()
 	if err != nil {
 		errFinal := fmt.Errorf("Error getting height from the node: %v", err)
-		return 0, errFinal
+		return errFinal
 	}
 	ttl = height + aeternity.Config.Client.TTL
-	return
+	fmt.Println(ttl)
+	return nil
 }
 
 var networkIDCmd = &cobra.Command{
@@ -175,27 +171,20 @@ var networkIDCmd = &cobra.Command{
 	Short: "Get the node's network_id",
 	Long:  ``,
 	Args:  cobra.ExactArgs(0),
-	RunE:  networkIDFunc,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		aeNode := newAeNode()
+		return networkIDFunc(aeNode, args)
+	},
 }
 
-func networkIDFunc(cmd *cobra.Command, args []string) (err error) {
-	ae := newAeNode()
-	nID, err := networkIDDo(ae)
-	if err != nil {
-		return err
-	}
-	fmt.Println(nID)
-	return nil
-}
-
-func networkIDDo(conn aeternity.GetStatuser) (networkID string, err error) {
+func networkIDFunc(conn aeternity.GetStatuser, args []string) (err error) {
 	resp, err := conn.GetStatus()
 	if err != nil {
 		errFinal := fmt.Errorf("Error getting status information from the node: %v", err)
-		return "", errFinal
+		return errFinal
 	}
-	networkID = *resp.NetworkID
-	return
+	fmt.Println(*resp.NetworkID)
+	return nil
 }
 
 func init() {
