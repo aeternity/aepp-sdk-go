@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
+	"github.com/aeternity/aepp-sdk-go/swagguard/node/models"
 	"github.com/spf13/cobra"
 )
 
@@ -61,9 +62,22 @@ func TestTxDumpRaw(t *testing.T) {
 	}
 }
 
+type mockgetHeightAccounter struct {
+	height  uint64
+	account string
+}
+
+func (m *mockgetHeightAccounter) GetHeight() (uint64, error) {
+	return m.height, nil
+}
+func (m *mockgetHeightAccounter) GetAccount(accountID string) (acc *models.Account, err error) {
+	acc = &models.Account{}
+	err = acc.UnmarshalBinary([]byte(m.account))
+	return acc, err
+}
 func Test_txContractCreateFunc(t *testing.T) {
 	type args struct {
-		cmd  *cobra.Command
+		conn getHeightAccounter
 		args []string
 	}
 	tests := []struct {
@@ -74,7 +88,10 @@ func Test_txContractCreateFunc(t *testing.T) {
 		{
 			name: "Deploy SimpleStorage with alice (unsigned)",
 			args: args{
-				cmd:  &cobra.Command{},
+				conn: &mockgetHeightAccounter{
+					height:  301,
+					account: `{"balance":1600000000000000077131306000000000000000,"id":"ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi","kind":"basic","nonce":0}`,
+				},
 				args: []string{alice, contractSimpleStorageBytecode, contractSimpleStorageInitCalldata},
 			},
 			wantErr: false,
@@ -82,7 +99,7 @@ func Test_txContractCreateFunc(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := txContractCreateFunc(tt.args.cmd, tt.args.args); (err != nil) != tt.wantErr {
+			if err := txContractCreateFunc(tt.args.conn, tt.args.args); (err != nil) != tt.wantErr {
 				t.Errorf("txContractCreateFunc() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
