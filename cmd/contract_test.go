@@ -1,12 +1,11 @@
 package cmd
 
 import (
-	"io/ioutil"
 	"os"
-	"path/filepath"
 	"testing"
 
-	"github.com/spf13/cobra"
+	"github.com/aeternity/aepp-sdk-go/aeternity"
+	"github.com/aeternity/aepp-sdk-go/swagguard/compiler/models"
 )
 
 const contractSimpleStorage = "contract SimpleStorage =\n  record state = { data : int }\n  function init(value : int) : state = { data = value }\n  function get() : int = state.data\n  stateful function set(value : int) = put(state{data = value})"
