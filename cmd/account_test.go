@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -9,14 +8,6 @@ import (
 	"github.com/aeternity/aepp-sdk-go/swagguard/node/models"
 	"github.com/spf13/cobra"
 )
-
-func testTempdir(t *testing.T) (string, func()) {
-	dir, err := ioutil.TempDir("", "aecli")
-	if err != nil {
-		t.Fatal(err)
-	}
-	return dir, func() { os.RemoveAll(dir) }
-}
 
 func TestAccountCreate(t *testing.T) {
 	password = "password"

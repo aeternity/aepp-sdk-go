@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"encoding"
 	"flag"
 	"fmt"
 	"testing"
@@ -17,20 +16,6 @@ func init() {
 	flag.BoolVar(&online, "online", false, "Run tests that need a running node on localhost:3013, Network ID ae_docker")
 	flag.Parse()
 	setPrivateNetParams()
-}
-
-func setPrivateNetParams() {
-	aeternity.Config.Node.URL = "http://localhost:3013"
-	aeternity.Config.Node.NetworkID = "ae_docker"
-}
-
-func dumpV(v encoding.BinaryMarshaler) error {
-	s, err := v.MarshalBinary()
-	if err != nil {
-		return err
-	}
-	fmt.Println(string(s))
-	return err
 }
 
 type mockGetTopBlocker struct {
