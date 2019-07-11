@@ -30,6 +30,12 @@ func NewCompiler(compilerURL string, debug bool) *Compiler {
 	return compiler
 }
 
+// APIVersioner guarantees that one can run a APIVersion() method on the
+// mocked/real network connection to the aesophia compiler
+type APIVersioner interface {
+	APIVersion() (version string, err error)
+}
+
 // APIVersion connects to the compiler and returns its version string, e.g.
 // 3.1.0
 func (c *Compiler) APIVersion() (version string, err error) {
@@ -39,6 +45,12 @@ func (c *Compiler) APIVersion() (version string, err error) {
 	}
 	version = *result.Payload.APIVersion
 	return
+}
+
+// CompileContracter guarantees that one can run a CompileContract() method on
+// the mocked/real network connection to the aesophia compiler
+type CompileContracter interface {
+	CompileContract(source string) (bytecode string, err error)
 }
 
 // CompileContract abstracts away the swagger specifics of posting to /compile
@@ -51,6 +63,12 @@ func (c *Compiler) CompileContract(source string) (bytecode string, err error) {
 	}
 	bytecode = string(result.Payload.Bytecode)
 	return
+}
+
+// DecodeCallResulter guarantees that one can run a DecodeCallResult() method on
+// the mocked/real network connection to the aesophia compiler
+type DecodeCallResulter interface {
+	DecodeCallResult(callResult string, callValue string, function string, source string) (answer interface{}, err error)
 }
 
 // DecodeCallResult abstracts away the swagger specifics of posting to
@@ -71,7 +89,15 @@ func (c *Compiler) DecodeCallResult(callResult string, callValue string, functio
 	return result.Payload, err
 }
 
-// DecodeCalldataBytecode abstracts away the swagger specifics of posting to /decode-calldata/bytecode
+// DecodeCalldataBytecoder guarantees that one can run a
+// DecodeCalldataBytecode() method on the mocked/real network connection to the
+// aesophia compiler
+type DecodeCalldataBytecoder interface {
+	DecodeCalldataBytecode(bytecode string, calldata string) (decodedCallData *models.DecodedCalldata, err error)
+}
+
+// DecodeCalldataBytecode abstracts away the swagger specifics of posting to
+// /decode-calldata/bytecode
 func (c *Compiler) DecodeCalldataBytecode(bytecode string, calldata string) (decodedCallData *models.DecodedCalldata, err error) {
 	decodeCalldataBytecode := &models.DecodeCalldataBytecode{
 		Bytecode: models.EncodedByteArray(bytecode),
@@ -86,7 +112,14 @@ func (c *Compiler) DecodeCalldataBytecode(bytecode string, calldata string) (dec
 	return result.Payload, err
 }
 
-// DecodeCalldataSource abstracts away the swagger specifics of posting to /decode-calldata/source
+// DecodeCalldataSourcer guarantees that one can run a DecodeCalldataSource()
+// method on the mocked/real network connection to the aesophia compiler
+type DecodeCalldataSourcer interface {
+	DecodeCalldataSource(source string, callData string) (decodedCallData *models.DecodedCalldata, err error)
+}
+
+// DecodeCalldataSource abstracts away the swagger specifics of posting to
+// /decode-calldata/source
 func (c *Compiler) DecodeCalldataSource(source string, callData string) (decodedCallData *models.DecodedCalldata, err error) {
 	p := &models.DecodeCalldataSource{
 		Source:   source,
@@ -99,6 +132,12 @@ func (c *Compiler) DecodeCalldataSource(source string, callData string) (decoded
 	}
 
 	return result.Payload, err
+}
+
+// DecodeDataer guarantees that one can run a DecodeData() method on the
+// mocked/real network connection to the aesophia compiler
+type DecodeDataer interface {
+	DecodeData(data string, sophiaType string) (decodedData *models.SophiaJSONData, err error)
 }
 
 // DecodeData abstracts away the swagger specifics of posting to /decode-data
@@ -116,7 +155,14 @@ func (c *Compiler) DecodeData(data string, sophiaType string) (decodedData *mode
 	return result.Payload, err
 }
 
-// EncodeCalldata abstracts away the swagger specifics of posting to /encode-calldata
+// EncodeCalldataer guarantees that one can run a EncodeCalldata() method on the
+// mocked/real network connection to the aesophia compiler
+type EncodeCalldataer interface {
+	EncodeCalldata(source string, function string, args []string) (callData string, err error)
+}
+
+// EncodeCalldata abstracts away the swagger specifics of posting to
+// /encode-calldata
 func (c *Compiler) EncodeCalldata(source string, function string, args []string) (callData string, err error) {
 	f := &models.FunctionCallInput{
 		Arguments: args,
@@ -133,6 +179,12 @@ func (c *Compiler) EncodeCalldata(source string, function string, args []string)
 	return s, err
 }
 
+// GenerateACIer guarantees that one can run a GenerateACI() method on the
+// mocked/real network connection to the aesophia compiler
+type GenerateACIer interface {
+	GenerateACI(source string) (aci *models.ACI, err error)
+}
+
 // GenerateACI abstracts away the swagger specifics of posting to /aci
 func (c *Compiler) GenerateACI(source string) (aci *models.ACI, err error) {
 	contract := &models.Contract{Code: &source, Options: &models.CompileOpts{}}
@@ -143,6 +195,12 @@ func (c *Compiler) GenerateACI(source string) (aci *models.ACI, err error) {
 	}
 
 	return result.Payload, err
+}
+
+// SophiaVersioner guarantees that one can run a SophiaVersion() method on the
+// mocked/real network connection to the aesophia compiler
+type SophiaVersioner interface {
+	SophiaVersion() (version string, err error)
 }
 
 // SophiaVersion abstracts away the swagger specifics of getting /version
