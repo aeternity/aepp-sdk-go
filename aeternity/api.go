@@ -36,7 +36,8 @@ func getErrorReason(v interface{}) (msg string) {
 }
 
 // NodeInterface collects together all the interfaces defined in this file to
-// describe the capabilities of a generic connection to an aeternity (or mock) node
+// describe the capabilities of a generic connection to an aeternity (or mock)
+// node
 type NodeInterface interface {
 	GetAccounter
 	GetTopBlocker
@@ -266,8 +267,8 @@ func (c *Node) GetTransactionByHash(txHash string) (tx *models.GenericSignedTx, 
 	return
 }
 
-// GetOracleByPubkeyer guarantees that one can run a GetOracleByPubkey() method on the
-// mocked/real network connection
+// GetOracleByPubkeyer guarantees that one can run a GetOracleByPubkey() method
+// on the mocked/real network connection
 type GetOracleByPubkeyer interface {
 	GetOracleByPubkey(string) (*models.RegisteredOracle, error)
 }
