@@ -93,10 +93,18 @@ var txContractCreateCmd = &cobra.Command{
 	Short: "Create a smart contract on the blockchain",
 	Long:  ``,
 	Args:  cobra.ExactArgs(3),
-	RunE:  txContractCreateFunc,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		aeNode := newAeNode()
+		return txContractCreateFunc(aeNode, args)
+	},
 }
 
-func txContractCreateFunc(cmd *cobra.Command, args []string) (err error) {
+type getHeightAccounter interface {
+	aeternity.GetHeighter
+	aeternity.GetAccounter
+}
+
+func txContractCreateFunc(conn getHeightAccounter, args []string) (err error) {
 	var (
 		owner    string
 		contract string
@@ -117,10 +125,10 @@ func txContractCreateFunc(cmd *cobra.Command, args []string) (err error) {
 		return errors.New("Error, missing or invalid init calldata bytecode")
 	}
 
-	c := aeternity.NewContext(
-		aeternity.NewNode(aeternity.Config.Node.URL, debug),
-		owner,
-	)
+	c := aeternity.Context{
+		Client:  conn,
+		Address: owner,
+	}
 
 	tx, err := c.ContractCreateTx(contract, calldata, aeternity.Config.Client.Contracts.VMVersion, aeternity.Config.Client.Contracts.ABIVersion, aeternity.Config.Client.Contracts.Deposit, aeternity.Config.Client.Contracts.Amount, aeternity.Config.Client.Contracts.Gas, aeternity.Config.Client.Contracts.GasPrice, aeternity.Config.Client.Fee)
 

@@ -106,7 +106,7 @@ func BroadcastTransaction(c PostTransactioner, txSignedBase64 string) (err error
 
 // Context stores relevant context (node connection, account address) that one might not want to spell out each time one creates a transaction
 type Context struct {
-	Client  *Node
+	Client  getHeightAccounter
 	Address string
 }
 
