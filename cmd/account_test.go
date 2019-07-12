@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
-	"github.com/aeternity/aepp-sdk-go/swagguard/node/models"
 	"github.com/spf13/cobra"
 )
 
@@ -71,16 +70,6 @@ func TestAccountSign(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-}
-
-type mockGetAccounter struct {
-	account string
-}
-
-func (m *mockGetAccounter) GetAccount(accountID string) (acc *models.Account, err error) {
-	acc = &models.Account{}
-	err = acc.UnmarshalBinary([]byte(m.account))
-	return acc, err
 }
 
 func Test_balanceFunc(t *testing.T) {
