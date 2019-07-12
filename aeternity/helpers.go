@@ -19,6 +19,8 @@ type getAccounter interface {
 	GetAccount(string) (*models.Account, error)
 }
 
+// GetHeightAccounter is only used by mock GetTTLNonce() functions to describe
+// the capabilities of whatever should be passed in as conn
 type GetHeightAccounter interface {
 	getHeighter
 	getAccounter
