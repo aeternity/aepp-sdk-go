@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
-	"github.com/aeternity/aepp-sdk-go/swagguard/node/models"
 )
 
 // Prefixing each test with Example makes go-test check the stdout
@@ -16,16 +15,6 @@ func init() {
 	flag.BoolVar(&online, "online", false, "Run tests that need a running node on localhost:3013, Network ID ae_docker")
 	flag.Parse()
 	setPrivateNetParams()
-}
-
-type mockGetTopBlocker struct {
-	msg string
-}
-
-func (m *mockGetTopBlocker) GetTopBlock() (*models.KeyBlockOrMicroBlockHeader, error) {
-	kb := &models.KeyBlockOrMicroBlockHeader{}
-	kb.UnmarshalBinary([]byte(m.msg))
-	return kb, nil
 }
 
 func Test_topFunc(t *testing.T) {
@@ -72,11 +61,6 @@ func Test_topFunc(t *testing.T) {
 	}
 }
 
-type mockPostTransactioner struct{}
-
-func (m *mockPostTransactioner) PostTransaction(signedEncodedTx, signedEncodedTxHash string) error {
-	return nil
-}
 func Test_broadcastFunc(t *testing.T) {
 	type args struct {
 		conn aeternity.PostTransactioner
@@ -119,15 +103,6 @@ func Test_broadcastFunc(t *testing.T) {
 	}
 }
 
-type mockGetStatuser struct {
-	msg string
-}
-
-func (m *mockGetStatuser) GetStatus() (*models.Status, error) {
-	kb := &models.Status{}
-	kb.UnmarshalBinary([]byte(m.msg))
-	return kb, nil
-}
 func Test_statusFunc(t *testing.T) {
 	type args struct {
 		conn aeternity.GetStatuser
@@ -170,13 +145,6 @@ func Test_statusFunc(t *testing.T) {
 	}
 }
 
-type mockGetHeighter struct {
-	h uint64
-}
-
-func (m *mockGetHeighter) GetHeight() (uint64, error) {
-	return m.h, nil
-}
 func Test_ttlFunc(t *testing.T) {
 	type args struct {
 		conn aeternity.GetHeighter

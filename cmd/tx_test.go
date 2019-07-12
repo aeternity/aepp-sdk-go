@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
-	"github.com/aeternity/aepp-sdk-go/swagguard/node/models"
 	"github.com/spf13/cobra"
 )
 
@@ -62,19 +61,6 @@ func TestTxDumpRaw(t *testing.T) {
 	}
 }
 
-type mockgetHeightAccounter struct {
-	height  uint64
-	account string
-}
-
-func (m *mockgetHeightAccounter) GetHeight() (uint64, error) {
-	return m.height, nil
-}
-func (m *mockgetHeightAccounter) GetAccount(accountID string) (acc *models.Account, err error) {
-	acc = &models.Account{}
-	err = acc.UnmarshalBinary([]byte(m.account))
-	return acc, err
-}
 func Test_txContractCreateFunc(t *testing.T) {
 	aeternity.GetTTLNonce = func(c aeternity.GetHeightAccounter, accountID string, offset uint64) (height uint64, nonce uint64, err error) {
 		return 2, 1337, nil
