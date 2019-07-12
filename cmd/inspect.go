@@ -33,7 +33,10 @@ var inspectCmd = &cobra.Command{
 	Long: `Inspect an object of the chain
 
 Valid object to inspect are block hash, transaction hash, accounts`,
-	RunE: inspectFunc,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		node := newAeNode()
+		return inspectFunc(node, args)
+	},
 	Args: cobra.MinimumNArgs(1),
 }
 
@@ -60,71 +63,107 @@ func printResult(title string, v interface{}, err error) {
 	PrintObject(title, v)
 }
 
-func inspectFunc(cmd *cobra.Command, args []string) (err error) {
-	aeNode := newAeNode()
+type nodeGetters interface {
+	aeternity.GetGenerationByHeighter
+	aeternity.GetNameEntryByNamer
+	aeternity.GetAccounter
+	aeternity.GetMicroBlockHeaderByHasher
+	aeternity.GetMicroBlockTransactionsByHasher
+	aeternity.GetKeyBlockByHasher
+	aeternity.GetTransactionByHasher
+	aeternity.GetOracleByPubkeyer
+}
+
+func printNameEntry(conn aeternity.GetNameEntryByNamer, name string) (err error) {
+	v, err := conn.GetNameEntryByName(name)
+	if err != nil {
+		return err
+	}
+	printResult("aens", v, err)
+	return err
+}
+
+func printAccount(conn aeternity.GetAccounter, accountID string) (err error) {
+	v, err := conn.GetAccount(accountID)
+	if err != nil {
+		return err
+	}
+	printResult("account", v, err)
+	return err
+}
+
+type getMicroBlockHeaderTransactions interface {
+	aeternity.GetMicroBlockHeaderByHasher
+	aeternity.GetMicroBlockTransactionsByHasher
+}
+
+func printMicroBlockAndTransactions(conn getMicroBlockHeaderTransactions, mbHash string) (err error) {
+	v, err := conn.GetMicroBlockHeaderByHash(mbHash)
+	if err != nil {
+		return err
+	}
+	printResult("block", v, err)
+	v1, err := conn.GetMicroBlockTransactionsByHash(mbHash)
+	if err != nil {
+		return err
+	}
+	printResult("transaction", v1, err)
+	return err
+}
+
+func printKeyBlockByHash(conn aeternity.GetKeyBlockByHasher, kbHash string) (err error) {
+	v, err := conn.GetKeyBlockByHash(kbHash)
+	if err != nil {
+		return err
+	}
+	printResult("key-block", v, err)
+	dumpV(v)
+	return err
+}
+
+func printTransactionByHash(conn aeternity.GetTransactionByHasher, txHash string) (err error) {
+	v, err := conn.GetTransactionByHash(txHash)
+	if err != nil {
+		return err
+	}
+	printResult("transaction", v, err)
+	return err
+}
+
+func printOracleByPubkey(conn aeternity.GetOracleByPubkeyer, oracleID string) (err error) {
+	v, err := conn.GetOracleByPubkey(oracleID)
+	if err != nil {
+		return err
+	}
+	printResult("oracle", v, err)
+	return err
+}
+
+func inspectFunc(conn nodeGetters, args []string) (err error) {
 	for _, object := range args {
 		// height
 		if matched, _ := regexp.MatchString(`^\d+$`, object); matched {
 			height, _ := strconv.ParseUint(object, 10, 64)
-			PrintGenerationByHeight(aeNode, height)
+			PrintGenerationByHeight(conn, height)
 			continue
 		}
 		// name
 		if strings.HasSuffix(object, ".aet") {
-			v, err := aeNode.GetNameEntryByName(object)
-			if err != nil {
-				return err
-			}
-			printResult("aens", v, err)
+			printNameEntry(conn, object)
 			continue
 		}
 
 		switch aeternity.GetHashPrefix(object) {
 		case aeternity.PrefixAccountPubkey:
-			// account balance
-			v, err := aeNode.GetAccount(object)
-			if err != nil {
-				return err
-			}
-
-			printResult("account", v, err)
-
+			printAccount(conn, object)
 		case aeternity.PrefixMicroBlockHash:
-			v, err := aeNode.GetMicroBlockHeaderByHash(object)
-			if err != nil {
-				return err
-			}
-			printResult("block", v, err)
-			v1, err := aeNode.GetMicroBlockTransactionsByHash(object)
-			if err != nil {
-				return err
-			}
-			printResult("transaction", v1, err)
-
+			printMicroBlockAndTransactions(conn, object)
 		case aeternity.PrefixKeyBlockHash:
-			// block
-			v, err := aeNode.GetKeyBlockByHash(object)
-			if err != nil {
-				return err
-			}
-			printResult("key-block", v, err)
-
+			printKeyBlockByHash(conn, object)
 		case aeternity.PrefixTransactionHash:
-			// transaction
-			v, err := aeNode.GetTransactionByHash(object)
-			if err != nil {
-				return err
-			}
-			printResult("transaction", v, err)
-
+			printTransactionByHash(conn, object)
 		case aeternity.PrefixOraclePubkey:
-			// oracle
-			v, err := aeNode.GetOracleByPubkey(object)
-			if err != nil {
-				return err
-			}
-			printResult("oracle", v, err)
-
+			printOracleByPubkey(conn, object)
 		default:
 			return fmt.Errorf("Object %v not yet supported", object)
 		}
