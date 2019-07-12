@@ -179,3 +179,36 @@ func Test_decodeCalldataFunc(t *testing.T) {
 		})
 	}
 }
+
+func Test_generateAciFunc(t *testing.T) {
+	// Write source file for Decode with source file test
+	tempdir, path := writeTestContractFile(t, contractSimpleStorage)
+	defer os.RemoveAll(tempdir)
+	type args struct {
+		conn aeternity.GenerateACIer
+		args []string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Generate ACI from SimpleStorage",
+			args: args{
+				conn: &mockGenerateACIer{
+					aci: `{"encoded_aci":{"contract":{"functions":[{"arguments":[{"name":"value","type":"int"}],"name":"init","returns":"SimpleStorage.state","stateful":false}],"name":"SimpleStorage","state":{"record":[{"name":"data","type":"int"}]},"type_defs":[]}},"interface":"contract SimpleStorage =\n  record state = {data : int}\n  entrypoint init : (int) =\u003e SimpleStorage.state\n"}`,
+				},
+				args: []string{path},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := generateAciFunc(tt.args.conn, tt.args.args); (err != nil) != tt.wantErr {
+				t.Errorf("generateAciFunc() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

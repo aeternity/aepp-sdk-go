@@ -145,3 +145,13 @@ func (m *mockdecodeCalldataer) DecodeCalldataBytecode(bytecode string, calldata 
 	decodedCallData.UnmarshalBinary([]byte(m.decodedCalldata))
 	return decodedCallData, nil
 }
+
+type mockGenerateACIer struct {
+	aci string
+}
+
+func (m *mockGenerateACIer) GenerateACI(source string) (aci *compilermodels.ACI, err error) {
+	aci = &compilermodels.ACI{}
+	err = aci.UnmarshalBinary([]byte(m.aci))
+	return aci, err
+}
