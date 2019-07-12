@@ -121,6 +121,31 @@ func decodeCalldataFunc(conn decodeCalldataer, args []string) (err error) {
 	return
 }
 
+var generateAciCmd = &cobra.Command{
+	Use:   "generateaci FILENAME",
+	Short: "Generate ACI out of source code",
+	Long:  ``,
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) (err error) {
+		compiler := newCompiler()
+		return generateAciFunc(compiler, args)
+	},
+	SilenceUsage: true,
+}
+
+func generateAciFunc(conn aeternity.GenerateACIer, args []string) (err error) {
+	source, err := readSource(args[0])
+	if err != nil {
+		return
+	}
+
+	aci, err := conn.GenerateACI(source)
+	if err != nil {
+		return
+	}
+	PrintObject("ACI", aci)
+	return nil
+}
 func readSource(path string) (s string, err error) {
 	file, err := os.Open(path)
 	if err != nil {
