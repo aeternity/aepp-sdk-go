@@ -76,6 +76,9 @@ func (m *mockgetHeightAccounter) GetAccount(accountID string) (acc *models.Accou
 	return acc, err
 }
 func Test_txContractCreateFunc(t *testing.T) {
+	aeternity.GetTTLNonce = func(c aeternity.GetHeightAccounter, accountID string, offset uint64) (height uint64, nonce uint64, err error) {
+		return 2, 1337, nil
+	}
 	type args struct {
 		conn getHeightAccounter
 		args []string
@@ -88,10 +91,7 @@ func Test_txContractCreateFunc(t *testing.T) {
 		{
 			name: "Deploy SimpleStorage with alice (unsigned)",
 			args: args{
-				conn: &mockgetHeightAccounter{
-					height:  301,
-					account: `{"balance":1600000000000000077131306000000000000000,"id":"ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi","kind":"basic","nonce":0}`,
-				},
+				conn: &mockgetHeightAccounter{},
 				args: []string{alice, contractSimpleStorageBytecode, contractSimpleStorageInitCalldata},
 			},
 			wantErr: false,

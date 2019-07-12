@@ -19,13 +19,13 @@ type getAccounter interface {
 	GetAccount(string) (*models.Account, error)
 }
 
-type getHeightAccounter interface {
+type GetHeightAccounter interface {
 	getHeighter
 	getAccounter
 }
 
 // GetTTL returns the chain height + offset
-func GetTTL(c getHeighter, offset uint64) (ttl uint64, err error) {
+var GetTTL = func(c getHeighter, offset uint64) (ttl uint64, err error) {
 	height, err := c.GetHeight()
 	if err != nil {
 		return
@@ -37,7 +37,7 @@ func GetTTL(c getHeighter, offset uint64) (ttl uint64, err error) {
 }
 
 // GetNextNonce retrieves the current accountNonce and adds 1 to it for use in transaction building
-func GetNextNonce(c getAccounter, accountID string) (nextNonce uint64, err error) {
+var GetNextNonce = func(c getAccounter, accountID string) (nextNonce uint64, err error) {
 	a, err := c.GetAccount(accountID)
 	if err != nil {
 		return
@@ -47,7 +47,7 @@ func GetNextNonce(c getAccounter, accountID string) (nextNonce uint64, err error
 }
 
 // GetTTLNonce combines the commonly used together functions of GetTTL and GetNextNonce
-func GetTTLNonce(c getHeightAccounter, accountID string, offset uint64) (height uint64, nonce uint64, err error) {
+var GetTTLNonce = func(c GetHeightAccounter, accountID string, offset uint64) (height uint64, nonce uint64, err error) {
 	height, err = GetTTL(c, offset)
 	if err != nil {
 		return
@@ -106,7 +106,7 @@ func BroadcastTransaction(c PostTransactioner, txSignedBase64 string) (err error
 
 // Context stores relevant context (node connection, account address) that one might not want to spell out each time one creates a transaction
 type Context struct {
-	Client  getHeightAccounter
+	Client  GetHeightAccounter
 	Address string
 }
 
