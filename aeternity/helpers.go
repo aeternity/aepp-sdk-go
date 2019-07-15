@@ -1,6 +1,7 @@
 package aeternity
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"math/big"
@@ -60,6 +61,21 @@ var GetTTLNonce = func(c GetHeightAccounter, accountID string, offset uint64) (h
 		return
 	}
 	return
+}
+
+// LookupName returns the first account_pubkey entry that it finds in a name's Pointers.
+var LookupName = func(c GetNameEntryByNamer, name string) (string, error) {
+	n, err := c.GetNameEntryByName(name)
+	if err != nil {
+		return "", err
+	}
+	for _, p := range n.Pointers {
+		if *p.Key == "account_pubkey" {
+			return *p.ID, nil
+		}
+	}
+	s := fmt.Sprintf("No account_pubkey entry found for %s", name)
+	return "", errors.New(s)
 }
 
 type getTransactionByHashHeighter interface {
@@ -263,6 +279,8 @@ func (c *Context) ContractCreateTx(Code string, CallData string, VMVersion, AbiV
 	tx = NewContractCreateTx(c.Address, nonce, Code, VMVersion, AbiVersion, Deposit, Amount, Gas, GasPrice, Fee, ttl, CallData)
 	return tx, nil
 }
+
+type ContractCallHelper func(ContractID, CallData string, AbiVersion uint16, Amount, Gas, GasPrice, Fee big.Int) (tx ContractCallTx, err error)
 
 // ContractCallTx returns a transaction for calling a contract on the chain
 func (c *Context) ContractCallTx(ContractID, CallData string, AbiVersion uint16, Amount, Gas, GasPrice, Fee big.Int) (tx ContractCallTx, err error) {
