@@ -8,28 +8,42 @@ import (
 	"os"
 	"path/filepath"
 	"time"
-
-	"github.com/aeternity/aepp-sdk-go/swagguard/node/models"
 )
 
-type getHeighter interface {
-	GetHeight() (uint64, error)
+// GetHeightAccountNamer is used by GetTTLNonce/GetName/GetNonce helper
+// functions (otherwise known as the Helper{} methods) to describe the
+// capabilities of whatever should be passed in as conn
+type GetHeightAccountNamer interface {
+	GetHeighter
+	GetAccounter
+	GetNameEntryByNamer
 }
 
-type getAccounter interface {
-	GetAccount(string) (*models.Account, error)
+// getTransactionByHashHeighter is used by WaitForTransactionUntilHeight
+type getTransactionByHashHeighter interface {
+	GetTransactionByHasher
+	GetHeighter
 }
 
-// GetHeightAccounter is only used by mock GetTTLNonce() functions to describe
-// the capabilities of whatever should be passed in as conn
-type GetHeightAccounter interface {
-	getHeighter
-	getAccounter
+// HelpersInterface describes an interface for the helper functions GetTTLNonce
+// and friends so they are mockable, without having to mock out the Node/network
+// connection.
+type HelpersInterface interface {
+	GetTTL(offset uint64) (ttl uint64, err error)
+	GetNextNonce(accountID string) (nextNonce uint64, err error)
+	GetTTLNonce(accountID string, offset uint64) (height uint64, nonce uint64, err error)
+	GetName(name string) (accountID string, err error)
+}
+
+// Helpers is a struct to contain the GetTTLNonce helper functions and feed them
+// with a node connection
+type Helpers struct {
+	node GetHeightAccountNamer
 }
 
 // GetTTL returns the chain height + offset
-var GetTTL = func(c getHeighter, offset uint64) (ttl uint64, err error) {
-	height, err := c.GetHeight()
+func (h Helpers) GetTTL(offset uint64) (ttl uint64, err error) {
+	height, err := h.node.GetHeight()
 	if err != nil {
 		return
 	}
@@ -40,8 +54,8 @@ var GetTTL = func(c getHeighter, offset uint64) (ttl uint64, err error) {
 }
 
 // GetNextNonce retrieves the current accountNonce and adds 1 to it for use in transaction building
-var GetNextNonce = func(c getAccounter, accountID string) (nextNonce uint64, err error) {
-	a, err := c.GetAccount(accountID)
+func (h Helpers) GetNextNonce(accountID string) (nextNonce uint64, err error) {
+	a, err := h.node.GetAccount(accountID)
 	if err != nil {
 		return
 	}
@@ -50,22 +64,22 @@ var GetNextNonce = func(c getAccounter, accountID string) (nextNonce uint64, err
 }
 
 // GetTTLNonce combines the commonly used together functions of GetTTL and GetNextNonce
-var GetTTLNonce = func(c GetHeightAccounter, accountID string, offset uint64) (height uint64, nonce uint64, err error) {
-	height, err = GetTTL(c, offset)
+func (h Helpers) GetTTLNonce(accountID string, offset uint64) (height uint64, nonce uint64, err error) {
+	height, err = h.GetTTL(offset)
 	if err != nil {
 		return
 	}
 
-	nonce, err = GetNextNonce(c, accountID)
+	nonce, err = h.GetNextNonce(accountID)
 	if err != nil {
 		return
 	}
 	return
 }
 
-// LookupName returns the first account_pubkey entry that it finds in a name's Pointers.
-var LookupName = func(c GetNameEntryByNamer, name string) (string, error) {
-	n, err := c.GetNameEntryByName(name)
+// GetName returns the first account_pubkey entry that it finds in a name's Pointers.
+func (h Helpers) GetName(name string) (address string, err error) {
+	n, err := h.node.GetNameEntryByName(name)
 	if err != nil {
 		return "", err
 	}
@@ -78,54 +92,11 @@ var LookupName = func(c GetNameEntryByNamer, name string) (string, error) {
 	return "", errors.New(s)
 }
 
-type getTransactionByHashHeighter interface {
-	GetTransactionByHasher
-	GetHeighter
-}
-
-// WaitForTransactionUntilHeight waits for a transaction until heightLimit (inclusive) is reached
-func WaitForTransactionUntilHeight(c getTransactionByHashHeighter, txHash string, untilHeight uint64) (blockHeight uint64, blockHash string, err error) {
-	var nodeHeight uint64
-	for nodeHeight <= untilHeight {
-		nodeHeight, err = c.GetHeight()
-		if err != nil {
-			return 0, "", err
-		}
-		tx, err := c.GetTransactionByHash(txHash)
-		if err != nil {
-			return 0, "", err
-		}
-
-		if tx.BlockHeight.LargerThanZero() {
-			bh := big.Int(tx.BlockHeight)
-			return bh.Uint64(), *tx.BlockHash, nil
-		}
-		time.Sleep(time.Millisecond * time.Duration(Config.Tuning.ChainPollInteval))
-	}
-	return 0, "", fmt.Errorf("It is already height %v and %v still isn't in a block", nodeHeight, txHash)
-}
-
-// BroadcastTransaction differs from Client.PostTransaction() in that the latter just handles
-// the HTTP request via swagger, the former recalculates the txhash and compares it to the node's
-//  response after POSTing the transaction.
-func BroadcastTransaction(c PostTransactioner, txSignedBase64 string) (err error) {
-	// Get back to RLP to calculate txhash
-	txRLP, _ := Decode(txSignedBase64)
-
-	// calculate the hash of the decoded txRLP
-	rlpTxHashRaw, _ := hash(txRLP)
-	// base58/64 encode the hash with the th_ prefix
-	signedEncodedTxHash := Encode(PrefixTransactionHash, rlpTxHashRaw)
-
-	// send it to the network
-	err = c.PostTransaction(txSignedBase64, signedEncodedTxHash)
-	return
-}
-
 // Context stores relevant context (node connection, account address) that one might not want to spell out each time one creates a transaction
 type Context struct {
-	Client  GetHeightAccounter
+	Client  GetHeightAccountNamer
 	Address string
+	Helpers
 }
 
 // NewContext ensures that every field of a Context is filled out.
@@ -147,7 +118,7 @@ func (c *Context) SpendTx(senderID string, recipientID string, amount, fee big.I
 // NamePreclaimTx creates a name preclaim transaction and salt (required for claiming)
 // It should return the Tx struct, not the base64 encoded RLP, to ease subsequent inspection.
 func (c *Context) NamePreclaimTx(name string, fee big.Int) (tx NamePreclaimTx, nameSalt *big.Int, err error) {
-	txTTL, accountNonce, err := GetTTLNonce(c.Client, c.Address, Config.Client.TTL)
+	txTTL, accountNonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -170,7 +141,7 @@ func (c *Context) NamePreclaimTx(name string, fee big.Int) (tx NamePreclaimTx, n
 
 // NameClaimTx creates a claim transaction
 func (c *Context) NameClaimTx(name string, nameSalt big.Int, fee big.Int) (tx NameClaimTx, err error) {
-	txTTL, accountNonce, err := GetTTLNonce(c.Client, c.Address, Config.Client.TTL)
+	txTTL, accountNonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -183,13 +154,13 @@ func (c *Context) NameClaimTx(name string, nameSalt big.Int, fee big.Int) (tx Na
 
 // NameUpdateTx perform a name update
 func (c *Context) NameUpdateTx(name string, targetAddress string) (tx NameUpdateTx, err error) {
-	txTTL, accountNonce, err := GetTTLNonce(c.Client, c.Address, Config.Client.TTL)
+	txTTL, accountNonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
 
 	encodedNameHash := Encode(PrefixName, Namehash(name))
-	absNameTTL, err := GetTTL(c.Client, Config.Client.Names.NameTTL)
+	absNameTTL, err := c.Helpers.GetTTL(Config.Client.Names.NameTTL)
 	if err != nil {
 		return NameUpdateTx{}, err
 	}
@@ -201,7 +172,7 @@ func (c *Context) NameUpdateTx(name string, targetAddress string) (tx NameUpdate
 
 // NameTransferTx transfer a name to another owner
 func (c *Context) NameTransferTx(name string, recipientAddress string) (tx NameTransferTx, err error) {
-	txTTL, accountNonce, err := GetTTLNonce(c.Client, c.Address, Config.Client.TTL)
+	txTTL, accountNonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -214,7 +185,7 @@ func (c *Context) NameTransferTx(name string, recipientAddress string) (tx NameT
 
 // NameRevokeTx revoke a name
 func (c *Context) NameRevokeTx(name string) (tx NameRevokeTx, err error) {
-	txTTL, accountNonce, err := GetTTLNonce(c.Client, c.Address, Config.Client.TTL)
+	txTTL, accountNonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -227,7 +198,7 @@ func (c *Context) NameRevokeTx(name string) (tx NameRevokeTx, err error) {
 
 // OracleRegisterTx create a new oracle
 func (c *Context) OracleRegisterTx(querySpec, responseSpec string, queryFee big.Int, oracleTTLType, oracleTTLValue uint64, abiVersion uint16) (tx OracleRegisterTx, err error) {
-	ttl, nonce, err := GetTTLNonce(c.Client, c.Address, Config.Client.TTL)
+	ttl, nonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return OracleRegisterTx{}, err
 	}
@@ -238,7 +209,7 @@ func (c *Context) OracleRegisterTx(querySpec, responseSpec string, queryFee big.
 
 // OracleExtendTx extend the lifetime of an existing oracle
 func (c *Context) OracleExtendTx(oracleID string, ttlType, ttlValue uint64) (tx OracleExtendTx, err error) {
-	ttl, nonce, err := GetTTLNonce(c.Client, c.Address, Config.Client.TTL)
+	ttl, nonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return OracleExtendTx{}, err
 	}
@@ -249,7 +220,7 @@ func (c *Context) OracleExtendTx(oracleID string, ttlType, ttlValue uint64) (tx 
 
 // OracleQueryTx ask something of an oracle
 func (c *Context) OracleQueryTx(OracleID, Query string, QueryFee big.Int, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64) (tx OracleQueryTx, err error) {
-	ttl, nonce, err := GetTTLNonce(c.Client, c.Address, Config.Client.TTL)
+	ttl, nonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return OracleQueryTx{}, err
 	}
@@ -260,7 +231,7 @@ func (c *Context) OracleQueryTx(OracleID, Query string, QueryFee big.Int, QueryT
 
 // OracleRespondTx the oracle responds by sending this transaction
 func (c *Context) OracleRespondTx(OracleID string, QueryID string, Response string, TTLType uint64, TTLValue uint64) (tx OracleRespondTx, err error) {
-	ttl, nonce, err := GetTTLNonce(c.Client, c.Address, Config.Client.TTL)
+	ttl, nonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return OracleRespondTx{}, err
 	}
@@ -271,7 +242,7 @@ func (c *Context) OracleRespondTx(OracleID string, QueryID string, Response stri
 
 // ContractCreateTx returns a transaction for creating a contract on the chain
 func (c *Context) ContractCreateTx(Code string, CallData string, VMVersion, AbiVersion uint16, Deposit, Amount, Gas, GasPrice, Fee big.Int) (tx ContractCreateTx, err error) {
-	ttl, nonce, err := GetTTLNonce(c.Client, c.Address, Config.Client.TTL)
+	ttl, nonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return ContractCreateTx{}, err
 	}
@@ -280,16 +251,26 @@ func (c *Context) ContractCreateTx(Code string, CallData string, VMVersion, AbiV
 	return tx, nil
 }
 
-type ContractCallHelper func(ContractID, CallData string, AbiVersion uint16, Amount, Gas, GasPrice, Fee big.Int) (tx ContractCallTx, err error)
-
 // ContractCallTx returns a transaction for calling a contract on the chain
 func (c *Context) ContractCallTx(ContractID, CallData string, AbiVersion uint16, Amount, Gas, GasPrice, Fee big.Int) (tx ContractCallTx, err error) {
-	ttl, nonce, err := GetTTLNonce(c.Client, c.Address, Config.Client.TTL)
+	ttl, nonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return ContractCallTx{}, err
 	}
 
 	tx = NewContractCallTx(c.Address, nonce, ContractID, Amount, Gas, GasPrice, AbiVersion, CallData, Fee, ttl)
+	return tx, nil
+}
+
+// ContractCallTxByName returns a transaction for calling a contract on the chain
+func (c *Context) ContractCallTxByName(Name, CallData string, AbiVersion uint16, Amount, Gas, GasPrice, Fee big.Int) (tx ContractCallTx, err error) {
+	ttl, nonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
+	if err != nil {
+		return ContractCallTx{}, err
+	}
+	contractID, err := c.Helpers.GetName(Name)
+
+	tx = NewContractCallTx(c.Address, nonce, contractID, Amount, Gas, GasPrice, AbiVersion, CallData, Fee, ttl)
 	return tx, nil
 }
 
@@ -367,5 +348,44 @@ func VerifySignedTx(accountID string, txSigned string, networkID string) (valid 
 	if err != nil {
 		return
 	}
+	return
+}
+
+// WaitForTransactionUntilHeight waits for a transaction until heightLimit (inclusive) is reached
+func WaitForTransactionUntilHeight(c getTransactionByHashHeighter, txHash string, untilHeight uint64) (blockHeight uint64, blockHash string, err error) {
+	var nodeHeight uint64
+	for nodeHeight <= untilHeight {
+		nodeHeight, err = c.GetHeight()
+		if err != nil {
+			return 0, "", err
+		}
+		tx, err := c.GetTransactionByHash(txHash)
+		if err != nil {
+			return 0, "", err
+		}
+
+		if tx.BlockHeight.LargerThanZero() {
+			bh := big.Int(tx.BlockHeight)
+			return bh.Uint64(), *tx.BlockHash, nil
+		}
+		time.Sleep(time.Millisecond * time.Duration(Config.Tuning.ChainPollInteval))
+	}
+	return 0, "", fmt.Errorf("It is already height %v and %v still isn't in a block", nodeHeight, txHash)
+}
+
+// BroadcastTransaction differs from Client.PostTransaction() in that the latter just handles
+// the HTTP request via swagger, the former recalculates the txhash and compares it to the node's
+//  response after POSTing the transaction.
+func BroadcastTransaction(c PostTransactioner, txSignedBase64 string) (err error) {
+	// Get back to RLP to calculate txhash
+	txRLP, _ := Decode(txSignedBase64)
+
+	// calculate the hash of the decoded txRLP
+	rlpTxHashRaw, _ := hash(txRLP)
+	// base58/64 encode the hash with the th_ prefix
+	signedEncodedTxHash := Encode(PrefixTransactionHash, rlpTxHashRaw)
+
+	// send it to the network
+	err = c.PostTransaction(txSignedBase64, signedEncodedTxHash)
 	return
 }

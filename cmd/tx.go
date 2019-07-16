@@ -28,11 +28,12 @@ var txSpendCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(3),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		aeNode := newAeNode()
-		return txSpendFunc(aeNode, args)
+		u := aeternity.Helpers{}
+		return txSpendFunc(aeNode, u, args)
 	},
 }
 
-func txSpendFunc(conn aeternity.GetAccounter, args []string) (err error) {
+func txSpendFunc(conn aeternity.GetAccounter, h aeternity.HelpersInterface, args []string) (err error) {
 	var (
 		sender    string
 		recipient string
@@ -62,7 +63,7 @@ func txSpendFunc(conn aeternity.GetAccounter, args []string) (err error) {
 
 	// Connect to the node to find out sender nonce only
 	if nonce == 0 {
-		nonce, err = aeternity.GetNextNonce(conn, sender)
+		nonce, err = h.GetNextNonce(sender)
 		if err != nil {
 			return err
 		}
@@ -95,7 +96,8 @@ var txContractCreateCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(3),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		aeNode := newAeNode()
-		return txContractCreateFunc(aeNode, args)
+		u := aeternity.Helpers{}
+		return txContractCreateFunc(aeNode, u, args)
 	},
 }
 
@@ -104,7 +106,7 @@ type getHeightAccounter interface {
 	aeternity.GetAccounter
 }
 
-func txContractCreateFunc(conn getHeightAccounter, args []string) (err error) {
+func txContractCreateFunc(conn aeternity.GetHeightAccountNamer, h aeternity.HelpersInterface, args []string) (err error) {
 	var (
 		owner    string
 		contract string
@@ -128,6 +130,7 @@ func txContractCreateFunc(conn getHeightAccounter, args []string) (err error) {
 	c := aeternity.Context{
 		Client:  conn,
 		Address: owner,
+		Helpers: h.(aeternity.Helpers),
 	}
 
 	tx, err := c.ContractCreateTx(contract, calldata, aeternity.Config.Client.Contracts.VMVersion, aeternity.Config.Client.Contracts.ABIVersion, aeternity.Config.Client.Contracts.Deposit, aeternity.Config.Client.Contracts.Amount, aeternity.Config.Client.Contracts.Gas, aeternity.Config.Client.Contracts.GasPrice, aeternity.Config.Client.Fee)
