@@ -15,7 +15,7 @@ func TestCompiler(t *testing.T) {
 		}
 	})
 	t.Run("CompileContract", func(t *testing.T) {
-		_, err := c.CompileContract("contract Identity =\n  type state = ()\n  function main(z : int) = z")
+		_, err := c.CompileContract("contract Identity =\n  type state = ()\n  entrypoint main(z : int) = z")
 		if err != nil {
 			t.Error(err)
 		}
