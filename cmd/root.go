@@ -74,6 +74,7 @@ func init() {
 	// will be global for your application.
 	RootCmd.PersistentFlags().StringVarP(&aeternity.Config.Node.URL, "external-api", "u", aeternity.Config.Node.URL, "node external API endpoint")
 	RootCmd.PersistentFlags().StringVarP(&aeternity.Config.Node.NetworkID, "network-id", "n", aeternity.Config.Node.NetworkID, "network ID for custom private net")
+	RootCmd.PersistentFlags().StringVarP(&compilerURL, "compiler-url", "c", "http://localhost:3080", "Compiler URL")
 	RootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "enable debug")
 	RootCmd.PersistentFlags().BoolVar(&aeternity.Config.Tuning.OutputFormatJSON, "json", false, "print output in json format")
 }

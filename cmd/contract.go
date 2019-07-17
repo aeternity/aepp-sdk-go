@@ -161,5 +161,4 @@ func init() {
 	contractCmd.AddCommand(compileCmd)
 	contractCmd.AddCommand(encodeCalldataCmd)
 	contractCmd.AddCommand(decodeCalldataCmd)
-	contractCmd.PersistentFlags().StringVarP(&compilerURL, "compiler-url", "c", "http://localhost:3080", "Compiler URL")
 }
