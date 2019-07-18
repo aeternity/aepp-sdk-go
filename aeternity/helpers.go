@@ -1,7 +1,6 @@
 package aeternity
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"math/big"
@@ -32,7 +31,10 @@ type HelpersInterface interface {
 	GetTTL(offset uint64) (ttl uint64, err error)
 	GetNextNonce(accountID string) (nextNonce uint64, err error)
 	GetTTLNonce(accountID string, offset uint64) (height uint64, nonce uint64, err error)
-	GetName(name string) (accountID string, err error)
+	GetAccountsByName(name string) (addresses []string, err error)
+	GetOraclesByName(name string) (oracleIDs []string, err error)
+	GetContractsByName(name string) (contracts []string, err error)
+	GetChannelsByName(name string) (channels []string, err error)
 }
 
 // Helpers is a struct to contain the GetTTLNonce helper functions and feed them
@@ -77,19 +79,38 @@ func (h Helpers) GetTTLNonce(accountID string, offset uint64) (height uint64, no
 	return
 }
 
-// GetName returns the first account_pubkey entry that it finds in a name's Pointers.
-func (h Helpers) GetName(name string) (address string, err error) {
+// getAnythingByName is the underlying implementation of Get*ByName
+func (h Helpers) getAnythingByName(name string, key string) (results []string, err error) {
 	n, err := h.node.GetNameEntryByName(name)
 	if err != nil {
-		return "", err
+		return []string{}, err
 	}
 	for _, p := range n.Pointers {
-		if *p.Key == "account_pubkey" {
-			return *p.ID, nil
+		if *p.Key == key {
+			results = append(results, *p.ID)
 		}
 	}
-	s := fmt.Sprintf("No account_pubkey entry found for %s", name)
-	return "", errors.New(s)
+	return results, nil
+}
+
+// GetAccountsByName returns any account_pubkey entries that it finds in a name's Pointers.
+func (h Helpers) GetAccountsByName(name string) (addresses []string, err error) {
+	return h.getAnythingByName(name, "account_pubkey")
+}
+
+// GetOraclesByName returns any oracle_pubkey entries that it finds in a name's Pointers.
+func (h Helpers) GetOraclesByName(name string) (oracleIDs []string, err error) {
+	return h.getAnythingByName(name, "oracle_pubkey")
+}
+
+// GetContractsByName returns any contract_pubkey entries that it finds in a name's Pointers.
+func (h Helpers) GetContractsByName(name string) (contracts []string, err error) {
+	return h.getAnythingByName(name, "contract_pubkey")
+}
+
+// GetChannelsByName returns any channel entries that it finds in a name's Pointers.
+func (h Helpers) GetChannelsByName(name string) (channels []string, err error) {
+	return h.getAnythingByName(name, "channel")
 }
 
 // Context stores relevant context (node connection, account address) that one might not want to spell out each time one creates a transaction
@@ -259,18 +280,6 @@ func (c *Context) ContractCallTx(ContractID, CallData string, AbiVersion uint16,
 	}
 
 	tx = NewContractCallTx(c.Address, nonce, ContractID, Amount, Gas, GasPrice, AbiVersion, CallData, Fee, ttl)
-	return tx, nil
-}
-
-// ContractCallTxByName returns a transaction for calling a contract on the chain
-func (c *Context) ContractCallTxByName(Name, CallData string, AbiVersion uint16, Amount, Gas, GasPrice, Fee big.Int) (tx ContractCallTx, err error) {
-	ttl, nonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
-	if err != nil {
-		return ContractCallTx{}, err
-	}
-	contractID, err := c.Helpers.GetName(Name)
-
-	tx = NewContractCallTx(c.Address, nonce, contractID, Amount, Gas, GasPrice, AbiVersion, CallData, Fee, ttl)
 	return tx, nil
 }
 
