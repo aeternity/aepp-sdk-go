@@ -5,6 +5,30 @@ import (
 	models "github.com/aeternity/aepp-sdk-go/swagguard/node/models"
 )
 
+type mockHelpers struct{}
+
+func (mh mockHelpers) GetTTL(uint64) (uint64, error) {
+	return 500, nil
+}
+func (mh mockHelpers) GetNextNonce(string) (uint64, error) {
+	return 1337, nil
+}
+func (mh mockHelpers) GetTTLNonce(string, uint64) (uint64, uint64, error) {
+	return 500, 1337, nil
+}
+func (mh mockHelpers) GetAccountsByName(string) ([]string, error) {
+	return []string{"ak_address"}, nil
+}
+func (mh mockHelpers) GetOraclesByName(string) ([]string, error) {
+	return []string{"ok_address"}, nil
+}
+func (mh mockHelpers) GetContractsByName(string) ([]string, error) {
+	return []string{"ct_address"}, nil
+}
+func (mh mockHelpers) GetChannelsByName(string) ([]string, error) {
+	return []string{"channel address?"}, nil
+}
+
 type mockGetHeighter struct {
 	h uint64
 }
