@@ -34,7 +34,7 @@ func TestSpendTx(t *testing.T) {
 	ctx := aeternity.NewContext(node, alice.Address)
 
 	// create the SpendTransaction
-	tx, err := ctx.SpendTx(alice.Address, bob.Address, *amount, *fee, msg)
+	tx, err := ctx.SpendTx(alice.Address, bob.Address, *amount, *fee, []byte(msg))
 	if err != nil {
 		t.Error(err)
 	}

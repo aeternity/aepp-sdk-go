@@ -1,11 +1,9 @@
 package aeternity
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"math/big"
-	"unicode/utf8"
 
 	"github.com/aeternity/aepp-sdk-go/swagguard/node/models"
 	"github.com/aeternity/aepp-sdk-go/utils"
@@ -147,7 +145,7 @@ type SpendTx struct {
 	RecipientID string
 	Amount      big.Int
 	Fee         big.Int
-	Payload     string
+	Payload     []byte
 	TTL         uint64
 	Nonce       uint64
 }
@@ -180,11 +178,12 @@ func (tx *SpendTx) RLP() (rlpRawMsg []byte, err error) {
 
 // JSON representation of a Tx is useful for querying the node's debug endpoint
 func (tx *SpendTx) JSON() (string, error) {
+	baseEncodedPayload := Encode(PrefixByteArray, tx.Payload)
 	swaggerT := models.SpendTx{
 		Amount:      utils.BigInt(tx.Amount),
 		Fee:         utils.BigInt(tx.Fee),
 		Nonce:       tx.Nonce,
-		Payload:     &tx.Payload,
+		Payload:     &baseEncodedPayload,
 		RecipientID: &tx.RecipientID,
 		SenderID:    &tx.SenderID,
 		TTL:         tx.TTL,
@@ -209,12 +208,8 @@ func (tx *SpendTx) FeeEstimate() (*big.Int, error) {
 }
 
 // NewSpendTx is a constructor for a SpendTx struct
-func NewSpendTx(senderID, recipientID string, amount, fee big.Int, payload string, ttl, nonce uint64) (SpendTx, error) {
-	payloadValid := utf8.ValidString(payload)
-	if !payloadValid {
-		return SpendTx{}, errors.New("Error: SpendTx payload must be valid UTF-8")
-	}
-	return SpendTx{senderID, recipientID, amount, fee, payload, ttl, nonce}, nil
+func NewSpendTx(senderID, recipientID string, amount, fee big.Int, payload []byte, ttl, nonce uint64) SpendTx {
+	return SpendTx{senderID, recipientID, amount, fee, payload, ttl, nonce}
 }
 
 // NamePreclaimTx represents a transaction where one reserves a name on AENS without revealing it yet

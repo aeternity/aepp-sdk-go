@@ -150,14 +150,14 @@ func NewContext(client *Node, address string) Context {
 }
 
 // SpendTx creates a spend transaction
-func (c *Context) SpendTx(senderID string, recipientID string, amount, fee big.Int, payload string) (tx SpendTx, err error) {
+func (c *Context) SpendTx(senderID string, recipientID string, amount, fee big.Int, payload []byte) (tx SpendTx, err error) {
 	txTTL, accountNonce, err := GetTTLNonce(c.Client, c.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
 
 	// create the transaction
-	return NewSpendTx(senderID, recipientID, amount, fee, payload, txTTL, accountNonce)
+	return NewSpendTx(senderID, recipientID, amount, fee, payload, txTTL, accountNonce), err
 }
 
 // NamePreclaimTx creates a name preclaim transaction and salt (required for claiming)
