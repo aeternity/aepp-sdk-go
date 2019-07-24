@@ -66,10 +66,7 @@ func txSpendFunc(cmd *cobra.Command, args []string) (err error) {
 		}
 	}
 
-	tx, err := aeternity.NewSpendTx(sender, recipient, *amount, *feeBigInt, spendTxPayload, ttl, nonce)
-	if err != nil {
-		return err
-	}
+	tx := aeternity.NewSpendTx(sender, recipient, *amount, *feeBigInt, []byte(spendTxPayload), ttl, nonce)
 	base64Tx, err := aeternity.BaseEncodeTx(&tx)
 	if err != nil {
 		return err
@@ -224,5 +221,5 @@ func init() {
 	txSpendCmd.Flags().StringVar(&fee, "fee", aeternity.Config.Client.Fee.String(), fmt.Sprintf("Set the transaction fee (default=%s)", aeternity.Config.Client.Fee.String()))
 	txSpendCmd.Flags().Uint64Var(&ttl, "ttl", aeternity.Config.Client.TTL, fmt.Sprintf("Set the TTL in keyblocks (default=%d)", aeternity.Config.Client.TTL))
 	txSpendCmd.Flags().Uint64Var(&nonce, "nonce", 0, fmt.Sprint("Set the sender account nonce, if not the chain will be queried for its value"))
-	txSpendCmd.Flags().StringVar(&spendTxPayload, "payload", "", fmt.Sprint("Optional text payload for Spend Transactions"))
+	txSpendCmd.Flags().StringVar(&spendTxPayload, "payload", "", fmt.Sprint("Optional text payload for Spend Transactions, which will be turned into a bytearray"))
 }

@@ -39,6 +39,7 @@ const (
 	PrefixTransactionHash       = HashPrefix("th_")
 
 	// Base 64 encoded transactions
+	PrefixByteArray         = HashPrefix("ba_")
 	PrefixContractByteArray = HashPrefix("cb_")
 	PrefixOracleResponse    = HashPrefix("or_")
 	PrefixOracleQuery       = HashPrefix("ov_")
@@ -50,6 +51,7 @@ const (
 
 // store the encoding
 var objectEncoding = map[HashPrefix]ObjectEncoding{
+	PrefixByteArray:             Base64c,
 	PrefixContractByteArray:     Base64c,
 	PrefixOracleResponse:        Base64c,
 	PrefixOracleQuery:           Base64c,

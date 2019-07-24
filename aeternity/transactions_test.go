@@ -24,7 +24,7 @@ func TestSpendTx_RLP(t *testing.T) {
 		recipientID string
 		amount      big.Int
 		fee         big.Int
-		payload     string
+		payload     []byte
 		ttl         uint64
 		nonce       uint64
 	}
@@ -41,7 +41,7 @@ func TestSpendTx_RLP(t *testing.T) {
 				recipientID: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
 				amount:      *utils.NewIntFromUint64(10),
 				fee:         *utils.NewIntFromUint64(10),
-				payload:     "Hello World",
+				payload:     []byte("Hello World"),
 				ttl:         uint64(10),
 				nonce:       uint64(1),
 			},
@@ -55,7 +55,7 @@ func TestSpendTx_RLP(t *testing.T) {
 				recipientID: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
 				amount:      *utils.NewIntFromUint64(0),
 				fee:         *utils.NewIntFromUint64(10),
-				payload:     "Hello World",
+				payload:     []byte("Hello World"),
 				ttl:         uint64(10),
 				nonce:       uint64(1),
 			},
@@ -65,7 +65,7 @@ func TestSpendTx_RLP(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tx, _ := NewSpendTx(tt.fields.senderID, tt.fields.recipientID,
+			tx := NewSpendTx(tt.fields.senderID, tt.fields.recipientID,
 				tt.fields.amount,
 				tt.fields.fee,
 				tt.fields.payload,

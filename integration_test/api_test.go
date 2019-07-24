@@ -112,7 +112,7 @@ func TestAPI(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Error in GetTTLNonce(): %v", err)
 	}
-	spendTx, _ := aeternity.NewSpendTx(sender, bob.Address, *big.NewInt(1000), aeternity.Config.Client.Fee, "", ttl, nonce)
+	spendTx := aeternity.NewSpendTx(sender, bob.Address, *big.NewInt(1000), aeternity.Config.Client.Fee, []byte(""), ttl, nonce)
 	_, _, _ = signBroadcastWaitForTransaction(t, &spendTx, alice, privateNet)
 
 	name := randomName(6)
