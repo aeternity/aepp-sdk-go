@@ -12,7 +12,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// txCmd implments the tx command
+// txCmd implments the tx command. All tx subcommands should work offline,
+// without any connection to the node.
 var txCmd = &cobra.Command{
 	Use:   "tx SUBCOMMAND [ARGS]...",
 	Short: "Handle transactions creation",
@@ -28,12 +29,12 @@ var txSpendCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(3),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		aeNode := newAeNode()
-		u := aeternity.Helpers{}
-		return txSpendFunc(aeNode, u, args)
+		u := aeternity.Helpers{Node: aeNode}
+		return txSpendFunc(u, args)
 	},
 }
 
-func txSpendFunc(conn aeternity.GetAccounter, h aeternity.HelpersInterface, args []string) (err error) {
+func txSpendFunc(helpers aeternity.HelpersInterface, args []string) (err error) {
 	var (
 		sender    string
 		recipient string
@@ -63,7 +64,7 @@ func txSpendFunc(conn aeternity.GetAccounter, h aeternity.HelpersInterface, args
 
 	// Connect to the node to find out sender nonce only
 	if nonce == 0 {
-		nonce, err = h.GetNextNonce(sender)
+		nonce, err = helpers.GetNextNonce(sender)
 		if err != nil {
 			return err
 		}
@@ -77,13 +78,13 @@ func txSpendFunc(conn aeternity.GetAccounter, h aeternity.HelpersInterface, args
 
 	// Sender, Recipient, Amount, Ttl, Fee, Nonce, Payload, Encoded
 	Pp(
-		"Sender acount", sender,
-		"Recipient account", recipient,
-		"Amount", amount,
-		"TTL", ttl,
-		"Fee", fee,
-		"Nonce", nonce,
-		"Payload", spendTxPayload,
+		"Sender acount", tx.SenderID,
+		"Recipient account", tx.RecipientID,
+		"Amount", tx.Amount,
+		"TTL", tx.TTL,
+		"Fee", tx.Fee,
+		"Nonce", tx.Nonce,
+		"Payload", tx.Payload,
 		"Encoded", base64Tx,
 	)
 	return nil
@@ -96,8 +97,8 @@ var txContractCreateCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(3),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		aeNode := newAeNode()
-		u := aeternity.Helpers{}
-		return txContractCreateFunc(aeNode, u, args)
+		u := aeternity.Helpers{Node: aeNode}
+		return txContractCreateFunc(u, args)
 	},
 }
 
@@ -106,7 +107,7 @@ type getHeightAccounter interface {
 	aeternity.GetAccounter
 }
 
-func txContractCreateFunc(conn aeternity.GetHeightAccountNamer, h aeternity.HelpersInterface, args []string) (err error) {
+func txContractCreateFunc(h aeternity.HelpersInterface, args []string) (err error) {
 	var (
 		owner    string
 		contract string
@@ -127,11 +128,7 @@ func txContractCreateFunc(conn aeternity.GetHeightAccountNamer, h aeternity.Help
 		return errors.New("Error, missing or invalid init calldata bytecode")
 	}
 
-	c := aeternity.Context{
-		Client:  conn,
-		Address: owner,
-		Helpers: h.(aeternity.Helpers),
-	}
+	c := aeternity.NewContext(owner, h)
 
 	tx, err := c.ContractCreateTx(contract, calldata, aeternity.Config.Client.Contracts.VMVersion, aeternity.Config.Client.Contracts.ABIVersion, aeternity.Config.Client.Contracts.Deposit, aeternity.Config.Client.Contracts.Amount, aeternity.Config.Client.Contracts.Gas, aeternity.Config.Client.Contracts.GasPrice, aeternity.Config.Client.Fee)
 
