@@ -106,18 +106,18 @@ func TestAPI(t *testing.T) {
 
 	alice, bob := setupAccounts(t)
 
+	name := randomName(6)
+	helpers := aeternity.Helpers{Node: privateNet}
+	aensAlice := aeternity.NewContext(alice.Address, helpers)
+	aensBob := aeternity.NewContext(bob.Address, helpers)
 	// SpendTx
 	fmt.Println("SpendTx")
-	ttl, nonce, err := aeternity.GetTTLNonce(privateNet, sender, aeternity.Config.Client.TTL)
+	spendTx, err := aensAlice.SpendTx(sender, bob.Address, *big.NewInt(1000), aeternity.Config.Client.Fee, []byte(""))
 	if err != nil {
-		t.Fatalf("Error in GetTTLNonce(): %v", err)
+		t.Fatal(err)
 	}
-	spendTx := aeternity.NewSpendTx(sender, bob.Address, *big.NewInt(1000), aeternity.Config.Client.Fee, []byte(""), ttl, nonce)
 	_, _, _ = signBroadcastWaitForTransaction(t, &spendTx, alice, privateNet)
 
-	name := randomName(6)
-	aensAlice := aeternity.NewContext(privateNet, alice.Address)
-	aensBob := aeternity.NewContext(privateNet, bob.Address)
 	// NamePreClaimTx
 	fmt.Println("NamePreClaimTx")
 	preclaimTx, salt, err := aensAlice.NamePreclaimTx(name, aeternity.Config.Client.Fee)
@@ -175,7 +175,7 @@ func TestAPI(t *testing.T) {
 	}
 	_, _, _ = signBroadcastWaitForTransaction(t, &claimTx, alice, privateNet)
 
-	oracleAlice := aeternity.NewContext(privateNet, alice.Address)
+	oracleAlice := aeternity.NewContext(alice.Address, helpers)
 	// OracleRegisterTx
 	fmt.Println("OracleRegisterTx")
 	register, err := oracleAlice.OracleRegisterTx("hello", "helloback", *big.NewInt(1000), uint64(0), uint64(100), 0)
