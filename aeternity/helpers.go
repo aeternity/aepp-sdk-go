@@ -9,8 +9,7 @@ import (
 	"time"
 )
 
-// GetHeightAccountNamer is used by GetTTLNonce/GetName/GetNonce helper
-// functions (otherwise known as the Helper{} methods) to describe the
+// GetHeightAccountNamer is used by Helper{} methods to describe the
 // capabilities of whatever should be passed in as conn
 type GetHeightAccountNamer interface {
 	GetHeighter
@@ -40,12 +39,12 @@ type HelpersInterface interface {
 // Helpers is a struct to contain the GetTTLNonce helper functions and feed them
 // with a node connection
 type Helpers struct {
-	node GetHeightAccountNamer
+	Node GetHeightAccountNamer
 }
 
 // GetTTL returns the chain height + offset
 func (h Helpers) GetTTL(offset uint64) (ttl uint64, err error) {
-	height, err := h.node.GetHeight()
+	height, err := h.Node.GetHeight()
 	if err != nil {
 		return
 	}
@@ -57,7 +56,7 @@ func (h Helpers) GetTTL(offset uint64) (ttl uint64, err error) {
 
 // GetNextNonce retrieves the current accountNonce and adds 1 to it for use in transaction building
 func (h Helpers) GetNextNonce(accountID string) (nextNonce uint64, err error) {
-	a, err := h.node.GetAccount(accountID)
+	a, err := h.Node.GetAccount(accountID)
 	if err != nil {
 		return
 	}
@@ -81,7 +80,7 @@ func (h Helpers) GetTTLNonce(accountID string, offset uint64) (height uint64, no
 
 // getAnythingByName is the underlying implementation of Get*ByName
 func (h Helpers) getAnythingByName(name string, key string) (results []string, err error) {
-	n, err := h.node.GetNameEntryByName(name)
+	n, err := h.Node.GetNameEntryByName(name)
 	if err != nil {
 		return []string{}, err
 	}
@@ -115,19 +114,18 @@ func (h Helpers) GetChannelsByName(name string) (channels []string, err error) {
 
 // Context stores relevant context (node connection, account address) that one might not want to spell out each time one creates a transaction
 type Context struct {
-	Client  GetHeightAccountNamer
 	Address string
-	Helpers
+	Helpers HelpersInterface
 }
 
 // NewContext ensures that every field of a Context is filled out.
-func NewContext(client *Node, address string) Context {
-	return Context{Client: client, Address: address}
+func NewContext(address string, helpers HelpersInterface) Context {
+	return Context{Helpers: helpers, Address: address}
 }
 
 // SpendTx creates a spend transaction
 func (c *Context) SpendTx(senderID string, recipientID string, amount, fee big.Int, payload []byte) (tx SpendTx, err error) {
-	txTTL, accountNonce, err := GetTTLNonce(c.Client, c.Address, Config.Client.TTL)
+	txTTL, accountNonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -148,13 +146,13 @@ func (c *Context) NamePreclaimTx(name string, fee big.Int) (tx NamePreclaimTx, n
 	// since the salt is 32 bytes long, you must use a big.Int to convert it into an integer
 	cm, nameSalt, err := generateCommitmentID(name)
 	if err != nil {
-		return NamePreclaimTx{}, new(big.Int), err
+		return
 	}
 
 	// build the transaction
 	tx = NewNamePreclaimTx(c.Address, cm, fee, txTTL, accountNonce)
 	if err != nil {
-		return NamePreclaimTx{}, new(big.Int), err
+		return
 	}
 
 	return
