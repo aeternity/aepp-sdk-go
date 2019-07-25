@@ -118,9 +118,11 @@ type Context struct {
 	Helpers HelpersInterface
 }
 
-// NewContext ensures that every field of a Context is filled out.
-func NewContext(address string, helpers HelpersInterface) Context {
-	return Context{Helpers: helpers, Address: address}
+// NewContextFromURL is a convenience function that associates a Node with a
+// Helper struct for you.
+func NewContextFromURL(url string, address string) Context {
+	h := Helpers{Node: NewNode(url, false)}
+	return Context{Helpers: h, Address: address}
 }
 
 // SpendTx creates a spend transaction
