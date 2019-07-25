@@ -108,11 +108,11 @@ func TestAPI(t *testing.T) {
 
 	name := randomName(6)
 	helpers := aeternity.Helpers{Node: privateNet}
-	aensAlice := aeternity.NewContext(alice.Address, helpers)
-	aensBob := aeternity.NewContext(bob.Address, helpers)
+	ctxAlice := aeternity.NewContext(alice.Address, helpers)
+	ctxBob := aeternity.NewContext(bob.Address, helpers)
 	// SpendTx
 	fmt.Println("SpendTx")
-	spendTx, err := aensAlice.SpendTx(sender, bob.Address, *big.NewInt(1000), aeternity.Config.Client.Fee, []byte(""))
+	spendTx, err := ctxAlice.SpendTx(sender, bob.Address, *big.NewInt(1000), aeternity.Config.Client.Fee, []byte(""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -120,7 +120,7 @@ func TestAPI(t *testing.T) {
 
 	// NamePreClaimTx
 	fmt.Println("NamePreClaimTx")
-	preclaimTx, salt, err := aensAlice.NamePreclaimTx(name, aeternity.Config.Client.Fee)
+	preclaimTx, salt, err := ctxAlice.NamePreclaimTx(name, aeternity.Config.Client.Fee)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -128,7 +128,7 @@ func TestAPI(t *testing.T) {
 
 	// NameClaimTx
 	fmt.Println("NameClaimTx")
-	claimTx, err := aensAlice.NameClaimTx(name, *salt, aeternity.Config.Client.Fee)
+	claimTx, err := ctxAlice.NameClaimTx(name, *salt, aeternity.Config.Client.Fee)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -136,7 +136,7 @@ func TestAPI(t *testing.T) {
 
 	// NameUpdateTx
 	fmt.Println("NameUpdateTx")
-	updateTx, err := aensAlice.NameUpdateTx(name, alice.Address)
+	updateTx, err := ctxAlice.NameUpdateTx(name, alice.Address)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -144,7 +144,7 @@ func TestAPI(t *testing.T) {
 
 	// NameTransferTx
 	fmt.Println("NameTransferTx")
-	transferTx, err := aensAlice.NameTransferTx(name, bob.Address)
+	transferTx, err := ctxAlice.NameTransferTx(name, bob.Address)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -152,7 +152,7 @@ func TestAPI(t *testing.T) {
 
 	// NameRevokeTx
 	fmt.Println("NameRevokeTx")
-	revokeTx, err := aensBob.NameRevokeTx(name)
+	revokeTx, err := ctxBob.NameRevokeTx(name)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -161,7 +161,7 @@ func TestAPI(t *testing.T) {
 	sentTxs.name = randomName(8)
 	// NamePreClaimTx
 	fmt.Println("NamePreClaimTx 2nd name for other tests")
-	preclaimTx, salt, err = aensAlice.NamePreclaimTx(sentTxs.name, aeternity.Config.Client.Fee)
+	preclaimTx, salt, err = ctxAlice.NamePreclaimTx(sentTxs.name, aeternity.Config.Client.Fee)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -169,16 +169,15 @@ func TestAPI(t *testing.T) {
 
 	// NameClaimTx
 	fmt.Println("NameClaimTx 2nd name for other tests")
-	claimTx, err = aensAlice.NameClaimTx(sentTxs.name, *salt, aeternity.Config.Client.Fee)
+	claimTx, err = ctxAlice.NameClaimTx(sentTxs.name, *salt, aeternity.Config.Client.Fee)
 	if err != nil {
 		t.Fatal(err)
 	}
 	_, _, _ = signBroadcastWaitForTransaction(t, &claimTx, alice, privateNet)
 
-	oracleAlice := aeternity.NewContext(alice.Address, helpers)
 	// OracleRegisterTx
 	fmt.Println("OracleRegisterTx")
-	register, err := oracleAlice.OracleRegisterTx("hello", "helloback", *big.NewInt(1000), uint64(0), uint64(100), 0)
+	register, err := ctxAlice.OracleRegisterTx("hello", "helloback", *big.NewInt(1000), uint64(0), uint64(100), 0)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -187,7 +186,7 @@ func TestAPI(t *testing.T) {
 	// OracleExtendTx
 	fmt.Println("OracleExtendTx")
 	sentTxs.oracleID = strings.Replace(alice.Address, "ak_", "ok_", 1)
-	extend, err := oracleAlice.OracleExtendTx(sentTxs.oracleID, 0, 1000)
+	extend, err := ctxAlice.OracleExtendTx(sentTxs.oracleID, 0, 1000)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -195,7 +194,7 @@ func TestAPI(t *testing.T) {
 
 	// OracleQueryTx
 	fmt.Println("OracleQueryTx")
-	query, err := oracleAlice.OracleQueryTx(sentTxs.oracleID, "How was your day?", *big.NewInt(1000), 0, 100, 0, 100)
+	query, err := ctxAlice.OracleQueryTx(sentTxs.oracleID, "How was your day?", *big.NewInt(1000), 0, 100, 0, 100)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -212,7 +211,7 @@ func TestAPI(t *testing.T) {
 	}
 	delay(getOracleQueries)
 	oqID := oracleQueries.OracleQueries[0].ID
-	respond, err := oracleAlice.OracleRespondTx(sentTxs.oracleID, *oqID, "My day was fine thank you", 0, 100)
+	respond, err := ctxAlice.OracleRespondTx(sentTxs.oracleID, *oqID, "My day was fine thank you", 0, 100)
 	_, _, _ = signBroadcastWaitForTransaction(t, &respond, alice, privateNet)
 
 	t.Logf("%+v\n", sentTxs)
