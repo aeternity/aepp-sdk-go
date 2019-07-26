@@ -120,8 +120,8 @@ type Context struct {
 
 // NewContextFromURL is a convenience function that associates a Node with a
 // Helper struct for you.
-func NewContextFromURL(url string, address string) Context {
-	h := Helpers{Node: NewNode(url, false)}
+func NewContextFromURL(url string, address string, debug bool) Context {
+	h := Helpers{Node: NewNode(url, debug)}
 	return Context{Helpers: h, Address: address}
 }
 
