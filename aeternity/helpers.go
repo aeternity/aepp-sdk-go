@@ -387,10 +387,15 @@ func WaitForTransactionUntilHeight(c getTransactionByHashHeighter, txHash string
 //  response after POSTing the transaction.
 func BroadcastTransaction(c PostTransactioner, txSignedBase64 string) (err error) {
 	// Get back to RLP to calculate txhash
-	txRLP, _ := Decode(txSignedBase64)
-
+	txRLP, err := Decode(txSignedBase64)
+	if err != nil {
+		return err
+	}
 	// calculate the hash of the decoded txRLP
-	rlpTxHashRaw, _ := hash(txRLP)
+	rlpTxHashRaw, err := hash(txRLP)
+	if err != nil {
+		return err
+	}
 	// base58/64 encode the hash with the th_ prefix
 	signedEncodedTxHash := Encode(PrefixTransactionHash, rlpTxHashRaw)
 
