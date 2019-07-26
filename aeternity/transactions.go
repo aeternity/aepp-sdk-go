@@ -1106,3 +1106,72 @@ func NewContractCallTx(CallerID string, AccountNonce uint64, ContractID string, 
 		TTL:          TTL,
 	}
 }
+
+// GAAttachTx is a transaction that converts a plain old account (POA) into a
+// Generalized Account. The function in the contract that should be used for
+// authenticating transactions from that account is denoted by the parameter
+// AuthFunc.
+type GAAttachTx struct {
+	OwnerID      string
+	AccountNonce uint64
+	Code         string
+	AuthFunc     string
+	VMVersion    uint16
+	AbiVersion   uint16
+	Deposit      big.Int
+	Gas          big.Int
+	GasPrice     big.Int
+	Fee          big.Int
+	TTL          uint64
+	CallData     string
+}
+
+// RLP returns a byte serialized representation
+func (tx *GAAttachTx) RLP() (rlpRawMsg []byte, err error) {
+	aID, err := buildIDTag(IDTagAccount, tx.OwnerID)
+	if err != nil {
+		return
+	}
+	codeBinary, err := Decode(tx.Code)
+	if err != nil {
+		return
+	}
+	callDataBinary, err := Decode(tx.CallData)
+	if err != nil {
+		return
+	}
+
+	rlpRawMsg, err = buildRLPMessage(
+		ObjectTagGeneralizedAccountAttachTransaction,
+		rlpMessageVersion,
+		aID,
+		tx.AccountNonce,
+		codeBinary,
+		tx.AuthFunc,
+		encodeVMABI(tx.VMVersion, tx.AbiVersion),
+		tx.Fee,
+		tx.TTL,
+		tx.Gas,
+		tx.GasPrice,
+		callDataBinary,
+	)
+	return
+}
+
+// NewGAAttachTx creates a GAAttachTx
+func NewGAAttachTx(OwnerID string, AccountNonce uint64, Code string, AuthFunc string, VMVersion uint16, AbiVersion uint16, Deposit big.Int, Gas big.Int, GasPrice big.Int, Fee big.Int, TTL uint64, CallData string) GAAttachTx {
+	return GAAttachTx{
+		OwnerID:      OwnerID,
+		AccountNonce: AccountNonce,
+		Code:         Code,
+		AuthFunc:     AuthFunc,
+		VMVersion:    VMVersion,
+		AbiVersion:   AbiVersion,
+		Deposit:      Deposit,
+		Gas:          Gas,
+		GasPrice:     GasPrice,
+		Fee:          Fee,
+		TTL:          TTL,
+		CallData:     CallData,
+	}
+}

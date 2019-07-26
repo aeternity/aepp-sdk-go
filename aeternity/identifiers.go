@@ -142,6 +142,8 @@ const (
 	ObjectTagChannel                             uint = 58
 	ObjectTagChannelSnapshotTransaction          uint = 59
 	ObjectTagPoi                                 uint = 60
+	ObjectTagGeneralizedAccountAttachTransaction uint = 80
+	ObjectTagGeneralizedAccountMetaTransaction   uint = 81
 	ObjectTagMicroBody                           uint = 101
 	ObjectTagLightMicroBlock                     uint = 102
 )
