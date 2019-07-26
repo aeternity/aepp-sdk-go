@@ -30,12 +30,13 @@ type AensConfig struct {
 
 // ContractConfig configurations for contracts
 type ContractConfig struct {
-	Gas        big.Int `json:"gas" yaml:"gas" mapstructure:"gas"`
-	GasPrice   big.Int `json:"gas_price" yaml:"gas_price" mapstructure:"gas_price"`
-	Amount     big.Int `json:"amount" yaml:"amount" mapstructure:"amount"`
-	Deposit    big.Int `json:"deposit" yaml:"deposit" mapstructure:"deposit"`
-	VMVersion  uint16  `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
-	ABIVersion uint16  `json:"abi_version" yaml:"abi_version" mapstructure:"abi_version"`
+	CompilerURL string  `json:"compiler" yaml:"compiler" mapstructure:"compiler"`
+	Gas         big.Int `json:"gas" yaml:"gas" mapstructure:"gas"`
+	GasPrice    big.Int `json:"gas_price" yaml:"gas_price" mapstructure:"gas_price"`
+	Amount      big.Int `json:"amount" yaml:"amount" mapstructure:"amount"`
+	Deposit     big.Int `json:"deposit" yaml:"deposit" mapstructure:"deposit"`
+	VMVersion   uint16  `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
+	ABIVersion  uint16  `json:"abi_version" yaml:"abi_version" mapstructure:"abi_version"`
 }
 
 // OracleConfig configurations for contracts
@@ -111,12 +112,13 @@ var Config = ProfileConfig{
 			UpdateFee:   *utils.RequireIntFromString("100000000000000"),
 		},
 		Contracts: ContractConfig{
-			Gas:        *utils.NewIntFromUint64(1e9),
-			GasPrice:   *utils.NewIntFromUint64(1e9),
-			Amount:     *new(big.Int),
-			Deposit:    *new(big.Int),
-			VMVersion:  3,
-			ABIVersion: 1,
+			CompilerURL: "http://localhost:3080",
+			Gas:         *utils.NewIntFromUint64(1e9),
+			GasPrice:    *utils.NewIntFromUint64(1e9),
+			Amount:      *new(big.Int),
+			Deposit:     *new(big.Int),
+			VMVersion:   3,
+			ABIVersion:  1,
 		},
 		Oracles: OracleConfig{
 			QueryFee:         *utils.NewIntFromUint64(0),
