@@ -117,7 +117,7 @@ var Config = ProfileConfig{
 			GasPrice:    *utils.NewIntFromUint64(1e9),
 			Amount:      *new(big.Int),
 			Deposit:     *new(big.Int),
-			VMVersion:   3,
+			VMVersion:   4,
 			ABIVersion:  1,
 		},
 		Oracles: OracleConfig{
