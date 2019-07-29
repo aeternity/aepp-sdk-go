@@ -2,6 +2,7 @@ package integrationtest
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"testing"
 	"time"
@@ -38,8 +39,10 @@ func setupAccounts(t *testing.T) (*aeternity.Account, *aeternity.Account) {
 }
 
 func signBroadcast(t *testing.T, tx aeternity.Tx, acc *aeternity.Account, aeNode *aeternity.Node) (hash string) {
-	txB64, _ := aeternity.BaseEncodeTx(tx)
-	// t.Log(txB64)
+	txB64, err := aeternity.BaseEncodeTx(tx)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	signedTxStr, hash, _, err := aeternity.SignEncodeTxStr(acc, txB64, aeternity.Config.Node.NetworkID)
 	if err != nil {
@@ -53,6 +56,14 @@ func signBroadcast(t *testing.T, tx aeternity.Tx, acc *aeternity.Account, aeNode
 
 	return hash
 
+}
+
+func readFile(t *testing.T, filename string) (r string) {
+	rb, err := ioutil.ReadFile(filename)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return string(rb)
 }
 
 type delayableCode func()
