@@ -21,9 +21,11 @@ aeNode := aeternity.NewNode("http://localhost:3013", false).WithAccount(acc)
 ```
 
 Most parameters are set by modifying the variables in `config.go` in this manner:
-`aeternity.Config.Client.Fee = *utils.RequireBigIntFromString("100000000000000")`
+`aeternity.Config.Client.Fee = big.NewInt(100000000000000)`
 
-When using the `Context` struct helper functions in `helpers.go`, chores like getting the TTL, Account Nonce, encoding of the AENS claim etc are done automatically.
+When using the `Helper` methods in `helpers.go`, chores like getting the TTL, Account Nonce are done automatically.
+When using the `Context` methods in `helpers.go`, additional conveniences for AENS like Commitment ID calculation, Namehashing, are done for you.
+For a painless experience when building transactions, use the `Context` methods.
 ```
 import "github.com/aeternity/aepp-sdk-go/aeternity"
 
@@ -31,7 +33,7 @@ import "github.com/aeternity/aepp-sdk-go/aeternity"
 
 // create a Context for the address you're going to sign the transaction
 // with, and an aeternity node to talk to/query the address's nonce.
-ctx := aeternity.NewContext(node, alice.Address)
+ctx := aeternity.NewContextFromURL(node, alice.Address, false)
 
 // create the SpendTransaction
 tx, err := ctx.SpendTx(alice.Address, bob.Address, *amount, *fee, msg)
