@@ -1,6 +1,7 @@
 package integrationtest
 
 import (
+	"math/big"
 	"testing"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
@@ -25,8 +26,13 @@ func TestGeneralizedAccounts(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	gaAlice := aeternity.NewGAAttachTx(alice.Address, 1, authBytecode, auth.TypeInfo[0].FuncHash, aeternity.Config.Client.Contracts.VMVersion, aeternity.Config.Client.Contracts.ABIVersion, aeternity.Config.Client.BaseGas, aeternity.Config.Client.GasPrice, aeternity.Config.Client.Fee, aeternity.Config.Client.TTL, authCalldata)
-	txHash := signBroadcast(t, &gaAlice, alice, aeNode)
+	testAccount, err := aeternity.NewAccount()
+	if err != nil {
+		t.Fatal(err)
+	}
+	fundAccount(t, aeNode, alice, testAccount, big.NewInt(1000000000000000000))
+	gaTx := aeternity.NewGAAttachTx(testAccount.Address, 1, authBytecode, auth.TypeInfo[0].FuncHash, aeternity.Config.Client.Contracts.VMVersion, aeternity.Config.Client.Contracts.ABIVersion, aeternity.Config.Client.BaseGas, aeternity.Config.Client.GasPrice, aeternity.Config.Client.Fee, aeternity.Config.Client.TTL, authCalldata)
+	txHash := signBroadcast(t, &gaTx, testAccount, aeNode)
 	_, _, err = waitForTransaction(aeNode, txHash)
 	if err != nil {
 		t.Fatal(err)
