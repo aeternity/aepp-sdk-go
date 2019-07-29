@@ -1115,10 +1115,9 @@ type GAAttachTx struct {
 	OwnerID      string
 	AccountNonce uint64
 	Code         string
-	AuthFunc     string
+	AuthFunc     []byte
 	VMVersion    uint16
 	AbiVersion   uint16
-	Deposit      big.Int
 	Gas          big.Int
 	GasPrice     big.Int
 	Fee          big.Int
@@ -1159,7 +1158,7 @@ func (tx *GAAttachTx) RLP() (rlpRawMsg []byte, err error) {
 }
 
 // NewGAAttachTx creates a GAAttachTx
-func NewGAAttachTx(OwnerID string, AccountNonce uint64, Code string, AuthFunc string, VMVersion uint16, AbiVersion uint16, Deposit big.Int, Gas big.Int, GasPrice big.Int, Fee big.Int, TTL uint64, CallData string) GAAttachTx {
+func NewGAAttachTx(OwnerID string, AccountNonce uint64, Code string, AuthFunc []byte, VMVersion uint16, AbiVersion uint16, Gas big.Int, GasPrice big.Int, Fee big.Int, TTL uint64, CallData string) GAAttachTx {
 	return GAAttachTx{
 		OwnerID:      OwnerID,
 		AccountNonce: AccountNonce,
@@ -1167,7 +1166,6 @@ func NewGAAttachTx(OwnerID string, AccountNonce uint64, Code string, AuthFunc st
 		AuthFunc:     AuthFunc,
 		VMVersion:    VMVersion,
 		AbiVersion:   AbiVersion,
-		Deposit:      Deposit,
 		Gas:          Gas,
 		GasPrice:     GasPrice,
 		Fee:          Fee,
