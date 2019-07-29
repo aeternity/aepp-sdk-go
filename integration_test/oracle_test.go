@@ -2,6 +2,7 @@ package integrationtest
 
 import (
 	"fmt"
+	"math/big"
 	"strings"
 	"testing"
 
@@ -15,20 +16,26 @@ func TestOracleWorkflow(t *testing.T) {
 	client := setupNetwork(t, privatenetURL, false)
 	helpers := aeternity.Helpers{Node: client}
 
-	oracleAlice := aeternity.Context{Helpers: helpers, Address: alice.Address}
+	// Setup temporary test account and fund it
+	testAccount, err := aeternity.NewAccount()
+	if err != nil {
+		t.Fatal(err)
+	}
+	fundAccount(t, client, alice, testAccount, big.NewInt(1000000000000000000))
+	oracleAccount := aeternity.Context{Helpers: helpers, Address: testAccount.Address}
 
 	// Register
 	queryFee := utils.NewIntFromUint64(1000)
-	register, err := oracleAlice.OracleRegisterTx("hello", "helloback", *queryFee, uint64(0), uint64(100), 0)
+	register, err := oracleAccount.OracleRegisterTx("hello", "helloback", *queryFee, uint64(0), uint64(100), 0)
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Printf("Register %+v\n", register)
-	registerHash := signBroadcast(t, &register, alice, client)
+	registerHash := signBroadcast(t, &register, testAccount, client)
 	_, _, _ = waitForTransaction(client, registerHash)
 
 	// Confirm that the oracle exists
-	oraclePubKey := strings.Replace(alice.Address, "ak_", "ok_", 1)
+	oraclePubKey := strings.Replace(testAccount.Address, "ak_", "ok_", 1)
 	var oracle *models.RegisteredOracle
 	getOracle := func() {
 		oracle, err = client.GetOracleByPubkey(oraclePubKey)
@@ -41,12 +48,12 @@ func TestOracleWorkflow(t *testing.T) {
 	// Extend
 	// save the oracle's initial TTL so we can compare it with after OracleExtendTx
 	oracleTTL := oracle.TTL
-	extend, err := oracleAlice.OracleExtendTx(oraclePubKey, 0, 1000)
+	extend, err := oracleAccount.OracleExtendTx(oraclePubKey, 0, 1000)
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Printf("Extend %+v\n", extend)
-	extendHash := signBroadcast(t, &extend, alice, client)
+	extendHash := signBroadcast(t, &extend, testAccount, client)
 	_, _, _ = waitForTransaction(client, extendHash)
 
 	// Confirm that the oracle's TTL changed
@@ -59,12 +66,12 @@ func TestOracleWorkflow(t *testing.T) {
 	}
 
 	// Query
-	query, err := oracleAlice.OracleQueryTx(oraclePubKey, "How was your day?", *queryFee, 0, 100, 0, 100)
+	query, err := oracleAccount.OracleQueryTx(oraclePubKey, "How was your day?", *queryFee, 0, 100, 0, 100)
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Printf("Query %+v\n", query)
-	queryHash := signBroadcast(t, &query, alice, client)
+	queryHash := signBroadcast(t, &query, testAccount, client)
 	_, _, _ = waitForTransaction(client, queryHash)
 
 	// Find the Oracle Query ID to reply to
@@ -81,8 +88,8 @@ func TestOracleWorkflow(t *testing.T) {
 	oqID := oracleQueries.OracleQueries[0].ID
 
 	// Respond
-	respond, err := oracleAlice.OracleRespondTx(oraclePubKey, *oqID, "My day was fine thank you", 0, 100)
+	respond, err := oracleAccount.OracleRespondTx(oraclePubKey, *oqID, "My day was fine thank you", 0, 100)
 	fmt.Printf("Respond %+v\n", respond)
-	respondHash := signBroadcast(t, &respond, alice, client)
+	respondHash := signBroadcast(t, &respond, testAccount, client)
 	_, _, _ = waitForTransaction(client, respondHash)
 }
