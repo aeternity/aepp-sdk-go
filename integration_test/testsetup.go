@@ -3,6 +3,7 @@ package integrationtest
 import (
 	"fmt"
 	"io/ioutil"
+	"math/big"
 	"os"
 	"testing"
 	"time"
@@ -93,4 +94,20 @@ func waitForTransaction(aeNode *aeternity.Node, hash string) (height uint64, mic
 	}
 	fmt.Println("Transaction was found at", height, "microblockHash", microblockHash, "err", err)
 	return height, microblockHash, err
+}
+
+func fundAccount(t *testing.T, n *aeternity.Node, source, destination *aeternity.Account, amount *big.Int) {
+	h := aeternity.Helpers{Node: n}
+	ctx := aeternity.Context{Address: source.Address, Helpers: h}
+
+	fmt.Println("Funding account", destination.Address)
+	tx, err := ctx.SpendTx(source.Address, destination.Address, *amount, aeternity.Config.Client.Fee, []byte{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	hash := signBroadcast(t, &tx, source, n)
+	_, _, err = waitForTransaction(n, hash)
+	if err != nil {
+		t.Fatal(err)
+	}
 }
