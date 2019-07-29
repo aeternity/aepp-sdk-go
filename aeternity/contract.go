@@ -4,6 +4,10 @@ import (
 	rlp "github.com/randomshinichi/rlpae"
 )
 
+// ContractFunction struct represents the type information for a single function
+// in a Sophia smart contract. FuncHash is the Blake2b hash of the function name
+// and function types. All data is provided by the compiler in the cb_ compiled
+// bytecode.
 type ContractFunction struct {
 	FuncHash []byte
 	FuncName string
@@ -11,7 +15,9 @@ type ContractFunction struct {
 	OutType  []byte
 }
 
-type contract struct {
+// Contract represents the internals of the compiled cb_ bytecode that the
+// compiler returns and exposes those internals as fields/methods.
+type Contract struct {
 	Tag             byte
 	RLPVersion      byte
 	SourceCodeHash  []byte
@@ -20,21 +26,18 @@ type contract struct {
 	CompilerVersion string
 }
 
-type Contract struct {
-	ct contract
-}
-
-func NewContractFromString(cb string) (Contract, error) {
+// NewContractFromString takes a cb_ compiled bytecode string and returns a
+// Contract struct
+func NewContractFromString(cb string) (c Contract, err error) {
 	rawBytes, err := Decode(cb)
 	if err != nil {
 		return Contract{}, err
 	}
-	c := contract{}
+
 	err = rlp.DecodeBytes(rawBytes, &c)
 	if err != nil {
 		return Contract{}, err
 	}
 
-	contract := Contract{ct: c}
-	return contract, nil
+	return c, nil
 }
