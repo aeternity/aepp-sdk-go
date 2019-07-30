@@ -129,8 +129,8 @@ type Tx interface {
 	RLP() ([]byte, error)
 }
 
-// BaseEncodeTx takes a Tx, runs its RLP() method, and base encodes the result.
-func BaseEncodeTx(tx Tx) (string, error) {
+// SerializeTx takes a Tx, runs its RLP() method, and base encodes the result.
+func SerializeTx(tx Tx) (string, error) {
 	txRaw, err := tx.RLP()
 	if err != nil {
 		return "", err
