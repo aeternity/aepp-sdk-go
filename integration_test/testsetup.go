@@ -40,7 +40,7 @@ func setupAccounts(t *testing.T) (*aeternity.Account, *aeternity.Account) {
 }
 
 func signBroadcast(t *testing.T, tx aeternity.Tx, acc *aeternity.Account, aeNode *aeternity.Node) (hash string) {
-	txB64, err := aeternity.BaseEncodeTx(tx)
+	txB64, err := aeternity.SerializeTx(tx)
 	if err != nil {
 		t.Fatal(err)
 	}

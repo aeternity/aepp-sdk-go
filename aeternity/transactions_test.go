@@ -76,7 +76,7 @@ func TestSpendTx_RLP(t *testing.T) {
 			txJSON, err := tx.JSON()
 			fmt.Println(txJSON)
 
-			gotTx, err := BaseEncodeTx(&tx)
+			gotTx, err := SerializeTx(&tx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("SpendTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -166,7 +166,7 @@ func TestNamePreclaimTx_RLP(t *testing.T) {
 
 			txJSON, err := tx.JSON()
 			fmt.Println(txJSON)
-			gotTx, err := BaseEncodeTx(&tx)
+			gotTx, err := SerializeTx(&tx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NamePreclaimTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -222,7 +222,7 @@ func TestNameClaimTx_RLP(t *testing.T) {
 			txJSON, err := tx.JSON()
 			fmt.Println(txJSON)
 
-			gotTx, err := BaseEncodeTx(&tx)
+			gotTx, err := SerializeTx(&tx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NameClaimTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -314,7 +314,7 @@ func TestNameUpdateTx_RLP(t *testing.T) {
 			txJSON, err := tx.JSON()
 			fmt.Println(txJSON)
 
-			gotTx, err := BaseEncodeTx(&tx)
+			gotTx, err := SerializeTx(&tx)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NameUpdateTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
@@ -367,7 +367,7 @@ func TestNameRevokeTx_RLP(t *testing.T) {
 			txJSON, _ := tx.JSON()
 			fmt.Println(txJSON)
 
-			gotTx, err := BaseEncodeTx(&tx)
+			gotTx, err := SerializeTx(&tx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NameRevokeTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -422,7 +422,7 @@ func TestNameTransferTx_RLP(t *testing.T) {
 			txJSON, _ := tx.JSON()
 			fmt.Println(txJSON)
 
-			gotTx, err := BaseEncodeTx(&tx)
+			gotTx, err := SerializeTx(&tx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NameTransferTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -525,7 +525,7 @@ func TestOracleRegisterTx_RLP(t *testing.T) {
 			txJSON, _ := tx.JSON()
 			fmt.Println(txJSON)
 
-			gotTx, err := BaseEncodeTx(&tx)
+			gotTx, err := SerializeTx(&tx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("OracleRegisterTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -581,7 +581,7 @@ func TestOracleExtendTx_RLP(t *testing.T) {
 			txJSON, _ := tx.JSON()
 			fmt.Println(txJSON)
 
-			gotTx, err := BaseEncodeTx(&tx)
+			gotTx, err := SerializeTx(&tx)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("OracleExtendTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
@@ -672,7 +672,7 @@ func TestOracleQueryTx_RLP(t *testing.T) {
 			txJSON, _ := tx.JSON()
 			fmt.Println(txJSON)
 
-			gotTx, err := BaseEncodeTx(&tx)
+			gotTx, err := SerializeTx(&tx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("OracleQueryTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -745,7 +745,7 @@ func TestOracleRespondTx_RLP(t *testing.T) {
 				tt.fields.Fee,
 				tt.fields.TTL,
 			)
-			gotTx, err := BaseEncodeTx(&tx)
+			gotTx, err := SerializeTx(&tx)
 
 			txJSON, _ := tx.JSON()
 			fmt.Println(txJSON)
@@ -862,7 +862,7 @@ func TestContractCreateTx_RLP(t *testing.T) {
 			txJSON, _ := tx.JSON()
 			fmt.Println(txJSON)
 
-			gotTx, err := BaseEncodeTx(&tx)
+			gotTx, err := SerializeTx(&tx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ContractCreateTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -1033,7 +1033,7 @@ func TestContractCallTx_RLP(t *testing.T) {
 			txJSON, _ := tx.JSON()
 			fmt.Println(txJSON)
 
-			gotTx, err := BaseEncodeTx(tx)
+			gotTx, err := SerializeTx(tx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ContractCallTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -1266,7 +1266,7 @@ func TestNewGAAttachTx(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := NewGAAttachTx(tt.args.OwnerID, tt.args.AccountNonce, tt.args.Code, tt.args.AuthFunc, tt.args.VMVersion, tt.args.AbiVersion, tt.args.Gas, tt.args.GasPrice, tt.args.Fee, tt.args.TTL, tt.args.CallData)
-			gotRLP, err := BaseEncodeTx(&got)
+			gotRLP, err := SerializeTx(&got)
 			if err != nil {
 				t.Error(err)
 			}
