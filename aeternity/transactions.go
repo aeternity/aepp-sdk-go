@@ -1173,3 +1173,56 @@ func NewGAAttachTx(OwnerID string, AccountNonce uint64, Code string, AuthFunc []
 		CallData:     CallData,
 	}
 }
+
+// GAMetaTx wraps a normal Tx (that is not a GAAttachTx) that will only be
+// executed if the contract located at GaID returns true
+type GAMetaTx struct {
+	GaID       string
+	AuthData   string
+	AbiVersion uint16
+	Gas        big.Int
+	GasPrice   big.Int
+	Fee        big.Int
+	TTL        uint64
+	Tx         Tx
+}
+
+// RLP returns a byte serialized representation
+func (tx *GAMetaTx) RLP() (rlpRawMsg []byte, err error) {
+	gaID, err := buildIDTag(IDTagContract, tx.GaID)
+	if err != nil {
+		return
+	}
+	authDataBinary, err := Decode(tx.AuthData)
+	if err != nil {
+		return
+	}
+
+	rlpRawMsg, err = buildRLPMessage(
+		ObjectTagGeneralizedAccountMetaTransaction,
+		rlpMessageVersion,
+		gaID,
+		authDataBinary,
+		tx.AbiVersion,
+		tx.Fee,
+		tx.Gas,
+		tx.GasPrice,
+		tx.TTL,
+		tx.Tx,
+	)
+	return
+}
+
+// NewGAMetaTx creates a GAMetaTx
+func NewGAMetaTx(GaID string, AuthData string, AbiVersion uint16, Gas big.Int, GasPrice big.Int, Fee big.Int, TTL uint64, Tx Tx) GAMetaTx {
+	return GAMetaTx{
+		GaID:       GaID,
+		AuthData:   AuthData,
+		AbiVersion: AbiVersion,
+		Gas:        Gas,
+		GasPrice:   GasPrice,
+		Fee:        Fee,
+		TTL:        TTL,
+		Tx:         Tx,
+	}
+}
