@@ -10,6 +10,7 @@ import (
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
 	"github.com/aeternity/aepp-sdk-go/swagguard/node/models"
+	rlp "github.com/randomshinichi/rlpae"
 )
 
 /*
@@ -51,7 +52,7 @@ type txTypes struct {
 var sentTxs txTypes
 var useTestNet bool
 
-func signBroadcastWaitForTransaction(t *testing.T, tx aeternity.Tx, acc *aeternity.Account, node *aeternity.Node) (height uint64, txHash string, mbHash string) {
+func signBroadcastWaitForTransaction(t *testing.T, tx rlp.Encoder, acc *aeternity.Account, node *aeternity.Node) (height uint64, txHash string, mbHash string) {
 	txHash = signBroadcast(t, tx, acc, node)
 	height, mbHash, err := waitForTransaction(node, txHash)
 	if err != nil {

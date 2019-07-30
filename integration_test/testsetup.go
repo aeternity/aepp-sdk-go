@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
+	rlp "github.com/randomshinichi/rlpae"
 )
 
 var sender = "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"
@@ -39,7 +40,7 @@ func setupAccounts(t *testing.T) (*aeternity.Account, *aeternity.Account) {
 	return alice, bob
 }
 
-func signBroadcast(t *testing.T, tx aeternity.Tx, acc *aeternity.Account, aeNode *aeternity.Node) (hash string) {
+func signBroadcast(t *testing.T, tx rlp.Encoder, acc *aeternity.Account, aeNode *aeternity.Node) (hash string) {
 	txB64, err := aeternity.SerializeTx(tx)
 	if err != nil {
 		t.Fatal(err)
