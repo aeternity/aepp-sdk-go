@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/aeternity/aepp-sdk-go/utils"
-	rlp "github.com/randomshinichi/rlpae"
 )
 
 func getRLPSerialized(tx1 string, tx2 string) ([]interface{}, []interface{}) {
@@ -19,7 +18,7 @@ func getRLPSerialized(tx1 string, tx2 string) ([]interface{}, []interface{}) {
 	return tx1RLP, tx2RLP
 }
 
-func TestSpendTx_RLP(t *testing.T) {
+func TestSpendTx_EncodeRLP(t *testing.T) {
 	type fields struct {
 		senderID    string
 		recipientID string
@@ -128,7 +127,7 @@ func TestNamePointer_EncodeRLP(t *testing.T) {
 	}
 }
 
-func TestNamePreclaimTx_RLP(t *testing.T) {
+func TestNamePreclaimTx_EncodeRLP(t *testing.T) {
 	type fields struct {
 		AccountID    string
 		CommitmentID string
@@ -180,7 +179,7 @@ func TestNamePreclaimTx_RLP(t *testing.T) {
 	}
 }
 
-func TestNameClaimTx_RLP(t *testing.T) {
+func TestNameClaimTx_EncodeRLP(t *testing.T) {
 	type fields struct {
 		AccountID string
 		Name      string
@@ -236,7 +235,7 @@ func TestNameClaimTx_RLP(t *testing.T) {
 	}
 }
 
-func TestNameUpdateTx_RLP(t *testing.T) {
+func TestNameUpdateTx_EncodeRLP(t *testing.T) {
 	type fields struct {
 		AccountID string
 		NameID    string
@@ -329,7 +328,7 @@ func TestNameUpdateTx_RLP(t *testing.T) {
 	}
 }
 
-func TestNameRevokeTx_RLP(t *testing.T) {
+func TestNameRevokeTx_EncodeRLP(t *testing.T) {
 	type fields struct {
 		AccountID    string
 		NameID       string
@@ -381,7 +380,7 @@ func TestNameRevokeTx_RLP(t *testing.T) {
 	}
 }
 
-func TestNameTransferTx_RLP(t *testing.T) {
+func TestNameTransferTx_EncodeRLP(t *testing.T) {
 	type fields struct {
 		AccountID    string
 		NameID       string
@@ -436,7 +435,7 @@ func TestNameTransferTx_RLP(t *testing.T) {
 	}
 }
 
-func TestOracleRegisterTx_RLP(t *testing.T) {
+func TestOracleRegisterTx_EncodeRLP(t *testing.T) {
 	type fields struct {
 		accountID      string
 		accountNonce   uint64
@@ -539,7 +538,7 @@ func TestOracleRegisterTx_RLP(t *testing.T) {
 	}
 }
 
-func TestOracleExtendTx_RLP(t *testing.T) {
+func TestOracleExtendTx_EncodeRLP(t *testing.T) {
 	type fields struct {
 		OracleID     string
 		AccountNonce uint64
@@ -596,7 +595,7 @@ func TestOracleExtendTx_RLP(t *testing.T) {
 	}
 }
 
-func TestOracleQueryTx_RLP(t *testing.T) {
+func TestOracleQueryTx_EncodeRLP(t *testing.T) {
 	type fields struct {
 		SenderID         string
 		AccountNonce     uint64
@@ -686,7 +685,7 @@ func TestOracleQueryTx_RLP(t *testing.T) {
 	}
 }
 
-func TestOracleRespondTx_RLP(t *testing.T) {
+func TestOracleRespondTx_EncodeRLP(t *testing.T) {
 	type fields struct {
 		OracleID         string
 		AccountNonce     uint64
@@ -762,7 +761,7 @@ func TestOracleRespondTx_RLP(t *testing.T) {
 	}
 }
 
-func TestContractCreateTx_RLP(t *testing.T) {
+func TestContractCreateTx_EncodeRLP(t *testing.T) {
 	type fields struct {
 		OwnerID      string
 		AccountNonce uint64
@@ -946,7 +945,7 @@ func TestContractCreateTx_FeeEstimate(t *testing.T) {
 	}
 }
 
-func TestContractCallTx_RLP(t *testing.T) {
+func TestContractCallTx_EncodeRLP(t *testing.T) {
 	type fields struct {
 		CallerID     string
 		AccountNonce uint64
@@ -1273,61 +1272,6 @@ func TestNewGAAttachTx(t *testing.T) {
 			}
 			if !reflect.DeepEqual(gotRLP, tt.want) {
 				t.Errorf("NewGAAttachTx() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestSpendTx_EncodeRLP(t *testing.T) {
-	type fields struct {
-		SenderID    string
-		RecipientID string
-		Amount      big.Int
-		Fee         big.Int
-		Payload     []byte
-		TTL         uint64
-		Nonce       uint64
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		wantTx  string
-		wantErr bool
-	}{
-		{
-			name: "Spend 10, Fee 10, Hello World",
-			fields: fields{
-				SenderID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
-				RecipientID: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
-				Amount:      *utils.NewIntFromUint64(10),
-				Fee:         *utils.NewIntFromUint64(10),
-				Payload:     []byte("Hello World"),
-				TTL:         uint64(10),
-				Nonce:       uint64(1),
-			},
-			wantTx:  "tx_+FYMAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vOhAR8To7CL8AFABmKmi2nYdfeAPOxMCGR/btXYTHiXvVCjCgoKAYtIZWxsbyBXb3JsZPSZjdM=",
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tx := &SpendTx{
-				SenderID:    tt.fields.SenderID,
-				RecipientID: tt.fields.RecipientID,
-				Amount:      tt.fields.Amount,
-				Fee:         tt.fields.Fee,
-				Payload:     tt.fields.Payload,
-				TTL:         tt.fields.TTL,
-				Nonce:       tt.fields.Nonce,
-			}
-			w := &bytes.Buffer{}
-			if err := rlp.Encode(w, tx); (err != nil) != tt.wantErr {
-				t.Errorf("SpendTx.EncodeRLP() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			gotW := Encode(PrefixTransaction, w.Bytes())
-			if gotW != tt.wantTx {
-				t.Errorf("SpendTx.EncodeRLP() = %v, want %v", gotW, tt.wantTx)
 			}
 		})
 	}
