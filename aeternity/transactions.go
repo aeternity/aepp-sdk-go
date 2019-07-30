@@ -1,6 +1,7 @@
 package aeternity
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"math/big"
@@ -78,7 +79,7 @@ func buildPointers(pointers []string) (ptrs []*NamePointer, err error) {
 	return
 }
 
-func calcFeeStd(tx Tx, txLen int) *big.Int {
+func calcFeeStd(tx rlp.Encoder, txLen int) *big.Int {
 	// (Config.Client.BaseGas + len(txRLP) * Config.Client.GasPerByte) * Config.Client.GasPrice
 	//                                   txLenGasPerByte
 	fee := new(big.Int)
@@ -109,33 +110,31 @@ func calcFeeContract(gas *big.Int, baseGasMultiplier int64, length int) *big.Int
 }
 
 // sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
-func calcSizeEstimate(tx Tx, fee *big.Int) (int, error) {
+func calcSizeEstimate(tx rlp.Encoder, fee *big.Int) (int, error) {
 	feeRlp, err := rlp.EncodeToBytes(fee)
 	if err != nil {
 		return 0, err
 	}
 	feeRlpLen := len(feeRlp)
 
-	rlpRawMsg, err := tx.RLP()
+	w := &bytes.Buffer{}
+	err = rlp.Encode(w, tx)
 	if err != nil {
 		return 0, err
 	}
 
+	rlpRawMsg := w.Bytes()
 	return len(rlpRawMsg) - feeRlpLen + 8, nil
 }
 
-// Tx interface guarantees that code using Tx can rely on these functions being present
-type Tx interface {
-	RLP() ([]byte, error)
-}
-
 // SerializeTx takes a Tx, runs its RLP() method, and base encodes the result.
-func SerializeTx(tx Tx) (string, error) {
-	txRaw, err := tx.RLP()
+func SerializeTx(tx rlp.Encoder) (string, error) {
+	w := &bytes.Buffer{}
+	err := rlp.Encode(w, tx)
 	if err != nil {
 		return "", err
 	}
-	txStr := Encode(PrefixTransaction, txRaw)
+	txStr := Encode(PrefixTransaction, w.Bytes())
 	return txStr, nil
 }
 
@@ -150,8 +149,8 @@ type SpendTx struct {
 	Nonce       uint64
 }
 
-// RLP returns a byte serialized representation
-func (tx *SpendTx) RLP() (rlpRawMsg []byte, err error) {
+// EncodeRLP implements rlp.Encoder
+func (tx *SpendTx) EncodeRLP(w io.Writer) (err error) {
 	// build id for the sender
 	sID, err := buildIDTag(IDTagAccount, tx.SenderID)
 	if err != nil {
@@ -163,7 +162,7 @@ func (tx *SpendTx) RLP() (rlpRawMsg []byte, err error) {
 		return
 	}
 	// create the transaction
-	rlpRawMsg, err = buildRLPMessage(
+	rlpRawMsg, err := buildRLPMessage(
 		ObjectTagSpendTransaction,
 		rlpMessageVersion,
 		sID,
@@ -173,7 +172,15 @@ func (tx *SpendTx) RLP() (rlpRawMsg []byte, err error) {
 		tx.TTL,
 		tx.Nonce,
 		[]byte(tx.Payload))
-	return
+
+	if err != nil {
+		return
+	}
+	_, err = w.Write(rlpRawMsg)
+	if err != nil {
+		return
+	}
+	return nil
 }
 
 // JSON representation of a Tx is useful for querying the node's debug endpoint
@@ -221,8 +228,8 @@ type NamePreclaimTx struct {
 	AccountNonce uint64
 }
 
-// RLP returns a byte serialized representation
-func (tx *NamePreclaimTx) RLP() (rlpRawMsg []byte, err error) {
+// EncodeRLP implements rlp.Encoder
+func (tx *NamePreclaimTx) EncodeRLP(w io.Writer) (err error) {
 	// build id for the sender
 	aID, err := buildIDTag(IDTagAccount, tx.AccountID)
 	if err != nil {
@@ -234,7 +241,7 @@ func (tx *NamePreclaimTx) RLP() (rlpRawMsg []byte, err error) {
 		return
 	}
 	// create the transaction
-	rlpRawMsg, err = buildRLPMessage(
+	rlpRawMsg, err := buildRLPMessage(
 		ObjectTagNameServicePreclaimTransaction,
 		rlpMessageVersion,
 		aID,
@@ -242,6 +249,14 @@ func (tx *NamePreclaimTx) RLP() (rlpRawMsg []byte, err error) {
 		cID,
 		tx.Fee,
 		tx.TTL)
+
+	if err != nil {
+		return
+	}
+	_, err = w.Write(rlpRawMsg)
+	if err != nil {
+		return
+	}
 	return
 }
 
@@ -290,8 +305,8 @@ type NameClaimTx struct {
 	AccountNonce uint64
 }
 
-// RLP returns a byte serialized representation
-func (tx *NameClaimTx) RLP() (rlpRawMsg []byte, err error) {
+// EncodeRLP implements rlp.Encoder
+func (tx *NameClaimTx) EncodeRLP(w io.Writer) (err error) {
 	// build id for the sender
 	aID, err := buildIDTag(IDTagAccount, tx.AccountID)
 	if err != nil {
@@ -299,7 +314,7 @@ func (tx *NameClaimTx) RLP() (rlpRawMsg []byte, err error) {
 	}
 
 	// create the transaction
-	rlpRawMsg, err = buildRLPMessage(
+	rlpRawMsg, err := buildRLPMessage(
 		ObjectTagNameServiceClaimTransaction,
 		rlpMessageVersion,
 		aID,
@@ -308,6 +323,14 @@ func (tx *NameClaimTx) RLP() (rlpRawMsg []byte, err error) {
 		tx.NameSalt,
 		tx.Fee,
 		tx.TTL)
+
+	if err != nil {
+		return
+	}
+	_, err = w.Write(rlpRawMsg)
+	if err != nil {
+		return
+	}
 	return
 }
 
@@ -389,8 +412,8 @@ type NameUpdateTx struct {
 	AccountNonce uint64
 }
 
-// RLP returns a byte serialized representation
-func (tx *NameUpdateTx) RLP() (rlpRawMsg []byte, err error) {
+// EncodeRLP implements rlp.Encoder
+func (tx *NameUpdateTx) EncodeRLP(w io.Writer) (err error) {
 	// build id for the sender
 	aID, err := buildIDTag(IDTagAccount, tx.AccountID)
 	if err != nil {
@@ -413,7 +436,7 @@ func (tx *NameUpdateTx) RLP() (rlpRawMsg []byte, err error) {
 	}
 
 	// create the transaction
-	rlpRawMsg, err = buildRLPMessage(
+	rlpRawMsg, err := buildRLPMessage(
 		ObjectTagNameServiceUpdateTransaction,
 		rlpMessageVersion,
 		aID,
@@ -424,6 +447,14 @@ func (tx *NameUpdateTx) RLP() (rlpRawMsg []byte, err error) {
 		tx.ClientTTL,
 		tx.Fee,
 		tx.TTL)
+
+	if err != nil {
+		return
+	}
+	_, err = w.Write(rlpRawMsg)
+	if err != nil {
+		return
+	}
 	return
 }
 
@@ -482,8 +513,8 @@ type NameRevokeTx struct {
 	AccountNonce uint64
 }
 
-// RLP returns a byte serialized representation
-func (tx *NameRevokeTx) RLP() (rlpRawMsg []byte, err error) {
+// EncodeRLP implements rlp.Encoder
+func (tx *NameRevokeTx) EncodeRLP(w io.Writer) (err error) {
 	// build id for the sender
 	aID, err := buildIDTag(IDTagAccount, tx.AccountID)
 	if err != nil {
@@ -495,7 +526,7 @@ func (tx *NameRevokeTx) RLP() (rlpRawMsg []byte, err error) {
 		return
 	}
 
-	rlpRawMsg, err = buildRLPMessage(
+	rlpRawMsg, err := buildRLPMessage(
 		ObjectTagNameServiceRevokeTransaction,
 		rlpMessageVersion,
 		aID,
@@ -503,6 +534,14 @@ func (tx *NameRevokeTx) RLP() (rlpRawMsg []byte, err error) {
 		nID,
 		tx.Fee,
 		tx.TTL)
+
+	if err != nil {
+		return
+	}
+	_, err = w.Write(rlpRawMsg)
+	if err != nil {
+		return
+	}
 	return
 }
 
@@ -550,8 +589,8 @@ type NameTransferTx struct {
 	AccountNonce uint64
 }
 
-// RLP returns a byte serialized representation
-func (tx *NameTransferTx) RLP() (rlpRawMsg []byte, err error) {
+// EncodeRLP implements rlp.Encoder
+func (tx *NameTransferTx) EncodeRLP(w io.Writer) (err error) {
 	// build id for the sender
 	aID, err := buildIDTag(IDTagAccount, tx.AccountID)
 	if err != nil {
@@ -571,7 +610,7 @@ func (tx *NameTransferTx) RLP() (rlpRawMsg []byte, err error) {
 	}
 
 	// create the transaction
-	rlpRawMsg, err = buildRLPMessage(
+	rlpRawMsg, err := buildRLPMessage(
 		ObjectTagNameServiceTransferTransaction,
 		rlpMessageVersion,
 		aID,
@@ -581,6 +620,14 @@ func (tx *NameTransferTx) RLP() (rlpRawMsg []byte, err error) {
 		tx.Fee,
 		tx.TTL,
 	)
+
+	if err != nil {
+		return
+	}
+	_, err = w.Write(rlpRawMsg)
+	if err != nil {
+		return
+	}
 	return
 }
 
@@ -633,15 +680,15 @@ type OracleRegisterTx struct {
 	TTL            uint64
 }
 
-// RLP returns a byte serialized representation
-func (tx *OracleRegisterTx) RLP() (rlpRawMsg []byte, err error) {
+// EncodeRLP implements rlp.Encoder
+func (tx *OracleRegisterTx) EncodeRLP(w io.Writer) (err error) {
 	// build id for the account
 	aID, err := buildIDTag(IDTagAccount, tx.AccountID)
 	if err != nil {
 		return
 	}
 	// create the transaction
-	rlpRawMsg, err = buildRLPMessage(
+	rlpRawMsg, err := buildRLPMessage(
 		ObjectTagOracleRegisterTransaction,
 		rlpMessageVersion,
 		aID,
@@ -654,6 +701,14 @@ func (tx *OracleRegisterTx) RLP() (rlpRawMsg []byte, err error) {
 		tx.Fee,
 		tx.TTL,
 		tx.AbiVersion)
+
+	if err != nil {
+		return
+	}
+	_, err = w.Write(rlpRawMsg)
+	if err != nil {
+		return
+	}
 	return
 }
 
@@ -711,14 +766,14 @@ type OracleExtendTx struct {
 	TTL            uint64
 }
 
-// RLP returns a byte serialized representation
-func (tx *OracleExtendTx) RLP() (rlpRawMsg []byte, err error) {
+// EncodeRLP implements rlp.Encoder
+func (tx *OracleExtendTx) EncodeRLP(w io.Writer) (err error) {
 	oID, err := buildIDTag(IDTagOracle, tx.OracleID)
 	if err != nil {
 		return
 	}
 
-	rlpRawMsg, err = buildRLPMessage(
+	rlpRawMsg, err := buildRLPMessage(
 		ObjectTagOracleExtendTransaction,
 		rlpMessageVersion,
 		oID,
@@ -727,6 +782,14 @@ func (tx *OracleExtendTx) RLP() (rlpRawMsg []byte, err error) {
 		tx.OracleTTLValue,
 		tx.Fee,
 		tx.TTL)
+
+	if err != nil {
+		return
+	}
+	_, err = w.Write(rlpRawMsg)
+	if err != nil {
+		return
+	}
 	return
 }
 
@@ -769,8 +832,8 @@ type OracleQueryTx struct {
 	TTL              uint64
 }
 
-// RLP returns a byte serialized representation
-func (tx *OracleQueryTx) RLP() (rlpRawMsg []byte, err error) {
+// EncodeRLP implements rlp.Encoder
+func (tx *OracleQueryTx) EncodeRLP(w io.Writer) (err error) {
 	accountID, err := buildIDTag(IDTagAccount, tx.SenderID)
 	if err != nil {
 		return
@@ -781,7 +844,7 @@ func (tx *OracleQueryTx) RLP() (rlpRawMsg []byte, err error) {
 		return
 	}
 
-	rlpRawMsg, err = buildRLPMessage(
+	rlpRawMsg, err := buildRLPMessage(
 		ObjectTagOracleQueryTransaction,
 		rlpMessageVersion,
 		accountID,
@@ -795,6 +858,14 @@ func (tx *OracleQueryTx) RLP() (rlpRawMsg []byte, err error) {
 		tx.ResponseTTLValue,
 		tx.Fee,
 		tx.TTL)
+
+	if err != nil {
+		return
+	}
+	_, err = w.Write(rlpRawMsg)
+	if err != nil {
+		return
+	}
 	return
 }
 
@@ -842,8 +913,8 @@ type OracleRespondTx struct {
 	TTL              uint64
 }
 
-// RLP returns a byte serialized representation
-func (tx *OracleRespondTx) RLP() (rlpRawMsg []byte, err error) {
+// EncodeRLP implements rlp.Encoder
+func (tx *OracleRespondTx) EncodeRLP(w io.Writer) (err error) {
 	oID, err := buildIDTag(IDTagOracle, tx.OracleID)
 	if err != nil {
 		return
@@ -853,7 +924,7 @@ func (tx *OracleRespondTx) RLP() (rlpRawMsg []byte, err error) {
 		return
 	}
 
-	rlpRawMsg, err = buildRLPMessage(
+	rlpRawMsg, err := buildRLPMessage(
 		ObjectTagOracleResponseTransaction,
 		rlpMessageVersion,
 		oID,
@@ -864,6 +935,14 @@ func (tx *OracleRespondTx) RLP() (rlpRawMsg []byte, err error) {
 		tx.ResponseTTLValue,
 		tx.Fee,
 		tx.TTL)
+
+	if err != nil {
+		return
+	}
+	_, err = w.Write(rlpRawMsg)
+	if err != nil {
+		return
+	}
 	return
 }
 
@@ -918,8 +997,8 @@ func encodeVMABI(VMVersion, ABIVersion uint16) []byte {
 	return vmAbiBytes
 }
 
-// RLP returns a byte serialized representation
-func (tx *ContractCreateTx) RLP() (rlpRawMsg []byte, err error) {
+// EncodeRLP implements rlp.Encoder
+func (tx *ContractCreateTx) EncodeRLP(w io.Writer) (err error) {
 	aID, err := buildIDTag(IDTagAccount, tx.OwnerID)
 	if err != nil {
 		return
@@ -933,7 +1012,7 @@ func (tx *ContractCreateTx) RLP() (rlpRawMsg []byte, err error) {
 		return
 	}
 
-	rlpRawMsg, err = buildRLPMessage(
+	rlpRawMsg, err := buildRLPMessage(
 		ObjectTagContractCreateTransaction,
 		rlpMessageVersion,
 		aID,
@@ -948,6 +1027,14 @@ func (tx *ContractCreateTx) RLP() (rlpRawMsg []byte, err error) {
 		tx.GasPrice,
 		callDataBinary,
 	)
+
+	if err != nil {
+		return
+	}
+	_, err = w.Write(rlpRawMsg)
+	if err != nil {
+		return
+	}
 	return
 }
 
@@ -1044,8 +1131,8 @@ func (tx *ContractCallTx) JSON() (string, error) {
 	return string(output), err
 }
 
-// RLP returns a byte serialized representation
-func (tx *ContractCallTx) RLP() (rlpRawMsg []byte, err error) {
+// EncodeRLP implements rlp.Encoder
+func (tx *ContractCallTx) EncodeRLP(w io.Writer) (err error) {
 	cID, err := buildIDTag(IDTagAccount, tx.CallerID)
 	if err != nil {
 		return
@@ -1059,7 +1146,7 @@ func (tx *ContractCallTx) RLP() (rlpRawMsg []byte, err error) {
 		return
 	}
 
-	rlpRawMsg, err = buildRLPMessage(
+	rlpRawMsg, err := buildRLPMessage(
 		ObjectTagContractCallTransaction,
 		rlpMessageVersion,
 		cID,
@@ -1073,6 +1160,14 @@ func (tx *ContractCallTx) RLP() (rlpRawMsg []byte, err error) {
 		tx.GasPrice,
 		callDataBinary,
 	)
+
+	if err != nil {
+		return
+	}
+	_, err = w.Write(rlpRawMsg)
+	if err != nil {
+		return
+	}
 	return
 }
 
@@ -1125,8 +1220,8 @@ type GAAttachTx struct {
 	CallData     string
 }
 
-// RLP returns a byte serialized representation
-func (tx *GAAttachTx) RLP() (rlpRawMsg []byte, err error) {
+// EncodeRLP implements rlp.Encoder
+func (tx *GAAttachTx) EncodeRLP(w io.Writer) (err error) {
 	aID, err := buildIDTag(IDTagAccount, tx.OwnerID)
 	if err != nil {
 		return
@@ -1140,7 +1235,7 @@ func (tx *GAAttachTx) RLP() (rlpRawMsg []byte, err error) {
 		return
 	}
 
-	rlpRawMsg, err = buildRLPMessage(
+	rlpRawMsg, err := buildRLPMessage(
 		ObjectTagGeneralizedAccountAttachTransaction,
 		rlpMessageVersion,
 		aID,
@@ -1154,6 +1249,14 @@ func (tx *GAAttachTx) RLP() (rlpRawMsg []byte, err error) {
 		tx.GasPrice,
 		callDataBinary,
 	)
+
+	if err != nil {
+		return
+	}
+	_, err = w.Write(rlpRawMsg)
+	if err != nil {
+		return
+	}
 	return
 }
 
@@ -1184,11 +1287,11 @@ type GAMetaTx struct {
 	GasPrice   big.Int
 	Fee        big.Int
 	TTL        uint64
-	Tx         Tx
+	Tx         rlp.Encoder
 }
 
-// RLP returns a byte serialized representation
-func (tx *GAMetaTx) RLP() (rlpRawMsg []byte, err error) {
+// EncodeRLP implements rlp.Encoder
+func (tx *GAMetaTx) EncodeRLP(w io.Writer) (err error) {
 	gaID, err := buildIDTag(IDTagContract, tx.GaID)
 	if err != nil {
 		return
@@ -1198,7 +1301,7 @@ func (tx *GAMetaTx) RLP() (rlpRawMsg []byte, err error) {
 		return
 	}
 
-	rlpRawMsg, err = buildRLPMessage(
+	rlpRawMsg, err := buildRLPMessage(
 		ObjectTagGeneralizedAccountMetaTransaction,
 		rlpMessageVersion,
 		gaID,
@@ -1210,11 +1313,19 @@ func (tx *GAMetaTx) RLP() (rlpRawMsg []byte, err error) {
 		tx.TTL,
 		tx.Tx,
 	)
+
+	if err != nil {
+		return
+	}
+	_, err = w.Write(rlpRawMsg)
+	if err != nil {
+		return
+	}
 	return
 }
 
 // NewGAMetaTx creates a GAMetaTx
-func NewGAMetaTx(GaID string, AuthData string, AbiVersion uint16, Gas big.Int, GasPrice big.Int, Fee big.Int, TTL uint64, Tx Tx) GAMetaTx {
+func NewGAMetaTx(GaID string, AuthData string, AbiVersion uint16, Gas big.Int, GasPrice big.Int, Fee big.Int, TTL uint64, Tx rlp.Encoder) GAMetaTx {
 	return GAMetaTx{
 		GaID:       GaID,
 		AuthData:   AuthData,
