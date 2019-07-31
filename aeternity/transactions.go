@@ -11,6 +11,48 @@ import (
 	rlp "github.com/randomshinichi/rlpae"
 )
 
+func Sign(kp *Account, tx *SignedTx, networkID string) (signature []byte, err error) {
+	txRaw, err := rlp.EncodeToBytes(tx.Tx)
+	if err != nil {
+		return []byte{}, err
+	}
+	// add the network_id to the transaction
+	msg := append([]byte(networkID), txRaw...)
+	// sign the transaction
+	signature = kp.Sign(msg)
+	return
+}
+
+func Hash(tx *SignedTx) (txhash string, err error) {
+	rlpTxRaw, err := rlp.EncodeToBytes(tx)
+	if err != nil {
+		return "", err
+	}
+	rlpTxHashRaw, err := hash(rlpTxRaw)
+	if err != nil {
+		return "", err
+	}
+
+	txhash = Encode(PrefixTransactionHash, rlpTxHashRaw)
+	return txhash, nil
+}
+
+func SignHashTx(kp *Account, tx rlp.Encoder, networkID string) (signedTx SignedTx, txhash, signature string, err error) {
+	signedTx = NewSignedTx([][]byte{}, tx)
+	sigBytes, err := Sign(kp, &signedTx, networkID)
+	if err != nil {
+		return
+	}
+	signedTx.Signatures = append(signedTx.Signatures, sigBytes)
+	signature = Encode(PrefixSignature, sigBytes)
+
+	txhash, err = Hash(&signedTx)
+	if err != nil {
+		return
+	}
+	return signedTx, txhash, signature, nil
+}
+
 // SignEncodeTx sign and encode a transaction
 func SignEncodeTx(kp *Account, txRaw []byte, networkID string) (signedEncodedTx, signedEncodedTxHash, signature string, err error) {
 	// add the network_id to the transaction
@@ -144,12 +186,48 @@ type SignedTx struct {
 }
 
 func (tx *SignedTx) EncodeRLP(w io.Writer) (err error) {
-	// encode the message using rlp
+	/*
+		DO NOT WANT
+		[
+			[11]
+			[1]
+			[
+				[236 231 90 243 220 196 194 60 197 146 118 25 164 100 106 136 121 102 44 60 54 186 255 231 125 101 99 245 135 206 127 202 47 114 210 160 204 85 98 246 178 145 76 58 59 165 110 97 131 144 141 124 223 118 254 14 37 79 8 99 73 97 190 10]
+			]
+			[
+				[12]
+				[1]
+				[1 206 167 173 228 112 201 249 157 157 78 64 8 128 168 111 29 73 187 68 75 98 241 26 158 187 100 187 207 235 115 254 243]
+				[1 31 19 163 176 139 240 1 64 6 98 166 139 105 216 117 247 128 60 236 76 8 100 127 110 213 216 76 120 151 189 80 163]
+				[255 255 255 255 255 255 255 255]
+				[15 141 103 108 248 0]
+				[2 172]
+				[1]
+				[72 101 108 108 111 32 87 111 114 108 100]
+			]
+		]
+
+		WANT
+		[
+		[11]
+		[1]
+		[
+			[173 20 154 64 81 213 186 62 125 201 233 189 58 130 84 238 72 139 204 93 244 135 85 176 84 140 19 30 41 84 113 189 36 16 190 47 230 28 129 84 152 173 60 131 60 55 60 8 127 98 209 161 161 125 188 163 226 193 93 208 202 255 99 1]
+		]
+		[248 102 12 1 161 1 206 167 173 228 112 201 249 157 157 78 64 8 128 168 111 29 73 187 68 75 98 241 26 158 187 100 187 20...
+		]
+	*/
+	// RLP serialize the wrapped Tx into a plain bytearray.
+	wrappedTxRLPBytes, err := rlp.EncodeToBytes(tx.Tx)
+	if err != nil {
+		return
+	}
+	// RLP Serialize the SignedTx
 	rlpRawMsg, err := buildRLPMessage(
 		ObjectTagSignedTransaction,
 		rlpMessageVersion,
 		tx.Signatures,
-		tx.Tx,
+		wrappedTxRLPBytes,
 	)
 	if err != nil {
 		return err
@@ -159,6 +237,13 @@ func (tx *SignedTx) EncodeRLP(w io.Writer) (err error) {
 		return err
 	}
 	return nil
+}
+
+func NewSignedTx(Signatures [][]byte, tx rlp.Encoder) (s SignedTx) {
+	return SignedTx{
+		Signatures: Signatures,
+		Tx:         tx,
+	}
 }
 
 // SpendTx represents a simple transaction where one party sends another AE
