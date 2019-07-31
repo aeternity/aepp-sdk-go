@@ -3,12 +3,9 @@ contract BlindAuth =
 
       entrypoint init(owner' : address) = { nonce = 1, owner = owner' }
 
-      stateful entrypoint authorize(s : signature) : bool =
-        switch(Auth.tx_hash)
-          None          => abort("Not in Auth context")
-          Some(tx_hash) => 
-              put(state{ nonce = state.nonce + 1 })
-              true
+      stateful entrypoint authorize() : bool =
+        put(state{nonce = state.nonce + 1})
+        true
 
       entrypoint to_sign(h : hash, n : int) : hash =
         Crypto.blake2b((h, n))
