@@ -46,7 +46,12 @@ func signBroadcast(t *testing.T, tx rlp.Encoder, acc *aeternity.Account, aeNode 
 		t.Fatal(err)
 	}
 
-	signedTxStr, hash, _, err := aeternity.SignEncodeTxStr(acc, txB64, aeternity.Config.Node.NetworkID)
+	signedTx, hash, _, err := aeternity.SignHashTx(acc, tx, aeternity.Config.Node.NetworkID)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	signedTxStr, err := aeternity.SerializeTx(&signedTx)
 	if err != nil {
 		t.Fatal(err)
 	}
