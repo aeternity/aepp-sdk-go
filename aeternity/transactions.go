@@ -138,6 +138,29 @@ func SerializeTx(tx rlp.Encoder) (string, error) {
 	return txStr, nil
 }
 
+type SignedTx struct {
+	Signatures [][]byte
+	Tx         rlp.Encoder
+}
+
+func (tx *SignedTx) EncodeRLP(w io.Writer) (err error) {
+	// encode the message using rlp
+	rlpRawMsg, err := buildRLPMessage(
+		ObjectTagSignedTransaction,
+		rlpMessageVersion,
+		tx.Signatures,
+		tx.Tx,
+	)
+	if err != nil {
+		return err
+	}
+	_, err = w.Write(rlpRawMsg)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // SpendTx represents a simple transaction where one party sends another AE
 type SpendTx struct {
 	SenderID    string
