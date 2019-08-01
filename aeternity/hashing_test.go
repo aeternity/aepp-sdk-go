@@ -388,3 +388,157 @@ func Test_buildContractID(t *testing.T) {
 		})
 	}
 }
+
+func Test_buildIDTag(t *testing.T) {
+	type args struct {
+		IDTag       uint8
+		encodedHash string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantV   []uint8
+		wantErr bool
+	}{
+		{
+			name: "ID tag for Account",
+			args: args{
+				IDTag:       IDTagAccount,
+				encodedHash: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
+			},
+			wantV:   []uint8{1, 31, 19, 163, 176, 139, 240, 1, 64, 6, 98, 166, 139, 105, 216, 117, 247, 128, 60, 236, 76, 8, 100, 127, 110, 213, 216, 76, 120, 151, 189, 80, 163},
+			wantErr: false,
+		},
+		{
+			name: "ID tag for Name",
+			args: args{
+				IDTag:       IDTagName,
+				encodedHash: "nm_ie148R2qZYBfo1Ek3sZpfTLwBhkkqCRKi2Ce8JJ7yyWVRw2Sb",
+			},
+			wantV:   []uint8{2, 94, 139, 71, 6, 116, 53, 155, 220, 71, 235, 99, 73, 173, 100, 0, 197, 208, 186, 16, 227, 34, 250, 207, 93, 8, 255, 113, 19, 39, 71, 233, 40},
+			wantErr: false,
+		},
+		{
+			name: "ID tag for Commitment",
+			args: args{
+				IDTag:       IDTagCommitment,
+				encodedHash: "cm_2jJov6dn121oKkHo6TuWaAAL4ZEMonnCjpo8jatkCixrLG8Uc4",
+			},
+			wantV:   []uint8{3, 227, 194, 105, 213, 122, 105, 93, 105, 190, 173, 83, 176, 72, 82, 232, 179, 29, 29, 42, 62, 248, 117, 91, 32, 18, 194, 151, 177, 251, 210, 208, 193},
+			wantErr: false,
+		},
+		{
+			name: "ID tag for Oracle",
+			args: args{
+				IDTag:       IDTagOracle,
+				encodedHash: "ok_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+			},
+			wantV:   []uint8{4, 206, 167, 173, 228, 112, 201, 249, 157, 157, 78, 64, 8, 128, 168, 111, 29, 73, 187, 68, 75, 98, 241, 26, 158, 187, 100, 187, 207, 235, 115, 254, 243},
+			wantErr: false,
+		},
+		{
+			name: "ID tag for Contract",
+			args: args{
+				IDTag:       IDTagContract,
+				encodedHash: "ct_2pfWWzeRzWSdm68HXZJn61KhxdsBA46wzYgvo1swkdJZij1rKm",
+			},
+			wantV:   []uint8{5, 239, 236, 68, 81, 186, 240, 95, 106, 155, 58, 111, 124, 149, 82, 169, 148, 80, 73, 134, 189, 169, 218, 37, 177, 128, 198, 72, 122, 183, 77, 248, 195},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotV, err := buildIDTag(tt.args.IDTag, tt.args.encodedHash)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("buildIDTag() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(gotV, tt.wantV) {
+				t.Errorf("buildIDTag() = %v, want %v", gotV, tt.wantV)
+			}
+		})
+	}
+}
+
+func Test_readIDTag(t *testing.T) {
+	type args struct {
+		v []uint8
+	}
+	tests := []struct {
+		name            string
+		args            args
+		wantIDTag       uint8
+		wantEncodedHash string
+		wantErr         bool
+	}{
+		{
+			name: "Read ID tag for Account",
+			args: args{
+				v: []uint8{1, 31, 19, 163, 176, 139, 240, 1, 64, 6, 98, 166, 139, 105, 216, 117, 247, 128, 60, 236, 76, 8, 100, 127, 110, 213, 216, 76, 120, 151, 189, 80, 163},
+			},
+			wantIDTag:       IDTagAccount,
+			wantEncodedHash: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
+			wantErr:         false,
+		},
+		{
+			name: "Read ID tag for Name",
+			args: args{
+				v: []uint8{2, 94, 139, 71, 6, 116, 53, 155, 220, 71, 235, 99, 73, 173, 100, 0, 197, 208, 186, 16, 227, 34, 250, 207, 93, 8, 255, 113, 19, 39, 71, 233, 40},
+			},
+			wantIDTag:       IDTagName,
+			wantEncodedHash: "nm_ie148R2qZYBfo1Ek3sZpfTLwBhkkqCRKi2Ce8JJ7yyWVRw2Sb",
+			wantErr:         false,
+		},
+		{
+			name: "Read ID tag for Commitment",
+			args: args{
+				v: []uint8{3, 227, 194, 105, 213, 122, 105, 93, 105, 190, 173, 83, 176, 72, 82, 232, 179, 29, 29, 42, 62, 248, 117, 91, 32, 18, 194, 151, 177, 251, 210, 208, 193},
+			},
+			wantIDTag:       IDTagCommitment,
+			wantEncodedHash: "cm_2jJov6dn121oKkHo6TuWaAAL4ZEMonnCjpo8jatkCixrLG8Uc4",
+			wantErr:         false,
+		},
+		{
+			name: "Read ID tag for Oracle",
+			args: args{
+				v: []uint8{4, 206, 167, 173, 228, 112, 201, 249, 157, 157, 78, 64, 8, 128, 168, 111, 29, 73, 187, 68, 75, 98, 241, 26, 158, 187, 100, 187, 207, 235, 115, 254, 243},
+			},
+			wantIDTag:       IDTagOracle,
+			wantEncodedHash: "ok_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+			wantErr:         false,
+		},
+		{
+			name: "Read ID tag for Contract",
+			args: args{
+				v: []uint8{5, 239, 236, 68, 81, 186, 240, 95, 106, 155, 58, 111, 124, 149, 82, 169, 148, 80, 73, 134, 189, 169, 218, 37, 177, 128, 198, 72, 122, 183, 77, 248, 195},
+			},
+			wantIDTag:       IDTagContract,
+			wantEncodedHash: "ct_2pfWWzeRzWSdm68HXZJn61KhxdsBA46wzYgvo1swkdJZij1rKm",
+			wantErr:         false,
+		},
+		{
+			name: "Unknown ID tag",
+			args: args{
+				v: []uint8{8, 239, 236, 68, 81, 186, 240, 95, 106, 155, 58, 111, 124, 149, 82, 169, 148, 80, 73, 134, 189, 169, 218, 37, 177, 128, 198, 72, 122, 183, 77, 248, 195},
+			},
+			wantIDTag:       0,
+			wantEncodedHash: "",
+			wantErr:         true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotIDTag, gotEncodedHash, err := readIDTag(tt.args.v)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("readIDTag() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if gotIDTag != tt.wantIDTag {
+				t.Errorf("readIDTag() gotIDTag = %v, want %v", gotIDTag, tt.wantIDTag)
+			}
+			if gotEncodedHash != tt.wantEncodedHash {
+				t.Errorf("readIDTag() gotEncodedHash = %v, want %v", gotEncodedHash, tt.wantEncodedHash)
+			}
+		})
+	}
+}

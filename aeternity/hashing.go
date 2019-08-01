@@ -8,9 +8,9 @@ import (
 	"math/big"
 	"strings"
 
-	rlp "github.com/randomshinichi/rlpae"
 	"github.com/aeternity/aepp-sdk-go/utils"
 	"github.com/btcsuite/btcutil/base58"
+	rlp "github.com/randomshinichi/rlpae"
 	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/blake2b"
 )
@@ -200,13 +200,44 @@ func buildRLPMessage(tag uint, version uint, fields ...interface{}) (rlpRawMsg [
 }
 
 // buildIDTag assemble an id() object see
-// https://github.com/aeternity/protocol/blob/epoch-v0.22.0/serializations.md#the-id-type
+// https://github.com/aeternity/protocol/blob/master/serializations.md#the-id-type
 func buildIDTag(IDTag uint8, encodedHash string) (v []uint8, err error) {
 	raw, err := Decode(encodedHash)
 	v = []uint8{IDTag}
 	for _, x := range raw {
 		v = append(v, uint8(x))
 	}
+	return
+}
+
+// readIDTag disassemble an id() object see
+// https://github.com/aeternity/protocol/blob/master/serializations.md#the-id-type
+func readIDTag(v []uint8) (IDTag uint8, encodedHash string, err error) {
+	IDTag = v[0]
+	hash := []byte{}
+	for _, x := range v[1:] {
+		hash = append(hash, byte(x))
+	}
+
+	var prefix HashPrefix
+	switch IDTag {
+	case IDTagAccount:
+		prefix = PrefixAccountPubkey
+	case IDTagName:
+		prefix = PrefixName
+	case IDTagCommitment:
+		prefix = PrefixCommitment
+	case IDTagOracle:
+		prefix = PrefixOraclePubkey
+	case IDTagContract:
+		prefix = PrefixContractPubkey
+	case IDTagChannel:
+		prefix = PrefixChannel
+	default:
+		return 0, "", fmt.Errorf("readIDTag() does not recognize this IDTag (first byte in input array): %v", IDTag)
+	}
+
+	encodedHash = Encode(prefix, hash)
 	return
 }
 
