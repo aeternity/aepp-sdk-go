@@ -330,18 +330,6 @@ func GetWalletPath(path string) (walletPath string, err error) {
 	return
 }
 
-// SignEncodeTxStr sign and encode a transaction format as string (ex. tx_xyz)
-func SignEncodeTxStr(kp *Account, tx string, networkID string) (signedEncodedTx, signedEncodedTxHash, signature string, err error) {
-	txRaw, err := Decode(tx)
-	if err != nil {
-		fmt.Println("Error decoding tx from base64")
-		os.Exit(1)
-	}
-
-	signedEncodedTx, signedEncodedTxHash, signature, err = SignEncodeTx(kp, txRaw, networkID)
-	return
-}
-
 // VerifySignedTx verifies a tx_ with signature
 func VerifySignedTx(accountID string, txSigned string, networkID string) (valid bool, err error) {
 	txRawSigned, _ := Decode(txSigned)
