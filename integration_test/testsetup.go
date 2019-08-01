@@ -41,11 +41,6 @@ func setupAccounts(t *testing.T) (*aeternity.Account, *aeternity.Account) {
 }
 
 func signBroadcast(t *testing.T, tx rlp.Encoder, acc *aeternity.Account, aeNode *aeternity.Node) (hash string) {
-	txB64, err := aeternity.SerializeTx(tx)
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	signedTx, hash, _, err := aeternity.SignHashTx(acc, tx, aeternity.Config.Node.NetworkID)
 	if err != nil {
 		t.Fatal(err)

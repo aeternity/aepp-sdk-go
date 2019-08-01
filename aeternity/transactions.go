@@ -53,38 +53,6 @@ func SignHashTx(kp *Account, tx rlp.Encoder, networkID string) (signedTx SignedT
 	return signedTx, txhash, signature, nil
 }
 
-// SignEncodeTx sign and encode a transaction
-func SignEncodeTx(kp *Account, txRaw []byte, networkID string) (signedEncodedTx, signedEncodedTxHash, signature string, err error) {
-	// add the network_id to the transaction
-	msg := append([]byte(networkID), txRaw...)
-	// sign the transaction
-	sigRaw := kp.Sign(msg)
-	if err != nil {
-		return
-	}
-	// encode the message using rlp
-	rlpTxRaw, err := createSignedTransaction(txRaw, [][]byte{sigRaw})
-	// encode the rlp message with the prefix
-	signedEncodedTx = Encode(PrefixTransaction, rlpTxRaw)
-	// compute the hash
-	rlpTxHashRaw, err := hash(rlpTxRaw)
-	signedEncodedTxHash = Encode(PrefixTransactionHash, rlpTxHashRaw)
-	// encode the signature
-	signature = Encode(PrefixSignature, sigRaw)
-	return
-}
-
-func createSignedTransaction(txRaw []byte, signatures [][]byte) (rlpRawMsg []byte, err error) {
-	// encode the message using rlp
-	rlpRawMsg, err = buildRLPMessage(
-		ObjectTagSignedTransaction,
-		rlpMessageVersion,
-		signatures,
-		txRaw,
-	)
-	return
-}
-
 func ttlTypeIntToStr(i uint64) string {
 	var oracleTTLTypeStr string
 	if i == 0 {
