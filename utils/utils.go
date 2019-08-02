@@ -62,6 +62,8 @@ func (b *BigInt) UnmarshalJSON(text []byte) error {
 // MarshalJSON implements the json.Marshaler interface.
 func (b *BigInt) MarshalJSON() ([]byte, error) {
 	bc := new(big.Int)
+	bOrig := big.Int(*b)
+	bc.Set(&bOrig)
 	return bc.MarshalJSON()
 }
 
