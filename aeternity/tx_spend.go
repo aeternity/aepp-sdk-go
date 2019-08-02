@@ -1,0 +1,144 @@
+package aeternity
+
+import (
+	"bytes"
+	"io"
+	"math/big"
+
+	"github.com/aeternity/aepp-sdk-go/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/utils"
+	rlp "github.com/randomshinichi/rlpae"
+)
+
+// SpendTx represents a simple transaction where one party sends another AE
+type SpendTx struct {
+	SenderID    string
+	RecipientID string
+	Amount      big.Int
+	Fee         big.Int
+	Payload     []byte
+	TTL         uint64
+	Nonce       uint64
+}
+
+// Equal compares the receiver to another struct of the same type. This is
+// needed because several types in Golang are difficult to compare, especially
+// using reflect.DeepEqual.
+func (tx *SpendTx) Equal(other *SpendTx) (equal bool) {
+	equal = (tx.SenderID == other.SenderID &&
+		tx.RecipientID == other.RecipientID &&
+		tx.Amount.Cmp(&other.Amount) == 0 &&
+		tx.Fee.Cmp(&other.Fee) == 0 &&
+		bytes.Equal(tx.Payload, other.Payload) &&
+		tx.TTL == other.TTL &&
+		tx.Nonce == other.Nonce)
+	return
+}
+
+// EncodeRLP implements rlp.Encoder
+func (tx *SpendTx) EncodeRLP(w io.Writer) (err error) {
+	// build id for the sender
+	sID, err := buildIDTag(IDTagAccount, tx.SenderID)
+	if err != nil {
+		return
+	}
+	// build id for the recipient
+	rID, err := buildIDTag(IDTagAccount, tx.RecipientID)
+	if err != nil {
+		return
+	}
+	// create the transaction
+	rlpRawMsg, err := buildRLPMessage(
+		ObjectTagSpendTransaction,
+		rlpMessageVersion,
+		sID,
+		rID,
+		tx.Amount,
+		tx.Fee,
+		tx.TTL,
+		tx.Nonce,
+		[]byte(tx.Payload))
+
+	if err != nil {
+		return
+	}
+	_, err = w.Write(rlpRawMsg)
+	if err != nil {
+		return
+	}
+	return nil
+}
+
+type spendtx struct {
+	ObjectTagSpendTransaction uint
+	RlpMessageVersion         uint
+	SenderID                  []uint8
+	ReceiverID                []uint8
+	Amount                    big.Int
+	Fee                       big.Int
+	TTL                       uint64
+	Nonce                     uint64
+	Payload                   []byte
+}
+
+func (tx *SpendTx) DecodeRLP(s *rlp.Stream) (err error) {
+	stx := &spendtx{}
+	blob, err := s.Raw()
+	err = rlp.DecodeBytes(blob, stx)
+	if err != nil {
+		return err
+	}
+
+	_, sID, err := readIDTag(stx.SenderID)
+	if err != nil {
+		return err
+	}
+	_, rID, err := readIDTag(stx.ReceiverID)
+	if err != nil {
+		return err
+	}
+	tx.SenderID = sID
+	tx.RecipientID = rID
+	tx.Amount = stx.Amount
+	tx.Fee = stx.Fee
+	tx.TTL = stx.TTL
+	tx.Nonce = stx.Nonce
+	tx.Payload = stx.Payload
+	return
+}
+
+// JSON representation of a Tx is useful for querying the node's debug endpoint
+func (tx *SpendTx) JSON() (string, error) {
+	baseEncodedPayload := Encode(PrefixByteArray, tx.Payload)
+	swaggerT := models.SpendTx{
+		Amount:      utils.BigInt(tx.Amount),
+		Fee:         utils.BigInt(tx.Fee),
+		Nonce:       tx.Nonce,
+		Payload:     &baseEncodedPayload,
+		RecipientID: &tx.RecipientID,
+		SenderID:    &tx.SenderID,
+		TTL:         tx.TTL,
+	}
+	output, err := swaggerT.MarshalBinary()
+	return string(output), err
+}
+
+// sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
+func (tx *SpendTx) sizeEstimate() (int, error) {
+	return calcSizeEstimate(tx, &tx.Fee)
+}
+
+// FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
+func (tx *SpendTx) FeeEstimate() (*big.Int, error) {
+	txLenEstimated, err := tx.sizeEstimate()
+	if err != nil {
+		return new(big.Int), err
+	}
+	estimatedFee := calcFeeStd(tx, txLenEstimated)
+	return estimatedFee, nil
+}
+
+// NewSpendTx is a constructor for a SpendTx struct
+func NewSpendTx(senderID, recipientID string, amount, fee big.Int, payload []byte, ttl, nonce uint64) SpendTx {
+	return SpendTx{senderID, recipientID, amount, fee, payload, ttl, nonce}
+}
