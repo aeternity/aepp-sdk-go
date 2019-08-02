@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/aeternity/aepp-sdk-go/utils"
+	rlp "github.com/randomshinichi/rlpae"
 )
 
 func TestNamePointer_EncodeRLP(t *testing.T) {
@@ -96,6 +97,50 @@ func TestNamePreclaimTx_EncodeRLP(t *testing.T) {
 			if !reflect.DeepEqual(gotTx, tt.wantTx) {
 				gotTxRawBytes, wantTxRawBytes := getRLPSerialized(gotTx, tt.wantTx)
 				t.Errorf("NamePreclaimTx.RLP() = \n%v\n%v, want \n%v\n%v", gotTx, gotTxRawBytes, tt.wantTx, wantTxRawBytes)
+			}
+		})
+	}
+}
+
+func TestNamePreclaimTx_DecodeRLP(t *testing.T) {
+	type args struct {
+		rlpBytes []byte
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantTx  NamePreclaimTx
+		wantErr bool
+	}{
+		{
+			name: "Normal procedure, reserve a name on AENS",
+			args: args{
+				// tx_+EkhAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vMBoQPk/tyQN11szXxmy4KFOFRzfzopJGCmg7cv5B9SwaJs0goKoCk0Qg==
+				// [[33] [1] [1 206 167 173 228 112 201 249 157 157 78 64 8 128 168 111 29 73 187 68 75 98 241 26 158 187 100 187 207 235 115 254 243] [1] [3 228 254 220 144 55 93 108 205 124 102 203 130 133 56 84 115 127 58 41 36 96 166 131 183 47 228 31 82 193 162 108 210] [10] [10]]
+				rlpBytes: []byte{248, 73, 33, 1, 161, 1, 206, 167, 173, 228, 112, 201, 249, 157, 157, 78, 64, 8, 128, 168, 111, 29, 73, 187, 68, 75, 98, 241, 26, 158, 187, 100, 187, 207, 235, 115, 254, 243, 1, 161, 3, 228, 254, 220, 144, 55, 93, 108, 205, 124, 102, 203, 130, 133, 56, 84, 115, 127, 58, 41, 36, 96, 166, 131, 183, 47, 228, 31, 82, 193, 162, 108, 210, 10, 10},
+			},
+			wantTx: NamePreclaimTx{
+				AccountID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+				CommitmentID: "cm_2jrPGyFKCEFFrsVvQsUzfnSURV5igr2WxvMR679S5DnuFEjet4", // name: fdsa.test, salt: 12345
+				Fee:          *utils.NewIntFromUint64(10),
+				TTL:          uint64(10),
+				AccountNonce: uint64(1),
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotTx := NamePreclaimTx{}
+			b := &bytes.Buffer{}
+			b.Write(tt.args.rlpBytes)
+
+			err := rlp.Decode(b, &gotTx)
+			if err != nil {
+				t.Error(err)
+			}
+			if !(gotTx.Equal(&tt.wantTx)) {
+				t.Errorf("Deserialization resulted in different structs: got %+v, want %+v", gotTx, tt.wantTx)
 			}
 		})
 	}
