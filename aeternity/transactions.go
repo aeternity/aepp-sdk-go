@@ -225,6 +225,20 @@ type SpendTx struct {
 	Nonce       uint64
 }
 
+// Equal compares the receiver to another struct of the same type. This is
+// needed because several types in Golang are difficult to compare, especially
+// using reflect.DeepEqual.
+func (tx *SpendTx) Equal(other *SpendTx) (equal bool) {
+	equal = (tx.SenderID == other.SenderID &&
+		tx.RecipientID == other.RecipientID &&
+		tx.Amount.Cmp(&other.Amount) == 0 &&
+		tx.Fee.Cmp(&other.Fee) == 0 &&
+		bytes.Equal(tx.Payload, other.Payload) &&
+		tx.TTL == other.TTL &&
+		tx.Nonce == other.Nonce)
+	return
+}
+
 // EncodeRLP implements rlp.Encoder
 func (tx *SpendTx) EncodeRLP(w io.Writer) (err error) {
 	// build id for the sender
@@ -257,6 +271,44 @@ func (tx *SpendTx) EncodeRLP(w io.Writer) (err error) {
 		return
 	}
 	return nil
+}
+
+type spendtx struct {
+	ObjectTagSpendTransaction uint
+	RlpMessageVersion         uint
+	SenderID                  []uint8
+	ReceiverID                []uint8
+	Amount                    big.Int
+	Fee                       big.Int
+	TTL                       uint64
+	Nonce                     uint64
+	Payload                   []byte
+}
+
+func (tx *SpendTx) DecodeRLP(s *rlp.Stream) (err error) {
+	stx := &spendtx{}
+	blob, err := s.Raw()
+	err = rlp.DecodeBytes(blob, stx)
+	if err != nil {
+		return err
+	}
+
+	_, sID, err := readIDTag(stx.SenderID)
+	if err != nil {
+		return err
+	}
+	_, rID, err := readIDTag(stx.ReceiverID)
+	if err != nil {
+		return err
+	}
+	tx.SenderID = sID
+	tx.RecipientID = rID
+	tx.Amount = stx.Amount
+	tx.Fee = stx.Fee
+	tx.TTL = stx.TTL
+	tx.Nonce = stx.Nonce
+	tx.Payload = stx.Payload
+	return
 }
 
 // JSON representation of a Tx is useful for querying the node's debug endpoint
