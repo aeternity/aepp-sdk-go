@@ -18,6 +18,18 @@ type NamePreclaimTx struct {
 	AccountNonce uint64
 }
 
+// Equal compares the receiver to another struct of the same type. This is
+// needed because several types in Golang are difficult to compare, especially
+// using reflect.DeepEqual.
+func (tx *NamePreclaimTx) Equal(other *NamePreclaimTx) (equal bool) {
+	equal = (tx.AccountID == other.AccountID &&
+		tx.CommitmentID == other.CommitmentID &&
+		tx.Fee.Cmp(&other.Fee) == 0 &&
+		tx.TTL == other.TTL &&
+		tx.AccountNonce == other.AccountNonce)
+	return
+}
+
 // EncodeRLP implements rlp.Encoder
 func (tx *NamePreclaimTx) EncodeRLP(w io.Writer) (err error) {
 	// build id for the sender
@@ -47,6 +59,44 @@ func (tx *NamePreclaimTx) EncodeRLP(w io.Writer) (err error) {
 	if err != nil {
 		return
 	}
+	return
+}
+
+type namePreclaimRLP struct {
+	ObjectTag         uint
+	RlpMessageVersion uint
+	AccountID         []uint8
+	AccountNonce      uint64
+	CommitmentID      []uint8
+	Fee               big.Int
+	TTL               uint64
+}
+
+// DecodeRLP implements rlp.Decoder
+func (tx *NamePreclaimTx) DecodeRLP(s *rlp.Stream) (err error) {
+	ntx := &namePreclaimRLP{}
+	blob, err := s.Raw()
+	if err != nil {
+		return err
+	}
+	err = rlp.DecodeBytes(blob, ntx)
+	if err != nil {
+		return err
+	}
+	_, aID, err := readIDTag(ntx.AccountID)
+	if err != nil {
+		return err
+	}
+	_, cID, err := readIDTag(ntx.CommitmentID)
+	if err != nil {
+		return err
+	}
+
+	tx.AccountID = aID
+	tx.CommitmentID = cID
+	tx.Fee = ntx.Fee
+	tx.TTL = ntx.TTL
+	tx.AccountNonce = ntx.AccountNonce
 	return
 }
 
