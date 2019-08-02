@@ -89,17 +89,17 @@ func TestSpendTx_DecodeRLP(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		wantTx  SpendTx
 		args    args
+		wantTx  SpendTx
 		wantErr bool
 	}{
 		{
+			name: "Spend 10, Fee 10, Hello World",
 			args: args{
 				// tx_+FYMAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vOhAR8To7CL8AFABmKmi2nYdfeAPOxMCGR/btXYTHiXvVCjCgoKAYtIZWxsbyBXb3JsZPSZjdM=
 				// [12] [1] [1 206 167 173 228 112 201 249 157 157 78 64 8 128 168 111 29 73 187 68 75 98 241 26 158 187 100 187 207 235 115 254 243] [1 31 19 163 176 139 240 1 64 6 98 166 139 105 216 117 247 128 60 236 76 8 100 127 110 213 216 76 120 151 189 80 163] [10] [10] [10] [1] [72 101 108 108 111 32 87 111 114 108 100]]
 				rlpBytes: []byte{248, 86, 12, 1, 161, 1, 206, 167, 173, 228, 112, 201, 249, 157, 157, 78, 64, 8, 128, 168, 111, 29, 73, 187, 68, 75, 98, 241, 26, 158, 187, 100, 187, 207, 235, 115, 254, 243, 161, 1, 31, 19, 163, 176, 139, 240, 1, 64, 6, 98, 166, 139, 105, 216, 117, 247, 128, 60, 236, 76, 8, 100, 127, 110, 213, 216, 76, 120, 151, 189, 80, 163, 10, 10, 10, 1, 139, 72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100},
 			},
-			name: "Spend 10, Fee 10, Hello World",
 			wantTx: SpendTx{
 				SenderID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
 				RecipientID: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
@@ -112,12 +112,12 @@ func TestSpendTx_DecodeRLP(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "Spend 0, Fee 10, Hello World (check correct RLP deserialization of 0)",
 			args: args{
 				// tx_+FYMAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vOhAR8To7CL8AFABmKmi2nYdfeAPOxMCGR/btXYTHiXvVCjAAoKAYtIZWxsbyBXb3JsZICI5/w=
 				// [[12] [1] [1 206 167 173 228 112 201 249 157 157 78 64 8 128 168 111 29 73 187 68 75 98 241 26 158 187 100 187 207 235 115 254 243] [1 31 19 163 176 139 240 1 64 6 98 166 139 105 216 117 247 128 60 236 76 8 100 127 110 213 216 76 120 151 189 80 163] [0] [10] [10] [1] [72 101 108 108 111 32 87 111 114 108 100]]
 				rlpBytes: []byte{248, 86, 12, 1, 161, 1, 206, 167, 173, 228, 112, 201, 249, 157, 157, 78, 64, 8, 128, 168, 111, 29, 73, 187, 68, 75, 98, 241, 26, 158, 187, 100, 187, 207, 235, 115, 254, 243, 161, 1, 31, 19, 163, 176, 139, 240, 1, 64, 6, 98, 166, 139, 105, 216, 117, 247, 128, 60, 236, 76, 8, 100, 127, 110, 213, 216, 76, 120, 151, 189, 80, 163, 0, 10, 10, 1, 139, 72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100},
 			},
-			name: "Spend 0, Fee 10, Hello World (check correct RLP deserialization of 0)",
 			wantTx: SpendTx{
 				SenderID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
 				RecipientID: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",

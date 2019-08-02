@@ -69,7 +69,7 @@ func (tx *SpendTx) EncodeRLP(w io.Writer) (err error) {
 	return nil
 }
 
-type spendtx struct {
+type spendRLP struct {
 	ObjectTagSpendTransaction uint
 	RlpMessageVersion         uint
 	SenderID                  []uint8
@@ -81,22 +81,31 @@ type spendtx struct {
 	Payload                   []byte
 }
 
+func (stx *spendRLP) ReadRLP(s *rlp.Stream) (sID, rID string, err error) {
+	var blob []byte
+	if blob, err = s.Raw(); err != nil {
+		return
+	}
+	if err = rlp.DecodeBytes(blob, stx); err != nil {
+		return
+	}
+	if _, sID, err = readIDTag(stx.SenderID); err != nil {
+		return
+	}
+	if _, rID, err = readIDTag(stx.ReceiverID); err != nil {
+		return
+	}
+	return
+}
+
+// DecodeRLP implements rlp.Decoder
 func (tx *SpendTx) DecodeRLP(s *rlp.Stream) (err error) {
-	stx := &spendtx{}
-	blob, err := s.Raw()
-	err = rlp.DecodeBytes(blob, stx)
+	stx := &spendRLP{}
+	sID, rID, err := stx.ReadRLP(s)
 	if err != nil {
-		return err
+		return
 	}
 
-	_, sID, err := readIDTag(stx.SenderID)
-	if err != nil {
-		return err
-	}
-	_, rID, err := readIDTag(stx.ReceiverID)
-	if err != nil {
-		return err
-	}
 	tx.SenderID = sID
 	tx.RecipientID = rID
 	tx.Amount = stx.Amount
