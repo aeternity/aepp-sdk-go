@@ -10,6 +10,10 @@ import (
 	rlp "github.com/randomshinichi/rlpae"
 )
 
+// Sign calculates the signature of the SignedTx.Tx. Although it does not use
+// the SignedTx itself, it takes a SignedTx as an argument because if it took a
+// rlp.Encoder as an interface, one might expect the signature to be of the
+// SignedTx itself, which won't work.
 func Sign(kp *Account, tx *SignedTx, networkID string) (signature []byte, err error) {
 	txRaw, err := rlp.EncodeToBytes(tx.Tx)
 	if err != nil {
@@ -22,6 +26,8 @@ func Sign(kp *Account, tx *SignedTx, networkID string) (signature []byte, err er
 	return
 }
 
+// Hash calculates the hash of a SignedTx. It is intended to be used after
+// SignedTx.Signatures has been filled out.
 func Hash(tx *SignedTx) (txhash string, err error) {
 	rlpTxRaw, err := rlp.EncodeToBytes(tx)
 	if err != nil {
@@ -36,6 +42,8 @@ func Hash(tx *SignedTx) (txhash string, err error) {
 	return txhash, nil
 }
 
+// SignHashTx wraps a *Tx struct in a SignedTx, then calculates the signature
+// and hash.
 func SignHashTx(kp *Account, tx rlp.Encoder, networkID string) (signedTx SignedTx, txhash, signature string, err error) {
 	signedTx = NewSignedTx([][]byte{}, tx)
 	sigBytes, err := Sign(kp, &signedTx, networkID)
@@ -147,11 +155,13 @@ func SerializeTx(tx rlp.Encoder) (string, error) {
 	return txStr, nil
 }
 
+// SignedTx wraps around other Tx structs to hold the signature.
 type SignedTx struct {
 	Signatures [][]byte
 	Tx         rlp.Encoder
 }
 
+// EncodeRLP implements rlp.Encoder
 func (tx *SignedTx) EncodeRLP(w io.Writer) (err error) {
 	/*
 		DO NOT WANT
@@ -206,6 +216,7 @@ func (tx *SignedTx) EncodeRLP(w io.Writer) (err error) {
 	return nil
 }
 
+// NewSignedTx ensures that all fields of SignedTx are filled out.
 func NewSignedTx(Signatures [][]byte, tx rlp.Encoder) (s SignedTx) {
 	return SignedTx{
 		Signatures: Signatures,
