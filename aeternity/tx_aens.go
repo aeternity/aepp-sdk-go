@@ -18,18 +18,6 @@ type NamePreclaimTx struct {
 	AccountNonce uint64
 }
 
-// Equal compares the receiver to another struct of the same type. This is
-// needed because several types in Golang are difficult to compare, especially
-// using reflect.DeepEqual.
-func (tx *NamePreclaimTx) Equal(other *NamePreclaimTx) (equal bool) {
-	equal = (tx.AccountID == other.AccountID &&
-		tx.CommitmentID == other.CommitmentID &&
-		tx.Fee.Cmp(&other.Fee) == 0 &&
-		tx.TTL == other.TTL &&
-		tx.AccountNonce == other.AccountNonce)
-	return
-}
-
 // EncodeRLP implements rlp.Encoder
 func (tx *NamePreclaimTx) EncodeRLP(w io.Writer) (err error) {
 	// build id for the sender
@@ -174,6 +162,42 @@ func (tx *NameClaimTx) EncodeRLP(w io.Writer) (err error) {
 	return
 }
 
+type nameClaimRLP struct {
+	ObjectTag         uint
+	RlpMessageVersion uint
+	AccountID         []uint8
+	AccountNonce      uint64
+	Name              string
+	NameSalt          big.Int
+	Fee               big.Int
+	TTL               uint64
+}
+
+// DecodeRLP implements rlp.Decoder
+func (tx *NameClaimTx) DecodeRLP(s *rlp.Stream) (err error) {
+	ntx := &nameClaimRLP{}
+	blob, err := s.Raw()
+	if err != nil {
+		return err
+	}
+	err = rlp.DecodeBytes(blob, ntx)
+	if err != nil {
+		return err
+	}
+	_, aID, err := readIDTag(ntx.AccountID)
+	if err != nil {
+		return err
+	}
+
+	tx.AccountID = aID
+	tx.Name = ntx.Name
+	tx.NameSalt = ntx.NameSalt
+	tx.Fee = ntx.Fee
+	tx.TTL = ntx.TTL
+	tx.AccountNonce = ntx.AccountNonce
+	return
+}
+
 // JSON representation of a Tx is useful for querying the node's debug endpoints
 func (tx *NameClaimTx) JSON() (string, error) {
 	// When talking JSON to the node, the name should be 'API encoded'
@@ -212,14 +236,24 @@ func NewNameClaimTx(accountID, name string, nameSalt big.Int, fee big.Int, ttl, 
 	return NameClaimTx{accountID, name, nameSalt, fee, ttl, accountNonce}
 }
 
-// NamePointer extends the swagger gener ated models.NamePointer to provide RLP serialization
+// NamePointer is a go-native representation of swagger generated
+// models.NamePointer.
 type NamePointer struct {
-	*models.NamePointer
+	Key string
+	ID  string
+}
+
+// Swagger generates the go-swagger representation of this model
+func (np *NamePointer) Swagger() *models.NamePointer {
+	return &models.NamePointer{
+		Key: &np.Key,
+		ID:  &np.ID,
+	}
 }
 
 // EncodeRLP implements rlp.Encoder interface.
 func (np *NamePointer) EncodeRLP(w io.Writer) (err error) {
-	accountID, err := buildIDTag(IDTagAccount, *np.NamePointer.ID)
+	accountID, err := buildIDTag(IDTagAccount, np.ID)
 	if err != nil {
 		return
 	}
@@ -231,12 +265,39 @@ func (np *NamePointer) EncodeRLP(w io.Writer) (err error) {
 	return err
 }
 
-// NewNamePointer is a constructor for a swagger generated NamePointer struct.
-// It returns a pointer because
+type namePointerRLP struct {
+	Key       string
+	AccountID []uint8
+}
+
+// DecodeRLP implements rlp.Decoder interface.
+func (np *NamePointer) DecodeRLP(s *rlp.Stream) (err error) {
+	npRLP := &namePointerRLP{}
+	blob, err := s.Raw()
+	if err != nil {
+		return err
+	}
+
+	err = rlp.DecodeBytes(blob, npRLP)
+	if err != nil {
+		return err
+	}
+
+	_, aID, err := readIDTag(npRLP.AccountID)
+	if err != nil {
+		return err
+	}
+
+	np.Key = npRLP.Key
+	np.ID = aID
+	return err
+}
+
+// NewNamePointer is a constructor for NamePointer struct.
 func NewNamePointer(key string, id string) *NamePointer {
-	np := models.NamePointer{ID: &id, Key: &key}
 	return &NamePointer{
-		NamePointer: &np,
+		Key: key,
+		ID:  id,
 	}
 }
 
@@ -302,7 +363,7 @@ func (tx *NameUpdateTx) EncodeRLP(w io.Writer) (err error) {
 func (tx *NameUpdateTx) JSON() (string, error) {
 	swaggerNamePointers := []*models.NamePointer{}
 	for _, np := range tx.Pointers {
-		swaggerNamePointers = append(swaggerNamePointers, np.NamePointer)
+		swaggerNamePointers = append(swaggerNamePointers, np.Swagger())
 	}
 
 	swaggerT := models.NameUpdateTx{
@@ -382,6 +443,44 @@ func (tx *NameRevokeTx) EncodeRLP(w io.Writer) (err error) {
 	if err != nil {
 		return
 	}
+	return
+}
+
+type nameRevokeRLP struct {
+	ObjectTag         uint
+	RlpMessageVersion uint
+	AccountID         []uint8
+	AccountNonce      uint64
+	Name              []uint8
+	Fee               big.Int
+	TTL               uint64
+}
+
+// DecodeRLP implements rlp.Decoder interface.
+func (tx *NameRevokeTx) DecodeRLP(s *rlp.Stream) (err error) {
+	ntx := &nameRevokeRLP{}
+	blob, err := s.Raw()
+	if err != nil {
+		return err
+	}
+	err = rlp.DecodeBytes(blob, ntx)
+	if err != nil {
+		return err
+	}
+	_, aID, err := readIDTag(ntx.AccountID)
+	if err != nil {
+		return err
+	}
+	_, name, err := readIDTag(ntx.Name)
+	if err != nil {
+		return err
+	}
+
+	tx.AccountID = aID
+	tx.NameID = name
+	tx.Fee = ntx.Fee
+	tx.TTL = ntx.TTL
+	tx.AccountNonce = ntx.AccountNonce
 	return
 }
 
@@ -468,6 +567,50 @@ func (tx *NameTransferTx) EncodeRLP(w io.Writer) (err error) {
 	if err != nil {
 		return
 	}
+	return
+}
+
+type nameTransferRLP struct {
+	ObjectTag         uint
+	RlpMessageVersion uint
+	AccountID         []uint8
+	AccountNonce      uint64
+	Name              []uint8
+	RecipientID       []uint8
+	Fee               big.Int
+	TTL               uint64
+}
+
+// DecodeRLP implements rlp.Decoder interface.
+func (tx *NameTransferTx) DecodeRLP(s *rlp.Stream) (err error) {
+	ntx := &nameTransferRLP{}
+	blob, err := s.Raw()
+	if err != nil {
+		return err
+	}
+	err = rlp.DecodeBytes(blob, ntx)
+	if err != nil {
+		return err
+	}
+	_, aID, err := readIDTag(ntx.AccountID)
+	if err != nil {
+		return err
+	}
+	_, name, err := readIDTag(ntx.Name)
+	if err != nil {
+		return err
+	}
+	_, rID, err := readIDTag(ntx.RecipientID)
+	if err != nil {
+		return err
+	}
+
+	tx.AccountID = aID
+	tx.NameID = name
+	tx.RecipientID = rID
+	tx.Fee = ntx.Fee
+	tx.TTL = ntx.TTL
+	tx.AccountNonce = ntx.AccountNonce
 	return
 }
 
