@@ -44,9 +44,6 @@ func (tx *NamePreclaimTx) EncodeRLP(w io.Writer) (err error) {
 		return
 	}
 	_, err = w.Write(rlpRawMsg)
-	if err != nil {
-		return
-	}
 	return
 }
 
@@ -60,24 +57,27 @@ type namePreclaimRLP struct {
 	TTL               uint64
 }
 
+func (n *namePreclaimRLP) ReadRLP(s *rlp.Stream) (aID, cID string, err error) {
+	var blob []byte
+	if blob, err = s.Raw(); err != nil {
+		return
+	}
+	if err = rlp.DecodeBytes(blob, n); err != nil {
+		return
+	}
+	if _, aID, err = readIDTag(n.AccountID); err != nil {
+		return
+	}
+	_, cID, err = readIDTag(n.CommitmentID)
+	return
+}
+
 // DecodeRLP implements rlp.Decoder
 func (tx *NamePreclaimTx) DecodeRLP(s *rlp.Stream) (err error) {
 	ntx := &namePreclaimRLP{}
-	blob, err := s.Raw()
+	aID, cID, err := ntx.ReadRLP(s)
 	if err != nil {
-		return err
-	}
-	err = rlp.DecodeBytes(blob, ntx)
-	if err != nil {
-		return err
-	}
-	_, aID, err := readIDTag(ntx.AccountID)
-	if err != nil {
-		return err
-	}
-	_, cID, err := readIDTag(ntx.CommitmentID)
-	if err != nil {
-		return err
+		return
 	}
 
 	tx.AccountID = aID
@@ -173,22 +173,27 @@ type nameClaimRLP struct {
 	TTL               uint64
 }
 
+func (n *nameClaimRLP) ReadRLP(s *rlp.Stream) (aID string, err error) {
+	var blob []byte
+	if blob, err = s.Raw(); err != nil {
+		return
+	}
+	if err = rlp.DecodeBytes(blob, n); err != nil {
+		return
+	}
+	if _, aID, err = readIDTag(n.AccountID); err != nil {
+		return
+	}
+	return
+}
+
 // DecodeRLP implements rlp.Decoder
 func (tx *NameClaimTx) DecodeRLP(s *rlp.Stream) (err error) {
 	ntx := &nameClaimRLP{}
-	blob, err := s.Raw()
+	aID, err := ntx.ReadRLP(s)
 	if err != nil {
-		return err
+		return
 	}
-	err = rlp.DecodeBytes(blob, ntx)
-	if err != nil {
-		return err
-	}
-	_, aID, err := readIDTag(ntx.AccountID)
-	if err != nil {
-		return err
-	}
-
 	tx.AccountID = aID
 	tx.Name = ntx.Name
 	tx.NameSalt = ntx.NameSalt
@@ -272,20 +277,18 @@ type namePointerRLP struct {
 
 // DecodeRLP implements rlp.Decoder interface.
 func (np *NamePointer) DecodeRLP(s *rlp.Stream) (err error) {
+	var blob []byte
 	npRLP := &namePointerRLP{}
-	blob, err := s.Raw()
-	if err != nil {
-		return err
-	}
 
-	err = rlp.DecodeBytes(blob, npRLP)
-	if err != nil {
-		return err
+	if blob, err = s.Raw(); err != nil {
+		return
 	}
-
+	if err = rlp.DecodeBytes(blob, npRLP); err != nil {
+		return
+	}
 	_, aID, err := readIDTag(npRLP.AccountID)
 	if err != nil {
-		return err
+		return
 	}
 
 	np.Key = npRLP.Key
@@ -313,6 +316,18 @@ type NameUpdateTx struct {
 	AccountNonce uint64
 }
 
+func reverse(input []*NamePointer) []*NamePointer {
+	i := 0
+	j := len(input) - 1
+	reversedPointers := make([]*NamePointer, len(input))
+	for i <= len(input)-1 {
+		reversedPointers[i] = input[j]
+		i++
+		j--
+	}
+	return reversedPointers
+}
+
 // EncodeRLP implements rlp.Encoder
 func (tx *NameUpdateTx) EncodeRLP(w io.Writer) (err error) {
 	// build id for the sender
@@ -327,14 +342,7 @@ func (tx *NameUpdateTx) EncodeRLP(w io.Writer) (err error) {
 	}
 
 	// reverse the NamePointer order as compared to the JSON serialization, because the node seems to want it that way
-	i := 0
-	j := len(tx.Pointers) - 1
-	reversedPointers := make([]*NamePointer, len(tx.Pointers))
-	for i <= len(tx.Pointers)-1 {
-		reversedPointers[i] = tx.Pointers[j]
-		i++
-		j--
-	}
+	reversedPointers := reverse(tx.Pointers)
 
 	// create the transaction
 	rlpRawMsg, err := buildRLPMessage(
@@ -357,6 +365,55 @@ func (tx *NameUpdateTx) EncodeRLP(w io.Writer) (err error) {
 		return
 	}
 	return
+}
+
+type nameUpdateRLP struct {
+	ObjectTag         uint
+	RlpMessageVersion uint
+	AccountID         []uint8
+	AccountNonce      uint64
+	Name              []uint8
+	NameTTL           uint64
+	Pointers          []*NamePointer
+	ClientTTL         uint64
+	Fee               big.Int
+	TTL               uint64
+}
+
+func (n *nameUpdateRLP) ReadRLP(s *rlp.Stream) (aID, name string, err error) {
+	var blob []byte
+	if blob, err = s.Raw(); err != nil {
+		return
+	}
+	if err = rlp.DecodeBytes(blob, n); err != nil {
+		return
+	}
+	if _, aID, err = readIDTag(n.AccountID); err != nil {
+		return
+	}
+	if _, name, err = readIDTag(n.Name); err != nil {
+		return
+	}
+	return
+}
+
+// DecodeRLP implements rlp.Decoder
+func (tx *NameUpdateTx) DecodeRLP(s *rlp.Stream) (err error) {
+	ntx := &nameUpdateRLP{}
+	aID, name, err := ntx.ReadRLP(s)
+	if err != nil {
+		return
+	}
+
+	tx.AccountID = aID
+	tx.NameID = name
+	tx.Pointers = reverse(ntx.Pointers)
+	tx.NameTTL = ntx.NameTTL
+	tx.ClientTTL = ntx.ClientTTL
+	tx.Fee = ntx.Fee
+	tx.TTL = ntx.TTL
+	tx.AccountNonce = ntx.AccountNonce
+	return nil
 }
 
 // JSON representation of a Tx is useful for querying the node's debug endpoint
@@ -456,24 +513,29 @@ type nameRevokeRLP struct {
 	TTL               uint64
 }
 
+func (n *nameRevokeRLP) ReadRLP(s *rlp.Stream) (aID, name string, err error) {
+	var blob []byte
+	if blob, err = s.Raw(); err != nil {
+		return
+	}
+	if err = rlp.DecodeBytes(blob, n); err != nil {
+		return
+	}
+	if _, aID, err = readIDTag(n.AccountID); err != nil {
+		return
+	}
+	if _, name, err = readIDTag(n.Name); err != nil {
+		return
+	}
+	return
+}
+
 // DecodeRLP implements rlp.Decoder interface.
 func (tx *NameRevokeTx) DecodeRLP(s *rlp.Stream) (err error) {
 	ntx := &nameRevokeRLP{}
-	blob, err := s.Raw()
+	aID, name, err := ntx.ReadRLP(s)
 	if err != nil {
-		return err
-	}
-	err = rlp.DecodeBytes(blob, ntx)
-	if err != nil {
-		return err
-	}
-	_, aID, err := readIDTag(ntx.AccountID)
-	if err != nil {
-		return err
-	}
-	_, name, err := readIDTag(ntx.Name)
-	if err != nil {
-		return err
+		return
 	}
 
 	tx.AccountID = aID
@@ -581,28 +643,32 @@ type nameTransferRLP struct {
 	TTL               uint64
 }
 
+func (n *nameTransferRLP) ReadRLP(s *rlp.Stream) (aID, name, rID string, err error) {
+	var blob []byte
+	if blob, err = s.Raw(); err != nil {
+		return
+	}
+	if err = rlp.DecodeBytes(blob, n); err != nil {
+		return
+	}
+	if _, aID, err = readIDTag(n.AccountID); err != nil {
+		return
+	}
+	if _, name, err = readIDTag(n.Name); err != nil {
+		return
+	}
+	if _, rID, err = readIDTag(n.RecipientID); err != nil {
+		return
+	}
+	return
+}
+
 // DecodeRLP implements rlp.Decoder interface.
 func (tx *NameTransferTx) DecodeRLP(s *rlp.Stream) (err error) {
 	ntx := &nameTransferRLP{}
-	blob, err := s.Raw()
+	aID, name, rID, err := ntx.ReadRLP(s)
 	if err != nil {
-		return err
-	}
-	err = rlp.DecodeBytes(blob, ntx)
-	if err != nil {
-		return err
-	}
-	_, aID, err := readIDTag(ntx.AccountID)
-	if err != nil {
-		return err
-	}
-	_, name, err := readIDTag(ntx.Name)
-	if err != nil {
-		return err
-	}
-	_, rID, err := readIDTag(ntx.RecipientID)
-	if err != nil {
-		return err
+		return
 	}
 
 	tx.AccountID = aID
