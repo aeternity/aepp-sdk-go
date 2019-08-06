@@ -1,7 +1,6 @@
 package aeternity
 
 import (
-	"bytes"
 	"io"
 	"math/big"
 
@@ -19,20 +18,6 @@ type SpendTx struct {
 	Payload     []byte
 	TTL         uint64
 	Nonce       uint64
-}
-
-// Equal compares the receiver to another struct of the same type. This is
-// needed because several types in Golang are difficult to compare, especially
-// using reflect.DeepEqual.
-func (tx *SpendTx) Equal(other *SpendTx) (equal bool) {
-	equal = (tx.SenderID == other.SenderID &&
-		tx.RecipientID == other.RecipientID &&
-		tx.Amount.Cmp(&other.Amount) == 0 &&
-		tx.Fee.Cmp(&other.Fee) == 0 &&
-		bytes.Equal(tx.Payload, other.Payload) &&
-		tx.TTL == other.TTL &&
-		tx.Nonce == other.Nonce)
-	return
 }
 
 // EncodeRLP implements rlp.Encoder
