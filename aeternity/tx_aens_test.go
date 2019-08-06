@@ -3,7 +3,6 @@ package aeternity
 import (
 	"bytes"
 	"fmt"
-	"math/big"
 	"reflect"
 	"testing"
 
@@ -12,10 +11,6 @@ import (
 )
 
 func TestNamePointer(t *testing.T) {
-	type fields struct {
-		ID  string
-		Key string
-	}
 	tests := []struct {
 		name        string
 		namepointer NamePointer
@@ -48,14 +43,10 @@ func TestNamePointer(t *testing.T) {
 		})
 		t.Run(fmt.Sprintf("%s DecodeRLP", tt.name), func(t *testing.T) {
 			np := NamePointer{}
-			s := &bytes.Buffer{}
-			s.Write(tt.rlpBytes)
-
-			err := rlp.Decode(s, &np)
+			err := rlp.DecodeBytes(tt.rlpBytes, &np)
 			if err != nil {
 				t.Errorf("NamePointer.DecodeRLP() error = %s", err)
 			}
-
 			if !(reflect.DeepEqual(tt.namepointer, np)) {
 				t.Errorf("Deserialized NamePointer %+v does not deep equal %+v", np, tt.namepointer)
 			}
@@ -100,6 +91,65 @@ func TestAENSTx(t *testing.T) {
 			wantErr:  false,
 		},
 		{
+			name: "NameUpdateTx update 1 pointer",
+			tx: &NameUpdateTx{
+				AccountID: "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+				NameID:    "nm_ie148R2qZYBfo1Ek3sZpfTLwBhkkqCRKi2Ce8JJ7yyWVRw2Sb", // fdsa.test
+				Pointers: []*NamePointer{
+					&NamePointer{Key: "account_pubkey", ID: "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"},
+				},
+				NameTTL:      uint64(0),
+				ClientTTL:    uint64(6),
+				Fee:          *utils.NewIntFromUint64(1),
+				TTL:          5,
+				AccountNonce: 5,
+			},
+			wantJSON: `{"account_id":"ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi","client_ttl":6,"fee":1,"name_id":"nm_ie148R2qZYBfo1Ek3sZpfTLwBhkkqCRKi2Ce8JJ7yyWVRw2Sb","name_ttl":0,"nonce":5,"pointers":[{"id":"ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi","key":"account_pubkey"}],"ttl":5}`,
+			wantRLP:  "tx_+H4iAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vMFoQJei0cGdDWb3EfrY0mtZADF0LoQ4yL6z10I/3ETJ0fpKADy8Y5hY2NvdW50X3B1YmtleaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vMGAQXLBNnv",
+			wantErr:  false,
+		},
+		{
+			name: "NameUpdateTx update 3 pointers",
+			tx: &NameUpdateTx{
+				AccountID: "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+				NameID:    "nm_ie148R2qZYBfo1Ek3sZpfTLwBhkkqCRKi2Ce8JJ7yyWVRw2Sb", // fdsa.test
+				Pointers: []*NamePointer{
+					&NamePointer{Key: "account_pubkey", ID: "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"},
+					&NamePointer{Key: "account_pubkey", ID: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v"},
+					&NamePointer{Key: "account_pubkey", ID: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt"},
+				},
+				NameTTL:      uint64(0),
+				ClientTTL:    uint64(6),
+				Fee:          *utils.NewIntFromUint64(1),
+				TTL:          5,
+				AccountNonce: 5,
+			},
+			wantJSON: `{"account_id":"ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi","client_ttl":6,"fee":1,"name_id":"nm_ie148R2qZYBfo1Ek3sZpfTLwBhkkqCRKi2Ce8JJ7yyWVRw2Sb","name_ttl":0,"nonce":5,"pointers":[{"id":"ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi","key":"account_pubkey"},{"id":"ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v","key":"account_pubkey"},{"id":"ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt","key":"account_pubkey"}],"ttl":5}`,
+			wantRLP:  "tx_+OMiAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vMFoQJei0cGdDWb3EfrY0mtZADF0LoQ4yL6z10I/3ETJ0fpKAD4lvGOYWNjb3VudF9wdWJrZXmhAQkzfmKK/9rguLQf6vv/O43g1vpP+B727TdTmYbwitiB8Y5hY2NvdW50X3B1YmtleaEBHxOjsIvwAUAGYqaLadh194A87EwIZH9u1dhMeJe9UKPxjmFjY291bnRfcHVia2V5oQHOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+8wYBBYpSjmc=",
+			wantErr:  false,
+		},
+		{
+			name: "NameUpdateTx update 4 pointers",
+			tx: &NameUpdateTx{
+				AccountID: "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+				NameID:    "nm_ie148R2qZYBfo1Ek3sZpfTLwBhkkqCRKi2Ce8JJ7yyWVRw2Sb", // fdsa.test
+				Pointers: []*NamePointer{
+					&NamePointer{Key: "account_pubkey", ID: "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"},
+					&NamePointer{Key: "account_pubkey", ID: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v"},
+					&NamePointer{Key: "account_pubkey", ID: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt"},
+					&NamePointer{Key: "account_pubkey", ID: "ak_rHQAmJsLKC2u7Tr1htTGYxy2ga71AESM611tjGGfyUJmLbDYP"},
+				},
+				NameTTL:      uint64(0),
+				ClientTTL:    uint64(6),
+				Fee:          *utils.NewIntFromUint64(1),
+				TTL:          5,
+				AccountNonce: 5,
+			},
+			wantJSON: `{"account_id":"ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi","client_ttl":6,"fee":1,"name_id":"nm_ie148R2qZYBfo1Ek3sZpfTLwBhkkqCRKi2Ce8JJ7yyWVRw2Sb","name_ttl":0,"nonce":5,"pointers":[{"id":"ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi","key":"account_pubkey"},{"id":"ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v","key":"account_pubkey"},{"id":"ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt","key":"account_pubkey"},{"id":"ak_rHQAmJsLKC2u7Tr1htTGYxy2ga71AESM611tjGGfyUJmLbDYP","key":"account_pubkey"}],"ttl":5}`,
+			wantRLP:  "tx_+QEVIgGhAc6nreRwyfmdnU5ACICobx1Ju0RLYvEanrtku8/rc/7zBaECXotHBnQ1m9xH62NJrWQAxdC6EOMi+s9dCP9xEydH6SgA+MjxjmFjY291bnRfcHVia2V5oQFv5wr11P3EEyoB8Vv8AoWK140cojJEja4CeC3rE+gY5/GOYWNjb3VudF9wdWJrZXmhAQkzfmKK/9rguLQf6vv/O43g1vpP+B727TdTmYbwitiB8Y5hY2NvdW50X3B1YmtleaEBHxOjsIvwAUAGYqaLadh194A87EwIZH9u1dhMeJe9UKPxjmFjY291bnRfcHVia2V5oQHOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+8wYBBaPTgbo=",
+			wantErr:  false,
+		},
+		{
 			name: "NameTransferTx",
 			tx: &NameTransferTx{
 				AccountID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
@@ -132,9 +182,7 @@ func TestAENSTx(t *testing.T) {
 			gotRLP, err := SerializeTx(tt.tx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("%s error = %v, wantErr %v", tt.name, err, tt.wantErr)
-				return
 			}
-
 			if gotRLP != tt.wantRLP {
 				gotRLPRawBytes, wantRLPRawBytes := getRLPSerialized(gotRLP, tt.wantRLP)
 				t.Errorf("%s = \n%v\n%v, want \n%v\n%v", tt.name, gotRLP, gotRLPRawBytes, tt.wantRLP, wantRLPRawBytes)
@@ -142,101 +190,12 @@ func TestAENSTx(t *testing.T) {
 
 		})
 		t.Run(fmt.Sprintf("%s DecodeRLP", tt.name), func(t *testing.T) {
-			tx, _ := DeserializeTx(tt.wantRLP)
+			tx, err := DeserializeTx(tt.wantRLP)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("%s error = %v, wantErr %v", tt.name, err, tt.wantErr)
+			}
 			if !(reflect.DeepEqual(tx, tt.tx)) {
 				t.Errorf("Deserialized Transaction %+v does not deep equal %+v", tx, tt.tx)
-			}
-		})
-	}
-}
-func TestNameUpdateTx_EncodeRLP(t *testing.T) {
-	type fields struct {
-		AccountID string
-		NameID    string
-		Pointers  []string
-		NameTTL   uint64
-		ClientTTL uint64
-		Fee       big.Int
-		TTL       uint64
-		Nonce     uint64
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		wantTx  string
-		wantErr bool
-	}{
-		{
-			name: "NameUpdateTx update 1 pointer",
-			fields: fields{
-				AccountID: "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
-				NameID:    "nm_ie148R2qZYBfo1Ek3sZpfTLwBhkkqCRKi2Ce8JJ7yyWVRw2Sb", // fdsa.test
-				Pointers:  []string{"ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"},
-				NameTTL:   uint64(0),
-				ClientTTL: uint64(6),
-				Fee:       *utils.NewIntFromUint64(1),
-				TTL:       5,
-				Nonce:     5,
-			},
-			wantTx:  "tx_+H4iAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vMFoQJei0cGdDWb3EfrY0mtZADF0LoQ4yL6z10I/3ETJ0fpKADy8Y5hY2NvdW50X3B1YmtleaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vMGAQXLBNnv",
-			wantErr: false,
-		},
-		{
-			name: "NameUpdateTx update 3 pointers",
-			fields: fields{
-				AccountID: "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
-				NameID:    "nm_ie148R2qZYBfo1Ek3sZpfTLwBhkkqCRKi2Ce8JJ7yyWVRw2Sb", // fdsa.test
-				Pointers:  []string{"ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi", "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v", "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt"},
-				NameTTL:   uint64(0),
-				ClientTTL: uint64(6),
-				Fee:       *utils.NewIntFromUint64(1),
-				TTL:       5,
-				Nonce:     5,
-			},
-			wantTx:  "tx_+OMiAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vMFoQJei0cGdDWb3EfrY0mtZADF0LoQ4yL6z10I/3ETJ0fpKAD4lvGOYWNjb3VudF9wdWJrZXmhAQkzfmKK/9rguLQf6vv/O43g1vpP+B727TdTmYbwitiB8Y5hY2NvdW50X3B1YmtleaEBHxOjsIvwAUAGYqaLadh194A87EwIZH9u1dhMeJe9UKPxjmFjY291bnRfcHVia2V5oQHOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+8wYBBYpSjmc=",
-			wantErr: false,
-		},
-		{
-			name: "NameUpdateTx update 4 pointers",
-			fields: fields{
-				AccountID: "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
-				NameID:    "nm_ie148R2qZYBfo1Ek3sZpfTLwBhkkqCRKi2Ce8JJ7yyWVRw2Sb", // fdsa.test
-				Pointers:  []string{"ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi", "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v", "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt", "ak_rHQAmJsLKC2u7Tr1htTGYxy2ga71AESM611tjGGfyUJmLbDYP"},
-				NameTTL:   uint64(0),
-				ClientTTL: uint64(6),
-				Fee:       *utils.NewIntFromUint64(1),
-				TTL:       5,
-				Nonce:     5,
-			},
-			wantTx:  "tx_+QEVIgGhAc6nreRwyfmdnU5ACICobx1Ju0RLYvEanrtku8/rc/7zBaECXotHBnQ1m9xH62NJrWQAxdC6EOMi+s9dCP9xEydH6SgA+MjxjmFjY291bnRfcHVia2V5oQFv5wr11P3EEyoB8Vv8AoWK140cojJEja4CeC3rE+gY5/GOYWNjb3VudF9wdWJrZXmhAQkzfmKK/9rguLQf6vv/O43g1vpP+B727TdTmYbwitiB8Y5hY2NvdW50X3B1YmtleaEBHxOjsIvwAUAGYqaLadh194A87EwIZH9u1dhMeJe9UKPxjmFjY291bnRfcHVia2V5oQHOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+8wYBBaPTgbo=",
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tx := NewNameUpdateTx(
-				tt.fields.AccountID,
-				tt.fields.NameID,
-				tt.fields.Pointers,
-				tt.fields.NameTTL,
-				tt.fields.ClientTTL,
-				tt.fields.Fee,
-				tt.fields.TTL,
-				tt.fields.Nonce,
-			)
-
-			txJSON, err := tx.JSON()
-			fmt.Println(txJSON)
-
-			gotTx, err := SerializeTx(&tx)
-
-			if (err != nil) != tt.wantErr {
-				t.Errorf("NameUpdateTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(gotTx, tt.wantTx) {
-				gotTxRawBytes, wantTxRawBytes := getRLPSerialized(gotTx, tt.wantTx)
-				t.Errorf("NameUpdateTx.RLP() = \n%v\n%v, want \n%v\n%v", gotTx, gotTxRawBytes, tt.wantTx, wantTxRawBytes)
 			}
 		})
 	}
