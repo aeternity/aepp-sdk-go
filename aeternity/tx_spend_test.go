@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"math/big"
+	"reflect"
 	"testing"
 
 	"github.com/aeternity/aepp-sdk-go/utils"
@@ -140,7 +141,7 @@ func TestSpendTx_DecodeRLP(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-			if !(gotTx.Equal(&tt.wantTx)) {
+			if !(reflect.DeepEqual(gotTx, tt.wantTx)) {
 				t.Errorf("Deserialization resulted in different structs: got %+v, want %+v", gotTx, tt.wantTx)
 			}
 		})
