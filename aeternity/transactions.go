@@ -10,6 +10,11 @@ import (
 	rlp "github.com/randomshinichi/rlpae"
 )
 
+// Transaction describes what every transaction struct should be able to do
+type Transaction interface {
+	rlp.Encoder
+}
+
 // Sign calculates the signature of the SignedTx.Tx. Although it does not use
 // the SignedTx itself, it takes a SignedTx as an argument because if it took a
 // rlp.Encoder as an interface, one might expect the signature to be of the
@@ -153,6 +158,28 @@ func SerializeTx(tx rlp.Encoder) (string, error) {
 	}
 	txStr := Encode(PrefixTransaction, w.Bytes())
 	return txStr, nil
+}
+
+// DeserializeTx takes a tx_ string and returns the corresponding Tx struct
+func DeserializeTx(txRLP string) (Transaction, error) {
+	rawRLP, err := Decode(txRLP)
+	if err != nil {
+		return nil, err
+	}
+
+	tx, err := GetTransactionType(rawRLP)
+	if err != nil {
+		return nil, err
+	}
+	err = rlp.DecodeBytes(rawRLP, tx)
+	return tx, err
+}
+
+// GetTransactionType reads the RLP input and returns a blank Tx struct of the correct type
+func GetTransactionType(rawRLP []byte) (tx Transaction, err error) {
+	f := DecodeRLPMessage(rawRLP)[0] // [33] interface, needs to be cast to []uint8
+	objTag := uint(f.([]uint8)[0])   // [33] cast to []uint8, get rid of the slice, cast to uint
+	return TransactionTypes[objTag], nil
 }
 
 // SignedTx wraps around other Tx structs to hold the signature.
