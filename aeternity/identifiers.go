@@ -147,3 +147,24 @@ const (
 	ObjectTagMicroBody                           uint = 101
 	ObjectTagLightMicroBlock                     uint = 102
 )
+
+// TransactionTypes is a map between the ObjectTags defined above and the
+// corresponding Tx struct
+// TODO why can't this be a const?
+var TransactionTypes = map[uint]Transaction{
+	ObjectTagSignedTransaction:                   &SignedTx{},
+	ObjectTagSpendTransaction:                    &SpendTx{},
+	ObjectTagNameServiceClaimTransaction:         &NameClaimTx{},
+	ObjectTagNameServicePreclaimTransaction:      &NamePreclaimTx{},
+	ObjectTagNameServiceUpdateTransaction:        &NameUpdateTx{},
+	ObjectTagNameServiceRevokeTransaction:        &NameRevokeTx{},
+	ObjectTagNameServiceTransferTransaction:      &NameTransferTx{},
+	ObjectTagOracleRegisterTransaction:           &OracleRegisterTx{},
+	ObjectTagOracleQueryTransaction:              &OracleQueryTx{},
+	ObjectTagOracleResponseTransaction:           &OracleRespondTx{},
+	ObjectTagOracleExtendTransaction:             &OracleExtendTx{},
+	ObjectTagContractCreateTransaction:           &ContractCreateTx{},
+	ObjectTagContractCallTransaction:             &ContractCallTx{},
+	ObjectTagGeneralizedAccountAttachTransaction: &GAAttachTx{},
+	ObjectTagGeneralizedAccountMetaTransaction:   &GAMetaTx{},
+}
