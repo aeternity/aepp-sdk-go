@@ -6,6 +6,7 @@ import (
 
 	"github.com/aeternity/aepp-sdk-go/swagguard/node/models"
 	"github.com/aeternity/aepp-sdk-go/utils"
+	rlp "github.com/randomshinichi/rlpae"
 )
 
 func encodeVMABI(VMVersion, ABIVersion uint16) []byte {
@@ -15,6 +16,22 @@ func encodeVMABI(VMVersion, ABIVersion uint16) []byte {
 	vmAbiBytes = append(vmAbiBytes, vmBytes...)
 	vmAbiBytes = append(vmAbiBytes, leftPadByteSlice(2, abiBytes)...)
 	return vmAbiBytes
+}
+
+func decodeVMABI(vmabi []byte) (VMVersion, ABIVersion uint16) {
+	var v, a big.Int
+	var vmPortion, abiPortion []byte
+	l := len(vmabi)
+	if (l % 2) == 0 {
+		vmPortion = vmabi[0:2]
+		abiPortion = vmabi[2:]
+	} else {
+		vmPortion = []byte{vmabi[0]}
+		abiPortion = []byte{vmabi[2]}
+	}
+	v.SetBytes(vmPortion)
+	a.SetBytes(abiPortion)
+	return uint16(v.Uint64()), uint16(a.Uint64())
 }
 
 // ContractCreateTx represents a transaction that creates a smart contract
@@ -71,6 +88,63 @@ func (tx *ContractCreateTx) EncodeRLP(w io.Writer) (err error) {
 	if err != nil {
 		return
 	}
+	return
+}
+
+type contractCreateRLP struct {
+	ObjectTag         uint
+	RlpMessageVersion uint
+	AccountID         []uint8
+	AccountNonce      uint64
+	CodeBinary        []byte
+	VMABI             []byte
+	Fee               big.Int
+	TTL               uint64
+	Deposit           big.Int
+	Amount            big.Int
+	Gas               big.Int
+	GasPrice          big.Int
+	CallDataBinary    []byte
+}
+
+func (c *contractCreateRLP) ReadRLP(s *rlp.Stream) (aID, code, calldata string, vmversion, abiversion uint16, err error) {
+	var blob []byte
+	if blob, err = s.Raw(); err != nil {
+		return
+	}
+	if err = rlp.DecodeBytes(blob, c); err != nil {
+		return
+	}
+	if _, aID, err = readIDTag(c.AccountID); err != nil {
+		return
+	}
+
+	code = Encode(PrefixContractByteArray, c.CodeBinary)
+	calldata = Encode(PrefixContractByteArray, c.CallDataBinary)
+	vmversion, abiversion = decodeVMABI(c.VMABI)
+	return
+}
+
+// DecodeRLP implements rlp.Decoder
+func (tx *ContractCreateTx) DecodeRLP(s *rlp.Stream) (err error) {
+	ctx := &contractCreateRLP{}
+	aID, code, calldata, vmversion, abiversion, err := ctx.ReadRLP(s)
+	if err != nil {
+		return
+	}
+
+	tx.OwnerID = aID
+	tx.AccountNonce = ctx.AccountNonce
+	tx.Code = code
+	tx.VMVersion = vmversion
+	tx.AbiVersion = abiversion
+	tx.Deposit = ctx.Deposit
+	tx.Amount = ctx.Amount
+	tx.Gas = ctx.Gas
+	tx.GasPrice = ctx.GasPrice
+	tx.Fee = ctx.Fee
+	tx.TTL = ctx.TTL
+	tx.CallData = calldata
 	return
 }
 
@@ -148,25 +222,6 @@ type ContractCallTx struct {
 	TTL          uint64
 }
 
-// JSON representation of a Tx is useful for querying the node's debug endpoint
-func (tx *ContractCallTx) JSON() (string, error) {
-	gas := tx.Gas.Uint64()
-	swaggerT := models.ContractCallTx{
-		CallerID:   &tx.CallerID,
-		Nonce:      tx.AccountNonce,
-		ContractID: &tx.ContractID,
-		Amount:     utils.BigInt(tx.Amount),
-		Gas:        &gas,
-		GasPrice:   utils.BigInt(tx.GasPrice),
-		AbiVersion: &tx.AbiVersion,
-		CallData:   &tx.CallData,
-		Fee:        utils.BigInt(tx.Fee),
-		TTL:        tx.TTL,
-	}
-	output, err := swaggerT.MarshalBinary()
-	return string(output), err
-}
-
 // EncodeRLP implements rlp.Encoder
 func (tx *ContractCallTx) EncodeRLP(w io.Writer) (err error) {
 	cID, err := buildIDTag(IDTagAccount, tx.CallerID)
@@ -205,6 +260,80 @@ func (tx *ContractCallTx) EncodeRLP(w io.Writer) (err error) {
 		return
 	}
 	return
+}
+
+type contractCallRLP struct {
+	ObjectTag         uint
+	RlpMessageVersion uint
+	CallerID          []uint8
+	AccountNonce      uint64
+	ContractID        []uint8
+	AbiVersion        uint16
+	Fee               big.Int
+	TTL               uint64
+	Amount            big.Int
+	Gas               big.Int
+	GasPrice          big.Int
+	CallDataBinary    []byte
+}
+
+func (c *contractCallRLP) ReadRLP(s *rlp.Stream) (cID, ctID, calldata string, err error) {
+	var blob []byte
+	if blob, err = s.Raw(); err != nil {
+		return
+	}
+	if err = rlp.DecodeBytes(blob, c); err != nil {
+		return
+	}
+	if _, cID, err = readIDTag(c.CallerID); err != nil {
+		return
+	}
+	if _, ctID, err = readIDTag(c.ContractID); err != nil {
+		return
+	}
+
+	calldata = Encode(PrefixContractByteArray, c.CallDataBinary)
+	return
+}
+
+// DecodeRLP implements rlp.Decoder
+func (tx *ContractCallTx) DecodeRLP(s *rlp.Stream) (err error) {
+	ctx := &contractCallRLP{}
+	cID, ctID, calldata, err := ctx.ReadRLP(s)
+	if err != nil {
+		return
+	}
+
+	tx.CallerID = cID
+	tx.AccountNonce = ctx.AccountNonce
+	tx.ContractID = ctID
+	tx.Amount = ctx.Amount
+	tx.Gas = ctx.Gas
+	tx.GasPrice = ctx.GasPrice
+	tx.AbiVersion = ctx.AbiVersion
+	tx.CallData = calldata
+	tx.Fee = ctx.Fee
+	tx.TTL = ctx.TTL
+	return
+}
+
+// JSON representation of a Tx is useful for querying the node's debug endpoint
+func (tx *ContractCallTx) JSON() (string, error) {
+	gas := tx.Gas.Uint64()
+	swaggerT := models.ContractCallTx{
+		CallerID:   &tx.CallerID,
+		Nonce:      tx.AccountNonce,
+		ContractID: &tx.ContractID,
+		Amount:     utils.BigInt(tx.Amount),
+		Gas:        &gas,
+		GasPrice:   utils.BigInt(tx.GasPrice),
+		AbiVersion: &tx.AbiVersion,
+		CallData:   &tx.CallData,
+		Fee:        utils.BigInt(tx.Fee),
+		TTL:        tx.TTL,
+	}
+	output, err := swaggerT.MarshalBinary()
+	return string(output), err
 }
 
 // sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
