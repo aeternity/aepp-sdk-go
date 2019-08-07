@@ -6,6 +6,7 @@ import (
 
 	"github.com/aeternity/aepp-sdk-go/swagguard/node/models"
 	"github.com/aeternity/aepp-sdk-go/utils"
+	rlp "github.com/randomshinichi/rlpae"
 )
 
 // OracleRegisterTx represents a transaction that registers an oracle on the blockchain's state
@@ -51,6 +52,54 @@ func (tx *OracleRegisterTx) EncodeRLP(w io.Writer) (err error) {
 	if err != nil {
 		return
 	}
+	return
+}
+
+type oracleRegisterRLP struct {
+	ObjectTag         uint
+	RlpMessageVersion uint
+	AccountID         []uint8
+	AccountNonce      uint64
+	QuerySpec         []byte
+	ResponseSpec      []byte
+	QueryFee          big.Int
+	OracleTTLType     uint64
+	OracleTTLValue    uint64
+	Fee               big.Int
+	TTL               uint64
+	AbiVersion        uint16
+}
+
+func (o *oracleRegisterRLP) ReadRLP(s *rlp.Stream) (aID string, err error) {
+	var blob []byte
+	if blob, err = s.Raw(); err != nil {
+		return
+	}
+	if err = rlp.DecodeBytes(blob, o); err != nil {
+		return
+	}
+	_, aID, err = readIDTag(o.AccountID)
+	return
+}
+
+// DecodeRLP implements rlp.Decoder
+func (tx *OracleRegisterTx) DecodeRLP(s *rlp.Stream) (err error) {
+	otx := &oracleRegisterRLP{}
+	aID, err := otx.ReadRLP(s)
+	if err != nil {
+		return
+	}
+
+	tx.AccountID = aID
+	tx.AccountNonce = otx.AccountNonce
+	tx.QuerySpec = string(otx.QuerySpec)
+	tx.ResponseSpec = string(otx.ResponseSpec)
+	tx.QueryFee = otx.QueryFee
+	tx.OracleTTLType = otx.OracleTTLType
+	tx.OracleTTLValue = otx.OracleTTLValue
+	tx.AbiVersion = otx.AbiVersion
+	tx.Fee = otx.Fee
+	tx.TTL = otx.TTL
 	return
 }
 
@@ -135,6 +184,46 @@ func (tx *OracleExtendTx) EncodeRLP(w io.Writer) (err error) {
 	return
 }
 
+type oracleExtendRLP struct {
+	ObjectTag         uint
+	RlpMessageVersion uint
+	OracleID          []uint8
+	AccountNonce      uint64
+	OracleTTLType     uint64
+	OracleTTLValue    uint64
+	Fee               big.Int
+	TTL               uint64
+}
+
+func (o *oracleExtendRLP) ReadRLP(s *rlp.Stream) (oID string, err error) {
+	var blob []byte
+	if blob, err = s.Raw(); err != nil {
+		return
+	}
+	if err = rlp.DecodeBytes(blob, o); err != nil {
+		return
+	}
+	_, oID, err = readIDTag(o.OracleID)
+	return
+}
+
+// DecodeRLP implements rlp.Decoder
+func (tx *OracleExtendTx) DecodeRLP(s *rlp.Stream) (err error) {
+	otx := &oracleExtendRLP{}
+	oID, err := otx.ReadRLP(s)
+	if err != nil {
+		return
+	}
+
+	tx.OracleID = oID
+	tx.AccountNonce = otx.AccountNonce
+	tx.OracleTTLType = otx.OracleTTLType
+	tx.OracleTTLValue = otx.OracleTTLValue
+	tx.Fee = otx.Fee
+	tx.TTL = otx.TTL
+	return
+}
+
 // JSON representation of a Tx is useful for querying the node's debug endpoint
 func (tx *OracleExtendTx) JSON() (string, error) {
 	oracleTTLTypeStr := ttlTypeIntToStr(tx.OracleTTLType)
@@ -208,6 +297,59 @@ func (tx *OracleQueryTx) EncodeRLP(w io.Writer) (err error) {
 	if err != nil {
 		return
 	}
+	return
+}
+
+type oracleQueryRLP struct {
+	ObjectTag         uint
+	RlpMessageVersion uint
+	AccountID         []uint8
+	AccountNonce      uint64
+	OracleID          []uint8
+	Query             []byte
+	QueryFee          big.Int
+	QueryTTLType      uint64
+	QueryTTLValue     uint64
+	ResponseTTLType   uint64
+	ResponseTTLValue  uint64
+	Fee               big.Int
+	TTL               uint64
+}
+
+func (o *oracleQueryRLP) ReadRLP(s *rlp.Stream) (aID, oID string, err error) {
+	var blob []byte
+	if blob, err = s.Raw(); err != nil {
+		return
+	}
+	if err = rlp.DecodeBytes(blob, o); err != nil {
+		return
+	}
+	if _, aID, err = readIDTag(o.AccountID); err != nil {
+		return
+	}
+	_, oID, err = readIDTag(o.OracleID)
+	return
+}
+
+// DecodeRLP implements rlp.Decoder
+func (tx *OracleQueryTx) DecodeRLP(s *rlp.Stream) (err error) {
+	otx := &oracleQueryRLP{}
+	aID, oID, err := otx.ReadRLP(s)
+	if err != nil {
+		return
+	}
+
+	tx.SenderID = aID
+	tx.AccountNonce = otx.AccountNonce
+	tx.OracleID = oID
+	tx.Query = string(otx.Query)
+	tx.QueryFee = otx.QueryFee
+	tx.QueryTTLType = otx.QueryTTLType
+	tx.QueryTTLValue = otx.QueryTTLValue
+	tx.ResponseTTLType = otx.ResponseTTLType
+	tx.ResponseTTLValue = otx.ResponseTTLValue
+	tx.Fee = otx.Fee
+	tx.TTL = otx.TTL
 	return
 }
 
@@ -285,6 +427,53 @@ func (tx *OracleRespondTx) EncodeRLP(w io.Writer) (err error) {
 	if err != nil {
 		return
 	}
+	return
+}
+
+type oracleRespondRLP struct {
+	ObjectTag         uint
+	RlpMessageVersion uint
+	OracleID          []uint8
+	AccountNonce      uint64
+	QueryID           []byte
+	Response          []byte
+	ResponseTTLType   uint64
+	ResponseTTLValue  uint64
+	Fee               big.Int
+	TTL               uint64
+}
+
+func (o *oracleRespondRLP) ReadRLP(s *rlp.Stream) (oID, qID string, err error) {
+	var blob []byte
+	if blob, err = s.Raw(); err != nil {
+		return
+	}
+	if err = rlp.DecodeBytes(blob, o); err != nil {
+		return
+	}
+	if _, oID, err = readIDTag(o.OracleID); err != nil {
+		return
+	}
+	qID = Encode(PrefixOracleQueryID, o.QueryID)
+	return
+}
+
+// DecodeRLP implements rlp.Decoder
+func (tx *OracleRespondTx) DecodeRLP(s *rlp.Stream) (err error) {
+	otx := &oracleRespondRLP{}
+	oID, qID, err := otx.ReadRLP(s)
+	if err != nil {
+		return
+	}
+
+	tx.OracleID = oID
+	tx.AccountNonce = otx.AccountNonce
+	tx.QueryID = qID
+	tx.Response = string(otx.Response)
+	tx.ResponseTTLType = otx.ResponseTTLType
+	tx.ResponseTTLValue = otx.ResponseTTLValue
+	tx.Fee = otx.Fee
+	tx.TTL = otx.TTL
 	return
 }
 
