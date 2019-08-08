@@ -166,12 +166,12 @@ func signFunc(cmd *cobra.Command, args []string) (err error) {
 	}
 
 	txUnsignedBase64 := args[1]
-	txRLP, err := aeternity.Decode(txUnsignedBase64)
+	tx, err := aeternity.DeserializeTxStr(txUnsignedBase64)
 	if err != nil {
 		return err
 	}
 
-	txSignedBase64, txHash, signature, err := aeternity.SignHashTx(account, txRLP, aeternity.Config.Node.NetworkID)
+	txSignedBase64, txHash, signature, err := aeternity.SignHashTx(account, tx, aeternity.Config.Node.NetworkID)
 	if err != nil {
 		return err
 	}
