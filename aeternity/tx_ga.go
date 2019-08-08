@@ -65,6 +65,60 @@ func (tx *GAAttachTx) EncodeRLP(w io.Writer) (err error) {
 	return
 }
 
+type gaAttachRLP struct {
+	ObjectTag         uint
+	RlpMessageVersion uint
+	AccountID         []uint8
+	AccountNonce      uint64
+	CodeBinary        []byte
+	AuthFunc          []byte
+	VMABI             []byte
+	Fee               big.Int
+	TTL               uint64
+	Gas               big.Int
+	GasPrice          big.Int
+	CallDataBinary    []byte
+}
+
+func (g *gaAttachRLP) ReadRLP(s *rlp.Stream) (aID, code, calldata string, vmversion, abiversion uint16, err error) {
+	var blob []byte
+	if blob, err = s.Raw(); err != nil {
+		return
+	}
+	if err = rlp.DecodeBytes(blob, g); err != nil {
+		return
+	}
+	if _, aID, err = readIDTag(g.AccountID); err != nil {
+		return
+	}
+	code = Encode(PrefixContractByteArray, g.CodeBinary)
+	calldata = Encode(PrefixContractByteArray, g.CallDataBinary)
+	vmversion, abiversion = decodeVMABI(g.VMABI)
+	return
+}
+
+// DecodeRLP implements rlp.Decoder
+func (tx *GAAttachTx) DecodeRLP(s *rlp.Stream) (err error) {
+	gtx := &gaAttachRLP{}
+	aID, code, calldata, vmversion, abiversion, err := gtx.ReadRLP(s)
+	if err != nil {
+		return
+	}
+
+	tx.OwnerID = aID
+	tx.AccountNonce = gtx.AccountNonce
+	tx.Code = code
+	tx.AuthFunc = gtx.AuthFunc
+	tx.VMVersion = vmversion
+	tx.AbiVersion = abiversion
+	tx.Gas = gtx.Gas
+	tx.GasPrice = gtx.GasPrice
+	tx.Fee = gtx.Fee
+	tx.TTL = gtx.TTL
+	tx.CallData = calldata
+	return
+}
+
 // NewGAAttachTx creates a GAAttachTx
 func NewGAAttachTx(OwnerID string, AccountNonce uint64, Code string, AuthFunc []byte, VMVersion uint16, AbiVersion uint16, Gas big.Int, GasPrice big.Int, Fee big.Int, TTL uint64, CallData string) GAAttachTx {
 	return GAAttachTx{
