@@ -49,7 +49,7 @@ func Hash(tx *SignedTx) (txhash string, err error) {
 
 // SignHashTx wraps a *Tx struct in a SignedTx, then calculates the signature
 // and hash.
-func SignHashTx(kp *Account, tx rlp.Encoder, networkID string) (signedTx SignedTx, txhash, signature string, err error) {
+func SignHashTx(kp *Account, tx Transaction, networkID string) (signedTx SignedTx, txhash, signature string, err error) {
 	signedTx = NewSignedTx([][]byte{}, tx)
 	sigBytes, err := Sign(kp, &signedTx, networkID)
 	if err != nil {
@@ -160,13 +160,18 @@ func SerializeTx(tx rlp.Encoder) (string, error) {
 	return txStr, nil
 }
 
-// DeserializeTx takes a tx_ string and returns the corresponding Tx struct
-func DeserializeTx(txRLP string) (Transaction, error) {
+// DeserializeTxStr takes a tx_ string and returns the corresponding Tx struct
+func DeserializeTxStr(txRLP string) (Transaction, error) {
 	rawRLP, err := Decode(txRLP)
 	if err != nil {
 		return nil, err
 	}
+	return DeserializeTx(rawRLP)
+}
 
+// DeserializeTx takes a RLP serialized transaction as a bytearray and returns
+// the corresponding Tx struct
+func DeserializeTx(rawRLP []byte) (Transaction, error) {
 	tx, err := GetTransactionType(rawRLP)
 	if err != nil {
 		return nil, err
@@ -241,6 +246,40 @@ func (tx *SignedTx) EncodeRLP(w io.Writer) (err error) {
 		return err
 	}
 	return nil
+}
+
+type signedTxRLP struct {
+	ObjectTag         uint
+	RlpMessageVersion uint
+	Signatures        [][]byte
+	WrappedTx         []byte
+}
+
+func (stx *signedTxRLP) ReadRLP(s *rlp.Stream) (err error) {
+	var blob []byte
+	if blob, err = s.Raw(); err != nil {
+		return
+	}
+	if err = rlp.DecodeBytes(blob, stx); err != nil {
+		return
+	}
+	return
+}
+
+// DecodeRLP implements rlp.Decoder
+func (tx *SignedTx) DecodeRLP(s *rlp.Stream) (err error) {
+	stx := &signedTxRLP{}
+	if err = stx.ReadRLP(s); err != nil {
+		return
+	}
+	wtx, err := DeserializeTx(stx.WrappedTx)
+	if err != nil {
+		return
+	}
+
+	tx.Signatures = stx.Signatures
+	tx.Tx = wtx
+	return
 }
 
 // NewSignedTx ensures that all fields of SignedTx are filled out.

@@ -148,7 +148,7 @@ func TestContractTx(t *testing.T) {
 			}
 		})
 		t.Run(fmt.Sprintf("%s DecodeRLP", tt.name), func(t *testing.T) {
-			tx, err := DeserializeTx(tt.wantRLP)
+			tx, err := DeserializeTxStr(tt.wantRLP)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("%s error = %v, wantErr %v", tt.name, err, tt.wantErr)
