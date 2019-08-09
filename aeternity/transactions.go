@@ -47,16 +47,21 @@ func Hash(tx *SignedTx) (txhash string, err error) {
 	return txhash, nil
 }
 
-// SignHashTx wraps a *Tx struct in a SignedTx, then calculates the signature
-// and hash.
+// SignHashTx wraps a *Tx struct in a SignedTx, then returns its signature and
+// hash.
 func SignHashTx(kp *Account, tx Transaction, networkID string) (signedTx SignedTx, txhash, signature string, err error) {
 	signedTx = NewSignedTx([][]byte{}, tx)
-	sigBytes, err := Sign(kp, &signedTx, networkID)
-	if err != nil {
-		return
+	var signatureBytes []byte
+
+	if _, ok := tx.(*GAMetaTx); !ok {
+		signatureBytes, err = Sign(kp, &signedTx, networkID)
+		if err != nil {
+			return
+		}
+		signedTx.Signatures = append(signedTx.Signatures, signatureBytes)
+		signature = Encode(PrefixSignature, signatureBytes)
+
 	}
-	signedTx.Signatures = append(signedTx.Signatures, sigBytes)
-	signature = Encode(PrefixSignature, sigBytes)
 
 	txhash, err = Hash(&signedTx)
 	if err != nil {
