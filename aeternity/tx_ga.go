@@ -146,7 +146,7 @@ type GAMetaTx struct {
 	GasPrice   big.Int
 	Fee        big.Int
 	TTL        uint64
-	Tx         rlp.Encoder
+	Tx         *SignedTx
 }
 
 // EncodeRLP implements rlp.Encoder
@@ -235,7 +235,7 @@ func (tx *GAMetaTx) DecodeRLP(s *rlp.Stream) (err error) {
 	tx.GasPrice = gtx.GasPrice
 	tx.Fee = gtx.Fee
 	tx.TTL = gtx.TTL
-	tx.Tx = wtx
+	tx.Tx = wtx.(*SignedTx)
 	return
 }
 
