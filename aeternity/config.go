@@ -89,7 +89,7 @@ type ProfileConfig struct {
 	Tuning TuningConfig `json:"tuning" yaml:"tuning" mapstructure:"tuning"`
 }
 
-// Config sytem configuration
+// Config system configuration
 var Config = ProfileConfig{
 	Name: "Default Config",
 	Node: NodeConfig{
