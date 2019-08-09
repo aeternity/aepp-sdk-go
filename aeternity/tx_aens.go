@@ -25,7 +25,7 @@ func (tx *NamePreclaimTx) EncodeRLP(w io.Writer) (err error) {
 	if err != nil {
 		return
 	}
-	// build id for the committment
+	// build id for the commitment
 	cID, err := buildIDTag(IDTagCommitment, tx.CommitmentID)
 	if err != nil {
 		return
