@@ -2,11 +2,11 @@ package integrationtest
 
 import (
 	"bytes"
-	"fmt"
 	"math/big"
 	"testing"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
+	"github.com/aeternity/aepp-sdk-go/utils"
 	rlp "github.com/randomshinichi/rlpae"
 )
 
@@ -24,6 +24,17 @@ func TestGeneralizedAccounts(t *testing.T) {
 	aeNode := setupNetwork(t, privatenetURL, false)
 	compiler := aeternity.NewCompiler(aeternity.Config.Client.Contracts.CompilerURL, false)
 	h := aeternity.Helpers{Node: aeNode}
+
+	// Take note of Bob's balance, and after this test, we expect it to have this much more AE
+	amount := utils.NewIntFromUint64(5000)
+	expected := new(big.Int)
+	bobState, err := aeNode.GetAccount(bob.Address)
+	if err != nil {
+		expected.Set(amount)
+	} else {
+		bS := big.Int(bobState.Balance)
+		expected.Add(&bS, amount)
+	}
 
 	// Read the auth contract from a file, compile and prepare its init() calldata
 	authSource := readFile(t, "authorize.aes")
@@ -79,38 +90,43 @@ func TestGeneralizedAccounts(t *testing.T) {
 		t.Fatalf("%s was supposed to be a generalized account but isn't", testAccount.Address)
 	}
 
-	// GAMetaTx with SpendTx
+	// GAMetaTx
+	// Get the TTL (not really needed, could be 0 too)
 	ttl, err = h.GetTTL(aeternity.Config.Client.TTL)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	// SpendTx - wrap it in SignedTx with 0 signatures before including in GAMetaTx
+	// spendTx will be wrapped in a SignedTx with 0 signatures before being
+	// included in GAMetaTx. The constructor NewGAMetaTx() does this for you.
 	spendTx := aeternity.NewSpendTx(testAccount.Address, bob.Address, *big.NewInt(5000), aeternity.Config.Client.Fee, []byte{}, ttl, 0)
+	gaMetaTx := aeternity.NewGAMetaTx(testAccount.Address, "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACArgmMvLPdJq0/eccQZx/kn0CmjZNS2PRRsu167v6sUZQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABdclTA==", aeternity.Config.Client.Contracts.ABIVersion, *utils.NewIntFromUint64(1000), aeternity.Config.Client.GasPrice, aeternity.Config.Client.Fee, ttl, &spendTx)
 
-	spendTxRLPBytes, err := EncodeRLPToBytes(&spendTx)
+	gaMetaTxFinal, hash, _, err := aeternity.SignHashTx(testAccount, &gaMetaTx, aeternity.Config.Node.NetworkID)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	gaMetaTx := aeternity.NewGAMetaTx(testAccount.Address, "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACArgmMvLPdJq0/eccQZx/kn0CmjZNS2PRRsu167v6sUZQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABdclTA==", aeternity.Config.Client.Contracts.ABIVersion, aeternity.Config.Client.BaseGas, aeternity.Config.Client.GasPrice, aeternity.Config.Client.Fee, ttl, &spendTx)
-
-	w := &bytes.Buffer{}
-	err = rlp.Encode(w, &gaMetaTx)
+	gaMetaTxStr, err := aeternity.SerializeTx(&gaMetaTxFinal)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = aeNode.PostTransaction(gaMetaTxStr, hash)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	gaMetaTxRaw, err := aeternity.CreateSignedTransaction(w.Bytes(), [][]byte{})
-	if err != nil {
-		t.Fatal(err)
+	// check bob.Address, make sure it got the SpendTx
+	getBobsAccount := func() {
+		bobState, err = aeNode.GetAccount(bob.Address)
+		if err != nil {
+			t.Fatalf("Couldn't get Bob's account data: %v", err)
+		}
 	}
+	delay(getBobsAccount)
+	b := big.Int(bobState.Balance)
 
-	gaMetaTxStr := aeternity.Encode(aeternity.PrefixTransaction, gaMetaTxRaw)
-	fmt.Println("GAMetaTx", gaMetaTxStr)
-	err = aeNode.PostTransaction(gaMetaTxStr, "th_fdsa")
-	if err != nil {
-		t.Error(err)
+	if expected.Cmp(&b) != 0 {
+		t.Fatalf("Bob should have %v, but has %v instead", expected.String(), bobState.Balance.String())
 	}
-
 }

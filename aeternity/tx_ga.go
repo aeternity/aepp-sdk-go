@@ -139,7 +139,7 @@ func NewGAAttachTx(OwnerID string, AccountNonce uint64, Code string, AuthFunc []
 // GAMetaTx wraps a normal Tx (that is not a GAAttachTx) that will only be
 // executed if the contract located at GaID returns true
 type GAMetaTx struct {
-	GaID       string
+	AccountID  string
 	AuthData   string
 	AbiVersion uint16
 	Gas        big.Int
@@ -151,7 +151,7 @@ type GAMetaTx struct {
 
 // EncodeRLP implements rlp.Encoder
 func (tx *GAMetaTx) EncodeRLP(w io.Writer) (err error) {
-	gaID, err := buildIDTag(IDTagContract, tx.GaID)
+	aID, err := buildIDTag(IDTagAccount, tx.AccountID)
 	if err != nil {
 		return
 	}
@@ -159,18 +159,22 @@ func (tx *GAMetaTx) EncodeRLP(w io.Writer) (err error) {
 	if err != nil {
 		return
 	}
+	txRLP, err := rlp.EncodeToBytes(tx.Tx)
+	if err != nil {
+		return
+	}
 
 	rlpRawMsg, err := buildRLPMessage(
 		ObjectTagGeneralizedAccountMetaTransaction,
 		rlpMessageVersion,
-		gaID,
+		aID,
 		authDataBinary,
 		tx.AbiVersion,
 		tx.Fee,
 		tx.Gas,
 		tx.GasPrice,
 		tx.TTL,
-		tx.Tx,
+		txRLP,
 	)
 
 	if err != nil {
@@ -186,7 +190,7 @@ func (tx *GAMetaTx) EncodeRLP(w io.Writer) (err error) {
 type gaMetaRLP struct {
 	ObjectTag         uint
 	RlpMessageVersion uint
-	GaID              []uint8
+	AccountID         []uint8
 	AuthDataBinary    []byte
 	AbiVersion        uint16
 	Fee               big.Int
@@ -196,7 +200,7 @@ type gaMetaRLP struct {
 	WrappedTx         []byte
 }
 
-func (g *gaMetaRLP) ReadRLP(s *rlp.Stream) (gaID, authdata string, err error) {
+func (g *gaMetaRLP) ReadRLP(s *rlp.Stream) (aID, authdata string, err error) {
 	var blob []byte
 	if blob, err = s.Raw(); err != nil {
 		return
@@ -204,7 +208,7 @@ func (g *gaMetaRLP) ReadRLP(s *rlp.Stream) (gaID, authdata string, err error) {
 	if err = rlp.DecodeBytes(blob, g); err != nil {
 		return
 	}
-	if _, gaID, err = readIDTag(g.GaID); err != nil {
+	if _, aID, err = readIDTag(g.AccountID); err != nil {
 		return
 	}
 
@@ -215,7 +219,7 @@ func (g *gaMetaRLP) ReadRLP(s *rlp.Stream) (gaID, authdata string, err error) {
 // DecodeRLP implements rlp.Decoder
 func (tx *GAMetaTx) DecodeRLP(s *rlp.Stream) (err error) {
 	gtx := &gaMetaRLP{}
-	gaID, authdata, err := gtx.ReadRLP(s)
+	aID, authdata, err := gtx.ReadRLP(s)
 	if err != nil {
 		return
 	}
@@ -224,7 +228,7 @@ func (tx *GAMetaTx) DecodeRLP(s *rlp.Stream) (err error) {
 		return
 	}
 
-	tx.GaID = gaID
+	tx.AccountID = aID
 	tx.AuthData = authdata
 	tx.AbiVersion = gtx.AbiVersion
 	tx.Gas = gtx.Gas
@@ -236,9 +240,9 @@ func (tx *GAMetaTx) DecodeRLP(s *rlp.Stream) (err error) {
 }
 
 // NewGAMetaTx creates a GAMetaTx
-func NewGAMetaTx(GaID string, AuthData string, AbiVersion uint16, Gas big.Int, GasPrice big.Int, Fee big.Int, TTL uint64, Tx rlp.Encoder) GAMetaTx {
+func NewGAMetaTx(AccountID string, AuthData string, AbiVersion uint16, Gas big.Int, GasPrice big.Int, Fee big.Int, TTL uint64, Tx rlp.Encoder) GAMetaTx {
 	return GAMetaTx{
-		GaID:       GaID,
+		AccountID:  AccountID,
 		AuthData:   AuthData,
 		AbiVersion: AbiVersion,
 		Gas:        Gas,
