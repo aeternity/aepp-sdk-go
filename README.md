@@ -46,15 +46,15 @@ est, _ := tx.FeeEstimate()
 fmt.Println("Estimated vs Actual Fee:", est, tx.Fee)
 tx.Fee = *est
 
-// transform the tx into a tx_base64encodedstring
-txB64, err := aeternity.BaseEncodeTx(tx)
-if err != nil {
-    t.Error(err)
-}
-
-signedTxStr, hash, _, err := aeternity.SignEncodeTxStr(acc, txB64, aeternity.Config.Node.NetworkID)
+signedTx, hash, signature, err := aeternity.SignHashTx(acc, tx, aeternity.Config.Node.NetworkID)
 if err != nil {
     t.Fatal(err)
+}
+
+// transform the tx into a tx_base64encodedstring so you can HTTP POST it
+signedTxStr, err := aeternity.SerializeTx(&tx)
+if err != nil {
+    t.Error(err)
 }
 
 err = aeternity.BroadcastTransaction(node, signedTxStr)
