@@ -1,0 +1,11 @@
+contract BlindAuth =
+      record state = { nonce : int, owner : address }
+
+      entrypoint init(owner' : address) = { nonce = 1, owner = owner' }
+
+      stateful entrypoint authorize() : bool =
+        put(state{nonce = state.nonce + 1})
+        true
+
+      entrypoint to_sign(h : hash, n : int) : hash =
+        Crypto.blake2b((h, n))

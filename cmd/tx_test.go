@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
+	"github.com/aeternity/aepp-sdk-go/golden"
 	"github.com/spf13/cobra"
 )
 
@@ -75,7 +76,7 @@ func Test_txContractCreateFunc(t *testing.T) {
 			name: "Deploy SimpleStorage with alice (unsigned)",
 			args: args{
 				helpers: &mockHelpers{},
-				args:    []string{alice, contractSimpleStorageBytecode, contractSimpleStorageInitCalldata},
+				args:    []string{alice, golden.SimpleStorageBytecode, golden.SimpleStorageCalldata},
 			},
 			wantErr: false,
 		},

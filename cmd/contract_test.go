@@ -5,11 +5,9 @@ import (
 	"testing"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
+	"github.com/aeternity/aepp-sdk-go/golden"
 )
 
-const contractSimpleStorage = "contract SimpleStorage =\n  record state = { data : int }\n  entrypoint init(value : int) : state = { data = value }\n  function get() : int = state.data\n  stateful function set(value : int) = put(state{data = value})"
-const contractSimpleStorageBytecode = "cb_+QYYRgKg+HOI9x+n5+MOEpnQ/zO+GoibqhQxGO4bgnvASx0vzB75BKX5AUmgOoWULXtHOgf10E7h2cFqXOqxa3kc6pKJYRpEw/nlugeDc2V0uMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoP//////////////////////////////////////////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC4YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///////////////////////////////////////////jJoEnsSQdsAgNxJqQzA+rc5DsuLDKUV7ETxQp+ItyJgJS3g2dldLhgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA///////////////////////////////////////////uEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+QKLoOIjHWzfyTkW3kyzqYV79lz0D8JW9KFJiz9+fJgMGZNEhGluaXS4wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACg//////////////////////////////////////////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALkBoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEA//////////////////////////////////////////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYD//////////////////////////////////////////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuQFEYgAAj2IAAMKRgICAUX9J7EkHbAIDcSakMwPq3OQ7LiwylFexE8UKfiLciYCUtxRiAAE5V1CAgFF/4iMdbN/JORbeTLOphXv2XPQPwlb0oUmLP358mAwZk0QUYgAA0VdQgFF/OoWULXtHOgf10E7h2cFqXOqxa3kc6pKJYRpEw/nlugcUYgABG1dQYAEZUQBbYAAZWWAgAZCBUmAgkANgAFmQgVKBUllgIAGQgVJgIJADYAOBUpBZYABRWVJgAFJgAPNbYACAUmAA81tgAFFRkFZbYCABUVGQUIOSUICRUFCAWZCBUllgIAGQgVJgIJADYAAZWWAgAZCBUmAgkANgAFmQgVKBUllgIAGQgVJgIJADYAOBUoFSkFCQVltgIAFRUVlQgJFQUGAAUYFZkIFSkFBgAFJZkFCQVltQUFlQUGIAAMpWhTMuMS4wHchc+w=="
-const contractSimpleStorageInitCalldata = "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACDiIx1s38k5Ft5Ms6mFe/Zc9A/CVvShSYs/fnyYDBmTRAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACo7j+li"
 const contractSimpleStorageErr = "contract SimpleStorage =\n  record state = { data : int }\n  function init(value : int) : state = { data = value }\n  function get() : int = state.data\n  function set(value : int) = put(state{data = value})"
 
 func Test_compileFunc(t *testing.T) {
@@ -27,7 +25,7 @@ func Test_compileFunc(t *testing.T) {
 			name: "Simple storage, mocked compiler",
 			args: args{
 				conn:   &mockCompileContracter{},
-				source: contractSimpleStorage,
+				source: golden.SimpleStorageSource,
 			},
 			wantErr: false,
 			online:  false,
@@ -36,7 +34,7 @@ func Test_compileFunc(t *testing.T) {
 			name: "Simple storage, online compiler: should compile",
 			args: args{
 				conn:   newCompiler(),
-				source: contractSimpleStorage,
+				source: golden.SimpleStorageSource,
 			},
 			wantErr: false,
 			online:  true,
@@ -83,7 +81,7 @@ func Test_encodeCalldataFunc(t *testing.T) {
 			args: args{
 				conn:   &mockEncodeCalldataer{},
 				args:   []string{"init", "42"},
-				source: contractSimpleStorage,
+				source: golden.SimpleStorageSource,
 			},
 			wantErr: false,
 			online:  false,
@@ -93,7 +91,7 @@ func Test_encodeCalldataFunc(t *testing.T) {
 			args: args{
 				conn:   newCompiler(),
 				args:   []string{"init", "42"},
-				source: contractSimpleStorage,
+				source: golden.SimpleStorageSource,
 			},
 			wantErr: false,
 			online:  true,
@@ -121,7 +119,7 @@ func Test_decodeCalldataFunc(t *testing.T) {
 		args []string
 	}
 	// Write source file for Decode with source file test
-	tempdir, path := writeTestContractFile(t, contractSimpleStorage)
+	tempdir, path := writeTestContractFile(t, golden.SimpleStorageSource)
 	defer os.RemoveAll(tempdir)
 
 	tests := []struct {
@@ -134,7 +132,7 @@ func Test_decodeCalldataFunc(t *testing.T) {
 			name: "Decode with bytecode",
 			args: args{
 				conn: &mockdecodeCalldataer{decodedCalldata: `{"arguments":[{"type":"word","value":42}],"function":"init"}`},
-				args: []string{contractSimpleStorageBytecode, contractSimpleStorageInitCalldata},
+				args: []string{golden.SimpleStorageBytecode, golden.SimpleStorageCalldata},
 			},
 			wantErr: false,
 			online:  false,
@@ -143,7 +141,7 @@ func Test_decodeCalldataFunc(t *testing.T) {
 			name: "Decode with source file",
 			args: args{
 				conn: &mockdecodeCalldataer{decodedCalldata: `{"arguments":[{"type":"word","value":42}],"function":"init"}`},
-				args: []string{path, contractSimpleStorageInitCalldata},
+				args: []string{path, golden.SimpleStorageCalldata},
 			},
 			wantErr: false,
 			online:  false,
@@ -152,7 +150,7 @@ func Test_decodeCalldataFunc(t *testing.T) {
 			name: "Decode with bytecode (online)",
 			args: args{
 				conn: newCompiler(),
-				args: []string{contractSimpleStorageBytecode, contractSimpleStorageInitCalldata},
+				args: []string{golden.SimpleStorageBytecode, golden.SimpleStorageCalldata},
 			},
 			wantErr: false,
 			online:  true,
@@ -161,7 +159,7 @@ func Test_decodeCalldataFunc(t *testing.T) {
 			name: "Decode with source file (online)",
 			args: args{
 				conn: newCompiler(),
-				args: []string{path, contractSimpleStorageInitCalldata},
+				args: []string{path, golden.SimpleStorageCalldata},
 			},
 			wantErr: false,
 			online:  true,
@@ -182,7 +180,7 @@ func Test_decodeCalldataFunc(t *testing.T) {
 
 func Test_generateAciFunc(t *testing.T) {
 	// Write source file for Decode with source file test
-	tempdir, path := writeTestContractFile(t, contractSimpleStorage)
+	tempdir, path := writeTestContractFile(t, golden.SimpleStorageSource)
 	defer os.RemoveAll(tempdir)
 	type args struct {
 		conn aeternity.GenerateACIer
