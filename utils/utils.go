@@ -13,8 +13,8 @@ import (
 type BigInt big.Int
 
 // String casts BigInt into big.Int and uses its String method.
-func (b *BigInt) String() string {
-	bc := big.Int(*b)
+func (b BigInt) String() string {
+	bc := big.Int(b)
 	return bc.String()
 }
 
