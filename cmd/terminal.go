@@ -133,9 +133,12 @@ func PrintGenerationByHeight(c getGenerationMicroBlockTransactioner, height uint
 			}
 			// go through all the hashes
 			for _, btx := range r.Transactions {
-				p, err := c.GetTransactionByHash(fmt.Sprint(btx.Hash))
+				p, err := c.GetTransactionByHash(fmt.Sprint(*btx.Hash))
 				if err == nil {
 					PrintObject("transaction", p)
+				} else {
+					fmt.Println("Error in c.GetTransactionByHash", err, btx.Hash)
+					continue
 				}
 			}
 		}
