@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"encoding/json"
+	"fmt"
 	"math"
 	"math/big"
 	"reflect"
@@ -72,28 +74,35 @@ func TestBigIntLargerThanZero(t *testing.T) {
 }
 
 func TestBigInt_UnmarshalJSON(t *testing.T) {
-	type args struct {
-		text []byte
-	}
 	tests := []struct {
 		name    string
 		b       BigInt
-		args    args
+		rawInt  []byte
 		wantErr bool
 	}{{
-		name:    "Deserialize this",
-		args:    args{[]byte("1600000000000000000129127208515966861305")},
+		name:    "utils.BigInt 1600000000000000000129127208515966861305",
+		rawInt:  []byte("1600000000000000000129127208515966861305"),
 		b:       BigInt(*RequireIntFromString("1600000000000000000129127208515966861305")),
 		wantErr: false,
 	}}
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(fmt.Sprintf("UnmarshalJSON %v", tt.name), func(t *testing.T) {
 			b := &BigInt{}
-			if err := b.UnmarshalJSON(tt.args.text); (err != nil) != tt.wantErr {
+			if err := b.UnmarshalJSON(tt.rawInt); (err != nil) != tt.wantErr {
 				t.Errorf("BigInt.UnmarshalJSON() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if b.Cmp(&tt.b) != 0 {
 				t.Errorf("The values are not the same: b: %s, want: %s", b.String(), tt.b.String())
+			}
+		})
+		t.Run(fmt.Sprintf("MarshalJSON %v", tt.name), func(t *testing.T) {
+			jm, err := json.Marshal(tt.b)
+			if err != nil {
+				t.Errorf("BigInt.MarshalJSON() error = %v", err)
+			}
+
+			if !reflect.DeepEqual(jm, tt.rawInt) {
+				t.Errorf("BigInt.MarshalJSON() should have marshaled into %s, got %s", tt.rawInt, jm)
 			}
 		})
 	}
