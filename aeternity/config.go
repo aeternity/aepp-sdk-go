@@ -13,10 +13,10 @@ const (
 
 // NodeConfig configuration for the node node
 type NodeConfig struct {
-	URL         string `yaml:"url" json:"url" mapstructure:"url"`
-	URLInternal string `yaml:"url_internal" json:"url_internal" mapstructure:"url_internal"`
-	URLChannels string `yaml:"url_channels" json:"url_channels" mapstructure:"url_channels"`
-	NetworkID   string `yaml:"network_id" json:"network_id" mapstructure:"network_id"`
+	URL         string `json:"url" yaml:"url" mapstructure:"url"`
+	URLInternal string `json:"url_internal" yaml:"url_internal" mapstructure:"url_internal"`
+	URLChannels string `json:"url_channels" yaml:"url_channels" mapstructure:"url_channels"`
+	NetworkID   string `json:"network_id" yaml:"network_id" mapstructure:"network_id"`
 }
 
 // AensConfig configurations for Aens
@@ -57,18 +57,17 @@ type StateChannelConfig struct {
 
 // ClientConfig client parameters configuration
 type ClientConfig struct {
-	BaseGas            big.Int
-	GasPerByte         big.Int
-	GasPrice           big.Int
-	TTL                uint64             `json:"ttl" yaml:"ttl" mapstructure:"ttl"`
-	Fee                big.Int            `json:"fee" yaml:"fee" mapstructure:"fee"`
-	DefaultKey         string             `json:"default_key_name" yaml:"default_key_name" mapstructure:"default_key_name"`
-	Names              AensConfig         `json:"names" yaml:"names" mapstructure:"names"`
-	Contracts          ContractConfig     `json:"contracts" yaml:"contracts" mapstructure:"contracts"`
-	Oracles            OracleConfig       `json:"oracles" yaml:"oracles" mapstructure:"oracles"`
-	StateChannels      StateChannelConfig `json:"state_channels" yaml:"state_channels" mapstructure:"state_channels"`
-	NativeTransactions bool               `yaml:"native_transactions" json:"native_transactions" mapstructure:"native_transactions"`
-	Offline            bool               `yaml:"offline" json:"offline" mapstructure:"offline"`
+	BaseGas       big.Int            `json:"base_gas" yaml:"base_gas" mapstructure:"base_gas"`
+	GasPerByte    big.Int            `json:"gas_per_byte" yaml:"gas_per_byte" mapstructure:"gas_per_byte"`
+	GasPrice      big.Int            `json:"gas_price" yaml:"gas_price" mapstructure:"gas_price"`
+	TTL           uint64             `json:"ttl" yaml:"ttl" mapstructure:"ttl"`
+	Fee           big.Int            `json:"fee" yaml:"fee" mapstructure:"fee"`
+	DefaultKey    string             `json:"default_key_name" yaml:"default_key_name" mapstructure:"default_key_name"`
+	Names         AensConfig         `json:"names" yaml:"names" mapstructure:"names"`
+	Contracts     ContractConfig     `json:"contracts" yaml:"contracts" mapstructure:"contracts"`
+	Oracles       OracleConfig       `json:"oracles" yaml:"oracles" mapstructure:"oracles"`
+	StateChannels StateChannelConfig `json:"state_channels" yaml:"state_channels" mapstructure:"state_channels"`
+	Offline       bool               `json:"offline" yaml:"offline" mapstructure:"offline"`
 }
 
 // TuningConfig fine tuning of parameters of the client
@@ -132,8 +131,7 @@ var Config = ProfileConfig{
 			LockPeriod:     0,
 			ChannelReserve: 0,
 		},
-		NativeTransactions: false, //UNUSED
-		Offline:            false, // UNUSED
+		Offline: false, // UNUSED
 	},
 	Tuning: TuningConfig{
 		ChainPollInteval:  100,
