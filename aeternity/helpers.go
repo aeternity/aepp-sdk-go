@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	rlp "github.com/randomshinichi/rlpae"
 )
 
 // GetHeightAccountNamer is used by Helper{} methods to describe the
@@ -348,10 +350,14 @@ func VerifySignedTx(accountID string, txSigned string, networkID string) (valid 
 	return
 }
 
-// WaitForTransactionUntilHeight waits for a transaction until heightLimit (inclusive) is reached
-func WaitForTransactionUntilHeight(c getTransactionByHashHeighter, txHash string, untilHeight uint64) (blockHeight uint64, blockHash string, err error) {
-	var nodeHeight uint64
-	for nodeHeight <= untilHeight {
+// WaitForTransactionForXBlocks waits for a transaction until X blocks have gone by
+func WaitForTransactionForXBlocks(c getTransactionByHashHeighter, txHash string, x uint64) (blockHeight uint64, blockHash string, err error) {
+	nodeHeight, err := c.GetHeight()
+	if err != nil {
+		return
+	}
+	endHeight := nodeHeight + x
+	for nodeHeight <= endHeight {
 		nodeHeight, err = c.GetHeight()
 		if err != nil {
 			return 0, "", err
@@ -367,7 +373,7 @@ func WaitForTransactionUntilHeight(c getTransactionByHashHeighter, txHash string
 		}
 		time.Sleep(time.Millisecond * time.Duration(Config.Tuning.ChainPollInteval))
 	}
-	return 0, "", fmt.Errorf("It is already height %v and %v still isn't in a block", nodeHeight, txHash)
+	return 0, "", fmt.Errorf("%v blocks have gone by and %v still isn't in a block", x, txHash)
 }
 
 // BroadcastTransaction differs from Client.PostTransaction() in that the latter just handles
@@ -389,5 +395,25 @@ func BroadcastTransaction(c PostTransactioner, txSignedBase64 string) (err error
 
 	// send it to the network
 	err = c.PostTransaction(txSignedBase64, signedEncodedTxHash)
+	return
+}
+
+// SignBroadcastTransaction is a convenience function that signs your
+// transaction before calling BroadcastTransaction on it
+func SignBroadcastTransaction(tx rlp.Encoder, signingAccount *Account, n *Node, networkID string) (signedTxStr, hash, signature string, err error) {
+	signedTx, hash, signature, err := SignHashTx(signingAccount, tx, networkID)
+	if err != nil {
+		return
+	}
+
+	signedTxStr, err = SerializeTx(&signedTx)
+	if err != nil {
+		return
+	}
+
+	err = BroadcastTransaction(n, signedTxStr)
+	if err != nil {
+		return
+	}
 	return
 }

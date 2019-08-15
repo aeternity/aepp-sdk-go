@@ -86,9 +86,7 @@ func getHeight(aeNode *aeternity.Node) (h uint64) {
 }
 
 func waitForTransaction(aeNode *aeternity.Node, hash string) (height uint64, microblockHash string, err error) {
-	height = getHeight(aeNode)
-	// fmt.Println("Waiting for", hash)
-	height, microblockHash, err = aeternity.WaitForTransactionUntilHeight(aeNode, hash, height+10)
+	height, microblockHash, err = aeternity.WaitForTransactionForXBlocks(aeNode, hash, 10)
 	if err != nil {
 		// Sometimes, the tests want the tx to fail. Return the err to let them know.
 		return 0, "", err

@@ -36,9 +36,9 @@ func (m *mockClient) GetTransactionByHash(hash string) (tx *models.GenericSigned
 	}
 	return tx, nil
 }
-func TestWaitForTransactionUntilHeight(t *testing.T) {
+func TestWaitForTransactionForXBlocks(t *testing.T) {
 	m := new(mockClient)
-	blockHeight, blockHash, err := WaitForTransactionUntilHeight(m, "th_transactionhash", 10)
+	blockHeight, blockHash, err := WaitForTransactionForXBlocks(m, "th_transactionhash", 10)
 	if err != nil {
 		t.Fatal(err)
 	}
