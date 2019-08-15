@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
+	"github.com/aeternity/aepp-sdk-go/golden"
 	"github.com/aeternity/aepp-sdk-go/utils"
 	rlp "github.com/randomshinichi/rlpae"
 )
@@ -37,12 +38,11 @@ func TestGeneralizedAccounts(t *testing.T) {
 	}
 
 	// Read the auth contract from a file, compile and prepare its init() calldata
-	authSource := readFile(t, "authorize.aes")
-	authBytecode, err := compiler.CompileContract(authSource)
+	authBytecode, err := compiler.CompileContract(golden.AuthorizeSource)
 	if err != nil {
 		t.Fatal(err)
 	}
-	authCalldata, err := compiler.EncodeCalldata(authSource, "init", []string{alice.Address})
+	authInitCalldata, err := compiler.EncodeCalldata(golden.AuthorizeSource, "init", []string{alice.Address})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -71,7 +71,7 @@ func TestGeneralizedAccounts(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	gaTx := aeternity.NewGAAttachTx(testAccount.Address, 1, authBytecode, auth.TypeInfo[0].FuncHash, aeternity.Config.Client.Contracts.VMVersion, aeternity.Config.Client.Contracts.ABIVersion, aeternity.Config.Client.BaseGas, aeternity.Config.Client.GasPrice, aeternity.Config.Client.Fee, ttl, authCalldata)
+	gaTx := aeternity.NewGAAttachTx(testAccount.Address, 1, authBytecode, auth.TypeInfo[0].FuncHash, aeternity.Config.Client.Contracts.VMVersion, aeternity.Config.Client.Contracts.ABIVersion, aeternity.Config.Client.BaseGas, aeternity.Config.Client.GasPrice, aeternity.Config.Client.Fee, ttl, authInitCalldata)
 	txHash := signBroadcast(t, &gaTx, testAccount, aeNode)
 	_, _, err = waitForTransaction(aeNode, txHash)
 	if err != nil {
@@ -99,8 +99,11 @@ func TestGeneralizedAccounts(t *testing.T) {
 
 	// spendTx will be wrapped in a SignedTx with 0 signatures before being
 	// included in GAMetaTx. The constructor NewGAMetaTx() does this for you.
+	// authData is authorize(3)
+	authData := "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACBGtXufEG2HuMYcRcNwsGAeqymslunKf692bHnvwI5K6wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAU3aKBNm"
+	gas := utils.NewIntFromUint64(10000) // the node will fail the authentication if there isn't enough gas
 	spendTx := aeternity.NewSpendTx(testAccount.Address, bob.Address, *big.NewInt(5000), aeternity.Config.Client.Fee, []byte{}, ttl, 0)
-	gaMetaTx := aeternity.NewGAMetaTx(testAccount.Address, "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACArgmMvLPdJq0/eccQZx/kn0CmjZNS2PRRsu167v6sUZQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABdclTA==", aeternity.Config.Client.Contracts.ABIVersion, *utils.NewIntFromUint64(1000), aeternity.Config.Client.GasPrice, aeternity.Config.Client.Fee, ttl, &spendTx)
+	gaMetaTx := aeternity.NewGAMetaTx(testAccount.Address, authData, aeternity.Config.Client.Contracts.ABIVersion, *gas, aeternity.Config.Client.GasPrice, aeternity.Config.Client.Fee, ttl, &spendTx)
 
 	gaMetaTxFinal, hash, _, err := aeternity.SignHashTx(testAccount, &gaMetaTx, aeternity.Config.Node.NetworkID)
 	if err != nil {
