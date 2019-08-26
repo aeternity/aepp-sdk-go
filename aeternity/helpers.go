@@ -220,13 +220,13 @@ func (c *Context) NameRevokeTx(name string) (tx NameRevokeTx, err error) {
 }
 
 // OracleRegisterTx create a new oracle
-func (c *Context) OracleRegisterTx(querySpec, responseSpec string, queryFee big.Int, oracleTTLType, oracleTTLValue uint64, abiVersion uint16) (tx OracleRegisterTx, err error) {
+func (c *Context) OracleRegisterTx(querySpec, responseSpec string, queryFee big.Int, oracleTTLType, oracleTTLValue uint64, VMVersion uint16) (tx OracleRegisterTx, err error) {
 	ttl, nonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return OracleRegisterTx{}, err
 	}
 
-	tx = NewOracleRegisterTx(c.Address, nonce, querySpec, responseSpec, queryFee, oracleTTLType, oracleTTLValue, abiVersion, Config.Client.Fee, ttl)
+	tx = NewOracleRegisterTx(c.Address, nonce, querySpec, responseSpec, queryFee, oracleTTLType, oracleTTLValue, VMVersion, Config.Client.Fee, ttl)
 	return tx, nil
 }
 
