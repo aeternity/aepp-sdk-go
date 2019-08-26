@@ -46,7 +46,10 @@ func TestAENSWorkflow(t *testing.T) {
 		t.Fatal(err)
 	}
 	fmt.Printf("Preclaim %+v with name %s \n", preclaimTx, name)
-	hash := signBroadcast(t, &preclaimTx, alice, node)
+	_, hash, _, err := aeternity.SignBroadcastTransaction(&preclaimTx, alice, node, networkID)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	// Wait for a bit
 	_, _, _ = waitForTransaction(node, hash)
@@ -57,7 +60,10 @@ func TestAENSWorkflow(t *testing.T) {
 		t.Fatal(err)
 	}
 	fmt.Printf("Claim %+v\n", claimTx)
-	hash = signBroadcast(t, &claimTx, alice, node)
+	_, hash, _, err = aeternity.SignBroadcastTransaction(&claimTx, alice, node, networkID)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	// Wait for a bit
 	_, _, _ = waitForTransaction(node, hash)
@@ -76,7 +82,10 @@ func TestAENSWorkflow(t *testing.T) {
 		t.Fatal(err)
 	}
 	fmt.Printf("Update %+v\n", updateTx)
-	_ = signBroadcast(t, &updateTx, alice, node)
+	_, _, _, err = aeternity.SignBroadcastTransaction(&updateTx, alice, node, networkID)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	// Verify that the name was updated
 	delay(printNameEntry)
@@ -90,7 +99,10 @@ func TestAENSWorkflow(t *testing.T) {
 		t.Fatal(err)
 	}
 	fmt.Printf("Transfer %+v\n", transferTx)
-	hash = signBroadcast(t, &transferTx, alice, node)
+	_, hash, _, err = aeternity.SignBroadcastTransaction(&transferTx, alice, node, networkID)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	// Wait for a bit
 	_, _, _ = waitForTransaction(node, hash)
@@ -103,7 +115,10 @@ func TestAENSWorkflow(t *testing.T) {
 		t.Fatal(err)
 	}
 	fmt.Printf("Update Signed By Recipient %+v\n", updateTx2)
-	_ = signBroadcast(t, &updateTx2, bob, node)
+	_, _, _, err = aeternity.SignBroadcastTransaction(&updateTx2, bob, node, networkID)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	// Revoke the name - shouldn't work because it is signed by the sender, who no longer owns the address
 	revokeTx, err := aensAlice.NameRevokeTx(name)
@@ -111,7 +126,10 @@ func TestAENSWorkflow(t *testing.T) {
 		t.Fatal(err)
 	}
 	fmt.Printf("Revoke %+v\n", revokeTx)
-	hash = signBroadcast(t, &revokeTx, alice, node)
+	_, hash, _, err = aeternity.SignBroadcastTransaction(&revokeTx, alice, node, networkID)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	// Wait for a bit
 	_, _, revokeTxShouldHaveFailed := waitForTransaction(node, hash)
@@ -127,7 +145,10 @@ func TestAENSWorkflow(t *testing.T) {
 		t.Fatal(err)
 	}
 	fmt.Printf("Revoke Signed By Recipient %+v\n", revokeTx2)
-	hash = signBroadcast(t, &revokeTx2, bob, node)
+	_, hash, _, err = aeternity.SignBroadcastTransaction(&revokeTx2, bob, node, networkID)
+	if err != nil {
+		t.Fatal(err)
+	}
 	// Wait for a bit
 	_, _, _ = waitForTransaction(node, hash)
 

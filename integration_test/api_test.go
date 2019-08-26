@@ -53,8 +53,11 @@ var sentTxs txTypes
 var useTestNet bool
 
 func signBroadcastWaitForTransaction(t *testing.T, tx rlp.Encoder, acc *aeternity.Account, node *aeternity.Node) (height uint64, txHash string, mbHash string) {
-	txHash = signBroadcast(t, tx, acc, node)
-	height, mbHash, err := waitForTransaction(node, txHash)
+	_, txHash, _, err := aeternity.SignBroadcastTransaction(tx, acc, node, networkID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	height, mbHash, err = waitForTransaction(node, txHash)
 	if err != nil {
 		t.Fatal(err)
 	}

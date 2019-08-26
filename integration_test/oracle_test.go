@@ -8,7 +8,6 @@ import (
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
 	"github.com/aeternity/aepp-sdk-go/swagguard/node/models"
-	"github.com/aeternity/aepp-sdk-go/utils"
 )
 
 func TestOracleWorkflow(t *testing.T) {
@@ -25,13 +24,15 @@ func TestOracleWorkflow(t *testing.T) {
 	oracleAccount := aeternity.Context{Helpers: helpers, Address: testAccount.Address}
 
 	// Register
-	queryFee := utils.NewIntFromUint64(1000)
-	register, err := oracleAccount.OracleRegisterTx("hello", "helloback", *queryFee, uint64(0), uint64(100), 0)
+	register, err := oracleAccount.OracleRegisterTx("hello", "helloback", aeternity.Config.Client.Oracles.QueryFee, aeternity.Config.Client.Oracles.QueryTTLType, aeternity.Config.Client.Oracles.QueryTTLValue, aeternity.Config.Client.Oracles.VMVersion)
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Printf("Register %+v\n", register)
-	registerHash := signBroadcast(t, &register, testAccount, client)
+	_, registerHash, _, err := aeternity.SignBroadcastTransaction(&register, testAccount, client, networkID)
+	if err != nil {
+		t.Fatal(err)
+	}
 	_, _, _ = waitForTransaction(client, registerHash)
 
 	// Confirm that the oracle exists
@@ -53,7 +54,10 @@ func TestOracleWorkflow(t *testing.T) {
 		t.Fatal(err)
 	}
 	fmt.Printf("Extend %+v\n", extend)
-	extendHash := signBroadcast(t, &extend, testAccount, client)
+	_, extendHash, _, err := aeternity.SignBroadcastTransaction(&extend, testAccount, client, networkID)
+	if err != nil {
+		t.Fatal(err)
+	}
 	_, _, _ = waitForTransaction(client, extendHash)
 
 	// Confirm that the oracle's TTL changed
@@ -66,12 +70,15 @@ func TestOracleWorkflow(t *testing.T) {
 	}
 
 	// Query
-	query, err := oracleAccount.OracleQueryTx(oraclePubKey, "How was your day?", *queryFee, 0, 100, 0, 100)
+	query, err := oracleAccount.OracleQueryTx(oraclePubKey, "How was your day?", aeternity.Config.Client.Oracles.QueryFee, 0, 100, 0, 100)
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Printf("Query %+v\n", query)
-	queryHash := signBroadcast(t, &query, testAccount, client)
+	_, queryHash, _, err := aeternity.SignBroadcastTransaction(&query, testAccount, client, networkID)
+	if err != nil {
+		t.Fatal(err)
+	}
 	_, _, _ = waitForTransaction(client, queryHash)
 
 	// Find the Oracle Query ID to reply to
@@ -90,6 +97,9 @@ func TestOracleWorkflow(t *testing.T) {
 	// Respond
 	respond, err := oracleAccount.OracleRespondTx(oraclePubKey, *oqID, "My day was fine thank you", 0, 100)
 	fmt.Printf("Respond %+v\n", respond)
-	respondHash := signBroadcast(t, &respond, testAccount, client)
+	_, respondHash, _, err := aeternity.SignBroadcastTransaction(&respond, testAccount, client, networkID)
+	if err != nil {
+		t.Fatal(err)
+	}
 	_, _, _ = waitForTransaction(client, respondHash)
 }
