@@ -46,7 +46,7 @@ type OracleConfig struct {
 	QueryTTLValue    uint64  `json:"query_ttl_value" yaml:"query_ttl_value" mapstructure:"query_ttl_value"`
 	ResponseTTLType  uint64  `json:"response_ttl_type" yaml:"response_ttl_type" mapstructure:"response_ttl_type"`
 	ResponseTTLValue uint64  `json:"response_ttl_value" yaml:"response_ttl_value" mapstructure:"response_ttl_value"`
-	VMVersion        uint64  `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
+	VMVersion        uint16  `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
 }
 
 // StateChannelConfig configurations for contracts TODO: not complete
