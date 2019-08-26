@@ -52,7 +52,7 @@ if err != nil {
 }
 
 // transform the tx into a tx_base64encodedstring so you can HTTP POST it
-signedTxStr, err := aeternity.SerializeTx(&tx)
+signedTxStr, err := aeternity.SerializeTx(&signedTx)
 if err != nil {
     t.Error(err)
 }
