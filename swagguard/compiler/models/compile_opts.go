@@ -6,14 +6,22 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
+
 	strfmt "github.com/go-openapi/strfmt"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // CompileOpts compile opts
 // swagger:model CompileOpts
 type CompileOpts struct {
+
+	// Compiler backend; fate | aevm
+	// Enum: [fate aevm]
+	Backend string `json:"backend,omitempty"`
 
 	// An explicit file system, mapping file names to file content
 	FileSystem interface{} `json:"file_system,omitempty"`
@@ -24,6 +32,58 @@ type CompileOpts struct {
 
 // Validate validates this compile opts
 func (m *CompileOpts) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateBackend(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+var compileOptsTypeBackendPropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["fate","aevm"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		compileOptsTypeBackendPropEnum = append(compileOptsTypeBackendPropEnum, v)
+	}
+}
+
+const (
+
+	// CompileOptsBackendFate captures enum value "fate"
+	CompileOptsBackendFate string = "fate"
+
+	// CompileOptsBackendAevm captures enum value "aevm"
+	CompileOptsBackendAevm string = "aevm"
+)
+
+// prop value enum
+func (m *CompileOpts) validateBackendEnum(path, location string, value string) error {
+	if err := validate.Enum(path, location, value, compileOptsTypeBackendPropEnum); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *CompileOpts) validateBackend(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Backend) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateBackendEnum("backend", "body", m.Backend); err != nil {
+		return err
+	}
+
 	return nil
 }
 

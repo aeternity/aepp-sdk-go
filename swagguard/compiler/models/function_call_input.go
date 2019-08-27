@@ -25,6 +25,9 @@ type FunctionCallInput struct {
 	// Required: true
 	Function *string `json:"function"`
 
+	// options
+	Options *CompileOpts `json:"options,omitempty"`
+
 	// (Possibly partial) Sophia contract code
 	// Required: true
 	Source *string `json:"source"`
@@ -39,6 +42,10 @@ func (m *FunctionCallInput) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateFunction(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateOptions(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -65,6 +72,24 @@ func (m *FunctionCallInput) validateFunction(formats strfmt.Registry) error {
 
 	if err := validate.Required("function", "body", m.Function); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (m *FunctionCallInput) validateOptions(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Options) { // not required
+		return nil
+	}
+
+	if m.Options != nil {
+		if err := m.Options.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("options")
+			}
+			return err
+		}
 	}
 
 	return nil

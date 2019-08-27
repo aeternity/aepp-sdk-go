@@ -122,7 +122,7 @@ type DecodeCalldataSourcer interface {
 // /decode-calldata/source
 func (c *Compiler) DecodeCalldataSource(source string, callData string) (decodedCallData *models.DecodedCalldata, err error) {
 	p := &models.DecodeCalldataSource{
-		Source:   source,
+		Source:   &source,
 		Calldata: models.EncodedByteArray(callData),
 	}
 	params := operations.NewDecodeCalldataSourceParams().WithBody(p)
