@@ -70,10 +70,19 @@
         },
         "CompileOpts": {
             "example": {
+                "backend": "fate",
                 "file_system": "{}",
                 "src_file": "src_file"
             },
             "properties": {
+                "backend": {
+                    "description": "Compiler backend; fate | aevm",
+                    "enum": [
+                        "fate",
+                        "aevm"
+                    ],
+                    "type": "string"
+                },
                 "file_system": {
                     "description": "An explicit file system, mapping file names to file content",
                     "properties": {},
@@ -105,6 +114,7 @@
             "example": {
                 "code": "code",
                 "options": {
+                    "backend": "fate",
                     "file_system": "{}",
                     "src_file": "src_file"
                 }
@@ -125,10 +135,19 @@
         },
         "DecodeCalldataBytecode": {
             "example": {
+                "backend": "fate",
                 "bytecode": null,
                 "calldata": {}
             },
             "properties": {
+                "backend": {
+                    "description": "Compiler backend; fate | aevm",
+                    "enum": [
+                        "fate",
+                        "aevm"
+                    ],
+                    "type": "string"
+                },
                 "bytecode": {
                     "$ref": "#/definitions/EncodedByteArray",
                     "description": "Compiled contract"
@@ -147,6 +166,12 @@
         "DecodeCalldataSource": {
             "example": {
                 "calldata": {},
+                "function": "function",
+                "options": {
+                    "backend": "fate",
+                    "file_system": "{}",
+                    "src_file": "src_file"
+                },
                 "source": "source"
             },
             "properties": {
@@ -154,11 +179,23 @@
                     "$ref": "#/definitions/EncodedByteArray",
                     "description": "Calldata to dissect"
                 },
+                "function": {
+                    "description": "Name of the function to call",
+                    "type": "string"
+                },
+                "options": {
+                    "$ref": "#/definitions/CompileOpts"
+                },
                 "source": {
                     "description": "(Possibly partial) Sophia contract code",
                     "type": "string"
                 }
             },
+            "required": [
+                "calldata",
+                "function",
+                "source"
+            ],
             "type": "object"
         },
         "DecodedCalldata": {
@@ -209,6 +246,11 @@
                     "arguments"
                 ],
                 "function": "function",
+                "options": {
+                    "backend": "fate",
+                    "file_system": "{}",
+                    "src_file": "src_file"
+                },
                 "source": "source"
             },
             "properties": {
@@ -222,6 +264,9 @@
                 "function": {
                     "description": "Name of function to call",
                     "type": "string"
+                },
+                "options": {
+                    "$ref": "#/definitions/CompileOpts"
                 },
                 "source": {
                     "description": "(Possibly partial) Sophia contract code",
@@ -260,6 +305,11 @@
                 "call-result": "call-result",
                 "call-value": "call-value",
                 "function": "function",
+                "options": {
+                    "backend": "fate",
+                    "file_system": "{}",
+                    "src_file": "src_file"
+                },
                 "source": "source"
             },
             "properties": {
@@ -274,6 +324,9 @@
                 "function": {
                     "description": "Name of the called function",
                     "type": "string"
+                },
+                "options": {
+                    "$ref": "#/definitions/CompileOpts"
                 },
                 "source": {
                     "description": "(Possibly partial) Sophia contract code/interface",
@@ -311,7 +364,7 @@
         "description": "This is the [Aeternity](https://www.aeternity.com/) compiler API.",
         "termsOfService": "https://www.aeternity.com/terms/",
         "title": "Aeternity node",
-        "version": "3.1.0"
+        "version": "4.0.0-rc1"
     },
     "paths": {
         "/aci": {

@@ -6,15 +6,22 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
+
 	strfmt "github.com/go-openapi/strfmt"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // DecodeCalldataBytecode decode calldata bytecode
 // swagger:model DecodeCalldataBytecode
 type DecodeCalldataBytecode struct {
+
+	// Compiler backend; fate | aevm
+	// Enum: [fate aevm]
+	Backend string `json:"backend,omitempty"`
 
 	// Compiled contract
 	// Required: true
@@ -29,6 +36,10 @@ type DecodeCalldataBytecode struct {
 func (m *DecodeCalldataBytecode) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateBackend(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateBytecode(formats); err != nil {
 		res = append(res, err)
 	}
@@ -40,6 +51,49 @@ func (m *DecodeCalldataBytecode) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+var decodeCalldataBytecodeTypeBackendPropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["fate","aevm"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		decodeCalldataBytecodeTypeBackendPropEnum = append(decodeCalldataBytecodeTypeBackendPropEnum, v)
+	}
+}
+
+const (
+
+	// DecodeCalldataBytecodeBackendFate captures enum value "fate"
+	DecodeCalldataBytecodeBackendFate string = "fate"
+
+	// DecodeCalldataBytecodeBackendAevm captures enum value "aevm"
+	DecodeCalldataBytecodeBackendAevm string = "aevm"
+)
+
+// prop value enum
+func (m *DecodeCalldataBytecode) validateBackendEnum(path, location string, value string) error {
+	if err := validate.Enum(path, location, value, decodeCalldataBytecodeTypeBackendPropEnum); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *DecodeCalldataBytecode) validateBackend(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Backend) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateBackendEnum("backend", "body", m.Backend); err != nil {
+		return err
+	}
+
 	return nil
 }
 
