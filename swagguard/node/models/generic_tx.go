@@ -246,8 +246,8 @@ func unmarshalGenericTx(data []byte, consumer runtime.Consumer) (GenericTx, erro
 		}
 		return &result, nil
 
-	case "OracleResponseTxJSON", "OracleResponseTx":
-		var result OracleResponseTxJSON
+	case "OracleRespondTxJSON", "OracleRespondTx":
+		var result OracleRespondTxJSON
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}

@@ -392,7 +392,7 @@ func TestAPI(t *testing.T) {
 				wantErr: false,
 			},
 			{
-				name: "OracleResponseTx",
+				name: "OracleRespondTx",
 				args: args{
 					txHash: sentTxs.OracleRespondTx.txHash,
 				},

@@ -16,36 +16,36 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// OracleResponseTxJSON oracle response tx JSON
-// swagger:model OracleResponseTxJSON
-type OracleResponseTxJSON struct {
+// OracleRespondTxJSON oracle response tx JSON
+// swagger:model OracleRespondTxJSON
+type OracleRespondTxJSON struct {
 	versionField *uint32
 
 	OracleRespondTx
 }
 
 // Type gets the type of this subtype
-func (m *OracleResponseTxJSON) Type() string {
-	return "OracleResponseTx"
+func (m *OracleRespondTxJSON) Type() string {
+	return "OracleRespondTx"
 }
 
 // SetType sets the type of this subtype
-func (m *OracleResponseTxJSON) SetType(val string) {
+func (m *OracleRespondTxJSON) SetType(val string) {
 
 }
 
 // Version gets the version of this subtype
-func (m *OracleResponseTxJSON) Version() *uint32 {
+func (m *OracleRespondTxJSON) Version() *uint32 {
 	return m.versionField
 }
 
 // SetVersion sets the version of this subtype
-func (m *OracleResponseTxJSON) SetVersion(val *uint32) {
+func (m *OracleRespondTxJSON) SetVersion(val *uint32) {
 	m.versionField = val
 }
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
-func (m *OracleResponseTxJSON) UnmarshalJSON(raw []byte) error {
+func (m *OracleRespondTxJSON) UnmarshalJSON(raw []byte) error {
 	var data struct {
 		OracleRespondTx
 	}
@@ -72,7 +72,7 @@ func (m *OracleResponseTxJSON) UnmarshalJSON(raw []byte) error {
 		return err
 	}
 
-	var result OracleResponseTxJSON
+	var result OracleRespondTxJSON
 
 	if base.Type != result.Type() {
 		/* Not the type we're looking for. */
@@ -89,7 +89,7 @@ func (m *OracleResponseTxJSON) UnmarshalJSON(raw []byte) error {
 }
 
 // MarshalJSON marshals this object with a polymorphic type to a JSON structure
-func (m OracleResponseTxJSON) MarshalJSON() ([]byte, error) {
+func (m OracleRespondTxJSON) MarshalJSON() ([]byte, error) {
 	var b1, b2, b3 []byte
 	var err error
 	b1, err = json.Marshal(struct {
@@ -121,7 +121,7 @@ func (m OracleResponseTxJSON) MarshalJSON() ([]byte, error) {
 }
 
 // Validate validates this oracle response tx JSON
-func (m *OracleResponseTxJSON) Validate(formats strfmt.Registry) error {
+func (m *OracleRespondTxJSON) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateVersion(formats); err != nil {
@@ -139,7 +139,7 @@ func (m *OracleResponseTxJSON) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *OracleResponseTxJSON) validateVersion(formats strfmt.Registry) error {
+func (m *OracleRespondTxJSON) validateVersion(formats strfmt.Registry) error {
 
 	if err := validate.Required("version", "body", m.Version()); err != nil {
 		return err
@@ -149,7 +149,7 @@ func (m *OracleResponseTxJSON) validateVersion(formats strfmt.Registry) error {
 }
 
 // MarshalBinary interface implementation
-func (m *OracleResponseTxJSON) MarshalBinary() ([]byte, error) {
+func (m *OracleRespondTxJSON) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -157,8 +157,8 @@ func (m *OracleResponseTxJSON) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *OracleResponseTxJSON) UnmarshalBinary(b []byte) error {
-	var res OracleResponseTxJSON
+func (m *OracleRespondTxJSON) UnmarshalBinary(b []byte) error {
+	var res OracleRespondTxJSON
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}
