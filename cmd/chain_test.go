@@ -70,7 +70,6 @@ func Test_broadcastFunc(t *testing.T) {
 		name    string
 		args    args
 		wantErr bool
-		online  bool
 	}{
 		{
 			name: "Normal PostTransaction without error", // this looks like it tests nothing, but actually exercises hashing/cross checking code. the mock pretends that the node checked the hash and found that it matched.
@@ -79,23 +78,10 @@ func Test_broadcastFunc(t *testing.T) {
 				args: []string{"tx_+KgLAfhCuEAPX1l3BdFOcLeduH3PPwPV25mETXZE8IBDe6PGuasSEKJeB/cDDm+kW05Cdp38+mpvVSTTPMx7trL/7qxfUr8IuGD4XhYBoQHOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+8wGTcXVlcnkgU3BlY2lmaWNhdGlvbpZyZXNwb25zZSBTcGVjaWZpY2F0aW9uAABkhrXmIPSAAIIB9AHdGxXf"},
 			},
 			wantErr: false,
-			online:  false,
-		},
-		{
-			name: "Online Status",
-			args: args{
-				conn: newAeNode(),
-				args: []string{"tx_+KgLAfhCuEAPX1l3BdFOcLeduH3PPwPV25mETXZE8IBDe6PGuasSEKJeB/cDDm+kW05Cdp38+mpvVSTTPMx7trL/7qxfUr8IuGD4XhYBoQHOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+8wGTcXVlcnkgU3BlY2lmaWNhdGlvbpZyZXNwb25zZSBTcGVjaWZpY2F0aW9uAABkhrXmIPSAAIIB9AHdGxXf"},
-			},
-			wantErr: false,
-			online:  true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if !online && tt.online {
-				t.Skip("Skipping online test")
-			}
 			if err := broadcastFunc(tt.args.conn, tt.args.args); (err != nil) != tt.wantErr {
 				t.Errorf("broadcastFunc() error = %v, wantErr %v", err, tt.wantErr)
 			}

@@ -5,10 +5,7 @@ import (
 	"testing"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
-	"github.com/aeternity/aepp-sdk-go/golden"
 )
-
-const contractSimpleStorageErr = "contract SimpleStorage =\n  record state = { data : int }\n  function init(value : int) : state = { data = value }\n  function get() : int = state.data\n  function set(value : int) = put(state{data = value})"
 
 func Test_compileFunc(t *testing.T) {
 	type args struct {
@@ -25,7 +22,7 @@ func Test_compileFunc(t *testing.T) {
 			name: "Simple storage, mocked compiler",
 			args: args{
 				conn:   &mockCompileContracter{},
-				source: golden.SimpleStorageSource,
+				source: contractSimpleStorage,
 			},
 			wantErr: false,
 			online:  false,
@@ -34,7 +31,7 @@ func Test_compileFunc(t *testing.T) {
 			name: "Simple storage, online compiler: should compile",
 			args: args{
 				conn:   newCompiler(),
-				source: golden.SimpleStorageSource,
+				source: contractSimpleStorage,
 			},
 			wantErr: false,
 			online:  true,
@@ -81,7 +78,7 @@ func Test_encodeCalldataFunc(t *testing.T) {
 			args: args{
 				conn:   &mockEncodeCalldataer{},
 				args:   []string{"init", "42"},
-				source: golden.SimpleStorageSource,
+				source: contractSimpleStorage,
 			},
 			wantErr: false,
 			online:  false,
@@ -91,7 +88,7 @@ func Test_encodeCalldataFunc(t *testing.T) {
 			args: args{
 				conn:   newCompiler(),
 				args:   []string{"init", "42"},
-				source: golden.SimpleStorageSource,
+				source: contractSimpleStorage,
 			},
 			wantErr: false,
 			online:  true,
@@ -113,15 +110,11 @@ func Test_encodeCalldataFunc(t *testing.T) {
 	}
 }
 
-func Test_decodeCalldataFunc(t *testing.T) {
+func Test_decodeCalldataBytecodeFunc(t *testing.T) {
 	type args struct {
 		conn decodeCalldataer
 		args []string
 	}
-	// Write source file for Decode with source file test
-	tempdir, path := writeTestContractFile(t, golden.SimpleStorageSource)
-	defer os.RemoveAll(tempdir)
-
 	tests := []struct {
 		name    string
 		args    args
@@ -131,17 +124,8 @@ func Test_decodeCalldataFunc(t *testing.T) {
 		{
 			name: "Decode with bytecode",
 			args: args{
-				conn: &mockdecodeCalldataer{decodedCalldata: `{"arguments":[{"type":"word","value":42}],"function":"init"}`},
-				args: []string{golden.SimpleStorageBytecode, golden.SimpleStorageCalldata},
-			},
-			wantErr: false,
-			online:  false,
-		},
-		{
-			name: "Decode with source file",
-			args: args{
-				conn: &mockdecodeCalldataer{decodedCalldata: `{"arguments":[{"type":"word","value":42}],"function":"init"}`},
-				args: []string{path, golden.SimpleStorageCalldata},
+				conn: &mockdecodeCalldataer{decodedCalldata: `{"arguments":[{"type":"init","value":42}],"function":"init"}`},
+				args: []string{contractSimpleStorageBytecode, contractSimpleStorageInit42},
 			},
 			wantErr: false,
 			online:  false,
@@ -150,16 +134,7 @@ func Test_decodeCalldataFunc(t *testing.T) {
 			name: "Decode with bytecode (online)",
 			args: args{
 				conn: newCompiler(),
-				args: []string{golden.SimpleStorageBytecode, golden.SimpleStorageCalldata},
-			},
-			wantErr: false,
-			online:  true,
-		},
-		{
-			name: "Decode with source file (online)",
-			args: args{
-				conn: newCompiler(),
-				args: []string{path, golden.SimpleStorageCalldata},
+				args: []string{contractSimpleStorageBytecode, contractSimpleStorageInit42},
 			},
 			wantErr: false,
 			online:  true,
@@ -171,16 +146,61 @@ func Test_decodeCalldataFunc(t *testing.T) {
 			t.Skip("Skipping online test")
 		}
 		t.Run(tt.name, func(t *testing.T) {
-			if err := decodeCalldataFunc(tt.args.conn, tt.args.args); (err != nil) != tt.wantErr {
+			if err := decodeCalldataBytecodeFunc(tt.args.conn, tt.args.args); (err != nil) != tt.wantErr {
 				t.Errorf("decodeCalldataFunc() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
 }
+func Test_decodeCalldataSourceFunc(t *testing.T) {
+	type args struct {
+		conn decodeCalldataer
+		args []string
+	}
+	// Write source file for Decode with source file test
+	tempdir, path := writeTestContractFile(t, contractSimpleStorage)
+	defer os.RemoveAll(tempdir)
 
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+		online  bool
+	}{
+		{
+			name: "Decode with source file",
+			args: args{
+				conn: &mockdecodeCalldataer{decodedCalldata: `{"arguments":[{"type":"int","value":42}],"function":"init"}`},
+				args: []string{path, "init", contractSimpleStorageInit42},
+			},
+			wantErr: false,
+			online:  false,
+		},
+		{
+			name: "Decode with source file (online)",
+			args: args{
+				conn: newCompiler(),
+				args: []string{path, "init", contractSimpleStorageInit42},
+			},
+			wantErr: false,
+			online:  true,
+		},
+	}
+
+	for _, tt := range tests {
+		if !online && tt.online {
+			t.Skip("Skipping online test")
+		}
+		t.Run(tt.name, func(t *testing.T) {
+			if err := decodeCalldataSourceFunc(tt.args.conn, tt.args.args); (err != nil) != tt.wantErr {
+				t.Errorf("decodeCalldataFunc() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
 func Test_generateAciFunc(t *testing.T) {
 	// Write source file for Decode with source file test
-	tempdir, path := writeTestContractFile(t, golden.SimpleStorageSource)
+	tempdir, path := writeTestContractFile(t, contractSimpleStorage)
 	defer os.RemoveAll(tempdir)
 	type args struct {
 		conn aeternity.GenerateACIer
