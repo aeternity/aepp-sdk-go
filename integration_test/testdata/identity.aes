@@ -1,0 +1,2 @@
+contract Identity =
+  entrypoint main(z : int) = z

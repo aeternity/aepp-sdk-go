@@ -1,0 +1,5 @@
+contract SimpleStorage =
+  record state = { data : int }
+  entrypoint init(value : int) : state = { data = value }
+  function get() : int = state.data
+  stateful function set(value : int) = put(state{data = value})

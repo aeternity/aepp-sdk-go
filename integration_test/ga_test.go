@@ -6,9 +6,9 @@ import (
 	"testing"
 
 	"github.com/aeternity/aepp-sdk-go/aeternity"
-	"github.com/aeternity/aepp-sdk-go/golden"
 	"github.com/aeternity/aepp-sdk-go/utils"
 	rlp "github.com/randomshinichi/rlpae"
+	"gotest.tools/golden"
 )
 
 func EncodeRLPToBytes(tx rlp.Encoder) (b []byte, err error) {
@@ -37,12 +37,13 @@ func TestGeneralizedAccounts(t *testing.T) {
 		expected.Add(&bS, amount)
 	}
 
+	authorizeSource := string(golden.Get(t, "authorize.aes"))
 	// Read the auth contract from a file, compile and prepare its init() calldata
-	authBytecode, err := compiler.CompileContract(golden.AuthorizeSource)
+	authBytecode, err := compiler.CompileContract(authorizeSource, aeternity.Config.Compiler.Backend)
 	if err != nil {
 		t.Fatal(err)
 	}
-	authInitCalldata, err := compiler.EncodeCalldata(golden.AuthorizeSource, "init", []string{alice.Address})
+	authInitCalldata, err := compiler.EncodeCalldata(authorizeSource, "init", []string{alice.Address}, aeternity.Config.Compiler.Backend)
 	if err != nil {
 		t.Fatal(err)
 	}
