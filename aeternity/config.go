@@ -6,17 +6,29 @@ import (
 	"github.com/aeternity/aepp-sdk-go/utils"
 )
 
+// Acceptable values for various parameters
 const (
-	// ConfigFilename default configuration file name
-	ConfigFilename = "config"
+	ConfigFilename      = "config"
+	NetworkIDMainnet    = "ae_mainnet"
+	URLMainnet          = "https://sdk-mainnet.aepps.com"
+	NetworkIDTestnet    = "ae_uat"
+	URLTestnet          = "https://sdk-testnet.aepps.com"
+	CompilerBackendFATE = "fate"
+	CompilerBackendAEVM = "aevm"
 )
 
-// NodeConfig configuration for the node node
+// NodeConfig configuration for the node
 type NodeConfig struct {
 	URL         string `json:"url" yaml:"url" mapstructure:"url"`
 	URLInternal string `json:"url_internal" yaml:"url_internal" mapstructure:"url_internal"`
 	URLChannels string `json:"url_channels" yaml:"url_channels" mapstructure:"url_channels"`
 	NetworkID   string `json:"network_id" yaml:"network_id" mapstructure:"network_id"`
+}
+
+// CompilerConfig configuration for the compiler
+type CompilerConfig struct {
+	URL     string `json:"url" yaml:"url" mapstructure:"url"`
+	Backend string `json:"backend" yaml:"backend" mapstructure:"backend"`
 }
 
 // AensConfig configurations for Aens
@@ -82,10 +94,11 @@ type TuningConfig struct {
 
 // ProfileConfig a configuration profile
 type ProfileConfig struct {
-	Name   string       `json:"name" yaml:"name" mapstructure:"name"`
-	Node   NodeConfig   `json:"node" yaml:"node" mapstructure:"node"`
-	Client ClientConfig `json:"client" yaml:"client" mapstructure:"client"`
-	Tuning TuningConfig `json:"tuning" yaml:"tuning" mapstructure:"tuning"`
+	Name     string         `json:"name" yaml:"name" mapstructure:"name"`
+	Node     NodeConfig     `json:"node" yaml:"node" mapstructure:"node"`
+	Compiler CompilerConfig `json:"compiler" yaml:"compiler" mapstructure:"compiler"`
+	Client   ClientConfig   `json:"client" yaml:"client" mapstructure:"client"`
+	Tuning   TuningConfig   `json:"tuning" yaml:"tuning" mapstructure:"tuning"`
 }
 
 // Config system configuration
@@ -96,6 +109,10 @@ var Config = ProfileConfig{
 		URLInternal: "https://sdk-mainnet.aepps.com",
 		URLChannels: "https://sdk-mainnet.aepps.com",
 		NetworkID:   "ae_mainnet",
+	},
+	Compiler: CompilerConfig{
+		URL:     "http://localhost:3080",
+		Backend: CompilerBackendAEVM,
 	},
 	Client: ClientConfig{
 		BaseGas:    *utils.NewIntFromUint64(15000),
