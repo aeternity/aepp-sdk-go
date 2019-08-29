@@ -11,6 +11,7 @@ import (
 type ContractFunction struct {
 	FuncHash []byte
 	FuncName string
+	Payable  bool
 	ArgType  []byte
 	OutType  []byte
 }
@@ -24,6 +25,7 @@ type Contract struct {
 	TypeInfo        []ContractFunction
 	Bytecode        []byte
 	CompilerVersion string
+	Payable         bool
 }
 
 // NewContractFromString takes a cb_ compiled bytecode string and returns a
