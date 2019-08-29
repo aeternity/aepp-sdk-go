@@ -1,3 +1,0 @@
-contract Identity =
-  type state = ()
-  entrypoint main(z : int) = z

@@ -34,7 +34,7 @@ func compileFunc(conn aeternity.CompileContracter, args []string) (err error) {
 		return err
 	}
 
-	bytecode, err := conn.CompileContract(s)
+	bytecode, err := conn.CompileContract(s, aeternity.Config.Compiler.Backend)
 	fmt.Println(bytecode)
 	return err
 }
@@ -57,7 +57,7 @@ func encodeCalldataFunc(conn aeternity.EncodeCalldataer, args []string) (err err
 		return err
 	}
 
-	callData, err := conn.EncodeCalldata(s, args[1], args[2:])
+	callData, err := conn.EncodeCalldata(s, args[1], args[2:], aeternity.Config.Compiler.Backend)
 	if err != nil {
 		return err
 	}
@@ -65,59 +65,64 @@ func encodeCalldataFunc(conn aeternity.EncodeCalldataer, args []string) (err err
 	return
 }
 
-var decodeCalldataCmd = &cobra.Command{
-	Use:   "decodeCalldata SOURCE_FILE/BYTECODE CALLDATA [..ARGS]",
-	Short: "Decode contract function calls. Needs the path to contract source file/compiled bytecode",
-	Long:  ``,
-	Args:  cobra.MinimumNArgs(2),
-	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		compiler := newCompiler()
-		return decodeCalldataFunc(compiler, args)
-	},
-	SilenceUsage: true,
-}
-
 type decodeCalldataer interface {
 	aeternity.DecodeCalldataBytecoder
 	aeternity.DecodeCalldataSourcer
 }
 
-func decodeCalldataFunc(conn decodeCalldataer, args []string) (err error) {
-	var decodeWithSource = func(path string, callData string) (function string, arguments []interface{}, err error) {
-		source, err := readSource(path)
-		if err != nil {
-			return
-		}
-		r, err := conn.DecodeCalldataSource(source, callData)
-		if err != nil {
-			return
-		}
-		arguments = r.Arguments
-		function = *r.Function
-		return
+var decodeCalldataBytecodeCmd = &cobra.Command{
+	Use:   "decodeCalldataBytecode BYTECODE CALLDATA [..ARGS]",
+	Short: "Decode contract function calls. Needs the path to contract source file/compiled bytecode",
+	Long:  ``,
+	Args:  cobra.MinimumNArgs(2),
+	RunE: func(cmd *cobra.Command, args []string) (err error) {
+		compiler := newCompiler()
+		return decodeCalldataBytecodeFunc(compiler, args)
+	},
+	SilenceUsage: true,
+}
+
+func decodeCalldataBytecodeFunc(conn decodeCalldataer, args []string) (err error) {
+	if !IsBytecode(args[0]) {
+		return fmt.Errorf("%s is not bytecode", args[0])
 	}
-	var decodeWithBytecode = func(bytecode string, callData string) (function string, arguments []interface{}, err error) {
-		r, err := conn.DecodeCalldataBytecode(bytecode, callData)
-		if err != nil {
-			return
-		}
-		arguments = r.Arguments
-		function = *r.Function
-		return
+	if !IsBytecode(args[1]) {
+		return fmt.Errorf("%s is not bytecode", args[0])
 	}
 
-	var function string
-	var arguments []interface{}
-	if !IsBytecode(args[0]) {
-		function, arguments, err = decodeWithSource(args[0], args[1])
-	} else {
-		function, arguments, err = decodeWithBytecode(args[0], args[1])
-	}
+	r, err := conn.DecodeCalldataBytecode(args[0], args[1], aeternity.Config.Compiler.Backend)
 	if err != nil {
 		return
 	}
 
-	fmt.Println(function, arguments)
+	fmt.Println(*r.Function, r.Arguments)
+	return nil
+}
+
+var decodeCalldataSourceCmd = &cobra.Command{
+	Use:   "decodeCalldataSource SOURCE_FILE FUNCTION_NAME CALLDATA [..ARGS]",
+	Short: "Decode contract function calls. Needs the path to contract source file/compiled bytecode",
+	Long:  ``,
+	Args:  cobra.MinimumNArgs(2),
+	RunE: func(cmd *cobra.Command, args []string) (err error) {
+		compiler := newCompiler()
+		return decodeCalldataSourceFunc(compiler, args)
+	},
+	SilenceUsage: true,
+}
+
+func decodeCalldataSourceFunc(conn decodeCalldataer, args []string) (err error) {
+	source, err := readSource(args[0])
+	if err != nil {
+		return err
+	}
+	if !IsBytecode(args[2]) {
+		return fmt.Errorf("%s is not bytecode", args[0])
+	}
+
+	r, err := conn.DecodeCalldataSource(source, args[1], args[2], aeternity.Config.Compiler.Backend)
+
+	fmt.Println(*r.Function, r.Arguments)
 	return
 }
 
@@ -139,7 +144,7 @@ func generateAciFunc(conn aeternity.GenerateACIer, args []string) (err error) {
 		return
 	}
 
-	aci, err := conn.GenerateACI(source)
+	aci, err := conn.GenerateACI(source, aeternity.Config.Compiler.Backend)
 	if err != nil {
 		return
 	}
@@ -160,5 +165,6 @@ func init() {
 	RootCmd.AddCommand(contractCmd)
 	contractCmd.AddCommand(compileCmd)
 	contractCmd.AddCommand(encodeCalldataCmd)
-	contractCmd.AddCommand(decodeCalldataCmd)
+	contractCmd.AddCommand(decodeCalldataBytecodeCmd)
+	contractCmd.AddCommand(decodeCalldataSourceCmd)
 }
