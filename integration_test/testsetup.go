@@ -83,7 +83,7 @@ func fundAccount(t *testing.T, n *aeternity.Node, source, destination *aeternity
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, hash, _, err := aeternity.SignBroadcastTransaction(&tx, source, n, networkID)
+	_, hash, _, err := aeternity.SignBroadcastTransaction(tx, source, n, networkID)
 	if err != nil {
 		t.Fatal(err)
 	}

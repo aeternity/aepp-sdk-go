@@ -128,7 +128,7 @@ func NewContextFromURL(url string, address string, debug bool) Context {
 }
 
 // SpendTx creates a spend transaction
-func (c *Context) SpendTx(senderID string, recipientID string, amount, fee big.Int, payload []byte) (tx SpendTx, err error) {
+func (c *Context) SpendTx(senderID string, recipientID string, amount, fee big.Int, payload []byte) (tx *SpendTx, err error) {
 	txTTL, accountNonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
@@ -140,7 +140,7 @@ func (c *Context) SpendTx(senderID string, recipientID string, amount, fee big.I
 
 // NamePreclaimTx creates a name preclaim transaction and salt (required for claiming)
 // It should return the Tx struct, not the base64 encoded RLP, to ease subsequent inspection.
-func (c *Context) NamePreclaimTx(name string, fee big.Int) (tx NamePreclaimTx, nameSalt *big.Int, err error) {
+func (c *Context) NamePreclaimTx(name string, fee big.Int) (tx *NamePreclaimTx, nameSalt *big.Int, err error) {
 	txTTL, accountNonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
@@ -155,15 +155,12 @@ func (c *Context) NamePreclaimTx(name string, fee big.Int) (tx NamePreclaimTx, n
 
 	// build the transaction
 	tx = NewNamePreclaimTx(c.Address, cm, fee, txTTL, accountNonce)
-	if err != nil {
-		return
-	}
 
 	return
 }
 
 // NameClaimTx creates a claim transaction
-func (c *Context) NameClaimTx(name string, nameSalt big.Int, fee big.Int) (tx NameClaimTx, err error) {
+func (c *Context) NameClaimTx(name string, nameSalt big.Int, fee big.Int) (tx *NameClaimTx, err error) {
 	txTTL, accountNonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
@@ -176,7 +173,7 @@ func (c *Context) NameClaimTx(name string, nameSalt big.Int, fee big.Int) (tx Na
 }
 
 // NameUpdateTx perform a name update
-func (c *Context) NameUpdateTx(name string, targetAddress string) (tx NameUpdateTx, err error) {
+func (c *Context) NameUpdateTx(name string, targetAddress string) (tx *NameUpdateTx, err error) {
 	txTTL, accountNonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
@@ -185,7 +182,7 @@ func (c *Context) NameUpdateTx(name string, targetAddress string) (tx NameUpdate
 	encodedNameHash := Encode(PrefixName, Namehash(name))
 	absNameTTL, err := c.Helpers.GetTTL(Config.Client.Names.NameTTL)
 	if err != nil {
-		return NameUpdateTx{}, err
+		return
 	}
 	// create the transaction
 	tx = NewNameUpdateTx(c.Address, encodedNameHash, []string{targetAddress}, absNameTTL, Config.Client.Names.ClientTTL, Config.Client.Names.UpdateFee, txTTL, accountNonce)
@@ -194,7 +191,7 @@ func (c *Context) NameUpdateTx(name string, targetAddress string) (tx NameUpdate
 }
 
 // NameTransferTx transfer a name to another owner
-func (c *Context) NameTransferTx(name string, recipientAddress string) (tx NameTransferTx, err error) {
+func (c *Context) NameTransferTx(name string, recipientAddress string) (tx *NameTransferTx, err error) {
 	txTTL, accountNonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
@@ -207,7 +204,7 @@ func (c *Context) NameTransferTx(name string, recipientAddress string) (tx NameT
 }
 
 // NameRevokeTx revoke a name
-func (c *Context) NameRevokeTx(name string) (tx NameRevokeTx, err error) {
+func (c *Context) NameRevokeTx(name string) (tx *NameRevokeTx, err error) {
 	txTTL, accountNonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
@@ -220,10 +217,10 @@ func (c *Context) NameRevokeTx(name string) (tx NameRevokeTx, err error) {
 }
 
 // OracleRegisterTx create a new oracle
-func (c *Context) OracleRegisterTx(querySpec, responseSpec string, queryFee big.Int, oracleTTLType, oracleTTLValue uint64, VMVersion uint16) (tx OracleRegisterTx, err error) {
+func (c *Context) OracleRegisterTx(querySpec, responseSpec string, queryFee big.Int, oracleTTLType, oracleTTLValue uint64, VMVersion uint16) (tx *OracleRegisterTx, err error) {
 	ttl, nonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
-		return OracleRegisterTx{}, err
+		return
 	}
 
 	tx = NewOracleRegisterTx(c.Address, nonce, querySpec, responseSpec, queryFee, oracleTTLType, oracleTTLValue, VMVersion, Config.Client.Fee, ttl)
@@ -231,10 +228,10 @@ func (c *Context) OracleRegisterTx(querySpec, responseSpec string, queryFee big.
 }
 
 // OracleExtendTx extend the lifetime of an existing oracle
-func (c *Context) OracleExtendTx(oracleID string, ttlType, ttlValue uint64) (tx OracleExtendTx, err error) {
+func (c *Context) OracleExtendTx(oracleID string, ttlType, ttlValue uint64) (tx *OracleExtendTx, err error) {
 	ttl, nonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
-		return OracleExtendTx{}, err
+		return
 	}
 
 	tx = NewOracleExtendTx(oracleID, nonce, ttlType, ttlValue, Config.Client.Fee, ttl)
@@ -242,10 +239,10 @@ func (c *Context) OracleExtendTx(oracleID string, ttlType, ttlValue uint64) (tx 
 }
 
 // OracleQueryTx ask something of an oracle
-func (c *Context) OracleQueryTx(OracleID, Query string, QueryFee big.Int, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64) (tx OracleQueryTx, err error) {
+func (c *Context) OracleQueryTx(OracleID, Query string, QueryFee big.Int, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64) (tx *OracleQueryTx, err error) {
 	ttl, nonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
-		return OracleQueryTx{}, err
+		return
 	}
 
 	tx = NewOracleQueryTx(c.Address, nonce, OracleID, Query, QueryFee, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue, Config.Client.Fee, ttl)
@@ -253,10 +250,10 @@ func (c *Context) OracleQueryTx(OracleID, Query string, QueryFee big.Int, QueryT
 }
 
 // OracleRespondTx the oracle responds by sending this transaction
-func (c *Context) OracleRespondTx(OracleID string, QueryID string, Response string, TTLType uint64, TTLValue uint64) (tx OracleRespondTx, err error) {
+func (c *Context) OracleRespondTx(OracleID string, QueryID string, Response string, TTLType uint64, TTLValue uint64) (tx *OracleRespondTx, err error) {
 	ttl, nonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
-		return OracleRespondTx{}, err
+		return
 	}
 
 	tx = NewOracleRespondTx(OracleID, nonce, QueryID, Response, TTLType, TTLValue, Config.Client.Fee, ttl)
@@ -264,10 +261,10 @@ func (c *Context) OracleRespondTx(OracleID string, QueryID string, Response stri
 }
 
 // ContractCreateTx returns a transaction for creating a contract on the chain
-func (c *Context) ContractCreateTx(Code string, CallData string, VMVersion, AbiVersion uint16, Deposit, Amount, Gas, GasPrice, Fee big.Int) (tx ContractCreateTx, err error) {
+func (c *Context) ContractCreateTx(Code string, CallData string, VMVersion, AbiVersion uint16, Deposit, Amount, Gas, GasPrice, Fee big.Int) (tx *ContractCreateTx, err error) {
 	ttl, nonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
-		return ContractCreateTx{}, err
+		return
 	}
 
 	tx = NewContractCreateTx(c.Address, nonce, Code, VMVersion, AbiVersion, Deposit, Amount, Gas, GasPrice, Fee, ttl, CallData)
@@ -275,10 +272,10 @@ func (c *Context) ContractCreateTx(Code string, CallData string, VMVersion, AbiV
 }
 
 // ContractCallTx returns a transaction for calling a contract on the chain
-func (c *Context) ContractCallTx(ContractID, CallData string, AbiVersion uint16, Amount, Gas, GasPrice, Fee big.Int) (tx ContractCallTx, err error) {
+func (c *Context) ContractCallTx(ContractID, CallData string, AbiVersion uint16, Amount, Gas, GasPrice, Fee big.Int) (tx *ContractCallTx, err error) {
 	ttl, nonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
-		return ContractCallTx{}, err
+		return
 	}
 
 	tx = NewContractCallTx(c.Address, nonce, ContractID, Amount, Gas, GasPrice, AbiVersion, CallData, Fee, ttl)
@@ -406,7 +403,7 @@ func SignBroadcastTransaction(tx rlp.Encoder, signingAccount *Account, n *Node, 
 		return
 	}
 
-	signedTxStr, err = SerializeTx(&signedTx)
+	signedTxStr, err = SerializeTx(signedTx)
 	if err != nil {
 		return
 	}

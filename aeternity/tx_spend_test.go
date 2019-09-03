@@ -71,7 +71,7 @@ func TestSpendTx_EncodeRLP(t *testing.T) {
 
 			fmt.Println(rlp.EncodeToBytes(&tx))
 
-			gotTx, err := SerializeTx(&tx)
+			gotTx, err := SerializeTx(tx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("SpendTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
 				return

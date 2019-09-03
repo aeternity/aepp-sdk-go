@@ -120,8 +120,8 @@ func (tx *GAAttachTx) DecodeRLP(s *rlp.Stream) (err error) {
 }
 
 // NewGAAttachTx creates a GAAttachTx
-func NewGAAttachTx(OwnerID string, AccountNonce uint64, Code string, AuthFunc []byte, VMVersion uint16, AbiVersion uint16, Gas big.Int, GasPrice big.Int, Fee big.Int, TTL uint64, CallData string) GAAttachTx {
-	return GAAttachTx{
+func NewGAAttachTx(OwnerID string, AccountNonce uint64, Code string, AuthFunc []byte, VMVersion uint16, AbiVersion uint16, Gas big.Int, GasPrice big.Int, Fee big.Int, TTL uint64, CallData string) *GAAttachTx {
+	return &GAAttachTx{
 		OwnerID:      OwnerID,
 		AccountNonce: AccountNonce,
 		Code:         Code,
@@ -240,8 +240,8 @@ func (tx *GAMetaTx) DecodeRLP(s *rlp.Stream) (err error) {
 }
 
 // NewGAMetaTx creates a GAMetaTx
-func NewGAMetaTx(AccountID string, AuthData string, AbiVersion uint16, Gas big.Int, GasPrice big.Int, Fee big.Int, TTL uint64, Tx rlp.Encoder) GAMetaTx {
-	return GAMetaTx{
+func NewGAMetaTx(AccountID string, AuthData string, AbiVersion uint16, Gas big.Int, GasPrice big.Int, Fee big.Int, TTL uint64, Tx rlp.Encoder) *GAMetaTx {
+	return &GAMetaTx{
 		AccountID:  AccountID,
 		AuthData:   AuthData,
 		AbiVersion: AbiVersion,

@@ -46,7 +46,7 @@ func TestSpendTx(t *testing.T) {
 	tx.Fee = *est
 
 	// sign the transaction, output params for debugging
-	_, hash, _, err := aeternity.SignBroadcastTransaction(&tx, alice, node, networkID)
+	_, hash, _, err := aeternity.SignBroadcastTransaction(tx, alice, node, networkID)
 	if err != nil {
 		t.Fatal(err)
 	}

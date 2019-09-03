@@ -190,8 +190,8 @@ func (tx *ContractCreateTx) ContractID() (string, error) {
 }
 
 // NewContractCreateTx is a constructor for a ContractCreateTx struct
-func NewContractCreateTx(OwnerID string, AccountNonce uint64, Code string, VMVersion, AbiVersion uint16, Deposit, Amount, Gas, GasPrice, Fee big.Int, TTL uint64, CallData string) ContractCreateTx {
-	return ContractCreateTx{
+func NewContractCreateTx(OwnerID string, AccountNonce uint64, Code string, VMVersion, AbiVersion uint16, Deposit, Amount, Gas, GasPrice, Fee big.Int, TTL uint64, CallData string) *ContractCreateTx {
+	return &ContractCreateTx{
 		OwnerID:      OwnerID,
 		AccountNonce: AccountNonce,
 		Code:         Code,
@@ -352,8 +352,8 @@ func (tx *ContractCallTx) FeeEstimate() (*big.Int, error) {
 }
 
 // NewContractCallTx is a constructor for a ContractCallTx struct
-func NewContractCallTx(CallerID string, AccountNonce uint64, ContractID string, Amount, Gas, GasPrice big.Int, AbiVersion uint16, CallData string, Fee big.Int, TTL uint64) ContractCallTx {
-	return ContractCallTx{
+func NewContractCallTx(CallerID string, AccountNonce uint64, ContractID string, Amount, Gas, GasPrice big.Int, AbiVersion uint16, CallData string, Fee big.Int, TTL uint64) *ContractCallTx {
+	return &ContractCallTx{
 		CallerID:     CallerID,
 		AccountNonce: AccountNonce,
 		ContractID:   ContractID,

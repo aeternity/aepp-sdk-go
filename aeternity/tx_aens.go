@@ -117,8 +117,8 @@ func (tx *NamePreclaimTx) FeeEstimate() (*big.Int, error) {
 }
 
 // NewNamePreclaimTx is a constructor for a NamePreclaimTx struct
-func NewNamePreclaimTx(accountID, commitmentID string, fee big.Int, ttl, accountNonce uint64) NamePreclaimTx {
-	return NamePreclaimTx{accountID, commitmentID, fee, ttl, accountNonce}
+func NewNamePreclaimTx(accountID, commitmentID string, fee big.Int, ttl, accountNonce uint64) *NamePreclaimTx {
+	return &NamePreclaimTx{accountID, commitmentID, fee, ttl, accountNonce}
 }
 
 // NameClaimTx represents a transaction where one claims a previously reserved name on AENS
@@ -237,8 +237,8 @@ func (tx *NameClaimTx) FeeEstimate() (*big.Int, error) {
 }
 
 // NewNameClaimTx is a constructor for a NameClaimTx struct
-func NewNameClaimTx(accountID, name string, nameSalt big.Int, fee big.Int, ttl, accountNonce uint64) NameClaimTx {
-	return NameClaimTx{accountID, name, nameSalt, fee, ttl, accountNonce}
+func NewNameClaimTx(accountID, name string, nameSalt big.Int, fee big.Int, ttl, accountNonce uint64) *NameClaimTx {
+	return &NameClaimTx{accountID, name, nameSalt, fee, ttl, accountNonce}
 }
 
 // NamePointer is a go-native representation of swagger generated
@@ -454,12 +454,12 @@ func (tx *NameUpdateTx) FeeEstimate() (*big.Int, error) {
 }
 
 // NewNameUpdateTx is a constructor for a NameUpdateTx struct
-func NewNameUpdateTx(accountID, nameID string, pointers []string, nameTTL, clientTTL uint64, fee big.Int, ttl, accountNonce uint64) NameUpdateTx {
+func NewNameUpdateTx(accountID, nameID string, pointers []string, nameTTL, clientTTL uint64, fee big.Int, ttl, accountNonce uint64) *NameUpdateTx {
 	parsedPointers, err := buildPointers(pointers)
 	if err != nil {
 		panic(err)
 	}
-	return NameUpdateTx{accountID, nameID, parsedPointers, nameTTL, clientTTL, fee, ttl, accountNonce}
+	return &NameUpdateTx{accountID, nameID, parsedPointers, nameTTL, clientTTL, fee, ttl, accountNonce}
 }
 
 // NameRevokeTx represents a transaction that revokes the name, i.e. has the same effect as waiting for the Name's TTL to expire.
@@ -576,8 +576,8 @@ func (tx *NameRevokeTx) FeeEstimate() (*big.Int, error) {
 }
 
 // NewNameRevokeTx is a constructor for a NameRevokeTx struct
-func NewNameRevokeTx(accountID, name string, fee big.Int, ttl, accountNonce uint64) NameRevokeTx {
-	return NameRevokeTx{accountID, name, fee, ttl, accountNonce}
+func NewNameRevokeTx(accountID, name string, fee big.Int, ttl, accountNonce uint64) *NameRevokeTx {
+	return &NameRevokeTx{accountID, name, fee, ttl, accountNonce}
 }
 
 // NameTransferTx represents a transaction that transfers ownership of one name to another account.
@@ -711,6 +711,6 @@ func (tx *NameTransferTx) FeeEstimate() (*big.Int, error) {
 }
 
 // NewNameTransferTx is a constructor for a NameTransferTx struct
-func NewNameTransferTx(AccountID, NameID, RecipientID string, Fee big.Int, TTL, AccountNonce uint64) NameTransferTx {
-	return NameTransferTx{AccountID, NameID, RecipientID, Fee, TTL, AccountNonce}
+func NewNameTransferTx(AccountID, NameID, RecipientID string, Fee big.Int, TTL, AccountNonce uint64) *NameTransferTx {
+	return &NameTransferTx{AccountID, NameID, RecipientID, Fee, TTL, AccountNonce}
 }

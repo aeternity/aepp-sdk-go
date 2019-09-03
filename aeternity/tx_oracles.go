@@ -143,8 +143,8 @@ func (tx *OracleRegisterTx) JSON() (string, error) {
 }
 
 // NewOracleRegisterTx is a constructor for a OracleRegisterTx struct
-func NewOracleRegisterTx(accountID string, accountNonce uint64, querySpec, responseSpec string, queryFee big.Int, oracleTTLType, oracleTTLValue uint64, abiVersion uint16, txFee big.Int, txTTL uint64) OracleRegisterTx {
-	return OracleRegisterTx{accountID, accountNonce, querySpec, responseSpec, queryFee, oracleTTLType, oracleTTLValue, abiVersion, txFee, txTTL}
+func NewOracleRegisterTx(accountID string, accountNonce uint64, querySpec, responseSpec string, queryFee big.Int, oracleTTLType, oracleTTLValue uint64, abiVersion uint16, txFee big.Int, txTTL uint64) *OracleRegisterTx {
+	return &OracleRegisterTx{accountID, accountNonce, querySpec, responseSpec, queryFee, oracleTTLType, oracleTTLValue, abiVersion, txFee, txTTL}
 }
 
 // OracleExtendTx represents a transaction that extends the lifetime of an oracle
@@ -244,8 +244,8 @@ func (tx *OracleExtendTx) JSON() (string, error) {
 }
 
 // NewOracleExtendTx is a constructor for a OracleExtendTx struct
-func NewOracleExtendTx(oracleID string, accountNonce, oracleTTLType, oracleTTLValue uint64, Fee big.Int, TTL uint64) OracleExtendTx {
-	return OracleExtendTx{oracleID, accountNonce, oracleTTLType, oracleTTLValue, Fee, TTL}
+func NewOracleExtendTx(oracleID string, accountNonce, oracleTTLType, oracleTTLValue uint64, Fee big.Int, TTL uint64) *OracleExtendTx {
+	return &OracleExtendTx{oracleID, accountNonce, oracleTTLType, oracleTTLValue, Fee, TTL}
 }
 
 // OracleQueryTx represents a transaction that a program sends to query an oracle
@@ -381,8 +381,8 @@ func (tx *OracleQueryTx) JSON() (string, error) {
 }
 
 // NewOracleQueryTx is a constructor for a OracleQueryTx struct
-func NewOracleQueryTx(SenderID string, AccountNonce uint64, OracleID, Query string, QueryFee big.Int, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64, Fee big.Int, TTL uint64) OracleQueryTx {
-	return OracleQueryTx{SenderID, AccountNonce, OracleID, Query, QueryFee, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue, Fee, TTL}
+func NewOracleQueryTx(SenderID string, AccountNonce uint64, OracleID, Query string, QueryFee big.Int, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64, Fee big.Int, TTL uint64) *OracleQueryTx {
+	return &OracleQueryTx{SenderID, AccountNonce, OracleID, Query, QueryFee, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue, Fee, TTL}
 }
 
 // OracleRespondTx represents a transaction that an oracle sends to respond to an incoming query
@@ -499,6 +499,6 @@ func (tx *OracleRespondTx) JSON() (string, error) {
 }
 
 // NewOracleRespondTx is a constructor for a OracleRespondTx struct
-func NewOracleRespondTx(OracleID string, AccountNonce uint64, QueryID string, Response string, TTLType uint64, TTLValue uint64, Fee big.Int, TTL uint64) OracleRespondTx {
-	return OracleRespondTx{OracleID, AccountNonce, QueryID, Response, TTLType, TTLValue, Fee, TTL}
+func NewOracleRespondTx(OracleID string, AccountNonce uint64, QueryID string, Response string, TTLType uint64, TTLValue uint64, Fee big.Int, TTL uint64) *OracleRespondTx {
+	return &OracleRespondTx{OracleID, AccountNonce, QueryID, Response, TTLType, TTLValue, Fee, TTL}
 }

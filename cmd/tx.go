@@ -71,7 +71,7 @@ func txSpendFunc(helpers aeternity.HelpersInterface, args []string) (err error) 
 	}
 
 	tx := aeternity.NewSpendTx(sender, recipient, *amount, *feeBigInt, []byte(spendTxPayload), ttl, nonce)
-	base64Tx, err := aeternity.SerializeTx(&tx)
+	base64Tx, err := aeternity.SerializeTx(tx)
 	if err != nil {
 		return err
 	}
@@ -135,7 +135,7 @@ func txContractCreateFunc(h aeternity.HelpersInterface, args []string) (err erro
 	if err != nil {
 		return err
 	}
-	txStr, err := aeternity.SerializeTx(&tx)
+	txStr, err := aeternity.SerializeTx(tx)
 	if err != nil {
 		return err
 	}
