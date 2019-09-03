@@ -417,3 +417,15 @@ func SignBroadcastTransaction(tx rlp.Encoder, signingAccount *Account, n *Node, 
 	}
 	return
 }
+
+// SignBroadcastWaitTransaction is a convenience function that runs
+// SignBroadcastTransaction and then blocks until the tx is found or x blocks
+// have gone by.
+func SignBroadcastWaitTransaction(tx rlp.Encoder, signingAccount *Account, n *Node, networkID string, x uint64) (signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
+	signedTxStr, hash, signature, err = SignBroadcastTransaction(tx, signingAccount, n, networkID)
+	if err != nil {
+		return
+	}
+	blockHeight, blockHash, err = WaitForTransactionForXBlocks(n, hash, x)
+	return
+}
