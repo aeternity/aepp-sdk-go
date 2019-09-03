@@ -8,13 +8,15 @@ import (
 
 // Acceptable values for various parameters
 const (
-	ConfigFilename      = "config"
-	NetworkIDMainnet    = "ae_mainnet"
-	URLMainnet          = "https://sdk-mainnet.aepps.com"
-	NetworkIDTestnet    = "ae_uat"
-	URLTestnet          = "https://sdk-testnet.aepps.com"
-	CompilerBackendFATE = "fate"
-	CompilerBackendAEVM = "aevm"
+	ConfigFilename        = "config"
+	NetworkIDMainnet      = "ae_mainnet"
+	URLMainnet            = "https://sdk-mainnet.aepps.com"
+	NetworkIDTestnet      = "ae_uat"
+	URLTestnet            = "https://sdk-testnet.aepps.com"
+	CompilerBackendFATE   = "fate"
+	CompilerBackendAEVM   = "aevm"
+	OracleTTLTypeDelta    = 0
+	OracleTTLTypeAbsolute = 1
 )
 
 // NodeConfig configuration for the node
@@ -138,9 +140,9 @@ var Config = ProfileConfig{
 		},
 		Oracles: OracleConfig{
 			QueryFee:         *utils.NewIntFromUint64(0),
-			QueryTTLType:     0,
+			QueryTTLType:     OracleTTLTypeDelta,
 			QueryTTLValue:    300,
-			ResponseTTLType:  0,
+			ResponseTTLType:  OracleTTLTypeDelta,
 			ResponseTTLValue: 300,
 			VMVersion:        0,
 		},
