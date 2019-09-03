@@ -133,6 +133,6 @@ func (tx *SpendTx) FeeEstimate() (*big.Int, error) {
 }
 
 // NewSpendTx is a constructor for a SpendTx struct
-func NewSpendTx(senderID, recipientID string, amount, fee big.Int, payload []byte, ttl, nonce uint64) SpendTx {
-	return SpendTx{senderID, recipientID, amount, fee, payload, ttl, nonce}
+func NewSpendTx(senderID, recipientID string, amount, fee big.Int, payload []byte, ttl, nonce uint64) *SpendTx {
+	return &SpendTx{senderID, recipientID, amount, fee, payload, ttl, nonce}
 }

@@ -73,7 +73,7 @@ func TestGeneralizedAccounts(t *testing.T) {
 		t.Fatal(err)
 	}
 	gaTx := aeternity.NewGAAttachTx(testAccount.Address, 1, authBytecode, auth.TypeInfo[0].FuncHash, aeternity.Config.Client.Contracts.VMVersion, aeternity.Config.Client.Contracts.ABIVersion, aeternity.Config.Client.BaseGas, aeternity.Config.Client.GasPrice, aeternity.Config.Client.Fee, ttl, authInitCalldata)
-	_, txHash, _, err := aeternity.SignBroadcastTransaction(&gaTx, testAccount, aeNode, networkID)
+	_, txHash, _, err := aeternity.SignBroadcastTransaction(gaTx, testAccount, aeNode, networkID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -107,14 +107,14 @@ func TestGeneralizedAccounts(t *testing.T) {
 	authData := "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACBGtXufEG2HuMYcRcNwsGAeqymslunKf692bHnvwI5K6wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAU3aKBNm"
 	gas := utils.NewIntFromUint64(10000) // the node will fail the authentication if there isn't enough gas
 	spendTx := aeternity.NewSpendTx(testAccount.Address, bob.Address, *big.NewInt(5000), aeternity.Config.Client.Fee, []byte{}, ttl, 0)
-	gaMetaTx := aeternity.NewGAMetaTx(testAccount.Address, authData, aeternity.Config.Client.Contracts.ABIVersion, *gas, aeternity.Config.Client.GasPrice, aeternity.Config.Client.Fee, ttl, &spendTx)
+	gaMetaTx := aeternity.NewGAMetaTx(testAccount.Address, authData, aeternity.Config.Client.Contracts.ABIVersion, *gas, aeternity.Config.Client.GasPrice, aeternity.Config.Client.Fee, ttl, spendTx)
 
-	gaMetaTxFinal, hash, _, err := aeternity.SignHashTx(testAccount, &gaMetaTx, aeternity.Config.Node.NetworkID)
+	gaMetaTxFinal, hash, _, err := aeternity.SignHashTx(testAccount, gaMetaTx, aeternity.Config.Node.NetworkID)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	gaMetaTxStr, err := aeternity.SerializeTx(&gaMetaTxFinal)
+	gaMetaTxStr, err := aeternity.SerializeTx(gaMetaTxFinal)
 	if err != nil {
 		t.Fatal(err)
 	}

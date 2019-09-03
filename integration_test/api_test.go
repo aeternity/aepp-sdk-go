@@ -120,7 +120,7 @@ func TestAPI(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, _ = signBroadcastWaitForTransaction(t, &spendTx, alice, privateNet)
+	_, _, _ = signBroadcastWaitForTransaction(t, spendTx, alice, privateNet)
 
 	// NamePreClaimTx
 	fmt.Println("NamePreClaimTx")
@@ -128,7 +128,7 @@ func TestAPI(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, _ = signBroadcastWaitForTransaction(t, &preclaimTx, alice, privateNet)
+	_, _, _ = signBroadcastWaitForTransaction(t, preclaimTx, alice, privateNet)
 
 	// NameClaimTx
 	fmt.Println("NameClaimTx")
@@ -136,7 +136,7 @@ func TestAPI(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, _ = signBroadcastWaitForTransaction(t, &claimTx, alice, privateNet)
+	_, _, _ = signBroadcastWaitForTransaction(t, claimTx, alice, privateNet)
 
 	// NameUpdateTx
 	fmt.Println("NameUpdateTx")
@@ -144,7 +144,7 @@ func TestAPI(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, _ = signBroadcastWaitForTransaction(t, &updateTx, alice, privateNet)
+	_, _, _ = signBroadcastWaitForTransaction(t, updateTx, alice, privateNet)
 
 	// NameTransferTx
 	fmt.Println("NameTransferTx")
@@ -152,7 +152,7 @@ func TestAPI(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, _ = signBroadcastWaitForTransaction(t, &transferTx, alice, privateNet)
+	_, _, _ = signBroadcastWaitForTransaction(t, transferTx, alice, privateNet)
 
 	// NameRevokeTx
 	fmt.Println("NameRevokeTx")
@@ -160,7 +160,7 @@ func TestAPI(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, _ = signBroadcastWaitForTransaction(t, &revokeTx, bob, privateNet)
+	_, _, _ = signBroadcastWaitForTransaction(t, revokeTx, bob, privateNet)
 
 	sentTxs.name = randomName(8)
 	// NamePreClaimTx
@@ -169,7 +169,7 @@ func TestAPI(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, _ = signBroadcastWaitForTransaction(t, &preclaimTx, alice, privateNet)
+	_, _, _ = signBroadcastWaitForTransaction(t, preclaimTx, alice, privateNet)
 
 	// NameClaimTx
 	fmt.Println("NameClaimTx 2nd name for other tests")
@@ -177,7 +177,7 @@ func TestAPI(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, _ = signBroadcastWaitForTransaction(t, &claimTx, alice, privateNet)
+	_, _, _ = signBroadcastWaitForTransaction(t, claimTx, alice, privateNet)
 
 	// OracleRegisterTx
 	fmt.Println("OracleRegisterTx")
@@ -185,7 +185,7 @@ func TestAPI(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, _ = signBroadcastWaitForTransaction(t, &register, alice, privateNet)
+	_, _, _ = signBroadcastWaitForTransaction(t, register, alice, privateNet)
 
 	// OracleExtendTx
 	fmt.Println("OracleExtendTx")
@@ -194,7 +194,7 @@ func TestAPI(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, _ = signBroadcastWaitForTransaction(t, &extend, alice, privateNet)
+	_, _, _ = signBroadcastWaitForTransaction(t, extend, alice, privateNet)
 
 	// OracleQueryTx
 	fmt.Println("OracleQueryTx")
@@ -202,7 +202,7 @@ func TestAPI(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, _ = signBroadcastWaitForTransaction(t, &query, alice, privateNet)
+	_, _, _ = signBroadcastWaitForTransaction(t, query, alice, privateNet)
 
 	// OracleRespondTx
 	fmt.Println("OracleRespondTx")
@@ -216,7 +216,7 @@ func TestAPI(t *testing.T) {
 	delay(getOracleQueries)
 	oqID := oracleQueries.OracleQueries[0].ID
 	respond, err := ctxAlice.OracleRespondTx(sentTxs.oracleID, *oqID, "My day was fine thank you", 0, 100)
-	_, _, _ = signBroadcastWaitForTransaction(t, &respond, alice, privateNet)
+	_, _, _ = signBroadcastWaitForTransaction(t, respond, alice, privateNet)
 
 	t.Logf("%+v\n", sentTxs)
 	t.Run("GetStatus", func(t *testing.T) {

@@ -49,12 +49,12 @@ func Hash(tx *SignedTx) (txhash string, err error) {
 
 // SignHashTx wraps a *Tx struct in a SignedTx, then returns its signature and
 // hash.
-func SignHashTx(kp *Account, tx Transaction, networkID string) (signedTx SignedTx, txhash, signature string, err error) {
+func SignHashTx(kp *Account, tx Transaction, networkID string) (signedTx *SignedTx, txhash, signature string, err error) {
 	signedTx = NewSignedTx([][]byte{}, tx)
 	var signatureBytes []byte
 
 	if _, ok := tx.(*GAMetaTx); !ok {
-		signatureBytes, err = Sign(kp, &signedTx, networkID)
+		signatureBytes, err = Sign(kp, signedTx, networkID)
 		if err != nil {
 			return
 		}
@@ -63,7 +63,7 @@ func SignHashTx(kp *Account, tx Transaction, networkID string) (signedTx SignedT
 
 	}
 
-	txhash, err = Hash(&signedTx)
+	txhash, err = Hash(signedTx)
 	if err != nil {
 		return
 	}
@@ -288,8 +288,8 @@ func (tx *SignedTx) DecodeRLP(s *rlp.Stream) (err error) {
 }
 
 // NewSignedTx ensures that all fields of SignedTx are filled out.
-func NewSignedTx(Signatures [][]byte, tx rlp.Encoder) (s SignedTx) {
-	return SignedTx{
+func NewSignedTx(Signatures [][]byte, tx rlp.Encoder) (s *SignedTx) {
+	return &SignedTx{
 		Signatures: Signatures,
 		Tx:         tx,
 	}

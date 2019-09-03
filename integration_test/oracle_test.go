@@ -29,7 +29,7 @@ func TestOracleWorkflow(t *testing.T) {
 		t.Fatal(err)
 	}
 	fmt.Printf("Register %+v\n", register)
-	_, registerHash, _, err := aeternity.SignBroadcastTransaction(&register, testAccount, client, networkID)
+	_, registerHash, _, err := aeternity.SignBroadcastTransaction(register, testAccount, client, networkID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -54,7 +54,7 @@ func TestOracleWorkflow(t *testing.T) {
 		t.Fatal(err)
 	}
 	fmt.Printf("Extend %+v\n", extend)
-	_, extendHash, _, err := aeternity.SignBroadcastTransaction(&extend, testAccount, client, networkID)
+	_, extendHash, _, err := aeternity.SignBroadcastTransaction(extend, testAccount, client, networkID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -75,7 +75,7 @@ func TestOracleWorkflow(t *testing.T) {
 		t.Fatal(err)
 	}
 	fmt.Printf("Query %+v\n", query)
-	_, queryHash, _, err := aeternity.SignBroadcastTransaction(&query, testAccount, client, networkID)
+	_, queryHash, _, err := aeternity.SignBroadcastTransaction(query, testAccount, client, networkID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -97,7 +97,7 @@ func TestOracleWorkflow(t *testing.T) {
 	// Respond
 	respond, err := oracleAccount.OracleRespondTx(oraclePubKey, *oqID, "My day was fine thank you", 0, 100)
 	fmt.Printf("Respond %+v\n", respond)
-	_, respondHash, _, err := aeternity.SignBroadcastTransaction(&respond, testAccount, client, networkID)
+	_, respondHash, _, err := aeternity.SignBroadcastTransaction(respond, testAccount, client, networkID)
 	if err != nil {
 		t.Fatal(err)
 	}

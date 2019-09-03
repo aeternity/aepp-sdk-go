@@ -26,7 +26,7 @@ func TestContracts(t *testing.T) {
 	}
 	ctID, _ = create.ContractID()
 	fmt.Printf("Create %s, %+v\n", ctID, create)
-	_, txHash, _, err = aeternity.SignBroadcastTransaction(&create, alice, aeNode, networkID)
+	_, txHash, _, err = aeternity.SignBroadcastTransaction(create, alice, aeNode, networkID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -50,7 +50,7 @@ func TestContracts(t *testing.T) {
 		t.Fatal(err)
 	}
 	fmt.Printf("Call %+v\n", callTx)
-	_, txHash, _, err = aeternity.SignBroadcastTransaction(&callTx, alice, aeNode, networkID)
+	_, txHash, _, err = aeternity.SignBroadcastTransaction(callTx, alice, aeNode, networkID)
 	if err != nil {
 		t.Fatal(err)
 	}
