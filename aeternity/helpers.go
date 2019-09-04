@@ -373,28 +373,6 @@ func WaitForTransactionForXBlocks(c getTransactionByHashHeighter, txHash string,
 	return 0, "", fmt.Errorf("%v blocks have gone by and %v still isn't in a block", x, txHash)
 }
 
-// BroadcastTransaction differs from Client.PostTransaction() in that the latter just handles
-// the HTTP request via swagger, the former recalculates the txhash and compares it to the node's
-//  response after POSTing the transaction.
-func BroadcastTransaction(c PostTransactioner, txSignedBase64 string) (err error) {
-	// Get back to RLP to calculate txhash
-	txRLP, err := Decode(txSignedBase64)
-	if err != nil {
-		return err
-	}
-	// calculate the hash of the decoded txRLP
-	rlpTxHashRaw, err := hash(txRLP)
-	if err != nil {
-		return err
-	}
-	// base58/64 encode the hash with the th_ prefix
-	signedEncodedTxHash := Encode(PrefixTransactionHash, rlpTxHashRaw)
-
-	// send it to the network
-	err = c.PostTransaction(txSignedBase64, signedEncodedTxHash)
-	return
-}
-
 // SignBroadcastTransaction is a convenience function that signs your
 // transaction before calling BroadcastTransaction on it
 func SignBroadcastTransaction(tx rlp.Encoder, signingAccount *Account, n *Node, networkID string) (signedTxStr, hash, signature string, err error) {
@@ -408,7 +386,7 @@ func SignBroadcastTransaction(tx rlp.Encoder, signingAccount *Account, n *Node, 
 		return
 	}
 
-	err = BroadcastTransaction(n, signedTxStr)
+	err = n.PostTransaction(signedTxStr, hash)
 	if err != nil {
 		return
 	}

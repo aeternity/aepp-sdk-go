@@ -71,8 +71,8 @@ func Decode(in string) (out []byte, err error) {
 	return out, nil
 }
 
-// hash calculate the blacke2b 32bit hash of the input byte array
-func hash(in []byte) (out []byte, err error) {
+// Blake2bHash calculate the blake2b 32bit hash of the input byte array
+func Blake2bHash(in []byte) (out []byte, err error) {
 	h, err := blake2b.New(32, nil)
 	if err != nil {
 		return
@@ -107,7 +107,7 @@ func buildOracleQueryID(sender string, senderNonce uint64, recipient string) (id
 	}
 	queryIDBin = append(queryIDBin, recipientBin...)
 
-	hashedQueryID, err := hash(queryIDBin)
+	hashedQueryID, err := Blake2bHash(queryIDBin)
 	if err != nil {
 		return
 	}
@@ -125,7 +125,7 @@ func buildContractID(sender string, senderNonce uint64) (ctID string, err error)
 	l.SetUint64(senderNonce)
 
 	ctIDUnhashed := append(senderBin, l.Bytes()...)
-	ctIDHashed, err := hash(ctIDUnhashed)
+	ctIDHashed, err := Blake2bHash(ctIDUnhashed)
 	if err != nil {
 		return ctID, err
 	}
@@ -139,8 +139,8 @@ func buildContractID(sender string, senderNonce uint64) (ctID string, err error)
 func Namehash(name string) []byte {
 	buf := make([]byte, 32)
 	for _, s := range strings.Split(name, ".") {
-		sh, _ := hash([]byte(s))
-		buf, _ = hash(append(buf, sh...))
+		sh, _ := Blake2bHash([]byte(s))
+		buf, _ = Blake2bHash(append(buf, sh...))
 	}
 	return buf
 }
@@ -183,7 +183,7 @@ func generateCommitmentID(name string) (ch string, salt *big.Int, err error) {
 
 func computeCommitmentID(name string, salt []byte) (ch string, err error) {
 	nh := append(Namehash(name), salt...)
-	nh, _ = hash(nh)
+	nh, _ = Blake2bHash(nh)
 	ch = Encode(PrefixCommitment, nh)
 	return
 }

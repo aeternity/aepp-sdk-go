@@ -135,7 +135,18 @@ func broadcastFunc(conn aeternity.PostTransactioner, args []string) (err error) 
 		return err
 	}
 
-	err = aeternity.BroadcastTransaction(conn, txSignedBase64)
+	// Transform tx_ string back to an RLP bytearray to calculate its hash
+	txRLP, err := aeternity.Decode(txSignedBase64)
+	if err != nil {
+		return err
+	}
+	rlpTxHashRaw, err := aeternity.Blake2bHash(txRLP)
+	if err != nil {
+		return err
+	}
+	signedEncodedTxHash := aeternity.Encode(aeternity.PrefixTransactionHash, rlpTxHashRaw)
+
+	err = conn.PostTransaction(txSignedBase64, signedEncodedTxHash)
 	if err != nil {
 		errFinal := fmt.Errorf("Error while broadcasting transaction: %v", err)
 		return errFinal
