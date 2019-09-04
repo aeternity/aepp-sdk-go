@@ -38,7 +38,7 @@ func Hash(tx *SignedTx) (txhash string, err error) {
 	if err != nil {
 		return "", err
 	}
-	rlpTxHashRaw, err := hash(rlpTxRaw)
+	rlpTxHashRaw, err := Blake2bHash(rlpTxRaw)
 	if err != nil {
 		return "", err
 	}
