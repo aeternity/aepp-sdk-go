@@ -114,7 +114,8 @@ func (h Helpers) GetChannelsByName(name string) (channels []string, err error) {
 	return h.getAnythingByName(name, "channel")
 }
 
-// Context stores relevant context (node connection, account address) that one might not want to spell out each time one creates a transaction
+// Context stores relevant context (node connection, account address) that one
+// might not want to spell out each time one creates a transaction
 type Context struct {
 	Address string
 	Helpers HelpersInterface
@@ -122,12 +123,14 @@ type Context struct {
 
 // NewContextFromURL is a convenience function that associates a Node with a
 // Helper struct for you.
-func NewContextFromURL(url string, address string, debug bool) Context {
-	h := Helpers{Node: NewNode(url, debug)}
-	return Context{Helpers: h, Address: address}
+func NewContextFromURL(url string, address string, debug bool) (ctx *Context, node *Node) {
+	node = NewNode(url, debug)
+	h := Helpers{Node: node}
+	ctx = &Context{Helpers: h, Address: address}
+	return
 }
 
-// SpendTx creates a spend transaction
+// SpendTx creates a spend transaction, filling in the account nonce and transaction TTL automatically.
 func (c *Context) SpendTx(senderID string, recipientID string, amount, fee big.Int, payload []byte) (tx *SpendTx, err error) {
 	txTTL, accountNonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
@@ -138,8 +141,7 @@ func (c *Context) SpendTx(senderID string, recipientID string, amount, fee big.I
 	return NewSpendTx(senderID, recipientID, amount, fee, payload, txTTL, accountNonce), err
 }
 
-// NamePreclaimTx creates a name preclaim transaction and salt (required for claiming)
-// It should return the Tx struct, not the base64 encoded RLP, to ease subsequent inspection.
+// NamePreclaimTx creates a name preclaim transaction and salt, filling in the account nonce and transaction TTL automatically.
 func (c *Context) NamePreclaimTx(name string, fee big.Int) (tx *NamePreclaimTx, nameSalt *big.Int, err error) {
 	txTTL, accountNonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
@@ -159,7 +161,7 @@ func (c *Context) NamePreclaimTx(name string, fee big.Int) (tx *NamePreclaimTx, 
 	return
 }
 
-// NameClaimTx creates a claim transaction
+// NameClaimTx creates a claim transaction, filling in the account nonce and transaction TTL automatically.
 func (c *Context) NameClaimTx(name string, nameSalt big.Int, fee big.Int) (tx *NameClaimTx, err error) {
 	txTTL, accountNonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
@@ -172,7 +174,7 @@ func (c *Context) NameClaimTx(name string, nameSalt big.Int, fee big.Int) (tx *N
 	return tx, err
 }
 
-// NameUpdateTx perform a name update
+// NameUpdateTx creates a name update transaction, filling in the account nonce and transaction TTL automatically.
 func (c *Context) NameUpdateTx(name string, targetAddress string) (tx *NameUpdateTx, err error) {
 	txTTL, accountNonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
@@ -190,7 +192,7 @@ func (c *Context) NameUpdateTx(name string, targetAddress string) (tx *NameUpdat
 	return
 }
 
-// NameTransferTx transfer a name to another owner
+// NameTransferTx creates a name transfer transaction, filling in the account nonce and transaction TTL automatically.
 func (c *Context) NameTransferTx(name string, recipientAddress string) (tx *NameTransferTx, err error) {
 	txTTL, accountNonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
@@ -203,7 +205,7 @@ func (c *Context) NameTransferTx(name string, recipientAddress string) (tx *Name
 	return
 }
 
-// NameRevokeTx revoke a name
+// NameRevokeTx creates a name revoke transaction, filling in the account nonce and transaction TTL automatically.
 func (c *Context) NameRevokeTx(name string) (tx *NameRevokeTx, err error) {
 	txTTL, accountNonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
@@ -216,7 +218,7 @@ func (c *Context) NameRevokeTx(name string) (tx *NameRevokeTx, err error) {
 	return
 }
 
-// OracleRegisterTx create a new oracle
+// OracleRegisterTx creates an oracle register transaction, filling in the account nonce and transaction TTL automatically.
 func (c *Context) OracleRegisterTx(querySpec, responseSpec string, queryFee big.Int, oracleTTLType, oracleTTLValue uint64, VMVersion uint16) (tx *OracleRegisterTx, err error) {
 	ttl, nonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
@@ -227,7 +229,7 @@ func (c *Context) OracleRegisterTx(querySpec, responseSpec string, queryFee big.
 	return tx, nil
 }
 
-// OracleExtendTx extend the lifetime of an existing oracle
+// OracleExtendTx creates an oracle extend transaction, filling in the account nonce and transaction TTL automatically.
 func (c *Context) OracleExtendTx(oracleID string, ttlType, ttlValue uint64) (tx *OracleExtendTx, err error) {
 	ttl, nonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
@@ -238,7 +240,7 @@ func (c *Context) OracleExtendTx(oracleID string, ttlType, ttlValue uint64) (tx 
 	return tx, nil
 }
 
-// OracleQueryTx ask something of an oracle
+// OracleQueryTx creates an oracle query transaction, filling in the account nonce and transaction TTL automatically.
 func (c *Context) OracleQueryTx(OracleID, Query string, QueryFee big.Int, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64) (tx *OracleQueryTx, err error) {
 	ttl, nonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
@@ -249,7 +251,7 @@ func (c *Context) OracleQueryTx(OracleID, Query string, QueryFee big.Int, QueryT
 	return tx, nil
 }
 
-// OracleRespondTx the oracle responds by sending this transaction
+// OracleRespondTx creates an oracle response transaction, filling in the account nonce and transaction TTL automatically.
 func (c *Context) OracleRespondTx(OracleID string, QueryID string, Response string, TTLType uint64, TTLValue uint64) (tx *OracleRespondTx, err error) {
 	ttl, nonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
@@ -260,7 +262,7 @@ func (c *Context) OracleRespondTx(OracleID string, QueryID string, Response stri
 	return tx, nil
 }
 
-// ContractCreateTx returns a transaction for creating a contract on the chain
+// ContractCreateTx creates a contract create transaction, filling in the account nonce and transaction TTL automatically.
 func (c *Context) ContractCreateTx(Code string, CallData string, VMVersion, AbiVersion uint16, Deposit, Amount, Gas, GasPrice, Fee big.Int) (tx *ContractCreateTx, err error) {
 	ttl, nonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
@@ -271,7 +273,7 @@ func (c *Context) ContractCreateTx(Code string, CallData string, VMVersion, AbiV
 	return tx, nil
 }
 
-// ContractCallTx returns a transaction for calling a contract on the chain
+// ContractCallTx creates a contract call transaction,, filling in the account nonce and transaction TTL automatically.
 func (c *Context) ContractCallTx(ContractID, CallData string, AbiVersion uint16, Amount, Gas, GasPrice, Fee big.Int) (tx *ContractCallTx, err error) {
 	ttl, nonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
@@ -282,7 +284,7 @@ func (c *Context) ContractCallTx(ContractID, CallData string, AbiVersion uint16,
 	return tx, nil
 }
 
-// StoreAccountToKeyStoreFile store an account to a json file
+// StoreAccountToKeyStoreFile saves an encrypted Account to a JSON file
 func StoreAccountToKeyStoreFile(account *Account, password, walletName string) (filePath string, err error) {
 	// keystore will be saved in current directory
 	basePath, _ := os.Getwd()
@@ -302,7 +304,7 @@ func StoreAccountToKeyStoreFile(account *Account, password, walletName string) (
 	return
 }
 
-// LoadAccountFromKeyStoreFile load file from the keystore
+// LoadAccountFromKeyStoreFile loads an encrypted Account from a JSON file
 func LoadAccountFromKeyStoreFile(keyFile, password string) (account *Account, err error) {
 	// find out the real path of the wallet
 	filePath, err := GetWalletPath(keyFile)
@@ -319,7 +321,7 @@ func LoadAccountFromKeyStoreFile(keyFile, password string) (account *Account, er
 	return
 }
 
-// GetWalletPath try to locate a wallet
+// GetWalletPath checks if a file exists at the specified path.
 func GetWalletPath(path string) (walletPath string, err error) {
 	// if file exists then load the file
 	if _, err = os.Stat(path); !os.IsNotExist(err) {
@@ -329,7 +331,11 @@ func GetWalletPath(path string) (walletPath string, err error) {
 	return
 }
 
-// VerifySignedTx verifies a tx_ with signature
+// VerifySignedTx verifies the signature of a signed transaction, in its RLP
+// serialized, base64 encoded tx_ form.
+//
+// The network ID is also used when calculating the signature, so the network ID
+// that the transaction was intended for should be provided too.
 func VerifySignedTx(accountID string, txSigned string, networkID string) (valid bool, err error) {
 	txRawSigned, _ := Decode(txSigned)
 	txRLP := DecodeRLPMessage(txRawSigned)
@@ -347,7 +353,9 @@ func VerifySignedTx(accountID string, txSigned string, networkID string) (valid 
 	return
 }
 
-// WaitForTransactionForXBlocks waits for a transaction until X blocks have gone by
+// WaitForTransactionForXBlocks blocks until a transaction has been mined or X
+// blocks have gone by, after which it returns an error. The node polling
+// interval can be configured with Config.Tuning.ChainPollInterval.
 func WaitForTransactionForXBlocks(c getTransactionByHashHeighter, txHash string, x uint64) (blockHeight uint64, blockHash string, err error) {
 	nodeHeight, err := c.GetHeight()
 	if err != nil {
@@ -373,8 +381,7 @@ func WaitForTransactionForXBlocks(c getTransactionByHashHeighter, txHash string,
 	return 0, "", fmt.Errorf("%v blocks have gone by and %v still isn't in a block", x, txHash)
 }
 
-// SignBroadcastTransaction is a convenience function that signs your
-// transaction before calling BroadcastTransaction on it
+// SignBroadcastTransaction signs a transaction and broadcasts it to a node.
 func SignBroadcastTransaction(tx rlp.Encoder, signingAccount *Account, n *Node, networkID string) (signedTxStr, hash, signature string, err error) {
 	signedTx, hash, signature, err := SignHashTx(signingAccount, tx, networkID)
 	if err != nil {
@@ -393,9 +400,8 @@ func SignBroadcastTransaction(tx rlp.Encoder, signingAccount *Account, n *Node, 
 	return
 }
 
-// SignBroadcastWaitTransaction is a convenience function that runs
-// SignBroadcastTransaction and then blocks until the tx is found or x blocks
-// have gone by.
+// SignBroadcastWaitTransaction is a convenience function that combines
+// SignBroadcastTransaction and WaitForTransactionForXBlocks.
 func SignBroadcastWaitTransaction(tx rlp.Encoder, signingAccount *Account, n *Node, networkID string, x uint64) (signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
 	signedTxStr, hash, signature, err = SignBroadcastTransaction(tx, signingAccount, n, networkID)
 	if err != nil {
