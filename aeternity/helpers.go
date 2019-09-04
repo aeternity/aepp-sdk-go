@@ -368,7 +368,7 @@ func WaitForTransactionForXBlocks(c getTransactionByHashHeighter, txHash string,
 			bh := big.Int(tx.BlockHeight)
 			return bh.Uint64(), *tx.BlockHash, nil
 		}
-		time.Sleep(time.Millisecond * time.Duration(Config.Tuning.ChainPollInteval))
+		time.Sleep(time.Millisecond * time.Duration(Config.Tuning.ChainPollInterval))
 	}
 	return 0, "", fmt.Errorf("%v blocks have gone by and %v still isn't in a block", x, txHash)
 }
