@@ -86,7 +86,7 @@ type ClientConfig struct {
 
 // TuningConfig fine tuning of parameters of the client
 type TuningConfig struct {
-	ChainPollInteval  int64  `json:"chain_poll_interval" yaml:"chain_poll_interval" mapstructure:"chain_poll_interval"`
+	ChainPollInterval int64  `json:"chain_poll_interval" yaml:"chain_poll_interval" mapstructure:"chain_poll_interval"`
 	ChainTimeout      int64  `json:"chain_timeout" yaml:"chain_timeout" mapstructure:"chain_timeout"`
 	CryptoKdfMemlimit uint32 `json:"crypto_kdf_memlimit" yaml:"crypto_kdf_memlimit" mapstructure:"crypto_kdf_memlimit"`
 	CryptoKdfOpslimit uint32 `json:"crypto_kdf_opslimit" yaml:"crypto_kdf_opslimit" mapstructure:"crypto_kdf_opslimit"`
@@ -153,7 +153,7 @@ var Config = ProfileConfig{
 		Offline: false, // UNUSED
 	},
 	Tuning: TuningConfig{
-		ChainPollInteval:  100,
+		ChainPollInterval: 100,
 		ChainTimeout:      5000,
 		CryptoKdfMemlimit: 1024 * 32, // 32MB
 		CryptoKdfOpslimit: 3,
