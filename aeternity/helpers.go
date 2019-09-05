@@ -108,8 +108,11 @@ func GetChannelsByName(n GetAnythingByNameFunc, name string) (channels []string,
 	return n(name, "channel")
 }
 
-// Context stores relevant context (node connection, account address) that one
-// might not want to spell out each time one creates a transaction
+// Context is a struct that eases transaction creation. Specifically, the role
+// of Context is to automate/hide the tedious details of transaction creation,
+// such as filling in an unused account nonce and an appropriate TTL, so that
+// the transaction creator only has to worry about the details relevant to the
+// task at hand.
 type Context struct {
 	GetTTL      GetTTLFunc
 	GetNonce    GetNextNonceFunc
@@ -119,9 +122,9 @@ type Context struct {
 
 // NewContextFromURL is a convenience function that creates a Context and its
 // TTL/Nonce closures from a URL
-func NewContextFromURL(url string, address string, debug bool) (ctx *Context) {
-	node := NewNode(url, debug)
-	return NewContextFromNode(node, address)
+func NewContextFromURL(url string, address string, debug bool) (ctx *Context, node *Node) {
+	node = NewNode(url, debug)
+	return NewContextFromNode(node, address), node
 }
 
 // NewContextFromNode is a convenience function that creates a Context and its
@@ -151,8 +154,9 @@ func (c *Context) SpendTx(senderID string, recipientID string, amount, fee big.I
 	return NewSpendTx(senderID, recipientID, amount, fee, payload, txTTL, accountNonce), err
 }
 
-// NamePreclaimTx creates a name preclaim transaction and salt, filling in the
-// account nonce and transaction TTL automatically.
+// NamePreclaimTx creates a name preclaim transaction, filling in the account
+// nonce and transaction TTL automatically. It also generates a commitment ID
+// and salt, later used to claim the name.
 func (c *Context) NamePreclaimTx(name string, fee big.Int) (tx *NamePreclaimTx, nameSalt *big.Int, err error) {
 	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {

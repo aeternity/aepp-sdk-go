@@ -17,7 +17,7 @@ type ContractFunction struct {
 }
 
 // Contract represents the internals of the compiled cb_ bytecode that the
-// compiler returns and exposes those internals as fields/methods.
+// compiler returns and exposes those internals as fields.
 type Contract struct {
 	Tag             byte
 	RLPVersion      byte

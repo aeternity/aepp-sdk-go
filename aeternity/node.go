@@ -8,7 +8,7 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// Node is the HTTP connection to the aeternity node
+// Node represents a HTTP connection to an aeternity node
 type Node struct {
 	*apiclient.Node
 }
@@ -25,7 +25,9 @@ func urlComponents(url string) (host string, schemas []string) {
 	return
 }
 
-// NewNode obtain a new swagger HTTP client to a aeternity node
+// NewNode instantiates a new swagger HTTP client to an aeternity node. No
+// network connection is actually performed, this only sets up the HTTP client
+// code.
 func NewNode(nodeURL string, debug bool) *Node {
 	// create the transport
 	host, schemas := urlComponents(nodeURL)

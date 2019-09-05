@@ -71,7 +71,7 @@ func Decode(in string) (out []byte, err error) {
 	return out, nil
 }
 
-// Blake2bHash calculate the blake2b 32bit hash of the input byte array
+// Blake2bHash calculates the blake2b 32bit hash of the input byte array
 func Blake2bHash(in []byte) (out []byte, err error) {
 	h, err := blake2b.New(32, nil)
 	if err != nil {
