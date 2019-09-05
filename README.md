@@ -17,7 +17,7 @@ if err != nil {
     fmt.Println(err)
     return
 }
-aeNode := aeternity.NewNode("http://localhost:3013", false).WithAccount(acc)
+node := aeternity.NewNode("http://localhost:3013", false).WithAccount(acc)
 ```
 
 Most parameters are set by modifying the variables in `config.go` in this manner:

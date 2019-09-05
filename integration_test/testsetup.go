@@ -54,8 +54,8 @@ func delay(f delayableCode) {
 	f()
 }
 
-func getHeight(aeNode *aeternity.Node) (h uint64) {
-	h, err := aeNode.GetHeight()
+func getHeight(node *aeternity.Node) (h uint64) {
+	h, err := node.GetHeight()
 	if err != nil {
 		fmt.Println("Could not retrieve chain height")
 		return
@@ -64,8 +64,8 @@ func getHeight(aeNode *aeternity.Node) (h uint64) {
 	return
 }
 
-func waitForTransaction(aeNode *aeternity.Node, hash string) (height uint64, microblockHash string, err error) {
-	height, microblockHash, err = aeternity.WaitForTransactionForXBlocks(aeNode, hash, 10)
+func waitForTransaction(node *aeternity.Node, hash string) (height uint64, microblockHash string, err error) {
+	height, microblockHash, err = aeternity.WaitForTransactionForXBlocks(node, hash, 10)
 	if err != nil {
 		// Sometimes, the tests want the tx to fail. Return the err to let them know.
 		return 0, "", err
@@ -74,20 +74,19 @@ func waitForTransaction(aeNode *aeternity.Node, hash string) (height uint64, mic
 	return height, microblockHash, err
 }
 
-func fundAccount(t *testing.T, n *aeternity.Node, source, destination *aeternity.Account, amount *big.Int) {
-	h := aeternity.Helpers{Node: n}
-	ctx := aeternity.Context{Address: source.Address, Helpers: h}
+func fundAccount(t *testing.T, node *aeternity.Node, source, destination *aeternity.Account, amount *big.Int) {
+	ctx := aeternity.NewContextFromNode(node, source.Address)
 
 	fmt.Println("Funding account", destination.Address)
 	tx, err := ctx.SpendTx(source.Address, destination.Address, *amount, aeternity.Config.Client.Fee, []byte{})
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, hash, _, err := aeternity.SignBroadcastTransaction(tx, source, n, networkID)
+	_, hash, _, err := aeternity.SignBroadcastTransaction(tx, source, node, networkID)
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, err = waitForTransaction(n, hash)
+	_, _, err = waitForTransaction(node, hash)
 	if err != nil {
 		t.Fatal(err)
 	}

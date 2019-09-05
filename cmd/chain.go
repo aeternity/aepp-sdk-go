@@ -34,8 +34,8 @@ var topCmd = &cobra.Command{
 	Short: "Query the top block of the chain",
 	Long:  ``,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		aeNode := newAeNode()
-		return topFunc(aeNode, args)
+		node := newAeNode()
+		return topFunc(node, args)
 	},
 }
 
@@ -53,8 +53,8 @@ var statusCmd = &cobra.Command{
 	Short: "Get the status and status of the node running the chain",
 	Long:  ``,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		aeNode := newAeNode()
-		return statusFunc(aeNode, args)
+		node := newAeNode()
+		return statusFunc(node, args)
 	},
 }
 
@@ -73,8 +73,8 @@ var playCmd = &cobra.Command{
 	Short: "Query the blocks of the chain one after the other",
 	Long:  ``,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		aeNode := newAeNode()
-		return playFunc(aeNode, args)
+		node := newAeNode()
+		return playFunc(node, args)
 	},
 }
 
@@ -121,8 +121,8 @@ var broadcastCmd = &cobra.Command{
 	Long:  ``,
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		aeNode := newAeNode()
-		return broadcastFunc(aeNode, args)
+		node := newAeNode()
+		return broadcastFunc(node, args)
 	},
 }
 
@@ -161,8 +161,8 @@ var ttlCmd = &cobra.Command{
 	Long:  `Get the absolute TTL (node's height + recommended TTL offset) for a Transaction`,
 	Args:  cobra.ExactArgs(0),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		aeNode := newAeNode()
-		return ttlFunc(aeNode, args)
+		node := newAeNode()
+		return ttlFunc(node, args)
 	},
 }
 
@@ -183,8 +183,8 @@ var networkIDCmd = &cobra.Command{
 	Long:  ``,
 	Args:  cobra.ExactArgs(0),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		aeNode := newAeNode()
-		return networkIDFunc(aeNode, args)
+		node := newAeNode()
+		return networkIDFunc(node, args)
 	},
 }
 
