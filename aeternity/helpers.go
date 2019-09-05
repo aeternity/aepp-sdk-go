@@ -11,128 +11,138 @@ import (
 	rlp "github.com/randomshinichi/rlpae"
 )
 
-// GetHeightAccountNamer is used by Helper{} methods to describe the
-// capabilities of whatever should be passed in as conn
-type GetHeightAccountNamer interface {
-	GetHeighter
-	GetAccounter
-	GetNameEntryByNamer
-}
+// GetTTLFunc defines a function that will return an appropriate TTL for a
+// transaction.
+type GetTTLFunc func(offset uint64) (ttl uint64, err error)
 
-// getTransactionByHashHeighter is used by WaitForTransactionUntilHeight
-type getTransactionByHashHeighter interface {
-	GetTransactionByHasher
-	GetHeighter
-}
+// GetNextNonceFunc defines a function that will return an unused account nonce
+// for making a transaction.
+type GetNextNonceFunc func(accountID string) (nonce uint64, err error)
 
-// HelpersInterface describes an interface for the helper functions GetTTLNonce
-// and friends so they are mockable, without having to mock out the Node/network
-// connection.
-type HelpersInterface interface {
-	GetTTL(offset uint64) (ttl uint64, err error)
-	GetNextNonce(accountID string) (nextNonce uint64, err error)
-	GetTTLNonce(accountID string, offset uint64) (height uint64, nonce uint64, err error)
-	GetAccountsByName(name string) (addresses []string, err error)
-	GetOraclesByName(name string) (oracleIDs []string, err error)
-	GetContractsByName(name string) (contracts []string, err error)
-	GetChannelsByName(name string) (channels []string, err error)
-}
+// GetTTLNonceFunc describes a function that combines the roles of GetTTLFunc
+// and GetNextNonceFunc
+type GetTTLNonceFunc func(address string, offset uint64) (ttl, nonce uint64, err error)
 
-// Helpers is a struct to contain the GetTTLNonce helper functions and feed them
-// with a node connection
-type Helpers struct {
-	Node GetHeightAccountNamer
-}
-
-// GetTTL returns the chain height + offset
-func (h Helpers) GetTTL(offset uint64) (ttl uint64, err error) {
-	height, err := h.Node.GetHeight()
-	if err != nil {
-		return
-	}
-
-	ttl = height + offset
-
-	return
-}
-
-// GetNextNonce retrieves the current accountNonce and adds 1 to it for use in transaction building
-func (h Helpers) GetNextNonce(accountID string) (nextNonce uint64, err error) {
-	a, err := h.Node.GetAccount(accountID)
-	if err != nil {
-		return
-	}
-	nextNonce = *a.Nonce + 1
-	return
-}
-
-// GetTTLNonce combines the commonly used together functions of GetTTL and GetNextNonce
-func (h Helpers) GetTTLNonce(accountID string, offset uint64) (height uint64, nonce uint64, err error) {
-	height, err = h.GetTTL(offset)
-	if err != nil {
-		return
-	}
-
-	nonce, err = h.GetNextNonce(accountID)
-	if err != nil {
-		return
-	}
-	return
-}
-
-// getAnythingByName is the underlying implementation of Get*ByName
-func (h Helpers) getAnythingByName(name string, key string) (results []string, err error) {
-	n, err := h.Node.GetNameEntryByName(name)
-	if err != nil {
-		return []string{}, err
-	}
-	for _, p := range n.Pointers {
-		if *p.Key == key {
-			results = append(results, *p.ID)
+// GenerateGetTTL returns the chain height + offset
+func GenerateGetTTL(n GetHeighter) GetTTLFunc {
+	return func(offset uint64) (ttl uint64, err error) {
+		height, err := n.GetHeight()
+		if err != nil {
+			return
 		}
+		ttl = height + offset
+		return
 	}
-	return results, nil
 }
 
-// GetAccountsByName returns any account_pubkey entries that it finds in a name's Pointers.
-func (h Helpers) GetAccountsByName(name string) (addresses []string, err error) {
-	return h.getAnythingByName(name, "account_pubkey")
+// GenerateGetNextNonce retrieves the current accountNonce and adds 1 to it for
+// use in transaction building
+func GenerateGetNextNonce(n GetAccounter) GetNextNonceFunc {
+	return func(accountID string) (nextNonce uint64, err error) {
+		a, err := n.GetAccount(accountID)
+		if err != nil {
+			return
+		}
+		nextNonce = *a.Nonce + 1
+		return
+	}
 }
 
-// GetOraclesByName returns any oracle_pubkey entries that it finds in a name's Pointers.
-func (h Helpers) GetOraclesByName(name string) (oracleIDs []string, err error) {
-	return h.getAnythingByName(name, "oracle_pubkey")
+// GenerateGetTTLNonce combines the commonly used together functions of GetTTL
+// and GetNextNonce
+func GenerateGetTTLNonce(ttlFunc GetTTLFunc, nonceFunc GetNextNonceFunc) GetTTLNonceFunc {
+	return func(accountID string, offset uint64) (ttl, nonce uint64, err error) {
+		ttl, err = ttlFunc(offset)
+		if err != nil {
+			return
+		}
+		nonce, err = nonceFunc(accountID)
+		if err != nil {
+			return
+		}
+		return
+	}
 }
 
-// GetContractsByName returns any contract_pubkey entries that it finds in a name's Pointers.
-func (h Helpers) GetContractsByName(name string) (contracts []string, err error) {
-	return h.getAnythingByName(name, "contract_pubkey")
+// GetAnythingByNameFunc describes a function that returns lookup results for a
+// AENS name
+type GetAnythingByNameFunc func(name, key string) (results []string, err error)
+
+// GenerateGetAnythingByName is the underlying implementation of Get*ByName
+func GenerateGetAnythingByName(n GetNameEntryByNamer) GetAnythingByNameFunc {
+	return func(name string, key string) (results []string, err error) {
+		nameEntry, err := n.GetNameEntryByName(name)
+		if err != nil {
+			return []string{}, err
+		}
+		for _, p := range nameEntry.Pointers {
+			if *p.Key == key {
+				results = append(results, *p.ID)
+			}
+		}
+		return results, nil
+	}
 }
 
-// GetChannelsByName returns any channel entries that it finds in a name's Pointers.
-func (h Helpers) GetChannelsByName(name string) (channels []string, err error) {
-	return h.getAnythingByName(name, "channel")
+// GetAccountsByName returns any account_pubkey entries that it finds in a
+// name's Pointers.
+func GetAccountsByName(n GetAnythingByNameFunc, name string) (addresses []string, err error) {
+	return n(name, "account_pubkey")
+}
+
+// GetOraclesByName returns any oracle_pubkey entries that it finds in a name's
+// Pointers.
+func GetOraclesByName(n GetAnythingByNameFunc, name string) (oracleIDs []string, err error) {
+	return n(name, "oracle_pubkey")
+}
+
+// GetContractsByName returns any contract_pubkey entries that it finds in a
+// name's Pointers.
+func GetContractsByName(n GetAnythingByNameFunc, name string) (contracts []string, err error) {
+	return n(name, "contract_pubkey")
+}
+
+// GetChannelsByName returns any channel entries that it finds in a name's
+// Pointers.
+func GetChannelsByName(n GetAnythingByNameFunc, name string) (channels []string, err error) {
+	return n(name, "channel")
 }
 
 // Context stores relevant context (node connection, account address) that one
 // might not want to spell out each time one creates a transaction
 type Context struct {
-	Address string
-	Helpers HelpersInterface
+	GetTTL      GetTTLFunc
+	GetNonce    GetNextNonceFunc
+	GetTTLNonce GetTTLNonceFunc
+	Address     string
 }
 
-// NewContextFromURL is a convenience function that associates a Node with a
-// Helper struct for you.
-func NewContextFromURL(url string, address string, debug bool) (ctx *Context, node *Node) {
-	node = NewNode(url, debug)
-	h := Helpers{Node: node}
-	ctx = &Context{Helpers: h, Address: address}
+// NewContextFromURL is a convenience function that creates a Context and its
+// TTL/Nonce closures from a URL
+func NewContextFromURL(url string, address string, debug bool) (ctx *Context) {
+	node := NewNode(url, debug)
+	return NewContextFromNode(node, address)
+}
+
+// NewContextFromNode is a convenience function that creates a Context and its
+// TTL/Nonce closures from a Node instance
+func NewContextFromNode(node *Node, address string) (ctx *Context) {
+	ttlFunc := GenerateGetTTL(node)
+	nonceFunc := GenerateGetNextNonce(node)
+	ttlNonceFunc := GenerateGetTTLNonce(ttlFunc, nonceFunc)
+	ctx = &Context{
+		GetTTL:      ttlFunc,
+		GetNonce:    nonceFunc,
+		GetTTLNonce: ttlNonceFunc,
+		Address:     address,
+	}
 	return
 }
 
-// SpendTx creates a spend transaction, filling in the account nonce and transaction TTL automatically.
+// SpendTx creates a spend transaction, filling in the account nonce and
+// transaction TTL automatically.
 func (c *Context) SpendTx(senderID string, recipientID string, amount, fee big.Int, payload []byte) (tx *SpendTx, err error) {
-	txTTL, accountNonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
+	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -141,15 +151,16 @@ func (c *Context) SpendTx(senderID string, recipientID string, amount, fee big.I
 	return NewSpendTx(senderID, recipientID, amount, fee, payload, txTTL, accountNonce), err
 }
 
-// NamePreclaimTx creates a name preclaim transaction and salt, filling in the account nonce and transaction TTL automatically.
+// NamePreclaimTx creates a name preclaim transaction and salt, filling in the
+// account nonce and transaction TTL automatically.
 func (c *Context) NamePreclaimTx(name string, fee big.Int) (tx *NamePreclaimTx, nameSalt *big.Int, err error) {
-	txTTL, accountNonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
+	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
 
-	// calculate the commitment and get the preclaim salt
-	// since the salt is 32 bytes long, you must use a big.Int to convert it into an integer
+	// calculate the commitment and get the preclaim salt since the salt is 32
+	// bytes long, you must use a big.Int to convert it into an integer
 	cm, nameSalt, err := generateCommitmentID(name)
 	if err != nil {
 		return
@@ -161,9 +172,10 @@ func (c *Context) NamePreclaimTx(name string, fee big.Int) (tx *NamePreclaimTx, 
 	return
 }
 
-// NameClaimTx creates a claim transaction, filling in the account nonce and transaction TTL automatically.
+// NameClaimTx creates a claim transaction, filling in the account nonce and
+// transaction TTL automatically.
 func (c *Context) NameClaimTx(name string, nameSalt big.Int, fee big.Int) (tx *NameClaimTx, err error) {
-	txTTL, accountNonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
+	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -174,15 +186,16 @@ func (c *Context) NameClaimTx(name string, nameSalt big.Int, fee big.Int) (tx *N
 	return tx, err
 }
 
-// NameUpdateTx creates a name update transaction, filling in the account nonce and transaction TTL automatically.
+// NameUpdateTx creates a name update transaction, filling in the account nonce
+// and transaction TTL automatically.
 func (c *Context) NameUpdateTx(name string, targetAddress string) (tx *NameUpdateTx, err error) {
-	txTTL, accountNonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
+	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
 
 	encodedNameHash := Encode(PrefixName, Namehash(name))
-	absNameTTL, err := c.Helpers.GetTTL(Config.Client.Names.NameTTL)
+	absNameTTL, err := c.GetTTL(Config.Client.Names.NameTTL)
 	if err != nil {
 		return
 	}
@@ -192,9 +205,10 @@ func (c *Context) NameUpdateTx(name string, targetAddress string) (tx *NameUpdat
 	return
 }
 
-// NameTransferTx creates a name transfer transaction, filling in the account nonce and transaction TTL automatically.
+// NameTransferTx creates a name transfer transaction, filling in the account
+// nonce and transaction TTL automatically.
 func (c *Context) NameTransferTx(name string, recipientAddress string) (tx *NameTransferTx, err error) {
-	txTTL, accountNonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
+	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -205,9 +219,10 @@ func (c *Context) NameTransferTx(name string, recipientAddress string) (tx *Name
 	return
 }
 
-// NameRevokeTx creates a name revoke transaction, filling in the account nonce and transaction TTL automatically.
+// NameRevokeTx creates a name revoke transaction, filling in the account nonce
+// and transaction TTL automatically.
 func (c *Context) NameRevokeTx(name string) (tx *NameRevokeTx, err error) {
-	txTTL, accountNonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
+	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -218,9 +233,10 @@ func (c *Context) NameRevokeTx(name string) (tx *NameRevokeTx, err error) {
 	return
 }
 
-// OracleRegisterTx creates an oracle register transaction, filling in the account nonce and transaction TTL automatically.
+// OracleRegisterTx creates an oracle register transaction, filling in the
+// account nonce and transaction TTL automatically.
 func (c *Context) OracleRegisterTx(querySpec, responseSpec string, queryFee big.Int, oracleTTLType, oracleTTLValue uint64, VMVersion uint16) (tx *OracleRegisterTx, err error) {
-	ttl, nonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
+	ttl, nonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -229,9 +245,10 @@ func (c *Context) OracleRegisterTx(querySpec, responseSpec string, queryFee big.
 	return tx, nil
 }
 
-// OracleExtendTx creates an oracle extend transaction, filling in the account nonce and transaction TTL automatically.
+// OracleExtendTx creates an oracle extend transaction, filling in the account
+// nonce and transaction TTL automatically.
 func (c *Context) OracleExtendTx(oracleID string, ttlType, ttlValue uint64) (tx *OracleExtendTx, err error) {
-	ttl, nonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
+	ttl, nonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -240,9 +257,10 @@ func (c *Context) OracleExtendTx(oracleID string, ttlType, ttlValue uint64) (tx 
 	return tx, nil
 }
 
-// OracleQueryTx creates an oracle query transaction, filling in the account nonce and transaction TTL automatically.
+// OracleQueryTx creates an oracle query transaction, filling in the account
+// nonce and transaction TTL automatically.
 func (c *Context) OracleQueryTx(OracleID, Query string, QueryFee big.Int, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64) (tx *OracleQueryTx, err error) {
-	ttl, nonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
+	ttl, nonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -251,9 +269,10 @@ func (c *Context) OracleQueryTx(OracleID, Query string, QueryFee big.Int, QueryT
 	return tx, nil
 }
 
-// OracleRespondTx creates an oracle response transaction, filling in the account nonce and transaction TTL automatically.
+// OracleRespondTx creates an oracle response transaction, filling in the
+// account nonce and transaction TTL automatically.
 func (c *Context) OracleRespondTx(OracleID string, QueryID string, Response string, TTLType uint64, TTLValue uint64) (tx *OracleRespondTx, err error) {
-	ttl, nonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
+	ttl, nonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -262,9 +281,10 @@ func (c *Context) OracleRespondTx(OracleID string, QueryID string, Response stri
 	return tx, nil
 }
 
-// ContractCreateTx creates a contract create transaction, filling in the account nonce and transaction TTL automatically.
+// ContractCreateTx creates a contract create transaction, filling in the
+// account nonce and transaction TTL automatically.
 func (c *Context) ContractCreateTx(Code string, CallData string, VMVersion, AbiVersion uint16, Deposit, Amount, Gas, GasPrice, Fee big.Int) (tx *ContractCreateTx, err error) {
-	ttl, nonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
+	ttl, nonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -273,9 +293,10 @@ func (c *Context) ContractCreateTx(Code string, CallData string, VMVersion, AbiV
 	return tx, nil
 }
 
-// ContractCallTx creates a contract call transaction,, filling in the account nonce and transaction TTL automatically.
+// ContractCallTx creates a contract call transaction,, filling in the account
+// nonce and transaction TTL automatically.
 func (c *Context) ContractCallTx(ContractID, CallData string, AbiVersion uint16, Amount, Gas, GasPrice, Fee big.Int) (tx *ContractCallTx, err error) {
-	ttl, nonce, err := c.Helpers.GetTTLNonce(c.Address, Config.Client.TTL)
+	ttl, nonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -340,7 +361,8 @@ func VerifySignedTx(accountID string, txSigned string, networkID string) (valid 
 	txRawSigned, _ := Decode(txSigned)
 	txRLP := DecodeRLPMessage(txRawSigned)
 
-	// RLP format of signed signature: [[Tag], [Version], [Signatures...], [Transaction]]
+	// RLP format of signed signature: [[Tag], [Version], [Signatures...],
+	// [Transaction]]
 	tx := txRLP[3].([]byte)
 	txSignature := txRLP[2].([]interface{})[0].([]byte)
 
@@ -351,6 +373,14 @@ func VerifySignedTx(accountID string, txSigned string, networkID string) (valid 
 		return
 	}
 	return
+}
+
+// getTransactionByHashHeighter is used by WaitForTransactionForXBlocks to
+// specify that the node/mock node passed in should support
+// GetTransactionByHash() and GetHeight()
+type getTransactionByHashHeighter interface {
+	GetTransactionByHasher
+	GetHeighter
 }
 
 // WaitForTransactionForXBlocks blocks until a transaction has been mined or X

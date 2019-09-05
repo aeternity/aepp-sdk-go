@@ -12,8 +12,9 @@ var bob = "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v"
 
 func Test_txSpendFunc(t *testing.T) {
 	type args struct {
-		helpers aeternity.HelpersInterface
-		args    []string
+		ttlFunc   aeternity.GetTTLFunc
+		nonceFunc aeternity.GetNextNonceFunc
+		args      []string
 	}
 	tests := []struct {
 		name    string
@@ -23,15 +24,16 @@ func Test_txSpendFunc(t *testing.T) {
 		{
 			name: "Alice sends 10 to Bob",
 			args: args{
-				helpers: &mockHelpers{},
-				args:    []string{alice, bob, "10"},
+				ttlFunc:   func(offset uint64) (ttl uint64, err error) { return 500, nil },
+				nonceFunc: func(address string) (nonce uint64, err error) { return 2, nil },
+				args:      []string{alice, bob, "10"},
 			},
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := txSpendFunc(tt.args.helpers, tt.args.args); (err != nil) != tt.wantErr {
+			if err := txSpendFunc(tt.args.ttlFunc, tt.args.nonceFunc, tt.args.args); (err != nil) != tt.wantErr {
 				t.Errorf("txSpendFunc() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -63,8 +65,9 @@ func TestTxDumpRaw(t *testing.T) {
 
 func Test_txContractCreateFunc(t *testing.T) {
 	type args struct {
-		helpers aeternity.HelpersInterface
-		args    []string
+		ttlFunc   aeternity.GetTTLFunc
+		nonceFunc aeternity.GetNextNonceFunc
+		args      []string
 	}
 	tests := []struct {
 		name    string
@@ -74,15 +77,16 @@ func Test_txContractCreateFunc(t *testing.T) {
 		{
 			name: "Deploy SimpleStorage with alice (unsigned)",
 			args: args{
-				helpers: &mockHelpers{},
-				args:    []string{alice, contractSimpleStorageBytecode, contractSimpleStorageInit42},
+				ttlFunc:   func(offset uint64) (ttl uint64, err error) { return 500, nil },
+				nonceFunc: func(address string) (nonce uint64, err error) { return 2, nil },
+				args:      []string{alice, contractSimpleStorageBytecode, contractSimpleStorageInit42},
 			},
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := txContractCreateFunc(tt.args.helpers, tt.args.args); (err != nil) != tt.wantErr {
+			if err := txContractCreateFunc(tt.args.ttlFunc, tt.args.nonceFunc, tt.args.args); (err != nil) != tt.wantErr {
 				t.Errorf("txContractCreateFunc() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

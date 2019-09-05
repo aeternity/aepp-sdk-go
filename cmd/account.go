@@ -124,8 +124,8 @@ var balanceCmd = &cobra.Command{
 	Long:  ``,
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		aeNode := newAeNode()
-		return balanceFunc(aeNode, args)
+		node := newAeNode()
+		return balanceFunc(node, args)
 	},
 }
 

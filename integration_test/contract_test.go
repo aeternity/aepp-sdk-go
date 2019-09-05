@@ -11,9 +11,8 @@ import (
 
 func TestContracts(t *testing.T) {
 	alice, _ := setupAccounts(t)
-	aeNode := setupNetwork(t, privatenetURL, false)
-	helpers := aeternity.Helpers{Node: aeNode}
-	contractsAlice := aeternity.Context{Helpers: helpers, Address: alice.Address}
+	node := setupNetwork(t, privatenetURL, false)
+	contractsAlice := aeternity.NewContextFromNode(node, alice.Address)
 
 	var ctID string
 	var txHash string
@@ -26,18 +25,18 @@ func TestContracts(t *testing.T) {
 	}
 	ctID, _ = create.ContractID()
 	fmt.Printf("Create %s, %+v\n", ctID, create)
-	_, txHash, _, err = aeternity.SignBroadcastTransaction(create, alice, aeNode, networkID)
+	_, txHash, _, err = aeternity.SignBroadcastTransaction(create, alice, node, networkID)
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, err = waitForTransaction(aeNode, txHash)
+	_, _, err = waitForTransaction(node, txHash)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Confirm that contract was created
 	getContract := func() {
-		_, err = aeNode.GetContractByID(ctID)
+		_, err = node.GetContractByID(ctID)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -50,12 +49,12 @@ func TestContracts(t *testing.T) {
 		t.Fatal(err)
 	}
 	fmt.Printf("Call %+v\n", callTx)
-	_, txHash, _, err = aeternity.SignBroadcastTransaction(callTx, alice, aeNode, networkID)
+	_, txHash, _, err = aeternity.SignBroadcastTransaction(callTx, alice, node, networkID)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, _, err = waitForTransaction(aeNode, txHash)
+	_, _, err = waitForTransaction(node, txHash)
 	if err != nil {
 		t.Fatal(err)
 	}

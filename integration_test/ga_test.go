@@ -22,14 +22,14 @@ func EncodeRLPToBytes(tx rlp.Encoder) (b []byte, err error) {
 
 func TestGeneralizedAccounts(t *testing.T) {
 	alice, bob := setupAccounts(t)
-	aeNode := setupNetwork(t, privatenetURL, false)
+	node := setupNetwork(t, privatenetURL, false)
 	compiler := aeternity.NewCompiler(aeternity.Config.Client.Contracts.CompilerURL, false)
-	h := aeternity.Helpers{Node: aeNode}
+	ttlFunc := aeternity.GenerateGetTTL(node)
 
 	// Take note of Bob's balance, and after this test, we expect it to have this much more AE
 	amount := utils.NewIntFromUint64(5000)
 	expected := new(big.Int)
-	bobState, err := aeNode.GetAccount(bob.Address)
+	bobState, err := node.GetAccount(bob.Address)
 	if err != nil {
 		expected.Set(amount)
 	} else {
@@ -53,8 +53,8 @@ func TestGeneralizedAccounts(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	fundAccount(t, aeNode, alice, testAccount, big.NewInt(1000000000000000000))
-	testAccountState, err := aeNode.GetAccount(testAccount.Address)
+	fundAccount(t, node, alice, testAccount, big.NewInt(1000000000000000000))
+	testAccountState, err := node.GetAccount(testAccount.Address)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -68,23 +68,23 @@ func TestGeneralizedAccounts(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	ttl, err := h.GetTTL(aeternity.Config.Client.TTL)
+	ttl, err := ttlFunc(aeternity.Config.Client.TTL)
 	if err != nil {
 		t.Fatal(err)
 	}
 	gaTx := aeternity.NewGAAttachTx(testAccount.Address, 1, authBytecode, auth.TypeInfo[0].FuncHash, aeternity.Config.Client.Contracts.VMVersion, aeternity.Config.Client.Contracts.ABIVersion, aeternity.Config.Client.BaseGas, aeternity.Config.Client.GasPrice, aeternity.Config.Client.Fee, ttl, authInitCalldata)
-	_, txHash, _, err := aeternity.SignBroadcastTransaction(gaTx, testAccount, aeNode, networkID)
+	_, txHash, _, err := aeternity.SignBroadcastTransaction(gaTx, testAccount, node, networkID)
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, err = waitForTransaction(aeNode, txHash)
+	_, _, err = waitForTransaction(node, txHash)
 	if err != nil {
 		t.Error(err)
 	}
 
 	// The test account should now be a generalized account
 	checkGeneralizedAccount := func() {
-		testAccountState, err = aeNode.GetAccount(testAccount.Address)
+		testAccountState, err = node.GetAccount(testAccount.Address)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -96,7 +96,7 @@ func TestGeneralizedAccounts(t *testing.T) {
 
 	// GAMetaTx
 	// Get the TTL (not really needed, could be 0 too)
-	ttl, err = h.GetTTL(aeternity.Config.Client.TTL)
+	ttl, err = ttlFunc(aeternity.Config.Client.TTL)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -118,14 +118,14 @@ func TestGeneralizedAccounts(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = aeNode.PostTransaction(gaMetaTxStr, hash)
+	err = node.PostTransaction(gaMetaTxStr, hash)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// check bob.Address, make sure it got the SpendTx
 	getBobsAccount := func() {
-		bobState, err = aeNode.GetAccount(bob.Address)
+		bobState, err = node.GetAccount(bob.Address)
 		if err != nil {
 			t.Fatalf("Couldn't get Bob's account data: %v", err)
 		}

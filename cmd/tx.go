@@ -28,13 +28,14 @@ var txSpendCmd = &cobra.Command{
 	Long:  ``,
 	Args:  cobra.ExactArgs(3),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		aeNode := newAeNode()
-		u := aeternity.Helpers{Node: aeNode}
-		return txSpendFunc(u, args)
+		node := newAeNode()
+		ttlFunc := aeternity.GenerateGetTTL(node)
+		nonceFunc := aeternity.GenerateGetNextNonce(node)
+		return txSpendFunc(ttlFunc, nonceFunc, args)
 	},
 }
 
-func txSpendFunc(helpers aeternity.HelpersInterface, args []string) (err error) {
+func txSpendFunc(ttlFunc aeternity.GetTTLFunc, nonceFunc aeternity.GetNextNonceFunc, args []string) (err error) {
 	var (
 		sender    string
 		recipient string
@@ -62,9 +63,19 @@ func txSpendFunc(helpers aeternity.HelpersInterface, args []string) (err error) 
 		return errors.New("Error, missing or invalid fee")
 	}
 
-	// Connect to the node to find out sender nonce only
+	// If nonce was not specified as an argument, connect to the node to
+	// query it
 	if nonce == 0 {
-		nonce, err = helpers.GetNextNonce(sender)
+		nonce, err = nonceFunc(sender)
+		if err != nil {
+			return err
+		}
+	}
+
+	// If TTL was not specified as an argument, connect to the node to calculate
+	// it
+	if ttl == 0 {
+		ttl, err = ttlFunc(aeternity.Config.Client.TTL)
 		if err != nil {
 			return err
 		}
@@ -76,7 +87,7 @@ func txSpendFunc(helpers aeternity.HelpersInterface, args []string) (err error) 
 		return err
 	}
 
-	// Sender, Recipient, Amount, Ttl, Fee, Nonce, Payload, Encoded
+	// Print the result
 	Pp(
 		"Sender acount", tx.SenderID,
 		"Recipient account", tx.RecipientID,
@@ -96,9 +107,10 @@ var txContractCreateCmd = &cobra.Command{
 	Long:  ``,
 	Args:  cobra.ExactArgs(3),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		aeNode := newAeNode()
-		u := aeternity.Helpers{Node: aeNode}
-		return txContractCreateFunc(u, args)
+		node := newAeNode()
+		ttlFunc := aeternity.GenerateGetTTL(node)
+		nonceFunc := aeternity.GenerateGetNextNonce(node)
+		return txContractCreateFunc(ttlFunc, nonceFunc, args)
 	},
 }
 
@@ -107,14 +119,14 @@ type getHeightAccounter interface {
 	aeternity.GetAccounter
 }
 
-func txContractCreateFunc(h aeternity.HelpersInterface, args []string) (err error) {
+func txContractCreateFunc(ttlFunc aeternity.GetTTLFunc, nonceFunc aeternity.GetNextNonceFunc, args []string) (err error) {
 	var (
 		owner    string
 		contract string
 		calldata string
 	)
 
-	// Load variables from arguments
+	// Load variables from arguments and validate them
 	owner = args[0]
 	if !IsAddress(owner) {
 		return errors.New("Error, missing or invalid owner address")
@@ -128,18 +140,32 @@ func txContractCreateFunc(h aeternity.HelpersInterface, args []string) (err erro
 		return errors.New("Error, missing or invalid init calldata bytecode")
 	}
 
-	c := aeternity.Context{Helpers: h, Address: owner}
-
-	tx, err := c.ContractCreateTx(contract, calldata, aeternity.Config.Client.Contracts.VMVersion, aeternity.Config.Client.Contracts.ABIVersion, aeternity.Config.Client.Contracts.Deposit, aeternity.Config.Client.Contracts.Amount, aeternity.Config.Client.Contracts.Gas, aeternity.Config.Client.Contracts.GasPrice, aeternity.Config.Client.Fee)
-
-	if err != nil {
-		return err
+	// If nonce was not specified as an argument, connect to the node to
+	// query it
+	if nonce == 0 {
+		nonce, err = nonceFunc(owner)
+		if err != nil {
+			return err
+		}
 	}
+
+	// If TTL was not specified as an argument, connect to the node to calculate
+	// it
+	if ttl == 0 {
+		ttl, err = ttlFunc(aeternity.Config.Client.TTL)
+		if err != nil {
+			return err
+		}
+	}
+
+	tx := aeternity.NewContractCreateTx(owner, nonce, contract, aeternity.Config.Client.Contracts.VMVersion, aeternity.Config.Client.Contracts.ABIVersion, aeternity.Config.Client.Contracts.Deposit, aeternity.Config.Client.Contracts.Amount, aeternity.Config.Client.Contracts.Gas, aeternity.Config.Client.Contracts.GasPrice, aeternity.Config.Client.Fee, ttl, calldata)
+
 	txStr, err := aeternity.SerializeTx(tx)
 	if err != nil {
 		return err
 	}
 
+	// Print the result
 	Pp(
 		"OwnerID", tx.OwnerID,
 		"AccountNonce", tx.AccountNonce,
@@ -229,7 +255,7 @@ func init() {
 
 	// tx spend command
 	txSpendCmd.Flags().StringVar(&fee, "fee", aeternity.Config.Client.Fee.String(), fmt.Sprintf("Set the transaction fee (default=%s)", aeternity.Config.Client.Fee.String()))
-	txSpendCmd.Flags().Uint64Var(&ttl, "ttl", aeternity.Config.Client.TTL, fmt.Sprintf("Set the TTL in keyblocks (default=%d)", aeternity.Config.Client.TTL))
+	txSpendCmd.Flags().Uint64Var(&ttl, "ttl", 0, fmt.Sprintf("Set the TTL in keyblocks (default=%d)", 0))
 	txSpendCmd.Flags().Uint64Var(&nonce, "nonce", 0, fmt.Sprint("Set the sender account nonce, if not the chain will be queried for its value"))
 	txSpendCmd.Flags().StringVar(&spendTxPayload, "payload", "", fmt.Sprint("Optional text payload for Spend Transactions, which will be turned into a bytearray"))
 }

@@ -111,9 +111,8 @@ func TestAPI(t *testing.T) {
 	alice, bob := setupAccounts(t)
 
 	name := randomName(6)
-	helpers := aeternity.Helpers{Node: privateNet}
-	ctxAlice := aeternity.Context{Helpers: helpers, Address: alice.Address}
-	ctxBob := aeternity.Context{Helpers: helpers, Address: bob.Address}
+	ctxAlice := aeternity.NewContextFromNode(privateNet, alice.Address)
+	ctxBob := aeternity.NewContextFromNode(privateNet, bob.Address)
 	// SpendTx
 	fmt.Println("SpendTx")
 	spendTx, err := ctxAlice.SpendTx(sender, bob.Address, *big.NewInt(1000), aeternity.Config.Client.Fee, []byte(""))
