@@ -8,14 +8,26 @@ import (
 
 // Acceptable values for various parameters
 const (
-	ConfigFilename        = "config"
-	NetworkIDMainnet      = "ae_mainnet"
-	URLMainnet            = "https://sdk-mainnet.aepps.com"
-	NetworkIDTestnet      = "ae_uat"
-	URLTestnet            = "https://sdk-testnet.aepps.com"
-	CompilerBackendFATE   = "fate"
-	CompilerBackendAEVM   = "aevm"
-	OracleTTLTypeDelta    = 0
+	// NetworkIDMainnet is the network ID for aeternity mainnet
+	NetworkIDMainnet = "ae_mainnet"
+	// URLMainnet is the URL to an aeternity Foundation maintained node
+	URLMainnet = "https://sdk-mainnet.aepps.com"
+	// NetworkIDTestnet is the network ID for aeternity testnet
+	NetworkIDTestnet = "ae_uat"
+	// URLTestnet is the URL to an aeternity Foundation maintained node
+	URLTestnet = "https://sdk-testnet.aepps.com"
+	// CompilerBackendFATE indicates that the compiler should use the FATE VM
+	// for contract bytecode execution
+	CompilerBackendFATE = "fate"
+	// CompilerBackendAEVM indicates that the compiler should use the AEVM for
+	// contract bytecode execution
+	CompilerBackendAEVM = "aevm"
+	// OracleTTLTypeDelta indicates that the accompanying TTL value (in blocks)
+	// should be interpreted as currentHeight + TTLValue
+	OracleTTLTypeDelta = 0
+	// OracleTTLTypeAbsolute indicates that the accompanying TTL value (in
+	// blocks) should be interpreted as an absolute block height, after which
+	// the TTL expires.
 	OracleTTLTypeAbsolute = 1
 )
 
