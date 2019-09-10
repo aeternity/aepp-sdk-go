@@ -204,7 +204,7 @@ func (c *Context) NameUpdateTx(name string, targetAddress string) (tx *NameUpdat
 		return
 	}
 	// create the transaction
-	tx = NewNameUpdateTx(c.Address, encodedNameHash, []string{targetAddress}, absNameTTL, Config.Client.Names.ClientTTL, Config.Client.Names.UpdateFee, txTTL, accountNonce)
+	tx = NewNameUpdateTx(c.Address, encodedNameHash, []string{targetAddress}, absNameTTL, Config.Client.Names.ClientTTL, Config.Client.Fee, txTTL, accountNonce)
 
 	return
 }
@@ -287,25 +287,25 @@ func (c *Context) OracleRespondTx(OracleID string, QueryID string, Response stri
 
 // ContractCreateTx creates a contract create transaction, filling in the
 // account nonce and transaction TTL automatically.
-func (c *Context) ContractCreateTx(Code string, CallData string, VMVersion, AbiVersion uint16, Deposit, Amount, Gas, GasPrice, Fee big.Int) (tx *ContractCreateTx, err error) {
+func (c *Context) ContractCreateTx(Code string, CallData string, VMVersion, AbiVersion uint16, Deposit, Amount, GasLimit, Fee big.Int) (tx *ContractCreateTx, err error) {
 	ttl, nonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
 
-	tx = NewContractCreateTx(c.Address, nonce, Code, VMVersion, AbiVersion, Deposit, Amount, Gas, GasPrice, Fee, ttl, CallData)
+	tx = NewContractCreateTx(c.Address, nonce, Code, VMVersion, AbiVersion, Deposit, Amount, GasLimit, Config.Client.GasPrice, Fee, ttl, CallData)
 	return tx, nil
 }
 
 // ContractCallTx creates a contract call transaction,, filling in the account
 // nonce and transaction TTL automatically.
-func (c *Context) ContractCallTx(ContractID, CallData string, AbiVersion uint16, Amount, Gas, GasPrice, Fee big.Int) (tx *ContractCallTx, err error) {
+func (c *Context) ContractCallTx(ContractID, CallData string, AbiVersion uint16, Amount, GasLimit, GasPrice, Fee big.Int) (tx *ContractCallTx, err error) {
 	ttl, nonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
 	}
 
-	tx = NewContractCallTx(c.Address, nonce, ContractID, Amount, Gas, GasPrice, AbiVersion, CallData, Fee, ttl)
+	tx = NewContractCallTx(c.Address, nonce, ContractID, Amount, GasLimit, GasPrice, AbiVersion, CallData, Fee, ttl)
 	return tx, nil
 }
 

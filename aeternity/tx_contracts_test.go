@@ -28,7 +28,7 @@ func TestContractTx(t *testing.T) {
 				AbiVersion: 1,
 				Deposit:    *new(big.Int),
 				Amount:     *new(big.Int),
-				Gas:        *utils.NewIntFromUint64(1e9),
+				GasLimit:   *utils.NewIntFromUint64(1e9),
 				GasPrice:   *utils.NewIntFromUint64(1e9),
 				Fee:        *utils.RequireIntFromString("200000000000000"),
 				TTL:        500,
@@ -49,7 +49,7 @@ func TestContractTx(t *testing.T) {
 				AbiVersion: 1,
 				Deposit:    *new(big.Int),
 				Amount:     *new(big.Int),
-				Gas:        *utils.NewIntFromUint64(1e9),
+				GasLimit:   *utils.NewIntFromUint64(1e9),
 				GasPrice:   *utils.NewIntFromUint64(1e9),
 				Fee:        *utils.RequireIntFromString("200000000000000"),
 				TTL:        500,
@@ -70,8 +70,8 @@ func TestContractTx(t *testing.T) {
 				AbiVersion: 1,
 				Deposit:    Config.Client.Contracts.Deposit,
 				Amount:     Config.Client.Contracts.Amount,
-				Gas:        Config.Client.Contracts.Gas,
-				GasPrice:   Config.Client.Contracts.GasPrice,
+				GasLimit:   Config.Client.Contracts.GasLimit,
+				GasPrice:   Config.Client.GasPrice,
 				Fee:        Config.Client.Fee,
 				TTL:        Config.Client.TTL,
 				CallData:   "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACC5yVbyizFJqfWYeqUF89obIgnMVzkjQAYrtsG9n5+Z6gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAnHQYrA==",
@@ -87,7 +87,7 @@ func TestContractTx(t *testing.T) {
 				AccountNonce: uint64(1),
 				ContractID:   "ct_2pfWWzeRzWSdm68HXZJn61KhxdsBA46wzYgvo1swkdJZij1rKm",
 				Amount:       *utils.NewIntFromUint64(10),
-				Gas:          *utils.NewIntFromUint64(10),
+				GasLimit:     *utils.NewIntFromUint64(10),
 				GasPrice:     *utils.NewIntFromUint64(10),
 				AbiVersion:   3,
 				CallData:     "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACDiIx1s38k5Ft5Ms6mFe/Zc9A/CVvShSYs/fnyYDBmTRAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACo7j+li",
@@ -105,7 +105,7 @@ func TestContractTx(t *testing.T) {
 				AccountNonce: uint64(2),
 				ContractID:   "ct_2pfWWzeRzWSdm68HXZJn61KhxdsBA46wzYgvo1swkdJZij1rKm",
 				Amount:       *new(big.Int),
-				Gas:          *utils.NewIntFromUint64(1e9),
+				GasLimit:     *utils.NewIntFromUint64(1e9),
 				GasPrice:     *utils.NewIntFromUint64(1e9),
 				AbiVersion:   4,
 				CallData:     "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACDiIx1s38k5Ft5Ms6mFe/Zc9A/CVvShSYs/fnyYDBmTRAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACo7j+li",
@@ -123,8 +123,8 @@ func TestContractTx(t *testing.T) {
 				AccountNonce: uint64(2),
 				ContractID:   "ct_2pfWWzeRzWSdm68HXZJn61KhxdsBA46wzYgvo1swkdJZij1rKm",
 				Amount:       Config.Client.Contracts.Amount,
-				Gas:          Config.Client.Contracts.Gas,
-				GasPrice:     Config.Client.Contracts.GasPrice,
+				GasLimit:     Config.Client.Contracts.GasLimit,
+				GasPrice:     Config.Client.GasPrice,
 				AbiVersion:   Config.Client.Contracts.ABIVersion,
 				CallData:     "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACDiIx1s38k5Ft5Ms6mFe/Zc9A/CVvShSYs/fnyYDBmTRAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACo7j+li",
 				Fee:          Config.Client.Fee,
@@ -169,7 +169,7 @@ func TestContractCreateTx_FeeEstimate(t *testing.T) {
 		AbiVersion   uint16
 		Deposit      big.Int
 		Amount       big.Int
-		Gas          big.Int
+		GasLimit     big.Int
 		GasPrice     big.Int
 		Fee          big.Int
 		TTL          uint64
@@ -191,7 +191,7 @@ func TestContractCreateTx_FeeEstimate(t *testing.T) {
 				AbiVersion: 1,
 				Deposit:    *new(big.Int),
 				Amount:     *new(big.Int),
-				Gas:        *utils.NewIntFromUint64(1e9),
+				GasLimit:   *utils.NewIntFromUint64(1e9),
 				GasPrice:   *utils.NewIntFromUint64(1e9),
 				Fee:        *utils.RequireIntFromString("200000000000000"),
 				TTL:        500,
@@ -210,7 +210,7 @@ func TestContractCreateTx_FeeEstimate(t *testing.T) {
 				AbiVersion:   tt.fields.AbiVersion,
 				Deposit:      tt.fields.Deposit,
 				Amount:       tt.fields.Amount,
-				Gas:          tt.fields.Gas,
+				GasLimit:     tt.fields.GasLimit,
 				GasPrice:     tt.fields.GasPrice,
 				Fee:          tt.fields.Fee,
 				TTL:          tt.fields.TTL,
@@ -236,7 +236,7 @@ func TestContractCallTx_FeeEstimate(t *testing.T) {
 		AccountNonce uint64
 		ContractID   string
 		Amount       big.Int
-		Gas          big.Int
+		GasLimit     big.Int
 		GasPrice     big.Int
 		AbiVersion   uint16
 		VMVersion    uint16
@@ -256,7 +256,7 @@ func TestContractCallTx_FeeEstimate(t *testing.T) {
 				AccountNonce: uint64(2),
 				ContractID:   "ct_2pfWWzeRzWSdm68HXZJn61KhxdsBA46wzYgvo1swkdJZij1rKm",
 				Amount:       *utils.NewIntFromUint64(0),
-				Gas:          *utils.NewIntFromUint64(1e5),
+				GasLimit:     *utils.NewIntFromUint64(1e5),
 				GasPrice:     *utils.NewIntFromUint64(1e9),
 				AbiVersion:   4,
 				CallData:     "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACDiIx1s38k5Ft5Ms6mFe/Zc9A/CVvShSYs/fnyYDBmTRAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACo7j+li",
@@ -273,7 +273,7 @@ func TestContractCallTx_FeeEstimate(t *testing.T) {
 				AccountNonce: tt.fields.AccountNonce,
 				ContractID:   tt.fields.ContractID,
 				Amount:       tt.fields.Amount,
-				Gas:          tt.fields.Gas,
+				GasLimit:     tt.fields.GasLimit,
 				GasPrice:     tt.fields.GasPrice,
 				AbiVersion:   tt.fields.AbiVersion,
 				CallData:     tt.fields.CallData,
