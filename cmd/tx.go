@@ -158,7 +158,7 @@ func txContractCreateFunc(ttlFunc aeternity.GetTTLFunc, nonceFunc aeternity.GetN
 		}
 	}
 
-	tx := aeternity.NewContractCreateTx(owner, nonce, contract, aeternity.Config.Client.Contracts.VMVersion, aeternity.Config.Client.Contracts.ABIVersion, aeternity.Config.Client.Contracts.Deposit, aeternity.Config.Client.Contracts.Amount, aeternity.Config.Client.Contracts.Gas, aeternity.Config.Client.Contracts.GasPrice, aeternity.Config.Client.Fee, ttl, calldata)
+	tx := aeternity.NewContractCreateTx(owner, nonce, contract, aeternity.Config.Client.Contracts.VMVersion, aeternity.Config.Client.Contracts.ABIVersion, aeternity.Config.Client.Contracts.Deposit, aeternity.Config.Client.Contracts.Amount, aeternity.Config.Client.Contracts.GasLimit, aeternity.Config.Client.GasPrice, aeternity.Config.Client.Fee, ttl, calldata)
 
 	txStr, err := aeternity.SerializeTx(tx)
 	if err != nil {
@@ -174,7 +174,7 @@ func txContractCreateFunc(ttlFunc aeternity.GetTTLFunc, nonceFunc aeternity.GetN
 		"ABIVersion", tx.AbiVersion,
 		"Deposit", tx.Deposit,
 		"Amount", tx.Amount,
-		"Gas", tx.Gas,
+		"GasLimit", tx.GasLimit,
 		"GasPrice", tx.GasPrice,
 		"TTL", tx.TTL,
 		"Fee", tx.Fee,

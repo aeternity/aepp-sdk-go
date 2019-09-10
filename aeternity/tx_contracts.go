@@ -43,7 +43,7 @@ type ContractCreateTx struct {
 	AbiVersion   uint16
 	Deposit      big.Int
 	Amount       big.Int
-	Gas          big.Int
+	GasLimit     big.Int
 	GasPrice     big.Int
 	Fee          big.Int
 	TTL          uint64
@@ -76,7 +76,7 @@ func (tx *ContractCreateTx) EncodeRLP(w io.Writer) (err error) {
 		tx.TTL,
 		tx.Deposit,
 		tx.Amount,
-		tx.Gas,
+		tx.GasLimit,
 		tx.GasPrice,
 		callDataBinary,
 	)
@@ -102,7 +102,7 @@ type contractCreateRLP struct {
 	TTL               uint64
 	Deposit           big.Int
 	Amount            big.Int
-	Gas               big.Int
+	GasLimit          big.Int
 	GasPrice          big.Int
 	CallDataBinary    []byte
 }
@@ -140,7 +140,7 @@ func (tx *ContractCreateTx) DecodeRLP(s *rlp.Stream) (err error) {
 	tx.AbiVersion = abiversion
 	tx.Deposit = ctx.Deposit
 	tx.Amount = ctx.Amount
-	tx.Gas = ctx.Gas
+	tx.GasLimit = ctx.GasLimit
 	tx.GasPrice = ctx.GasPrice
 	tx.Fee = ctx.Fee
 	tx.TTL = ctx.TTL
@@ -150,7 +150,7 @@ func (tx *ContractCreateTx) DecodeRLP(s *rlp.Stream) (err error) {
 
 // JSON representation of a Tx is useful for querying the node's debug endpoint
 func (tx *ContractCreateTx) JSON() (string, error) {
-	g := tx.Gas.Uint64()
+	g := tx.GasLimit.Uint64()
 	swaggerT := models.ContractCreateTx{
 		OwnerID:    &tx.OwnerID,
 		Nonce:      tx.AccountNonce,
@@ -180,7 +180,7 @@ func (tx *ContractCreateTx) FeeEstimate() (*big.Int, error) {
 	if err != nil {
 		return new(big.Int), err
 	}
-	estimatedFee := calcFeeContract(&tx.Gas, 5, txLenEstimated)
+	estimatedFee := calcFeeContract(&tx.GasLimit, 5, txLenEstimated)
 	return estimatedFee, nil
 }
 
@@ -190,7 +190,7 @@ func (tx *ContractCreateTx) ContractID() (string, error) {
 }
 
 // NewContractCreateTx is a constructor for a ContractCreateTx struct
-func NewContractCreateTx(OwnerID string, AccountNonce uint64, Code string, VMVersion, AbiVersion uint16, Deposit, Amount, Gas, GasPrice, Fee big.Int, TTL uint64, CallData string) *ContractCreateTx {
+func NewContractCreateTx(OwnerID string, AccountNonce uint64, Code string, VMVersion, AbiVersion uint16, Deposit, Amount, GasLimit, GasPrice, Fee big.Int, TTL uint64, CallData string) *ContractCreateTx {
 	return &ContractCreateTx{
 		OwnerID:      OwnerID,
 		AccountNonce: AccountNonce,
@@ -199,7 +199,7 @@ func NewContractCreateTx(OwnerID string, AccountNonce uint64, Code string, VMVer
 		AbiVersion:   AbiVersion,
 		Deposit:      Deposit,
 		Amount:       Amount,
-		Gas:          Gas,
+		GasLimit:     GasLimit,
 		GasPrice:     GasPrice,
 		Fee:          Fee,
 		TTL:          TTL,
@@ -208,13 +208,12 @@ func NewContractCreateTx(OwnerID string, AccountNonce uint64, Code string, VMVer
 }
 
 // ContractCallTx represents calling an existing smart contract
-// VMVersion is not included in RLP serialized representation (implied by contract type already)
 type ContractCallTx struct {
 	CallerID     string
 	AccountNonce uint64
 	ContractID   string
 	Amount       big.Int
-	Gas          big.Int
+	GasLimit     big.Int
 	GasPrice     big.Int
 	AbiVersion   uint16
 	CallData     string
@@ -247,7 +246,7 @@ func (tx *ContractCallTx) EncodeRLP(w io.Writer) (err error) {
 		tx.Fee,
 		tx.TTL,
 		tx.Amount,
-		tx.Gas,
+		tx.GasLimit,
 		tx.GasPrice,
 		callDataBinary,
 	)
@@ -272,7 +271,7 @@ type contractCallRLP struct {
 	Fee               big.Int
 	TTL               uint64
 	Amount            big.Int
-	Gas               big.Int
+	GasLimit          big.Int
 	GasPrice          big.Int
 	CallDataBinary    []byte
 }
@@ -308,7 +307,7 @@ func (tx *ContractCallTx) DecodeRLP(s *rlp.Stream) (err error) {
 	tx.AccountNonce = ctx.AccountNonce
 	tx.ContractID = ctID
 	tx.Amount = ctx.Amount
-	tx.Gas = ctx.Gas
+	tx.GasLimit = ctx.GasLimit
 	tx.GasPrice = ctx.GasPrice
 	tx.AbiVersion = ctx.AbiVersion
 	tx.CallData = calldata
@@ -319,7 +318,7 @@ func (tx *ContractCallTx) DecodeRLP(s *rlp.Stream) (err error) {
 
 // JSON representation of a Tx is useful for querying the node's debug endpoint
 func (tx *ContractCallTx) JSON() (string, error) {
-	gas := tx.Gas.Uint64()
+	gas := tx.GasLimit.Uint64()
 	swaggerT := models.ContractCallTx{
 		CallerID:   &tx.CallerID,
 		Nonce:      tx.AccountNonce,
@@ -347,18 +346,18 @@ func (tx *ContractCallTx) FeeEstimate() (*big.Int, error) {
 	if err != nil {
 		return new(big.Int), err
 	}
-	estimatedFee := calcFeeContract(&tx.Gas, 30, txLenEstimated)
+	estimatedFee := calcFeeContract(&tx.GasLimit, 30, txLenEstimated)
 	return estimatedFee, nil
 }
 
 // NewContractCallTx is a constructor for a ContractCallTx struct
-func NewContractCallTx(CallerID string, AccountNonce uint64, ContractID string, Amount, Gas, GasPrice big.Int, AbiVersion uint16, CallData string, Fee big.Int, TTL uint64) *ContractCallTx {
+func NewContractCallTx(CallerID string, AccountNonce uint64, ContractID string, Amount, GasLimit, GasPrice big.Int, AbiVersion uint16, CallData string, Fee big.Int, TTL uint64) *ContractCallTx {
 	return &ContractCallTx{
 		CallerID:     CallerID,
 		AccountNonce: AccountNonce,
 		ContractID:   ContractID,
 		Amount:       Amount,
-		Gas:          Gas,
+		GasLimit:     GasLimit,
 		GasPrice:     GasPrice,
 		AbiVersion:   AbiVersion,
 		CallData:     CallData,
