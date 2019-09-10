@@ -8,6 +8,9 @@ import (
 	"github.com/aeternity/aepp-sdk-go/swagguard/node/models"
 )
 
+// getErrorReason parses the external.*BadRequest structs returned by the
+// Swagger API endpoints and gets to the Reason field of the wrapped
+// models.Error struct, returning the reason why the call failed.
 func getErrorReason(v interface{}) (msg string) {
 	var p func(v reflect.Value) (msg string)
 	p = func(v reflect.Value) (msg string) {

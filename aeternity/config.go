@@ -45,34 +45,55 @@ type CompilerConfig struct {
 	Backend string `json:"backend" yaml:"backend" mapstructure:"backend"`
 }
 
-// AensConfig configurations for Aens
+// AensConfig contains default parameters for AENS
 type AensConfig struct {
-	NameTTL     uint64  `json:"name_ttl" yaml:"name_ttl" mapstructure:"name_ttl"`
-	ClientTTL   uint64  `json:"client_ttl" yaml:"client_ttl" mapstructure:"client_ttl"`
-	PreClaimFee big.Int `json:"preclaim_fee" yaml:"preclaim_fee" mapstructure:"preclaim_fee"`
-	ClaimFee    big.Int `json:"claim_fee" yaml:"claim_fee" mapstructure:"claim_fee"`
-	UpdateFee   big.Int `json:"update_fee" yaml:"update_fee" mapstructure:"update_fee"`
+	// NameTTL is the block height (in this case not an absolute block height,
+	// but a delta) after which the name goes into the 'revoked' state.
+	NameTTL uint64 `json:"name_ttl" yaml:"name_ttl" mapstructure:"name_ttl"`
+	// ClientTTL suggests how long (in seconds) AENS clients should cache an AENS entry.
+	ClientTTL uint64 `json:"client_ttl" yaml:"client_ttl" mapstructure:"client_ttl"`
 }
 
-// ContractConfig configurations for contracts
+// ContractConfig contains default parameters for contracts
 type ContractConfig struct {
-	CompilerURL string  `json:"compiler" yaml:"compiler" mapstructure:"compiler"`
-	Gas         big.Int `json:"gas" yaml:"gas" mapstructure:"gas"`
-	GasPrice    big.Int `json:"gas_price" yaml:"gas_price" mapstructure:"gas_price"`
-	Amount      big.Int `json:"amount" yaml:"amount" mapstructure:"amount"`
-	Deposit     big.Int `json:"deposit" yaml:"deposit" mapstructure:"deposit"`
-	VMVersion   uint16  `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
-	ABIVersion  uint16  `json:"abi_version" yaml:"abi_version" mapstructure:"abi_version"`
+	CompilerURL string `json:"compiler" yaml:"compiler" mapstructure:"compiler"`
+	// GasLimit is a default value for the maximum amount of gas that a contract
+	// execution should consume. see
+	// https://github.com/aeternity/protocol/blob/master/consensus/consensus.md
+	//
+	// In order to control the size and the number of transactions in a micro
+	// block, each transaction has a gas. The sum of gas of all the transactions
+	// cannot exceed the gas limit per micro block, which is 6 000 000.
+	// The gas of a transaction is the sum of:
+	// * the base gas;
+	// * other gas components, such as gas proportional to the byte size of the
+	//   transaction or relative TTL, gas needed for contract execution.
+	GasLimit big.Int `json:"gas" yaml:"gas" mapstructure:"gas"`
+	// Amount is an optional amount to transfer to the contract account.
+	Amount big.Int `json:"amount" yaml:"amount" mapstructure:"amount"`
+	// Deposit will be "held by the contract" until it is deactivated.
+	Deposit big.Int `json:"deposit" yaml:"deposit" mapstructure:"deposit"`
+	// VMVersion indicates which virtual machine should be used for bytecode execution.
+	VMVersion uint16 `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
+	// ABIVersion indicates the binary interface/calling convention used by the contract.
+	ABIVersion uint16 `json:"abi_version" yaml:"abi_version" mapstructure:"abi_version"`
 }
 
-// OracleConfig configurations for contracts
+// OracleConfig contains default parameters for oracles
 type OracleConfig struct {
-	QueryFee         big.Int `json:"query_fee" yaml:"query_fee" mapstructure:"query_fee"`
-	QueryTTLType     uint64  `json:"query_ttl_type" yaml:"query_ttl_type" mapstructure:"query_ttl_type"`
-	QueryTTLValue    uint64  `json:"query_ttl_value" yaml:"query_ttl_value" mapstructure:"query_ttl_value"`
-	ResponseTTLType  uint64  `json:"response_ttl_type" yaml:"response_ttl_type" mapstructure:"response_ttl_type"`
-	ResponseTTLValue uint64  `json:"response_ttl_value" yaml:"response_ttl_value" mapstructure:"response_ttl_value"`
-	VMVersion        uint16  `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
+	// QueryFee is locked up until the oracle answers (and gets the fee) or the
+	// transaction TTL expires (and the sender is refunded). In other words, it
+	// is a bounty.
+	QueryFee big.Int `json:"query_fee" yaml:"query_fee" mapstructure:"query_fee"`
+	// QueryTTLType indicates whether the TTLValue should be interpreted as an absolute or delta blockheight.
+	QueryTTLType uint64 `json:"query_ttl_type" yaml:"query_ttl_type" mapstructure:"query_ttl_type"`
+	// QueryTTLValue indicates how long the query is open for response from the oracle.
+	QueryTTLValue uint64 `json:"query_ttl_value" yaml:"query_ttl_value" mapstructure:"query_ttl_value"`
+	// ResponseTTLType indicates whether the TTLValue should be interpreted as an absolute or delta blockheight.
+	ResponseTTLType uint64 `json:"response_ttl_type" yaml:"response_ttl_type" mapstructure:"response_ttl_type"`
+	// ResponseTTLValue indicates how long the response is available when given from the oracle.
+	ResponseTTLValue uint64 `json:"response_ttl_value" yaml:"response_ttl_value" mapstructure:"response_ttl_value"`
+	VMVersion        uint16 `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
 }
 
 // StateChannelConfig configurations for contracts TODO: not complete
@@ -83,17 +104,21 @@ type StateChannelConfig struct {
 
 // ClientConfig client parameters configuration
 type ClientConfig struct {
-	BaseGas       big.Int            `json:"base_gas" yaml:"base_gas" mapstructure:"base_gas"`
-	GasPerByte    big.Int            `json:"gas_per_byte" yaml:"gas_per_byte" mapstructure:"gas_per_byte"`
-	GasPrice      big.Int            `json:"gas_price" yaml:"gas_price" mapstructure:"gas_price"`
-	TTL           uint64             `json:"ttl" yaml:"ttl" mapstructure:"ttl"`
+	// BaseGas is one component of transaction fee calculation.
+	BaseGas big.Int `json:"base_gas" yaml:"base_gas" mapstructure:"base_gas"`
+	// GasPerByte is multiplied by the RLP serialized transaction's length.
+	GasPerByte big.Int `json:"gas_per_byte" yaml:"gas_per_byte" mapstructure:"gas_per_byte"`
+	// GasPrice is the conversion factor from gas to AE.
+	GasPrice big.Int `json:"gas_price" yaml:"gas_price" mapstructure:"gas_price"`
+	// TTL is the default blockheight offset that will be added to the current
+	// height to determine a transaction's TTL.
+	TTL uint64 `json:"ttl" yaml:"ttl" mapstructure:"ttl"`
+	// Fee is a default transaction fee that should be big enough for most transaction types.
 	Fee           big.Int            `json:"fee" yaml:"fee" mapstructure:"fee"`
-	DefaultKey    string             `json:"default_key_name" yaml:"default_key_name" mapstructure:"default_key_name"`
 	Names         AensConfig         `json:"names" yaml:"names" mapstructure:"names"`
 	Contracts     ContractConfig     `json:"contracts" yaml:"contracts" mapstructure:"contracts"`
 	Oracles       OracleConfig       `json:"oracles" yaml:"oracles" mapstructure:"oracles"`
 	StateChannels StateChannelConfig `json:"state_channels" yaml:"state_channels" mapstructure:"state_channels"`
-	Offline       bool               `json:"offline" yaml:"offline" mapstructure:"offline"`
 }
 
 // TuningConfig fine tuning of parameters of the client
@@ -115,7 +140,7 @@ type ProfileConfig struct {
 	Tuning   TuningConfig   `json:"tuning" yaml:"tuning" mapstructure:"tuning"`
 }
 
-// Config system configuration
+// Config specifies defaults for all configuration parameters
 var Config = ProfileConfig{
 	Name: "Default Config",
 	Node: NodeConfig{
@@ -131,20 +156,16 @@ var Config = ProfileConfig{
 	Client: ClientConfig{
 		BaseGas:    *utils.NewIntFromUint64(15000),
 		GasPerByte: *utils.NewIntFromUint64(20),
-		GasPrice:   *utils.NewIntFromUint64(1000000000),
+		GasPrice:   *utils.NewIntFromUint64(1e9),
 		TTL:        500,
 		Fee:        *utils.RequireIntFromString("200000000000000"),
 		Names: AensConfig{
-			NameTTL:     500, // absolute block height when the name will expire
-			ClientTTL:   500, // time in blocks until the name resolver should check again in case the name was updated
-			PreClaimFee: *utils.RequireIntFromString("100000000000000"),
-			ClaimFee:    *utils.RequireIntFromString("100000000000000"),
-			UpdateFee:   *utils.RequireIntFromString("100000000000000"),
+			NameTTL:   500,
+			ClientTTL: 500,
 		},
 		Contracts: ContractConfig{
 			CompilerURL: "http://localhost:3080",
-			Gas:         *utils.NewIntFromUint64(1e9),
-			GasPrice:    *utils.NewIntFromUint64(1e9),
+			GasLimit:    *utils.NewIntFromUint64(1e9),
 			Amount:      *new(big.Int),
 			Deposit:     *new(big.Int),
 			VMVersion:   4,
@@ -162,7 +183,6 @@ var Config = ProfileConfig{
 			LockPeriod:     0,
 			ChannelReserve: 0,
 		},
-		Offline: false, // UNUSED
 	},
 	Tuning: TuningConfig{
 		ChainPollInterval: 100,
