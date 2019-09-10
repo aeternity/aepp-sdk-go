@@ -4,13 +4,18 @@ import (
 	"fmt"
 )
 
-// HashPrefix a prefix for an aeternity object hash
+// HashPrefix describes a prefix that is attached to every base-encoded
+// bytearray used in aeternity to describe its function.
+//
+// For example, the "ak_" HashPrefix describes an account address and "ct_"
+// HashPrefix describes a contract address.
 type HashPrefix string
 
-// ObjectEncoding the encoding of an object
+// ObjectEncoding is an enum string that describes whether a bytearray is base58
+// or base64 encoded
 type ObjectEncoding string
 
-// Encoding strategies
+// Base58/Base64 encoding definitions
 const (
 	Base58c = ObjectEncoding("b58c")
 	Base64c = ObjectEncoding("b64c")
@@ -21,7 +26,7 @@ const (
 	// Prefix separator
 	PrefixSeparator = "_"
 
-	// Base58 prefixes
+	// Base58 encoded bytearrays
 	PrefixAccountPubkey         = HashPrefix("ak_")
 	PrefixBlockProofOfFraudHash = HashPrefix("bf_")
 	PrefixBlockStateHash        = HashPrefix("bs_")
@@ -38,7 +43,7 @@ const (
 	PrefixSignature             = HashPrefix("sg_")
 	PrefixTransactionHash       = HashPrefix("th_")
 
-	// Base 64 encoded transactions
+	// Base64 encoded bytearrays
 	PrefixByteArray         = HashPrefix("ba_")
 	PrefixContractByteArray = HashPrefix("cb_")
 	PrefixOracleResponse    = HashPrefix("or_")
@@ -49,7 +54,8 @@ const (
 	PrefixTransaction       = HashPrefix("tx_")
 )
 
-// store the encoding
+// objectEncoding maps a HashPrefix like "ak_" to its base encoding scheme
+// (base58).
 var objectEncoding = map[HashPrefix]ObjectEncoding{
 	PrefixByteArray:             Base64c,
 	PrefixContractByteArray:     Base64c,
@@ -76,7 +82,8 @@ var objectEncoding = map[HashPrefix]ObjectEncoding{
 	PrefixTransactionHash:       Base58c,
 }
 
-// GetHashPrefix get the prefix of an hash, panics if the hash is too short
+// GetHashPrefix returns a HashPrefix of a string. It panics if the hash
+// contains only the prefix (length 3).
 func GetHashPrefix(hash string) (p HashPrefix) {
 	if len(hash) <= 3 {
 		panic(fmt.Sprintln("Invalid hash", hash))
@@ -85,14 +92,14 @@ func GetHashPrefix(hash string) (p HashPrefix) {
 	return
 }
 
-// verion used in the rlp message
+// RLP message version used in RLP serialization
 const (
 	rlpMessageVersion uint = 1
 )
 
-// Tag constant for ids (type uint8)
-// see https://github.com/aeternity/protocol/blob/master/serializations.md#the-id-type
-// <<Tag:1/unsigned-integer-unit:8, Hash:32/binary-unit:8>>
+// Address-like bytearrays are converted in to an ID (uint8 bytearray) for RLP
+// serialization. ID Tags differentiate between them.
+// https://github.com/aeternity/protocol/blob/master/serializations.md#the-id-type
 const (
 	IDTagAccount    uint8 = 1
 	IDTagName       uint8 = 2
@@ -102,8 +109,9 @@ const (
 	IDTagChannel    uint8 = 6
 )
 
-// Object tags
-// see https://github.com/aeternity/protocol/blob/master/serializations.md#binary-serialization
+// Object tags are used to differentiate between different types of bytearrays
+// in RLP serialization. see
+// https://github.com/aeternity/protocol/blob/master/serializations.md#binary-serialization
 const (
 	ObjectTagAccount                             uint = 10
 	ObjectTagSignedTransaction                   uint = 11
@@ -150,7 +158,6 @@ const (
 
 // TransactionTypes is a map between the ObjectTags defined above and the
 // corresponding Tx struct
-// TODO why can't this be a const?
 var TransactionTypes = map[uint]Transaction{
 	ObjectTagSignedTransaction:                   &SignedTx{},
 	ObjectTagSpendTransaction:                    &SpendTx{},

@@ -10,7 +10,7 @@ import (
 	rlp "github.com/randomshinichi/rlpae"
 )
 
-// Transaction describes what every transaction struct should be able to do
+// Transaction is used to indicate a transaction of any type.
 type Transaction interface {
 	rlp.Encoder
 }

@@ -1,10 +1,28 @@
 package aeternity
 
 import (
+	"fmt"
 	"reflect"
 	"strings"
 	"testing"
 )
+
+func ExampleDecode() {
+	b, err := Decode("ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v")
+	if err != nil {
+		return
+	}
+	fmt.Println(b)
+	// Output: [31 19 163 176 139 240 1 64 6 98 166 139 105 216 117 247 128 60 236 76 8 100 127 110 213 216 76 120 151 189 80 163]
+}
+
+func ExampleEncode() {
+	addrB := []byte{31, 19, 163, 176, 139, 240, 1, 64, 6, 98, 166, 139, 105, 216, 117, 247, 128, 60, 236, 76, 8, 100, 127, 110, 213, 216, 76, 120, 151, 189, 80, 163}
+
+	addr := Encode("ak_", addrB)
+	fmt.Println(addr)
+	// Output: ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v
+}
 
 func TestLoad(t *testing.T) {
 	type args struct {

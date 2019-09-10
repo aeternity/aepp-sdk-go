@@ -21,7 +21,12 @@ func hashSha256(data []byte) []byte {
 	return d.Sum(nil)
 }
 
-// Encode a byte array into base58/base64 with chacksum and a prefix
+// Encode a byte array into base58/base64 with checksum and a prefix.
+//
+// in aeternity, bytearrays are always base-encoded with a prefix that indicates
+// what the bytearray is. For example, accounts "ak_...." are a plain bytearray
+// that is base58 encoded and prefixed with "ak_" to indicate that it is an
+// account.
 func Encode(prefix HashPrefix, data []byte) string {
 	checksum := hashSha256(hashSha256(data))
 	in := append(data, checksum[0:4]...)
@@ -37,6 +42,11 @@ func Encode(prefix HashPrefix, data []byte) string {
 }
 
 // Decode a string encoded with base58/base64 + checksum to a byte array
+//
+// in aeternity, bytearrays are always base-encoded with a prefix that indicates
+// what the bytearray is. For example, accounts "ak_...." are a plain bytearray
+// that is base58 encoded and prefixed with "ak_" to indicate that it is an
+// account.
 func Decode(in string) (out []byte, err error) {
 	// prefix and hash
 	var p HashPrefix
@@ -134,8 +144,12 @@ func buildContractID(sender string, senderNonce uint64) (ctID string, err error)
 	return ctID, err
 }
 
-// Namehash calculate the Namehash of a string
-// TODO: link to the
+// Namehash calculate the Namehash of a string. Names within aeternity are
+// generally referred to only by their namehashes.
+//
+// The implementation is the same as ENS EIP-137
+// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-137.md#namehash-algorithm
+// but using Blake2b.
 func Namehash(name string) []byte {
 	buf := make([]byte, 32)
 	for _, s := range strings.Split(name, ".") {
@@ -163,6 +177,10 @@ func uuidV4() (u string) {
 	return fmt.Sprint(uuid.NewV4())
 }
 
+// generateCommitmentID gives a commitment ID 'cm_...' given a particular AENS
+// name. It is split into the deterministic part computeCommitmentID(), which
+// can be tested, and the part incorporating random salt generateCommitmentID()
+//
 // since the salt is a uint256, which Erlang handles well, but Go has nothing
 // similar to it, it is imperative that the salt be kept as a bytearray unless
 // you really have to convert it into an integer. Which you usually don't,
@@ -241,8 +259,10 @@ func readIDTag(v []uint8) (IDTag uint8, encodedHash string, err error) {
 	return
 }
 
-// DecodeRLPMessage transforms a plain stream of bytes into a structure of bytes
-// that represents the object that was serialized
+// DecodeRLPMessage takes an RLP serialized bytearray and parses the RLP to
+// return the deserialized, structured data as bytearrays ([]interfaces that
+// should be later coerced into specific types). Only meant for debugging
+// purposes - to parse serialized RLP into a useful type, see DeseralizeTx.
 func DecodeRLPMessage(rawBytes []byte) []interface{} {
 	res := []interface{}{}
 	rlp.DecodeBytes(rawBytes, &res)
