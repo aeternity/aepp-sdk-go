@@ -8,8 +8,11 @@ import (
 	"strings"
 	"testing"
 
+	"gotest.tools/golden"
+
 	"github.com/aeternity/aepp-sdk-go/aeternity"
 	"github.com/aeternity/aepp-sdk-go/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/utils"
 	rlp "github.com/randomshinichi/rlpae"
 )
 
@@ -217,6 +220,30 @@ func TestAPI(t *testing.T) {
 	respond, err := ctxAlice.OracleRespondTx(sentTxs.oracleID, *oqID, "My day was fine thank you", 0, 100)
 	_, _, _ = signBroadcastWaitForTransaction(t, respond, alice, privateNet)
 
+	// ContractCreateTx
+	fmt.Println("ContractCreateTx")
+	ctCreateBytecode := golden.Get(t, "identity_bytecode.txt")
+	ctCreateInitCalldata := golden.Get(t, "identity_initcalldata.txt")
+	ctCreate, err := ctxAlice.ContractCreateTx(string(ctCreateBytecode), string(ctCreateInitCalldata), aeternity.Config.Client.Contracts.VMVersion, aeternity.Config.Client.Contracts.ABIVersion, aeternity.Config.Client.Contracts.Deposit, aeternity.Config.Client.Contracts.Amount, *utils.NewIntFromUint64(1e5), *utils.NewIntFromUint64(564480000000000))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	sentTxs.contractID, err = ctCreate.ContractID()
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, _, _ = signBroadcastWaitForTransaction(t, ctCreate, alice, privateNet)
+
+	// ContractCallTx
+	fmt.Println("ContractCallTx")
+	ctCallCalldata := golden.Get(t, "identity_main42.txt")
+	ctCall, err := ctxAlice.ContractCallTx(sentTxs.contractID, string(ctCallCalldata), aeternity.Config.Client.Contracts.ABIVersion, aeternity.Config.Client.Contracts.Amount, *utils.NewIntFromUint64(1e5), aeternity.Config.Client.GasPrice, *utils.NewIntFromUint64(665480000000000))
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, _, _ = signBroadcastWaitForTransaction(t, ctCall, alice, privateNet)
+
 	t.Logf("%+v\n", sentTxs)
 	t.Run("GetStatus", func(t *testing.T) {
 		gotStatus, err := privateNet.GetStatus()
@@ -398,22 +425,22 @@ func TestAPI(t *testing.T) {
 				wantTx:  &models.GenericSignedTx{},
 				wantErr: false,
 			},
-			// {
-			// 	name: "ContractCreateTx",
-			// 	args: args{
-			// 		txHash: sentTxs.???.txHash,
-			// 	},
-			// 	wantTx:  &models.GenericSignedTx{},
-			// 	wantErr: false,
-			// },
-			// {
-			// 	name: "ContractCallTx",
-			// 	args: args{
-			// 		txHash: sentTxs.???.txHash,
-			// 	},
-			// 	wantTx:  &models.GenericSignedTx{},
-			// 	wantErr: false,
-			// },
+			{
+				name: "ContractCreateTx",
+				args: args{
+					txHash: sentTxs.ContractCreateTx.txHash,
+				},
+				wantTx:  &models.GenericSignedTx{},
+				wantErr: false,
+			},
+			{
+				name: "ContractCallTx",
+				args: args{
+					txHash: sentTxs.ContractCallTx.txHash,
+				},
+				wantTx:  &models.GenericSignedTx{},
+				wantErr: false,
+			},
 		}
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
@@ -455,12 +482,12 @@ func TestAPI(t *testing.T) {
 			return
 		}
 	})
-	// t.Run("GetContractByID", func(t *testing.T) {
-	// 	_, err := privateNet.GetContractByID(sentTxs.contractID)
-	// 	// t.Logf("%+v\n", gotContractByID)
-	// 	if err != nil {
-	// 		t.Errorf("Client.GetContractByID() error = %v", err)
-	// 		return
-	// 	}
-	// })
+	t.Run("GetContractByID", func(t *testing.T) {
+		_, err := privateNet.GetContractByID(sentTxs.contractID)
+		// t.Logf("%+v\n", gotContractByID)
+		if err != nil {
+			t.Errorf("Client.GetContractByID() error = %v", err)
+			return
+		}
+	})
 }
