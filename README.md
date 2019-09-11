@@ -28,37 +28,22 @@ When using the `Context` methods in `helpers.go`, additional conveniences for AE
 For a painless experience when building transactions, use the `Context` methods.
 ```
 import "github.com/aeternity/aepp-sdk-go/aeternity"
-
 ...
 
-// create a Context for the address you're going to sign the transaction
-// with, and an aeternity node to talk to/query the address's nonce.
-ctx := aeternity.NewContextFromURL(node, alice.Address, false)
+	// create a Context for the address you're going to sign the transaction
+	// with, and an aeternity node to talk to/query the address's nonce.
+	ctx, node := aeternity.NewContextFromURL("http://localhost:3013", alice.Address, false)
 
-// create the SpendTransaction
-tx, err := ctx.SpendTx(alice.Address, bob.Address, *amount, *fee, msg)
-if err != nil {
-    t.Error(err)
-}
+	// create the SpendTransaction
+	tx, err := ctx.SpendTx(alice.Address, bob.Address, *utils.NewIntFromUint64(10000), aeternity.Config.Client.Fee, []byte("Reason"))
+	if err != nil {
+		os.Exit(1)
+	}
 
-// optional: minimize the fee to save money!
-est, _ := tx.FeeEstimate()
-fmt.Println("Estimated vs Actual Fee:", est, tx.Fee)
-tx.Fee = *est
+	// optional: minimize the fee to save money!
+	est, _ := tx.FeeEstimate()
+	fmt.Println("Estimated vs Actual Fee:", est, tx.Fee)
+	tx.Fee = *est
 
-signedTx, hash, signature, err := aeternity.SignHashTx(acc, tx, aeternity.Config.Node.NetworkID)
-if err != nil {
-    t.Fatal(err)
-}
-
-// transform the tx into a tx_base64encodedstring so you can HTTP POST it
-signedTxStr, err := aeternity.SerializeTx(signedTx)
-if err != nil {
-    t.Error(err)
-}
-
-err = aeternity.BroadcastTransaction(node, signedTxStr)
-if err != nil {
-    t.Fatal(err)
-}
+	signedTxStr, hash, signature, blockHeight, blockHash, err := aeternity.SignBroadcastWaitTransaction(tx, alice, node, aeternity.Config.Node.NetworkID, 10)
 ```
