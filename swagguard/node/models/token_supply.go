@@ -11,7 +11,7 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
 
-	utils "github.com/aeternity/aepp-sdk-go/utils"
+	utils "github.com/aeternity/aepp-sdk-go/v5/utils"
 )
 
 // TokenSupply token supply

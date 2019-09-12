@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/aeternity/aepp-sdk-go/aeternity"
+	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
 )
 
 // IsAddress does some minor checks to ensure that the string is an ak_ address

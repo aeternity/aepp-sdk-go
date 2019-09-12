@@ -39,7 +39,7 @@ def add_definitions(data):
       "minimum": 0,
       "x-go-type": {
         "import": {
-          "package": "github.com/aeternity/aepp-sdk-go/utils"
+          "package": "github.com/aeternity/aepp-sdk-go/v5/utils"
         },
         "type": "BigInt"
       }

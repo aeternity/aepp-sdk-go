@@ -13,7 +13,7 @@ import (
 
 	strfmt "github.com/go-openapi/strfmt"
 
-	models "github.com/aeternity/aepp-sdk-go/swagguard/node/models"
+	models "github.com/aeternity/aepp-sdk-go/v5/swagguard/node/models"
 )
 
 // GetMicroBlockHeaderByHashReader is a Reader for the GetMicroBlockHeaderByHash structure.

@@ -27,7 +27,7 @@ When using the `Helper` methods in `helpers.go`, chores like getting the TTL, Ac
 When using the `Context` methods in `helpers.go`, additional conveniences for AENS like Commitment ID calculation, Namehashing, are done for you.
 For a painless experience when building transactions, use the `Context` methods.
 ```
-import "github.com/aeternity/aepp-sdk-go/aeternity"
+import "github.com/aeternity/aepp-sdk-go/v5/aeternity"
 ...
 
 	// create a Context for the address you're going to sign the transaction

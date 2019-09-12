@@ -3,7 +3,7 @@ package aeternity
 import (
 	"math/big"
 
-	"github.com/aeternity/aepp-sdk-go/utils"
+	"github.com/aeternity/aepp-sdk-go/v5/utils"
 )
 
 // Acceptable values for various parameters

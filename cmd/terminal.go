@@ -8,7 +8,7 @@ import (
 
 	"time"
 
-	"github.com/aeternity/aepp-sdk-go/aeternity"
+	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
 )
 
 func times(str string, n int) (out string) {

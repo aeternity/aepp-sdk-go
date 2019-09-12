@@ -16,7 +16,7 @@ import (
 
 	strfmt "github.com/go-openapi/strfmt"
 
-	models "github.com/aeternity/aepp-sdk-go/swagguard/compiler/models"
+	models "github.com/aeternity/aepp-sdk-go/v5/swagguard/compiler/models"
 )
 
 // NewEncodeCalldataParams creates a new EncodeCalldataParams object
