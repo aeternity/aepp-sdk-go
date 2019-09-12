@@ -3,7 +3,7 @@ package cmd
 import (
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/aeternity"
+	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
 )
 
 func Test_printNameEntry(t *testing.T) {

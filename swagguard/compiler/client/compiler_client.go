@@ -11,7 +11,7 @@ import (
 
 	strfmt "github.com/go-openapi/strfmt"
 
-	"github.com/aeternity/aepp-sdk-go/swagguard/compiler/client/operations"
+	"github.com/aeternity/aepp-sdk-go/v5/swagguard/compiler/client/operations"
 )
 
 // Default compiler HTTP client.

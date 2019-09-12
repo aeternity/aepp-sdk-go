@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 
-	utils "github.com/aeternity/aepp-sdk-go/utils"
+	utils "github.com/aeternity/aepp-sdk-go/v5/utils"
 )
 
 // ChannelSnapshotSoloTx channel snapshot solo tx

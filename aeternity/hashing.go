@@ -8,7 +8,7 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/aeternity/aepp-sdk-go/utils"
+	"github.com/aeternity/aepp-sdk-go/v5/utils"
 	"github.com/btcsuite/btcutil/base58"
 	rlp "github.com/randomshinichi/rlpae"
 	uuid "github.com/satori/go.uuid"

@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/aeternity/aepp-sdk-go/aeternity"
+	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
 )
 
 var sender = "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"

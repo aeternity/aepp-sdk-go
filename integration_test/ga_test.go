@@ -5,8 +5,8 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/aeternity"
-	"github.com/aeternity/aepp-sdk-go/utils"
+	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
+	"github.com/aeternity/aepp-sdk-go/v5/utils"
 	rlp "github.com/randomshinichi/rlpae"
 	"gotest.tools/golden"
 )

@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/swagguard/node/client/external"
-	"github.com/aeternity/aepp-sdk-go/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v5/swagguard/node/client/external"
+	"github.com/aeternity/aepp-sdk-go/v5/swagguard/node/models"
 )
 
 func TestErrorModelDereferencing(t *testing.T) {

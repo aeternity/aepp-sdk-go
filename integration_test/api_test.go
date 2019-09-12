@@ -10,9 +10,9 @@ import (
 
 	"gotest.tools/golden"
 
-	"github.com/aeternity/aepp-sdk-go/aeternity"
-	"github.com/aeternity/aepp-sdk-go/swagguard/node/models"
-	"github.com/aeternity/aepp-sdk-go/utils"
+	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
+	"github.com/aeternity/aepp-sdk-go/v5/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v5/utils"
 	rlp "github.com/randomshinichi/rlpae"
 )
 

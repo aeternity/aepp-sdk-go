@@ -3,8 +3,8 @@ package aeternity
 import (
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/swagguard/node/models"
-	"github.com/aeternity/aepp-sdk-go/utils"
+	"github.com/aeternity/aepp-sdk-go/v5/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v5/utils"
 )
 
 type mockClient struct {

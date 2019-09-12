@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/aeternity"
+	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
 )
 
 func Test_compileFunc(t *testing.T) {
