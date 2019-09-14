@@ -119,7 +119,7 @@ func NewDecodeDataForbidden() *DecodeDataForbidden {
 Invalid data
 */
 type DecodeDataForbidden struct {
-	Payload *models.Error
+	Payload models.CompilerErrors
 }
 
 func (o *DecodeDataForbidden) Error() string {
@@ -128,10 +128,8 @@ func (o *DecodeDataForbidden) Error() string {
 
 func (o *DecodeDataForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.Error)
-
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
 		return err
 	}
 
