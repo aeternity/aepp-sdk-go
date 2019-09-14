@@ -1,11 +1,13 @@
 package aeternity
 
 import (
+	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"time"
 
+	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/argon2"
 	"golang.org/x/crypto/nacl/secretbox"
 )
@@ -80,6 +82,19 @@ func KeystoreOpen(data []byte, password string) (account *Account, err error) {
 	return
 }
 
+// randomBytes returns securely generated random bytes. It will return an error
+// if the system's secure random number generator fails to function correctly,
+// in which case the caller should not continue.
+func randomBytes(n int) ([]byte, error) {
+	b := make([]byte, n)
+	_, err := rand.Read(b)
+	// Note that err == nil only if we read len(b) bytes.
+	if err != nil {
+		return nil, err
+	}
+	return b, nil
+}
+
 // KeystoreSeal create an encrypted json keystore with the private key of the account
 func KeystoreSeal(account *Account, password string) (j []byte, e error) {
 	// normalize pwd
@@ -146,4 +161,9 @@ func toISO8601(t time.Time) string {
 		tz = fmt.Sprintf("%03d00", offset/3600)
 	}
 	return fmt.Sprintf("%04d-%02d-%02dT%02d-%02d-%02d.%09d%s", t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), tz)
+}
+
+// generate an uuid v4 string
+func uuidV4() (u string) {
+	return fmt.Sprint(uuid.NewV4())
 }
