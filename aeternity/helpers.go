@@ -1,11 +1,13 @@
 package aeternity
 
 import (
+	"crypto/rand"
 	"fmt"
 	"io/ioutil"
 	"math/big"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	rlp "github.com/randomshinichi/rlpae"
@@ -443,4 +445,51 @@ func SignBroadcastWaitTransaction(tx rlp.Encoder, signingAccount *Account, n *No
 	}
 	blockHeight, blockHash, err = WaitForTransactionForXBlocks(n, hash, x)
 	return
+}
+
+// generateCommitmentID gives a commitment ID 'cm_...' given a particular AENS
+// name. It is split into the deterministic part computeCommitmentID(), which
+// can be tested, and the part incorporating random salt generateCommitmentID()
+//
+// since the salt is a uint256, which Erlang handles well, but Go has nothing
+// similar to it, it is imperative that the salt be kept as a bytearray unless
+// you really have to convert it into an integer. Which you usually don't,
+// because it's a salt.
+func generateCommitmentID(name string) (ch string, salt *big.Int, err error) {
+	// Generate 32 random bytes for a salt
+	saltBytes := make([]byte, 32)
+	_, err = rand.Read(saltBytes)
+	// Note that err == nil only if we read len(b) bytes.
+	if err != nil {
+		return
+	}
+
+	ch, err = computeCommitmentID(name, saltBytes)
+
+	salt = new(big.Int)
+	salt.SetBytes(saltBytes)
+
+	return ch, salt, err
+}
+
+func computeCommitmentID(name string, salt []byte) (ch string, err error) {
+	nh := append(Namehash(name), salt...)
+	nh, _ = Blake2bHash(nh)
+	ch = Encode(PrefixCommitment, nh)
+	return
+}
+
+// Namehash calculate the Namehash of a string. Names within aeternity are
+// generally referred to only by their namehashes.
+//
+// The implementation is the same as ENS EIP-137
+// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-137.md#namehash-algorithm
+// but using Blake2b.
+func Namehash(name string) []byte {
+	buf := make([]byte, 32)
+	for _, s := range strings.Split(name, ".") {
+		sh, _ := Blake2bHash([]byte(s))
+		buf, _ = Blake2bHash(append(buf, sh...))
+	}
+	return buf
 }

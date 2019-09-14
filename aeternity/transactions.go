@@ -10,6 +10,58 @@ import (
 	rlp "github.com/randomshinichi/rlpae"
 )
 
+func leftPadByteSlice(length int, data []byte) []byte {
+	dataLen := len(data)
+	t := make([]byte, length-dataLen)
+	paddedSlice := append(t, data...)
+	return paddedSlice
+}
+
+func buildOracleQueryID(sender string, senderNonce uint64, recipient string) (id string, err error) {
+	queryIDBin := []byte{}
+	senderBin, err := Decode(sender)
+	if err != nil {
+		return
+	}
+	queryIDBin = append(queryIDBin, senderBin...)
+
+	senderNonceBytes := utils.NewIntFromUint64(senderNonce).Bytes()
+	senderNonceBytesPadded := leftPadByteSlice(32, senderNonceBytes)
+	queryIDBin = append(queryIDBin, senderNonceBytesPadded...)
+
+	recipientBin, err := Decode(recipient)
+	if err != nil {
+		return
+	}
+	queryIDBin = append(queryIDBin, recipientBin...)
+
+	hashedQueryID, err := Blake2bHash(queryIDBin)
+	if err != nil {
+		return
+	}
+	id = Encode(PrefixOracleQueryID, hashedQueryID)
+	return
+}
+
+func buildContractID(sender string, senderNonce uint64) (ctID string, err error) {
+	senderBin, err := Decode(sender)
+	if err != nil {
+		return ctID, err
+	}
+
+	l := big.Int{}
+	l.SetUint64(senderNonce)
+
+	ctIDUnhashed := append(senderBin, l.Bytes()...)
+	ctIDHashed, err := Blake2bHash(ctIDUnhashed)
+	if err != nil {
+		return ctID, err
+	}
+
+	ctID = Encode(PrefixContractPubkey, ctIDHashed)
+	return ctID, err
+}
+
 // Transaction is used to indicate a transaction of any type.
 type Transaction interface {
 	rlp.Encoder
@@ -293,4 +345,57 @@ func NewSignedTx(Signatures [][]byte, tx rlp.Encoder) (s *SignedTx) {
 		Signatures: Signatures,
 		Tx:         tx,
 	}
+}
+
+func buildRLPMessage(tag uint, version uint, fields ...interface{}) (rlpRawMsg []byte, err error) {
+	// create a message of the transaction and signature
+	data := []interface{}{tag, version}
+	data = append(data, fields...)
+	// fmt.Printf("TX %+v\n\n", data)
+	// encode the message using rlp
+	rlpRawMsg, err = rlp.EncodeToBytes(data)
+	// fmt.Printf("ENCODED %+v\n\n", data)
+	return
+}
+
+// buildIDTag assemble an id() object see
+// https://github.com/aeternity/protocol/blob/master/serializations.md#the-id-type
+func buildIDTag(IDTag uint8, encodedHash string) (v []uint8, err error) {
+	raw, err := Decode(encodedHash)
+	v = []uint8{IDTag}
+	for _, x := range raw {
+		v = append(v, uint8(x))
+	}
+	return
+}
+
+// readIDTag disassemble an id() object see
+// https://github.com/aeternity/protocol/blob/master/serializations.md#the-id-type
+func readIDTag(v []uint8) (IDTag uint8, encodedHash string, err error) {
+	IDTag = v[0]
+	hash := []byte{}
+	for _, x := range v[1:] {
+		hash = append(hash, byte(x))
+	}
+
+	var prefix HashPrefix
+	switch IDTag {
+	case IDTagAccount:
+		prefix = PrefixAccountPubkey
+	case IDTagName:
+		prefix = PrefixName
+	case IDTagCommitment:
+		prefix = PrefixCommitment
+	case IDTagOracle:
+		prefix = PrefixOraclePubkey
+	case IDTagContract:
+		prefix = PrefixContractPubkey
+	case IDTagChannel:
+		prefix = PrefixChannel
+	default:
+		return 0, "", fmt.Errorf("readIDTag() does not recognize this IDTag (first byte in input array): %v", IDTag)
+	}
+
+	encodedHash = Encode(prefix, hash)
+	return
 }
