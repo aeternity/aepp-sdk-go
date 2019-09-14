@@ -95,6 +95,34 @@
             },
             "type": "object"
         },
+        "CompilerError": {
+            "properties": {
+                "context": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "pos": {
+                    "$ref": "#/definitions/ErrorPos"
+                },
+                "type": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "message",
+                "pos",
+                "type"
+            ],
+            "type": "object"
+        },
+        "CompilerErrors": {
+            "items": {
+                "$ref": "#/definitions/CompilerError"
+            },
+            "type": "array"
+        },
         "CompilerVersion": {
             "example": {
                 "version": "version"
@@ -239,6 +267,24 @@
             ],
             "type": "object"
         },
+        "ErrorPos": {
+            "properties": {
+                "col": {
+                    "type": "integer"
+                },
+                "file": {
+                    "type": "string"
+                },
+                "line": {
+                    "type": "integer"
+                }
+            },
+            "required": [
+                "col",
+                "line"
+            ],
+            "type": "object"
+        },
         "FunctionCallInput": {
             "example": {
                 "arguments": [
@@ -364,7 +410,7 @@
         "description": "This is the [Aeternity](https://www.aeternity.com/) compiler API.",
         "termsOfService": "https://www.aeternity.com/terms/",
         "title": "Aeternity node",
-        "version": "4.0.0-rc1"
+        "version": "4.0.0-rc4"
     },
     "paths": {
         "/aci": {
@@ -402,9 +448,9 @@
                         }
                     },
                     "403": {
-                        "description": "Invalid input",
+                        "description": "Compiler errors",
                         "schema": {
-                            "$ref": "#/definitions/Error"
+                            "$ref": "#/definitions/CompilerErrors"
                         }
                     }
                 }
@@ -495,7 +541,7 @@
                     "403": {
                         "description": "Invalid contract",
                         "schema": {
-                            "$ref": "#/definitions/Error"
+                            "$ref": "#/definitions/CompilerErrors"
                         }
                     }
                 }
@@ -538,7 +584,7 @@
                     "403": {
                         "description": "Invalid data",
                         "schema": {
-                            "$ref": "#/definitions/Error"
+                            "$ref": "#/definitions/CompilerErrors"
                         }
                     }
                 }
@@ -624,7 +670,7 @@
                     "403": {
                         "description": "Invalid data",
                         "schema": {
-                            "$ref": "#/definitions/Error"
+                            "$ref": "#/definitions/CompilerErrors"
                         }
                     }
                 }
@@ -667,7 +713,7 @@
                     "403": {
                         "description": "Invalid data",
                         "schema": {
-                            "$ref": "#/definitions/Error"
+                            "$ref": "#/definitions/CompilerErrors"
                         }
                     }
                 }
@@ -710,7 +756,7 @@
                     "403": {
                         "description": "Invalid contract",
                         "schema": {
-                            "$ref": "#/definitions/Error"
+                            "$ref": "#/definitions/CompilerErrors"
                         }
                     }
                 }
