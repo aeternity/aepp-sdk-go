@@ -6,6 +6,8 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"fmt"
+
 	strfmt "github.com/go-openapi/strfmt"
 
 	"github.com/go-openapi/errors"
@@ -81,4 +83,8 @@ func (m *ErrorPos) UnmarshalBinary(b []byte) error {
 	}
 	*m = res
 	return nil
+}
+
+func (m *ErrorPos) String() string {
+	return fmt.Sprintf("%s:line %v, col %v", m.File, *m.Line, *m.Col)
 }
