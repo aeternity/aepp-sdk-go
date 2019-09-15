@@ -32,8 +32,8 @@ func TestSignedTx(t *testing.T) {
 				Tx: &SpendTx{
 					SenderID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
 					RecipientID: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
-					Amount:      *utils.NewIntFromUint64(10),
-					Fee:         *utils.NewIntFromUint64(10),
+					Amount:      utils.NewIntFromUint64(10),
+					Fee:         utils.NewIntFromUint64(10),
 					Payload:     []byte("Hello World"),
 					TTL:         uint64(10),
 					Nonce:       uint64(1),

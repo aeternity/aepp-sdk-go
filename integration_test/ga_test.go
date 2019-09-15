@@ -106,8 +106,8 @@ func TestGeneralizedAccounts(t *testing.T) {
 	// authData is authorize(3)
 	authData := "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACBGtXufEG2HuMYcRcNwsGAeqymslunKf692bHnvwI5K6wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAU3aKBNm"
 	gas := utils.NewIntFromUint64(10000) // the node will fail the authentication if there isn't enough gas
-	spendTx := aeternity.NewSpendTx(testAccount.Address, bob.Address, *big.NewInt(5000), aeternity.Config.Client.Fee, []byte{}, ttl, 0)
-	gaMetaTx := aeternity.NewGAMetaTx(testAccount.Address, authData, aeternity.Config.Client.Contracts.ABIVersion, *gas, aeternity.Config.Client.GasPrice, aeternity.Config.Client.Fee, ttl, spendTx)
+	spendTx := aeternity.NewSpendTx(testAccount.Address, bob.Address, big.NewInt(5000), aeternity.Config.Client.Fee, []byte{}, ttl, 0)
+	gaMetaTx := aeternity.NewGAMetaTx(testAccount.Address, authData, aeternity.Config.Client.Contracts.ABIVersion, gas, aeternity.Config.Client.GasPrice, aeternity.Config.Client.Fee, ttl, spendTx)
 
 	gaMetaTxFinal, hash, _, err := aeternity.SignHashTx(testAccount, gaMetaTx, aeternity.Config.Node.NetworkID)
 	if err != nil {

@@ -118,7 +118,7 @@ func TestAPI(t *testing.T) {
 	ctxBob := aeternity.NewContextFromNode(privateNet, bob.Address)
 	// SpendTx
 	fmt.Println("SpendTx")
-	spendTx, err := ctxAlice.SpendTx(sender, bob.Address, *big.NewInt(1000), aeternity.Config.Client.Fee, []byte(""))
+	spendTx, err := ctxAlice.SpendTx(sender, bob.Address, big.NewInt(1000), aeternity.Config.Client.Fee, []byte(""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -134,7 +134,7 @@ func TestAPI(t *testing.T) {
 
 	// NameClaimTx
 	fmt.Println("NameClaimTx")
-	claimTx, err := ctxAlice.NameClaimTx(name, *salt, aeternity.Config.Client.Fee)
+	claimTx, err := ctxAlice.NameClaimTx(name, salt, aeternity.Config.Client.Fee)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -175,7 +175,7 @@ func TestAPI(t *testing.T) {
 
 	// NameClaimTx
 	fmt.Println("NameClaimTx 2nd name for other tests")
-	claimTx, err = ctxAlice.NameClaimTx(sentTxs.name, *salt, aeternity.Config.Client.Fee)
+	claimTx, err = ctxAlice.NameClaimTx(sentTxs.name, salt, aeternity.Config.Client.Fee)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -183,7 +183,7 @@ func TestAPI(t *testing.T) {
 
 	// OracleRegisterTx
 	fmt.Println("OracleRegisterTx")
-	register, err := ctxAlice.OracleRegisterTx("hello", "helloback", *big.NewInt(1000), uint64(0), uint64(100), 0)
+	register, err := ctxAlice.OracleRegisterTx("hello", "helloback", big.NewInt(1000), uint64(0), uint64(100), 0)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -200,7 +200,7 @@ func TestAPI(t *testing.T) {
 
 	// OracleQueryTx
 	fmt.Println("OracleQueryTx")
-	query, err := ctxAlice.OracleQueryTx(sentTxs.oracleID, "How was your day?", *big.NewInt(1000), 0, 100, 0, 100)
+	query, err := ctxAlice.OracleQueryTx(sentTxs.oracleID, "How was your day?", big.NewInt(1000), 0, 100, 0, 100)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -224,7 +224,7 @@ func TestAPI(t *testing.T) {
 	fmt.Println("ContractCreateTx")
 	ctCreateBytecode := golden.Get(t, "identity_bytecode.txt")
 	ctCreateInitCalldata := golden.Get(t, "identity_initcalldata.txt")
-	ctCreate, err := ctxAlice.ContractCreateTx(string(ctCreateBytecode), string(ctCreateInitCalldata), aeternity.Config.Client.Contracts.VMVersion, aeternity.Config.Client.Contracts.ABIVersion, aeternity.Config.Client.Contracts.Deposit, aeternity.Config.Client.Contracts.Amount, *utils.NewIntFromUint64(1e5), *utils.NewIntFromUint64(564480000000000))
+	ctCreate, err := ctxAlice.ContractCreateTx(string(ctCreateBytecode), string(ctCreateInitCalldata), aeternity.Config.Client.Contracts.VMVersion, aeternity.Config.Client.Contracts.ABIVersion, aeternity.Config.Client.Contracts.Deposit, aeternity.Config.Client.Contracts.Amount, utils.NewIntFromUint64(1e5), utils.NewIntFromUint64(564480000000000))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -238,7 +238,7 @@ func TestAPI(t *testing.T) {
 	// ContractCallTx
 	fmt.Println("ContractCallTx")
 	ctCallCalldata := golden.Get(t, "identity_main42.txt")
-	ctCall, err := ctxAlice.ContractCallTx(sentTxs.contractID, string(ctCallCalldata), aeternity.Config.Client.Contracts.ABIVersion, aeternity.Config.Client.Contracts.Amount, *utils.NewIntFromUint64(1e5), aeternity.Config.Client.GasPrice, *utils.NewIntFromUint64(665480000000000))
+	ctCall, err := ctxAlice.ContractCallTx(sentTxs.contractID, string(ctCallCalldata), aeternity.Config.Client.Contracts.ABIVersion, aeternity.Config.Client.Contracts.Amount, utils.NewIntFromUint64(1e5), aeternity.Config.Client.GasPrice, utils.NewIntFromUint64(665480000000000))
 	if err != nil {
 		t.Fatal(err)
 	}

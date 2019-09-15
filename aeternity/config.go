@@ -68,11 +68,11 @@ type ContractConfig struct {
 	// * the base gas;
 	// * other gas components, such as gas proportional to the byte size of the
 	//   transaction or relative TTL, gas needed for contract execution.
-	GasLimit big.Int `json:"gas" yaml:"gas" mapstructure:"gas"`
+	GasLimit *big.Int `json:"gas" yaml:"gas" mapstructure:"gas"`
 	// Amount is an optional amount to transfer to the contract account.
-	Amount big.Int `json:"amount" yaml:"amount" mapstructure:"amount"`
+	Amount *big.Int `json:"amount" yaml:"amount" mapstructure:"amount"`
 	// Deposit will be "held by the contract" until it is deactivated.
-	Deposit big.Int `json:"deposit" yaml:"deposit" mapstructure:"deposit"`
+	Deposit *big.Int `json:"deposit" yaml:"deposit" mapstructure:"deposit"`
 	// VMVersion indicates which virtual machine should be used for bytecode execution.
 	VMVersion uint16 `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
 	// ABIVersion indicates the binary interface/calling convention used by the contract.
@@ -84,7 +84,7 @@ type OracleConfig struct {
 	// QueryFee is locked up until the oracle answers (and gets the fee) or the
 	// transaction TTL expires (and the sender is refunded). In other words, it
 	// is a bounty.
-	QueryFee big.Int `json:"query_fee" yaml:"query_fee" mapstructure:"query_fee"`
+	QueryFee *big.Int `json:"query_fee" yaml:"query_fee" mapstructure:"query_fee"`
 	// QueryTTLType indicates whether the TTLValue should be interpreted as an absolute or delta blockheight.
 	QueryTTLType uint64 `json:"query_ttl_type" yaml:"query_ttl_type" mapstructure:"query_ttl_type"`
 	// QueryTTLValue indicates how long the query is open for response from the oracle.
@@ -105,16 +105,16 @@ type StateChannelConfig struct {
 // ClientConfig client parameters configuration
 type ClientConfig struct {
 	// BaseGas is one component of transaction fee calculation.
-	BaseGas big.Int `json:"base_gas" yaml:"base_gas" mapstructure:"base_gas"`
+	BaseGas *big.Int `json:"base_gas" yaml:"base_gas" mapstructure:"base_gas"`
 	// GasPerByte is multiplied by the RLP serialized transaction's length.
-	GasPerByte big.Int `json:"gas_per_byte" yaml:"gas_per_byte" mapstructure:"gas_per_byte"`
+	GasPerByte *big.Int `json:"gas_per_byte" yaml:"gas_per_byte" mapstructure:"gas_per_byte"`
 	// GasPrice is the conversion factor from gas to AE.
-	GasPrice big.Int `json:"gas_price" yaml:"gas_price" mapstructure:"gas_price"`
+	GasPrice *big.Int `json:"gas_price" yaml:"gas_price" mapstructure:"gas_price"`
 	// TTL is the default blockheight offset that will be added to the current
 	// height to determine a transaction's TTL.
 	TTL uint64 `json:"ttl" yaml:"ttl" mapstructure:"ttl"`
 	// Fee is a default transaction fee that should be big enough for most transaction types.
-	Fee           big.Int            `json:"fee" yaml:"fee" mapstructure:"fee"`
+	Fee           *big.Int           `json:"fee" yaml:"fee" mapstructure:"fee"`
 	Names         AensConfig         `json:"names" yaml:"names" mapstructure:"names"`
 	Contracts     ContractConfig     `json:"contracts" yaml:"contracts" mapstructure:"contracts"`
 	Oracles       OracleConfig       `json:"oracles" yaml:"oracles" mapstructure:"oracles"`
@@ -154,25 +154,25 @@ var Config = ProfileConfig{
 		Backend: CompilerBackendAEVM,
 	},
 	Client: ClientConfig{
-		BaseGas:    *utils.NewIntFromUint64(15000),
-		GasPerByte: *utils.NewIntFromUint64(20),
-		GasPrice:   *utils.NewIntFromUint64(1e9),
+		BaseGas:    utils.NewIntFromUint64(15000),
+		GasPerByte: utils.NewIntFromUint64(20),
+		GasPrice:   utils.NewIntFromUint64(1e9),
 		TTL:        500,
-		Fee:        *utils.RequireIntFromString("200000000000000"),
+		Fee:        utils.RequireIntFromString("200000000000000"),
 		Names: AensConfig{
 			NameTTL:   500,
 			ClientTTL: 500,
 		},
 		Contracts: ContractConfig{
 			CompilerURL: "http://localhost:3080",
-			GasLimit:    *utils.NewIntFromUint64(1e9),
-			Amount:      *new(big.Int),
-			Deposit:     *new(big.Int),
+			GasLimit:    utils.NewIntFromUint64(1e9),
+			Amount:      new(big.Int),
+			Deposit:     new(big.Int),
 			VMVersion:   4,
 			ABIVersion:  1,
 		},
 		Oracles: OracleConfig{
-			QueryFee:         *utils.NewIntFromUint64(0),
+			QueryFee:         utils.NewIntFromUint64(0),
 			QueryTTLType:     OracleTTLTypeDelta,
 			QueryTTLValue:    300,
 			ResponseTTLType:  OracleTTLTypeDelta,

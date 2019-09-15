@@ -13,7 +13,7 @@ import (
 type NamePreclaimTx struct {
 	AccountID    string
 	CommitmentID string
-	Fee          big.Int
+	Fee          *big.Int
 	TTL          uint64
 	AccountNonce uint64
 }
@@ -53,7 +53,7 @@ type namePreclaimRLP struct {
 	AccountID         []uint8
 	AccountNonce      uint64
 	CommitmentID      []uint8
-	Fee               big.Int
+	Fee               *big.Int
 	TTL               uint64
 }
 
@@ -93,7 +93,7 @@ func (tx *NamePreclaimTx) JSON() (string, error) {
 	swaggerT := models.NamePreclaimTx{
 		AccountID:    &tx.AccountID,
 		CommitmentID: &tx.CommitmentID,
-		Fee:          utils.BigInt(tx.Fee),
+		Fee:          utils.BigInt(*tx.Fee),
 		Nonce:        tx.AccountNonce,
 		TTL:          tx.TTL,
 	}
@@ -103,7 +103,7 @@ func (tx *NamePreclaimTx) JSON() (string, error) {
 
 // sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
 func (tx *NamePreclaimTx) sizeEstimate() (int, error) {
-	return calcSizeEstimate(tx, &tx.Fee)
+	return calcSizeEstimate(tx, tx.Fee)
 }
 
 // FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
@@ -117,7 +117,7 @@ func (tx *NamePreclaimTx) FeeEstimate() (*big.Int, error) {
 }
 
 // NewNamePreclaimTx is a constructor for a NamePreclaimTx struct
-func NewNamePreclaimTx(accountID, commitmentID string, fee big.Int, ttl, accountNonce uint64) *NamePreclaimTx {
+func NewNamePreclaimTx(accountID, commitmentID string, fee *big.Int, ttl, accountNonce uint64) *NamePreclaimTx {
 	return &NamePreclaimTx{accountID, commitmentID, fee, ttl, accountNonce}
 }
 
@@ -127,8 +127,8 @@ func NewNamePreclaimTx(accountID, commitmentID string, fee big.Int, ttl, account
 type NameClaimTx struct {
 	AccountID    string
 	Name         string
-	NameSalt     big.Int
-	Fee          big.Int
+	NameSalt     *big.Int
+	Fee          *big.Int
 	TTL          uint64
 	AccountNonce uint64
 }
@@ -168,8 +168,8 @@ type nameClaimRLP struct {
 	AccountID         []uint8
 	AccountNonce      uint64
 	Name              string
-	NameSalt          big.Int
-	Fee               big.Int
+	NameSalt          *big.Int
+	Fee               *big.Int
 	TTL               uint64
 }
 
@@ -210,9 +210,9 @@ func (tx *NameClaimTx) JSON() (string, error) {
 	nameAPIEncoded := Encode(PrefixName, []byte(tx.Name))
 	swaggerT := models.NameClaimTx{
 		AccountID: &tx.AccountID,
-		Fee:       utils.BigInt(tx.Fee),
+		Fee:       utils.BigInt(*tx.Fee),
 		Name:      &nameAPIEncoded,
-		NameSalt:  utils.BigInt(tx.NameSalt),
+		NameSalt:  utils.BigInt(*tx.NameSalt),
 		Nonce:     tx.AccountNonce,
 		TTL:       tx.TTL,
 	}
@@ -223,7 +223,7 @@ func (tx *NameClaimTx) JSON() (string, error) {
 
 // sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
 func (tx *NameClaimTx) sizeEstimate() (int, error) {
-	return calcSizeEstimate(tx, &tx.Fee)
+	return calcSizeEstimate(tx, tx.Fee)
 }
 
 // FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
@@ -237,7 +237,7 @@ func (tx *NameClaimTx) FeeEstimate() (*big.Int, error) {
 }
 
 // NewNameClaimTx is a constructor for a NameClaimTx struct
-func NewNameClaimTx(accountID, name string, nameSalt big.Int, fee big.Int, ttl, accountNonce uint64) *NameClaimTx {
+func NewNameClaimTx(accountID, name string, nameSalt, fee *big.Int, ttl, accountNonce uint64) *NameClaimTx {
 	return &NameClaimTx{accountID, name, nameSalt, fee, ttl, accountNonce}
 }
 
@@ -311,7 +311,7 @@ type NameUpdateTx struct {
 	Pointers     []*NamePointer
 	NameTTL      uint64
 	ClientTTL    uint64
-	Fee          big.Int
+	Fee          *big.Int
 	TTL          uint64
 	AccountNonce uint64
 }
@@ -376,7 +376,7 @@ type nameUpdateRLP struct {
 	NameTTL           uint64
 	Pointers          []*NamePointer
 	ClientTTL         uint64
-	Fee               big.Int
+	Fee               *big.Int
 	TTL               uint64
 }
 
@@ -426,7 +426,7 @@ func (tx *NameUpdateTx) JSON() (string, error) {
 	swaggerT := models.NameUpdateTx{
 		AccountID: &tx.AccountID,
 		ClientTTL: &tx.ClientTTL,
-		Fee:       utils.BigInt(tx.Fee),
+		Fee:       utils.BigInt(*tx.Fee),
 		NameID:    &tx.NameID,
 		NameTTL:   &tx.NameTTL,
 		Nonce:     tx.AccountNonce,
@@ -440,7 +440,7 @@ func (tx *NameUpdateTx) JSON() (string, error) {
 
 // sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
 func (tx *NameUpdateTx) sizeEstimate() (int, error) {
-	return calcSizeEstimate(tx, &tx.Fee)
+	return calcSizeEstimate(tx, tx.Fee)
 }
 
 // FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
@@ -454,7 +454,7 @@ func (tx *NameUpdateTx) FeeEstimate() (*big.Int, error) {
 }
 
 // NewNameUpdateTx is a constructor for a NameUpdateTx struct
-func NewNameUpdateTx(accountID, nameID string, pointers []string, nameTTL, clientTTL uint64, fee big.Int, ttl, accountNonce uint64) *NameUpdateTx {
+func NewNameUpdateTx(accountID, nameID string, pointers []string, nameTTL, clientTTL uint64, fee *big.Int, ttl, accountNonce uint64) *NameUpdateTx {
 	parsedPointers, err := buildPointers(pointers)
 	if err != nil {
 		panic(err)
@@ -466,7 +466,7 @@ func NewNameUpdateTx(accountID, nameID string, pointers []string, nameTTL, clien
 type NameRevokeTx struct {
 	AccountID    string
 	NameID       string
-	Fee          big.Int
+	Fee          *big.Int
 	TTL          uint64
 	AccountNonce uint64
 }
@@ -509,7 +509,7 @@ type nameRevokeRLP struct {
 	AccountID         []uint8
 	AccountNonce      uint64
 	Name              []uint8
-	Fee               big.Int
+	Fee               *big.Int
 	TTL               uint64
 }
 
@@ -550,7 +550,7 @@ func (tx *NameRevokeTx) DecodeRLP(s *rlp.Stream) (err error) {
 func (tx *NameRevokeTx) JSON() (string, error) {
 	swaggerT := models.NameRevokeTx{
 		AccountID: &tx.AccountID,
-		Fee:       utils.BigInt(tx.Fee),
+		Fee:       utils.BigInt(*tx.Fee),
 		NameID:    &tx.NameID,
 		Nonce:     tx.AccountNonce,
 		TTL:       tx.TTL,
@@ -562,7 +562,7 @@ func (tx *NameRevokeTx) JSON() (string, error) {
 
 // sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
 func (tx *NameRevokeTx) sizeEstimate() (int, error) {
-	return calcSizeEstimate(tx, &tx.Fee)
+	return calcSizeEstimate(tx, tx.Fee)
 }
 
 // FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
@@ -576,7 +576,7 @@ func (tx *NameRevokeTx) FeeEstimate() (*big.Int, error) {
 }
 
 // NewNameRevokeTx is a constructor for a NameRevokeTx struct
-func NewNameRevokeTx(accountID, name string, fee big.Int, ttl, accountNonce uint64) *NameRevokeTx {
+func NewNameRevokeTx(accountID, name string, fee *big.Int, ttl, accountNonce uint64) *NameRevokeTx {
 	return &NameRevokeTx{accountID, name, fee, ttl, accountNonce}
 }
 
@@ -585,7 +585,7 @@ type NameTransferTx struct {
 	AccountID    string
 	NameID       string
 	RecipientID  string
-	Fee          big.Int
+	Fee          *big.Int
 	TTL          uint64
 	AccountNonce uint64
 }
@@ -639,7 +639,7 @@ type nameTransferRLP struct {
 	AccountNonce      uint64
 	Name              []uint8
 	RecipientID       []uint8
-	Fee               big.Int
+	Fee               *big.Int
 	TTL               uint64
 }
 
@@ -684,7 +684,7 @@ func (tx *NameTransferTx) DecodeRLP(s *rlp.Stream) (err error) {
 func (tx *NameTransferTx) JSON() (string, error) {
 	swaggerT := models.NameTransferTx{
 		AccountID:   &tx.AccountID,
-		Fee:         utils.BigInt(tx.Fee),
+		Fee:         utils.BigInt(*tx.Fee),
 		NameID:      &tx.NameID,
 		Nonce:       tx.AccountNonce,
 		RecipientID: &tx.RecipientID,
@@ -697,7 +697,7 @@ func (tx *NameTransferTx) JSON() (string, error) {
 
 // sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
 func (tx *NameTransferTx) sizeEstimate() (int, error) {
-	return calcSizeEstimate(tx, &tx.Fee)
+	return calcSizeEstimate(tx, tx.Fee)
 }
 
 // FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
@@ -711,6 +711,6 @@ func (tx *NameTransferTx) FeeEstimate() (*big.Int, error) {
 }
 
 // NewNameTransferTx is a constructor for a NameTransferTx struct
-func NewNameTransferTx(AccountID, NameID, RecipientID string, Fee big.Int, TTL, AccountNonce uint64) *NameTransferTx {
+func NewNameTransferTx(AccountID, NameID, RecipientID string, Fee *big.Int, TTL, AccountNonce uint64) *NameTransferTx {
 	return &NameTransferTx{AccountID, NameID, RecipientID, Fee, TTL, AccountNonce}
 }

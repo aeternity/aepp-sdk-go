@@ -34,7 +34,7 @@ func TestSpendTx(t *testing.T) {
 	ctx := aeternity.NewContextFromNode(node, alice.Address)
 
 	// create the SpendTransaction
-	tx, err := ctx.SpendTx(alice.Address, bob.Address, *amount, *fee, []byte(msg))
+	tx, err := ctx.SpendTx(alice.Address, bob.Address, amount, fee, []byte(msg))
 	if err != nil {
 		t.Error(err)
 	}
@@ -42,7 +42,7 @@ func TestSpendTx(t *testing.T) {
 	// minimize the fee to save money!
 	est, _ := tx.FeeEstimate()
 	fmt.Println("Estimated vs Actual Fee:", est, tx.Fee)
-	tx.Fee = *est
+	tx.Fee = est
 
 	// sign the transaction, output params for debugging
 	_, hash, _, err := aeternity.SignBroadcastTransaction(tx, alice, node, networkID)

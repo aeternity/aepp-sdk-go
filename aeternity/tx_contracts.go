@@ -19,7 +19,8 @@ func encodeVMABI(VMVersion, ABIVersion uint16) []byte {
 }
 
 func decodeVMABI(vmabi []byte) (VMVersion, ABIVersion uint16) {
-	var v, a big.Int
+	v := new(big.Int)
+	a := new(big.Int)
 	var vmPortion, abiPortion []byte
 	l := len(vmabi)
 	if (l % 2) == 0 {
@@ -41,11 +42,11 @@ type ContractCreateTx struct {
 	Code         string
 	VMVersion    uint16
 	AbiVersion   uint16
-	Deposit      big.Int
-	Amount       big.Int
-	GasLimit     big.Int
-	GasPrice     big.Int
-	Fee          big.Int
+	Deposit      *big.Int
+	Amount       *big.Int
+	GasLimit     *big.Int
+	GasPrice     *big.Int
+	Fee          *big.Int
 	TTL          uint64
 	CallData     string
 }
@@ -98,12 +99,12 @@ type contractCreateRLP struct {
 	AccountNonce      uint64
 	CodeBinary        []byte
 	VMABI             []byte
-	Fee               big.Int
+	Fee               *big.Int
 	TTL               uint64
-	Deposit           big.Int
-	Amount            big.Int
-	GasLimit          big.Int
-	GasPrice          big.Int
+	Deposit           *big.Int
+	Amount            *big.Int
+	GasLimit          *big.Int
+	GasPrice          *big.Int
 	CallDataBinary    []byte
 }
 
@@ -157,11 +158,11 @@ func (tx *ContractCreateTx) JSON() (string, error) {
 		Code:       &tx.Code,
 		VMVersion:  &tx.VMVersion,
 		AbiVersion: &tx.AbiVersion,
-		Deposit:    utils.BigInt(tx.Deposit),
-		Amount:     utils.BigInt(tx.Amount),
+		Deposit:    utils.BigInt(*tx.Deposit),
+		Amount:     utils.BigInt(*tx.Amount),
 		Gas:        &g,
-		GasPrice:   utils.BigInt(tx.GasPrice),
-		Fee:        utils.BigInt(tx.Fee),
+		GasPrice:   utils.BigInt(*tx.GasPrice),
+		Fee:        utils.BigInt(*tx.Fee),
 		TTL:        tx.TTL,
 		CallData:   &tx.CallData,
 	}
@@ -171,7 +172,7 @@ func (tx *ContractCreateTx) JSON() (string, error) {
 
 // sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
 func (tx *ContractCreateTx) sizeEstimate() (int, error) {
-	return calcSizeEstimate(tx, &tx.Fee)
+	return calcSizeEstimate(tx, tx.Fee)
 }
 
 // FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
@@ -180,7 +181,7 @@ func (tx *ContractCreateTx) FeeEstimate() (*big.Int, error) {
 	if err != nil {
 		return new(big.Int), err
 	}
-	estimatedFee := calcFeeContract(&tx.GasLimit, 5, txLenEstimated)
+	estimatedFee := calcFeeContract(tx.GasLimit, 5, txLenEstimated)
 	return estimatedFee, nil
 }
 
@@ -190,7 +191,7 @@ func (tx *ContractCreateTx) ContractID() (string, error) {
 }
 
 // NewContractCreateTx is a constructor for a ContractCreateTx struct
-func NewContractCreateTx(OwnerID string, AccountNonce uint64, Code string, VMVersion, AbiVersion uint16, Deposit, Amount, GasLimit, GasPrice, Fee big.Int, TTL uint64, CallData string) *ContractCreateTx {
+func NewContractCreateTx(OwnerID string, AccountNonce uint64, Code string, VMVersion, AbiVersion uint16, Deposit, Amount, GasLimit, GasPrice, Fee *big.Int, TTL uint64, CallData string) *ContractCreateTx {
 	return &ContractCreateTx{
 		OwnerID:      OwnerID,
 		AccountNonce: AccountNonce,
@@ -212,12 +213,12 @@ type ContractCallTx struct {
 	CallerID     string
 	AccountNonce uint64
 	ContractID   string
-	Amount       big.Int
-	GasLimit     big.Int
-	GasPrice     big.Int
+	Amount       *big.Int
+	GasLimit     *big.Int
+	GasPrice     *big.Int
 	AbiVersion   uint16
 	CallData     string
-	Fee          big.Int
+	Fee          *big.Int
 	TTL          uint64
 }
 
@@ -268,11 +269,11 @@ type contractCallRLP struct {
 	AccountNonce      uint64
 	ContractID        []uint8
 	AbiVersion        uint16
-	Fee               big.Int
+	Fee               *big.Int
 	TTL               uint64
-	Amount            big.Int
-	GasLimit          big.Int
-	GasPrice          big.Int
+	Amount            *big.Int
+	GasLimit          *big.Int
+	GasPrice          *big.Int
 	CallDataBinary    []byte
 }
 
@@ -323,12 +324,12 @@ func (tx *ContractCallTx) JSON() (string, error) {
 		CallerID:   &tx.CallerID,
 		Nonce:      tx.AccountNonce,
 		ContractID: &tx.ContractID,
-		Amount:     utils.BigInt(tx.Amount),
+		Amount:     utils.BigInt(*tx.Amount),
 		Gas:        &gas,
-		GasPrice:   utils.BigInt(tx.GasPrice),
+		GasPrice:   utils.BigInt(*tx.GasPrice),
 		AbiVersion: &tx.AbiVersion,
 		CallData:   &tx.CallData,
-		Fee:        utils.BigInt(tx.Fee),
+		Fee:        utils.BigInt(*tx.Fee),
 		TTL:        tx.TTL,
 	}
 	output, err := swaggerT.MarshalBinary()
@@ -337,7 +338,7 @@ func (tx *ContractCallTx) JSON() (string, error) {
 
 // sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
 func (tx *ContractCallTx) sizeEstimate() (int, error) {
-	return calcSizeEstimate(tx, &tx.Fee)
+	return calcSizeEstimate(tx, tx.Fee)
 }
 
 // FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
@@ -346,12 +347,12 @@ func (tx *ContractCallTx) FeeEstimate() (*big.Int, error) {
 	if err != nil {
 		return new(big.Int), err
 	}
-	estimatedFee := calcFeeContract(&tx.GasLimit, 30, txLenEstimated)
+	estimatedFee := calcFeeContract(tx.GasLimit, 30, txLenEstimated)
 	return estimatedFee, nil
 }
 
 // NewContractCallTx is a constructor for a ContractCallTx struct
-func NewContractCallTx(CallerID string, AccountNonce uint64, ContractID string, Amount, GasLimit, GasPrice big.Int, AbiVersion uint16, CallData string, Fee big.Int, TTL uint64) *ContractCallTx {
+func NewContractCallTx(CallerID string, AccountNonce uint64, ContractID string, Amount, GasLimit, GasPrice *big.Int, AbiVersion uint16, CallData string, Fee *big.Int, TTL uint64) *ContractCallTx {
 	return &ContractCallTx{
 		CallerID:     CallerID,
 		AccountNonce: AccountNonce,

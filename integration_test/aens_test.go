@@ -54,7 +54,7 @@ func TestAENSWorkflow(t *testing.T) {
 	_, _, _ = waitForTransaction(node, hash)
 
 	// Claim the name
-	claimTx, err := aensAlice.NameClaimTx(name, *salt, aeternity.Config.Client.Fee)
+	claimTx, err := aensAlice.NameClaimTx(name, salt, aeternity.Config.Client.Fee)
 	if err != nil {
 		t.Fatal(err)
 	}

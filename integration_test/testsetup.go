@@ -78,7 +78,7 @@ func fundAccount(t *testing.T, node *aeternity.Node, source, destination *aetern
 	ctx := aeternity.NewContextFromNode(node, source.Address)
 
 	fmt.Println("Funding account", destination.Address)
-	tx, err := ctx.SpendTx(source.Address, destination.Address, *amount, aeternity.Config.Client.Fee, []byte{})
+	tx, err := ctx.SpendTx(source.Address, destination.Address, amount, aeternity.Config.Client.Fee, []byte{})
 	if err != nil {
 		t.Fatal(err)
 	}
