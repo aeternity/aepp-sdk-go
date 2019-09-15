@@ -164,9 +164,9 @@ func calcFeeStd(tx rlp.Encoder, txLen int) *big.Int {
 	fee := new(big.Int)
 	txLenGasPerByte := new(big.Int)
 
-	txLenGasPerByte.Mul(utils.NewIntFromUint64(uint64(txLen)), &Config.Client.GasPerByte)
-	fee.Add(&Config.Client.BaseGas, txLenGasPerByte)
-	fee.Mul(fee, &Config.Client.GasPrice)
+	txLenGasPerByte.Mul(utils.NewIntFromUint64(uint64(txLen)), Config.Client.GasPerByte)
+	fee.Add(Config.Client.BaseGas, txLenGasPerByte)
+	fee.Mul(fee, Config.Client.GasPrice)
 	return fee
 }
 
@@ -177,14 +177,14 @@ func calcFeeContract(gas *big.Int, baseGasMultiplier int64, length int) *big.Int
 	txLenBig := new(big.Int)
 	answer := new(big.Int)
 
-	baseGas5.Mul(&Config.Client.BaseGas, big.NewInt(baseGasMultiplier))
+	baseGas5.Mul(Config.Client.BaseGas, big.NewInt(baseGasMultiplier))
 	txLenBig.SetUint64(uint64(length))
 	txLenGasPerByte := new(big.Int)
-	txLenGasPerByte.Mul(txLenBig, &Config.Client.GasPerByte)
+	txLenGasPerByte.Mul(txLenBig, Config.Client.GasPerByte)
 
 	answer.Add(baseGas5, gas)
 	answer.Add(answer, txLenGasPerByte)
-	answer.Mul(answer, &Config.Client.GasPrice)
+	answer.Mul(answer, Config.Client.GasPrice)
 	return answer
 }
 

@@ -18,9 +18,9 @@ type GAAttachTx struct {
 	AuthFunc     []byte
 	VMVersion    uint16
 	AbiVersion   uint16
-	GasLimit     big.Int
-	GasPrice     big.Int
-	Fee          big.Int
+	GasLimit     *big.Int
+	GasPrice     *big.Int
+	Fee          *big.Int
 	TTL          uint64
 	CallData     string
 }
@@ -73,10 +73,10 @@ type gaAttachRLP struct {
 	CodeBinary        []byte
 	AuthFunc          []byte
 	VMABI             []byte
-	Fee               big.Int
+	Fee               *big.Int
 	TTL               uint64
-	GasLimit          big.Int
-	GasPrice          big.Int
+	GasLimit          *big.Int
+	GasPrice          *big.Int
 	CallDataBinary    []byte
 }
 
@@ -120,7 +120,7 @@ func (tx *GAAttachTx) DecodeRLP(s *rlp.Stream) (err error) {
 }
 
 // NewGAAttachTx creates a GAAttachTx
-func NewGAAttachTx(OwnerID string, AccountNonce uint64, Code string, AuthFunc []byte, VMVersion uint16, AbiVersion uint16, GasLimit big.Int, GasPrice big.Int, Fee big.Int, TTL uint64, CallData string) *GAAttachTx {
+func NewGAAttachTx(OwnerID string, AccountNonce uint64, Code string, AuthFunc []byte, VMVersion uint16, AbiVersion uint16, GasLimit *big.Int, GasPrice *big.Int, Fee *big.Int, TTL uint64, CallData string) *GAAttachTx {
 	return &GAAttachTx{
 		OwnerID:      OwnerID,
 		AccountNonce: AccountNonce,
@@ -142,9 +142,9 @@ type GAMetaTx struct {
 	AccountID  string
 	AuthData   string
 	AbiVersion uint16
-	GasLimit   big.Int
-	GasPrice   big.Int
-	Fee        big.Int
+	GasLimit   *big.Int
+	GasPrice   *big.Int
+	Fee        *big.Int
 	TTL        uint64
 	Tx         *SignedTx
 }
@@ -193,9 +193,9 @@ type gaMetaRLP struct {
 	AccountID         []uint8
 	AuthDataBinary    []byte
 	AbiVersion        uint16
-	Fee               big.Int
-	GasLimit          big.Int
-	GasPrice          big.Int
+	Fee               *big.Int
+	GasLimit          *big.Int
+	GasPrice          *big.Int
 	TTL               uint64
 	WrappedTx         []byte
 }
@@ -240,7 +240,7 @@ func (tx *GAMetaTx) DecodeRLP(s *rlp.Stream) (err error) {
 }
 
 // NewGAMetaTx creates a GAMetaTx
-func NewGAMetaTx(AccountID string, AuthData string, AbiVersion uint16, GasLimit big.Int, GasPrice big.Int, Fee big.Int, TTL uint64, Tx rlp.Encoder) *GAMetaTx {
+func NewGAMetaTx(AccountID string, AuthData string, AbiVersion uint16, GasLimit *big.Int, GasPrice *big.Int, Fee *big.Int, TTL uint64, Tx rlp.Encoder) *GAMetaTx {
 	return &GAMetaTx{
 		AccountID:  AccountID,
 		AuthData:   AuthData,

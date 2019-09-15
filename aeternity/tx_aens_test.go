@@ -67,7 +67,7 @@ func TestAENSTx(t *testing.T) {
 			tx: &NamePreclaimTx{
 				AccountID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
 				CommitmentID: "cm_2jrPGyFKCEFFrsVvQsUzfnSURV5igr2WxvMR679S5DnuFEjet4", // name: fdsa.test, salt: 12345
-				Fee:          *utils.NewIntFromUint64(10),
+				Fee:          utils.NewIntFromUint64(10),
 				TTL:          uint64(10),
 				AccountNonce: uint64(1),
 			},
@@ -81,8 +81,8 @@ func TestAENSTx(t *testing.T) {
 			tx: &NameClaimTx{
 				AccountID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
 				Name:         "fdsa.test",
-				NameSalt:     *utils.RequireIntFromString("9795159241593061970"),
-				Fee:          *utils.NewIntFromUint64(10),
+				NameSalt:     utils.RequireIntFromString("9795159241593061970"),
+				Fee:          utils.NewIntFromUint64(10),
 				TTL:          uint64(10),
 				AccountNonce: uint64(1),
 			},
@@ -100,7 +100,7 @@ func TestAENSTx(t *testing.T) {
 				},
 				NameTTL:      uint64(0),
 				ClientTTL:    uint64(6),
-				Fee:          *utils.NewIntFromUint64(1),
+				Fee:          utils.NewIntFromUint64(1),
 				TTL:          5,
 				AccountNonce: 5,
 			},
@@ -120,7 +120,7 @@ func TestAENSTx(t *testing.T) {
 				},
 				NameTTL:      uint64(0),
 				ClientTTL:    uint64(6),
-				Fee:          *utils.NewIntFromUint64(1),
+				Fee:          utils.NewIntFromUint64(1),
 				TTL:          5,
 				AccountNonce: 5,
 			},
@@ -141,7 +141,7 @@ func TestAENSTx(t *testing.T) {
 				},
 				NameTTL:      uint64(0),
 				ClientTTL:    uint64(6),
-				Fee:          *utils.NewIntFromUint64(1),
+				Fee:          utils.NewIntFromUint64(1),
 				TTL:          5,
 				AccountNonce: 5,
 			},
@@ -155,7 +155,7 @@ func TestAENSTx(t *testing.T) {
 				AccountID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
 				NameID:       "nm_ie148R2qZYBfo1Ek3sZpfTLwBhkkqCRKi2Ce8JJ7yyWVRw2Sb", // fdsa.test
 				RecipientID:  "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
-				Fee:          *utils.NewIntFromUint64(1),
+				Fee:          utils.NewIntFromUint64(1),
 				TTL:          5,
 				AccountNonce: 5,
 			},
@@ -168,7 +168,7 @@ func TestAENSTx(t *testing.T) {
 			tx: &NameRevokeTx{
 				AccountID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
 				NameID:       "nm_ie148R2qZYBfo1Ek3sZpfTLwBhkkqCRKi2Ce8JJ7yyWVRw2Sb", // fdsa.test
-				Fee:          *utils.NewIntFromUint64(1),
+				Fee:          utils.NewIntFromUint64(1),
 				TTL:          5,
 				AccountNonce: 5,
 			},

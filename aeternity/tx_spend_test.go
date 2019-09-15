@@ -15,8 +15,8 @@ func TestSpendTx_EncodeRLP(t *testing.T) {
 	type fields struct {
 		senderID    string
 		recipientID string
-		amount      big.Int
-		fee         big.Int
+		amount      *big.Int
+		fee         *big.Int
 		payload     []byte
 		ttl         uint64
 		nonce       uint64
@@ -32,8 +32,8 @@ func TestSpendTx_EncodeRLP(t *testing.T) {
 			fields: fields{
 				senderID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
 				recipientID: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
-				amount:      *utils.NewIntFromUint64(10),
-				fee:         *utils.NewIntFromUint64(10),
+				amount:      utils.NewIntFromUint64(10),
+				fee:         utils.NewIntFromUint64(10),
 				payload:     []byte("Hello World"),
 				ttl:         uint64(10),
 				nonce:       uint64(1),
@@ -46,8 +46,8 @@ func TestSpendTx_EncodeRLP(t *testing.T) {
 			fields: fields{
 				senderID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
 				recipientID: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
-				amount:      *utils.NewIntFromUint64(0),
-				fee:         *utils.NewIntFromUint64(10),
+				amount:      utils.NewIntFromUint64(0),
+				fee:         utils.NewIntFromUint64(10),
 				payload:     []byte("Hello World"),
 				ttl:         uint64(10),
 				nonce:       uint64(1),
@@ -104,8 +104,8 @@ func TestSpendTx_DecodeRLP(t *testing.T) {
 			wantTx: SpendTx{
 				SenderID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
 				RecipientID: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
-				Amount:      *utils.NewIntFromUint64(10),
-				Fee:         *utils.NewIntFromUint64(10),
+				Amount:      utils.NewIntFromUint64(10),
+				Fee:         utils.NewIntFromUint64(10),
 				Payload:     []byte("Hello World"),
 				TTL:         uint64(10),
 				Nonce:       uint64(1),
@@ -122,8 +122,8 @@ func TestSpendTx_DecodeRLP(t *testing.T) {
 			wantTx: SpendTx{
 				SenderID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
 				RecipientID: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
-				Amount:      *utils.NewIntFromUint64(0),
-				Fee:         *utils.NewIntFromUint64(10),
+				Amount:      utils.NewIntFromUint64(0),
+				Fee:         utils.NewIntFromUint64(10),
 				Payload:     []byte("Hello World"),
 				TTL:         uint64(10),
 				Nonce:       uint64(1),

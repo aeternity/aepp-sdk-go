@@ -146,7 +146,7 @@ func NewContextFromNode(node *Node, address string) (ctx *Context) {
 
 // SpendTx creates a spend transaction, filling in the account nonce and
 // transaction TTL automatically.
-func (c *Context) SpendTx(senderID string, recipientID string, amount, fee big.Int, payload []byte) (tx *SpendTx, err error) {
+func (c *Context) SpendTx(senderID string, recipientID string, amount, fee *big.Int, payload []byte) (tx *SpendTx, err error) {
 	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
@@ -159,7 +159,7 @@ func (c *Context) SpendTx(senderID string, recipientID string, amount, fee big.I
 // NamePreclaimTx creates a name preclaim transaction, filling in the account
 // nonce and transaction TTL automatically. It also generates a commitment ID
 // and salt, later used to claim the name.
-func (c *Context) NamePreclaimTx(name string, fee big.Int) (tx *NamePreclaimTx, nameSalt *big.Int, err error) {
+func (c *Context) NamePreclaimTx(name string, fee *big.Int) (tx *NamePreclaimTx, nameSalt *big.Int, err error) {
 	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
@@ -180,7 +180,7 @@ func (c *Context) NamePreclaimTx(name string, fee big.Int) (tx *NamePreclaimTx, 
 
 // NameClaimTx creates a claim transaction, filling in the account nonce and
 // transaction TTL automatically.
-func (c *Context) NameClaimTx(name string, nameSalt big.Int, fee big.Int) (tx *NameClaimTx, err error) {
+func (c *Context) NameClaimTx(name string, nameSalt, fee *big.Int) (tx *NameClaimTx, err error) {
 	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
@@ -241,7 +241,7 @@ func (c *Context) NameRevokeTx(name string) (tx *NameRevokeTx, err error) {
 
 // OracleRegisterTx creates an oracle register transaction, filling in the
 // account nonce and transaction TTL automatically.
-func (c *Context) OracleRegisterTx(querySpec, responseSpec string, queryFee big.Int, oracleTTLType, oracleTTLValue uint64, VMVersion uint16) (tx *OracleRegisterTx, err error) {
+func (c *Context) OracleRegisterTx(querySpec, responseSpec string, queryFee *big.Int, oracleTTLType, oracleTTLValue uint64, VMVersion uint16) (tx *OracleRegisterTx, err error) {
 	ttl, nonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
@@ -265,7 +265,7 @@ func (c *Context) OracleExtendTx(oracleID string, ttlType, ttlValue uint64) (tx 
 
 // OracleQueryTx creates an oracle query transaction, filling in the account
 // nonce and transaction TTL automatically.
-func (c *Context) OracleQueryTx(OracleID, Query string, QueryFee big.Int, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64) (tx *OracleQueryTx, err error) {
+func (c *Context) OracleQueryTx(OracleID, Query string, QueryFee *big.Int, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64) (tx *OracleQueryTx, err error) {
 	ttl, nonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
@@ -289,7 +289,7 @@ func (c *Context) OracleRespondTx(OracleID string, QueryID string, Response stri
 
 // ContractCreateTx creates a contract create transaction, filling in the
 // account nonce and transaction TTL automatically.
-func (c *Context) ContractCreateTx(Code string, CallData string, VMVersion, AbiVersion uint16, Deposit, Amount, GasLimit, Fee big.Int) (tx *ContractCreateTx, err error) {
+func (c *Context) ContractCreateTx(Code string, CallData string, VMVersion, AbiVersion uint16, Deposit, Amount, GasLimit, Fee *big.Int) (tx *ContractCreateTx, err error) {
 	ttl, nonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return
@@ -301,7 +301,7 @@ func (c *Context) ContractCreateTx(Code string, CallData string, VMVersion, AbiV
 
 // ContractCallTx creates a contract call transaction,, filling in the account
 // nonce and transaction TTL automatically.
-func (c *Context) ContractCallTx(ContractID, CallData string, AbiVersion uint16, Amount, GasLimit, GasPrice, Fee big.Int) (tx *ContractCallTx, err error) {
+func (c *Context) ContractCallTx(ContractID, CallData string, AbiVersion uint16, Amount, GasLimit, GasPrice, Fee *big.Int) (tx *ContractCallTx, err error) {
 	ttl, nonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
 	if err != nil {
 		return

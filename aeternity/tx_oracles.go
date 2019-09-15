@@ -15,11 +15,11 @@ type OracleRegisterTx struct {
 	AccountNonce   uint64
 	QuerySpec      string
 	ResponseSpec   string
-	QueryFee       big.Int
+	QueryFee       *big.Int
 	OracleTTLType  uint64
 	OracleTTLValue uint64
 	AbiVersion     uint16
-	Fee            big.Int
+	Fee            *big.Int
 	TTL            uint64
 }
 
@@ -62,10 +62,10 @@ type oracleRegisterRLP struct {
 	AccountNonce      uint64
 	QuerySpec         []byte
 	ResponseSpec      []byte
-	QueryFee          big.Int
+	QueryFee          *big.Int
 	OracleTTLType     uint64
 	OracleTTLValue    uint64
-	Fee               big.Int
+	Fee               *big.Int
 	TTL               uint64
 	AbiVersion        uint16
 }
@@ -104,7 +104,7 @@ func (tx *OracleRegisterTx) DecodeRLP(s *rlp.Stream) (err error) {
 }
 
 // JSON representation of a Tx is useful for querying the node's debug endpoint
-// BUG: Account Nonce won'tx be represented in JSON output if nonce is 0, thanks to swagger.json
+// BUG: Account Nonce won't be represented in JSON output if nonce is 0, thanks to swagger.json
 func (tx *OracleRegisterTx) JSON() (string, error) {
 	// # Oracles
 	// ORACLE_TTL_TYPE_DELTA = 'delta'
@@ -127,13 +127,13 @@ func (tx *OracleRegisterTx) JSON() (string, error) {
 	swaggerT := models.OracleRegisterTx{
 		AbiVersion: tx.AbiVersion,
 		AccountID:  &tx.AccountID,
-		Fee:        utils.BigInt(tx.Fee),
+		Fee:        utils.BigInt(*tx.Fee),
 		Nonce:      tx.AccountNonce,
 		OracleTTL: &models.TTL{
 			Type:  &ttlTypeStr,
 			Value: &tx.OracleTTLValue,
 		},
-		QueryFee:       utils.BigInt(tx.QueryFee),
+		QueryFee:       utils.BigInt(*tx.QueryFee),
 		QueryFormat:    &tx.QuerySpec,
 		ResponseFormat: &tx.ResponseSpec,
 		TTL:            tx.TTL,
@@ -143,7 +143,7 @@ func (tx *OracleRegisterTx) JSON() (string, error) {
 }
 
 // NewOracleRegisterTx is a constructor for a OracleRegisterTx struct
-func NewOracleRegisterTx(accountID string, accountNonce uint64, querySpec, responseSpec string, queryFee big.Int, oracleTTLType, oracleTTLValue uint64, abiVersion uint16, txFee big.Int, txTTL uint64) *OracleRegisterTx {
+func NewOracleRegisterTx(accountID string, accountNonce uint64, querySpec, responseSpec string, queryFee *big.Int, oracleTTLType, oracleTTLValue uint64, abiVersion uint16, txFee *big.Int, txTTL uint64) *OracleRegisterTx {
 	return &OracleRegisterTx{accountID, accountNonce, querySpec, responseSpec, queryFee, oracleTTLType, oracleTTLValue, abiVersion, txFee, txTTL}
 }
 
@@ -153,7 +153,7 @@ type OracleExtendTx struct {
 	AccountNonce   uint64
 	OracleTTLType  uint64
 	OracleTTLValue uint64
-	Fee            big.Int
+	Fee            *big.Int
 	TTL            uint64
 }
 
@@ -191,7 +191,7 @@ type oracleExtendRLP struct {
 	AccountNonce      uint64
 	OracleTTLType     uint64
 	OracleTTLValue    uint64
-	Fee               big.Int
+	Fee               *big.Int
 	TTL               uint64
 }
 
@@ -229,7 +229,7 @@ func (tx *OracleExtendTx) JSON() (string, error) {
 	oracleTTLTypeStr := ttlTypeIntToStr(tx.OracleTTLType)
 
 	swaggerT := models.OracleExtendTx{
-		Fee:      utils.BigInt(tx.Fee),
+		Fee:      utils.BigInt(*tx.Fee),
 		Nonce:    tx.AccountNonce,
 		OracleID: &tx.OracleID,
 		OracleTTL: &models.RelativeTTL{
@@ -244,7 +244,7 @@ func (tx *OracleExtendTx) JSON() (string, error) {
 }
 
 // NewOracleExtendTx is a constructor for a OracleExtendTx struct
-func NewOracleExtendTx(oracleID string, accountNonce, oracleTTLType, oracleTTLValue uint64, Fee big.Int, TTL uint64) *OracleExtendTx {
+func NewOracleExtendTx(oracleID string, accountNonce, oracleTTLType, oracleTTLValue uint64, Fee *big.Int, TTL uint64) *OracleExtendTx {
 	return &OracleExtendTx{oracleID, accountNonce, oracleTTLType, oracleTTLValue, Fee, TTL}
 }
 
@@ -254,12 +254,12 @@ type OracleQueryTx struct {
 	AccountNonce     uint64
 	OracleID         string
 	Query            string
-	QueryFee         big.Int
+	QueryFee         *big.Int
 	QueryTTLType     uint64
 	QueryTTLValue    uint64
 	ResponseTTLType  uint64
 	ResponseTTLValue uint64
-	Fee              big.Int
+	Fee              *big.Int
 	TTL              uint64
 }
 
@@ -307,12 +307,12 @@ type oracleQueryRLP struct {
 	AccountNonce      uint64
 	OracleID          []uint8
 	Query             []byte
-	QueryFee          big.Int
+	QueryFee          *big.Int
 	QueryTTLType      uint64
 	QueryTTLValue     uint64
 	ResponseTTLType   uint64
 	ResponseTTLValue  uint64
-	Fee               big.Int
+	Fee               *big.Int
 	TTL               uint64
 }
 
@@ -359,11 +359,11 @@ func (tx *OracleQueryTx) JSON() (string, error) {
 	queryTTLTypeStr := ttlTypeIntToStr(tx.QueryTTLType)
 
 	swaggerT := models.OracleQueryTx{
-		Fee:      utils.BigInt(tx.Fee),
+		Fee:      utils.BigInt(*tx.Fee),
 		Nonce:    tx.AccountNonce,
 		OracleID: &tx.OracleID,
 		Query:    &tx.Query,
-		QueryFee: utils.BigInt(tx.QueryFee),
+		QueryFee: utils.BigInt(*tx.QueryFee),
 		QueryTTL: &models.TTL{
 			Type:  &queryTTLTypeStr,
 			Value: &tx.QueryTTLValue,
@@ -381,7 +381,7 @@ func (tx *OracleQueryTx) JSON() (string, error) {
 }
 
 // NewOracleQueryTx is a constructor for a OracleQueryTx struct
-func NewOracleQueryTx(SenderID string, AccountNonce uint64, OracleID, Query string, QueryFee big.Int, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64, Fee big.Int, TTL uint64) *OracleQueryTx {
+func NewOracleQueryTx(SenderID string, AccountNonce uint64, OracleID, Query string, QueryFee *big.Int, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64, Fee *big.Int, TTL uint64) *OracleQueryTx {
 	return &OracleQueryTx{SenderID, AccountNonce, OracleID, Query, QueryFee, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue, Fee, TTL}
 }
 
@@ -393,7 +393,7 @@ type OracleRespondTx struct {
 	Response         string
 	ResponseTTLType  uint64
 	ResponseTTLValue uint64
-	Fee              big.Int
+	Fee              *big.Int
 	TTL              uint64
 }
 
@@ -439,7 +439,7 @@ type oracleRespondRLP struct {
 	Response          []byte
 	ResponseTTLType   uint64
 	ResponseTTLValue  uint64
-	Fee               big.Int
+	Fee               *big.Int
 	TTL               uint64
 }
 
@@ -482,7 +482,7 @@ func (tx *OracleRespondTx) JSON() (string, error) {
 	responseTTLTypeStr := ttlTypeIntToStr(tx.ResponseTTLType)
 
 	swaggerT := models.OracleRespondTx{
-		Fee:      utils.BigInt(tx.Fee),
+		Fee:      utils.BigInt(*tx.Fee),
 		Nonce:    tx.AccountNonce,
 		OracleID: &tx.OracleID,
 		QueryID:  &tx.QueryID,
@@ -499,6 +499,6 @@ func (tx *OracleRespondTx) JSON() (string, error) {
 }
 
 // NewOracleRespondTx is a constructor for a OracleRespondTx struct
-func NewOracleRespondTx(OracleID string, AccountNonce uint64, QueryID string, Response string, TTLType uint64, TTLValue uint64, Fee big.Int, TTL uint64) *OracleRespondTx {
+func NewOracleRespondTx(OracleID string, AccountNonce uint64, QueryID string, Response string, TTLType uint64, TTLValue uint64, Fee *big.Int, TTL uint64) *OracleRespondTx {
 	return &OracleRespondTx{OracleID, AccountNonce, QueryID, Response, TTLType, TTLValue, Fee, TTL}
 }

@@ -13,8 +13,8 @@ import (
 type SpendTx struct {
 	SenderID    string
 	RecipientID string
-	Amount      big.Int
-	Fee         big.Int
+	Amount      *big.Int
+	Fee         *big.Int
 	Payload     []byte
 	TTL         uint64
 	Nonce       uint64
@@ -59,8 +59,8 @@ type spendRLP struct {
 	RlpMessageVersion         uint
 	SenderID                  []uint8
 	ReceiverID                []uint8
-	Amount                    big.Int
-	Fee                       big.Int
+	Amount                    *big.Int
+	Fee                       *big.Int
 	TTL                       uint64
 	Nonce                     uint64
 	Payload                   []byte
@@ -105,8 +105,8 @@ func (tx *SpendTx) DecodeRLP(s *rlp.Stream) (err error) {
 func (tx *SpendTx) JSON() (string, error) {
 	baseEncodedPayload := Encode(PrefixByteArray, tx.Payload)
 	swaggerT := models.SpendTx{
-		Amount:      utils.BigInt(tx.Amount),
-		Fee:         utils.BigInt(tx.Fee),
+		Amount:      utils.BigInt(*tx.Amount),
+		Fee:         utils.BigInt(*tx.Fee),
 		Nonce:       tx.Nonce,
 		Payload:     &baseEncodedPayload,
 		RecipientID: &tx.RecipientID,
@@ -119,7 +119,7 @@ func (tx *SpendTx) JSON() (string, error) {
 
 // sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
 func (tx *SpendTx) sizeEstimate() (int, error) {
-	return calcSizeEstimate(tx, &tx.Fee)
+	return calcSizeEstimate(tx, tx.Fee)
 }
 
 // FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
@@ -133,6 +133,6 @@ func (tx *SpendTx) FeeEstimate() (*big.Int, error) {
 }
 
 // NewSpendTx is a constructor for a SpendTx struct
-func NewSpendTx(senderID, recipientID string, amount, fee big.Int, payload []byte, ttl, nonce uint64) *SpendTx {
+func NewSpendTx(senderID, recipientID string, amount, fee *big.Int, payload []byte, ttl, nonce uint64) *SpendTx {
 	return &SpendTx{senderID, recipientID, amount, fee, payload, ttl, nonce}
 }

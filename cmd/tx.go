@@ -81,7 +81,7 @@ func txSpendFunc(ttlFunc aeternity.GetTTLFunc, nonceFunc aeternity.GetNextNonceF
 		}
 	}
 
-	tx := aeternity.NewSpendTx(sender, recipient, *amount, *feeBigInt, []byte(spendTxPayload), ttl, nonce)
+	tx := aeternity.NewSpendTx(sender, recipient, amount, feeBigInt, []byte(spendTxPayload), ttl, nonce)
 	base64Tx, err := aeternity.SerializeTx(tx)
 	if err != nil {
 		return err
