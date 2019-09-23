@@ -1,4 +1,4 @@
-package aeternity
+package account
 
 import (
 	"encoding/hex"

@@ -1,9 +1,10 @@
-package aeternity
+package models
 
 import (
 	"io"
 	"math/big"
 
+	"github.com/aeternity/aepp-sdk-go/v5/binary"
 	"github.com/aeternity/aepp-sdk-go/v5/swagguard/node/models"
 	"github.com/aeternity/aepp-sdk-go/v5/utils"
 	rlp "github.com/randomshinichi/rlpae"
@@ -403,7 +404,7 @@ func (tx *OracleRespondTx) EncodeRLP(w io.Writer) (err error) {
 	if err != nil {
 		return
 	}
-	queryIDBytes, err := Decode(tx.QueryID)
+	queryIDBytes, err := binary.Decode(tx.QueryID)
 	if err != nil {
 		return
 	}
@@ -454,7 +455,7 @@ func (o *oracleRespondRLP) ReadRLP(s *rlp.Stream) (oID, qID string, err error) {
 	if _, oID, err = readIDTag(o.OracleID); err != nil {
 		return
 	}
-	qID = Encode(PrefixOracleQueryID, o.QueryID)
+	qID = binary.Encode(binary.PrefixOracleQueryID, o.QueryID)
 	return
 }
 

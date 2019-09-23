@@ -1,4 +1,4 @@
-package aeternity
+package naet
 
 import (
 	"fmt"

@@ -1,6 +1,7 @@
-package aeternity
+package models
 
 import (
+	"github.com/aeternity/aepp-sdk-go/v5/binary"
 	rlp "github.com/randomshinichi/rlpae"
 )
 
@@ -31,7 +32,7 @@ type Contract struct {
 // NewContractFromString takes a cb_ compiled bytecode string and returns a
 // Contract struct
 func NewContractFromString(cb string) (c Contract, err error) {
-	rawBytes, err := Decode(cb)
+	rawBytes, err := binary.Decode(cb)
 	if err != nil {
 		return Contract{}, err
 	}

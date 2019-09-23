@@ -1,4 +1,4 @@
-package aeternity
+package models
 
 import (
 	"bytes"
@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/aeternity/aepp-sdk-go/binary"
 	"github.com/aeternity/aepp-sdk-go/v5/utils"
 	rlp "github.com/randomshinichi/rlpae"
 )
@@ -38,7 +39,7 @@ func TestNamePointer(t *testing.T) {
 			}
 			if !bytes.Equal(gotRLP, tt.rlpBytes) {
 				t.Errorf("NamePointer.EncodeRLP() = %v, want %v", gotRLP, tt.rlpBytes)
-				fmt.Println(DecodeRLPMessage(gotRLP))
+				fmt.Println(binary.DecodeRLPMessage(gotRLP))
 			}
 		})
 		t.Run(fmt.Sprintf("%s DecodeRLP", tt.name), func(t *testing.T) {

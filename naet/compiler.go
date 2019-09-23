@@ -1,4 +1,4 @@
-package aeternity
+package naet
 
 import (
 	compiler_client "github.com/aeternity/aepp-sdk-go/v5/swagguard/compiler/client"

@@ -3,6 +3,7 @@ package aeternity
 import (
 	"testing"
 
+	"github.com/aeternity/aepp-sdk-go/binary"
 	"github.com/aeternity/aepp-sdk-go/v5/swagguard/node/models"
 	"github.com/aeternity/aepp-sdk-go/v5/utils"
 )
@@ -66,7 +67,7 @@ func Test_Namehash(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := Encode(PrefixName, Namehash(tt.args.name))
+			got := binary.Encode(binary.PrefixName, Namehash(tt.args.name))
 			if got != tt.want {
 				t.Errorf("Namehash() = %v, want %v", got, tt.want)
 			}

@@ -1,4 +1,4 @@
-package aeternity
+package account
 
 import (
 	"crypto/rand"
@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"time"
 
+	config "github.com/aeternity/aepp-sdk-go/config"
 	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/argon2"
 	"golang.org/x/crypto/nacl/secretbox"
@@ -103,9 +104,9 @@ func KeystoreSeal(account *Account, password string) (j []byte, e error) {
 		return
 	}
 	argonKey := argon2.IDKey([]byte(password), salt,
-		Config.Tuning.CryptoKdfOpslimit,
-		Config.Tuning.CryptoKdfMemlimit,
-		Config.Tuning.CryptoKdfThreads,
+		config.Config.Tuning.CryptoKdfOpslimit,
+		config.Config.Tuning.CryptoKdfMemlimit,
+		config.Config.Tuning.CryptoKdfThreads,
 		kdfKeySize)
 
 	var key [kdfKeySize]byte
@@ -133,10 +134,10 @@ func KeystoreSeal(account *Account, password string) (j []byte, e error) {
 			Ciphertext:   hex.EncodeToString(encrypted),
 			Kdf:          kdf,
 			KdfParams: kdfParams{
-				Memlimit:    Config.Tuning.CryptoKdfMemlimit,
-				Opslimit:    Config.Tuning.CryptoKdfOpslimit,
+				Memlimit:    config.Config.Tuning.CryptoKdfMemlimit,
+				Opslimit:    config.Config.Tuning.CryptoKdfOpslimit,
 				Salt:        hex.EncodeToString(salt),
-				Parallelism: Config.Tuning.CryptoKdfThreads,
+				Parallelism: config.Config.Tuning.CryptoKdfThreads,
 			},
 		},
 	}

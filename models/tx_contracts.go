@@ -1,9 +1,10 @@
-package aeternity
+package models
 
 import (
 	"io"
 	"math/big"
 
+	"github.com/aeternity/aepp-sdk-go/v5/binary"
 	"github.com/aeternity/aepp-sdk-go/v5/swagguard/node/models"
 	"github.com/aeternity/aepp-sdk-go/v5/utils"
 	rlp "github.com/randomshinichi/rlpae"
@@ -57,11 +58,11 @@ func (tx *ContractCreateTx) EncodeRLP(w io.Writer) (err error) {
 	if err != nil {
 		return
 	}
-	codeBinary, err := Decode(tx.Code)
+	codeBinary, err := binary.Decode(tx.Code)
 	if err != nil {
 		return
 	}
-	callDataBinary, err := Decode(tx.CallData)
+	callDataBinary, err := binary.Decode(tx.CallData)
 	if err != nil {
 		return
 	}
@@ -120,8 +121,8 @@ func (c *contractCreateRLP) ReadRLP(s *rlp.Stream) (aID, code, calldata string, 
 		return
 	}
 
-	code = Encode(PrefixContractByteArray, c.CodeBinary)
-	calldata = Encode(PrefixContractByteArray, c.CallDataBinary)
+	code = binary.Encode(binary.PrefixContractByteArray, c.CodeBinary)
+	calldata = binary.Encode(binary.PrefixContractByteArray, c.CallDataBinary)
 	vmversion, abiversion = decodeVMABI(c.VMABI)
 	return
 }
@@ -232,7 +233,7 @@ func (tx *ContractCallTx) EncodeRLP(w io.Writer) (err error) {
 	if err != nil {
 		return
 	}
-	callDataBinary, err := Decode(tx.CallData)
+	callDataBinary, err := binary.Decode(tx.CallData)
 	if err != nil {
 		return
 	}
@@ -292,7 +293,7 @@ func (c *contractCallRLP) ReadRLP(s *rlp.Stream) (cID, ctID, calldata string, er
 		return
 	}
 
-	calldata = Encode(PrefixContractByteArray, c.CallDataBinary)
+	calldata = binary.Encode(binary.PrefixContractByteArray, c.CallDataBinary)
 	return
 }
 
