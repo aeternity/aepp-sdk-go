@@ -4,12 +4,12 @@ import (
 	"os"
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
+	"github.com/aeternity/aepp-sdk-go/naet"
 )
 
 func Test_compileFunc(t *testing.T) {
 	type args struct {
-		conn   aeternity.CompileContracter
+		conn   naet.CompileContracter
 		source string
 	}
 	tests := []struct {
@@ -63,7 +63,7 @@ func Test_compileFunc(t *testing.T) {
 
 func Test_encodeCalldataFunc(t *testing.T) {
 	type args struct {
-		conn   aeternity.EncodeCalldataer
+		conn   naet.EncodeCalldataer
 		args   []string
 		source string
 	}
@@ -203,7 +203,7 @@ func Test_generateAciFunc(t *testing.T) {
 	tempdir, path := writeTestContractFile(t, contractSimpleStorage)
 	defer os.RemoveAll(tempdir)
 	type args struct {
-		conn aeternity.GenerateACIer
+		conn naet.GenerateACIer
 		args []string
 	}
 	tests := []struct {

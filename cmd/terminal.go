@@ -8,7 +8,8 @@ import (
 
 	"time"
 
-	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
+	"github.com/aeternity/aepp-sdk-go/config"
+	"github.com/aeternity/aepp-sdk-go/naet"
 )
 
 func times(str string, n int) (out string) {
@@ -100,7 +101,7 @@ func printIf(title string, v interface{}) {
 
 // PrintObject pretty print an object obtained from the api with a title
 func PrintObject(title string, i interface{}) {
-	if aeternity.Config.Tuning.OutputFormatJSON {
+	if config.Config.Tuning.OutputFormatJSON {
 		j, _ := json.MarshalIndent(i, "", "  ")
 		fmt.Printf("%s\n", j)
 		return
@@ -112,9 +113,9 @@ func PrintObject(title string, i interface{}) {
 }
 
 type getGenerationMicroBlockTransactioner interface {
-	aeternity.GetTransactionByHasher
-	aeternity.GetMicroBlockTransactionsByHasher
-	aeternity.GetGenerationByHeighter
+	naet.GetTransactionByHasher
+	naet.GetMicroBlockTransactionsByHasher
+	naet.GetGenerationByHeighter
 }
 
 // PrintGenerationByHeight utility function to print a generation by it's height

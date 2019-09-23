@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
+	"github.com/aeternity/aepp-sdk-go/naet"
 )
 
 // Prefixing each test with Example makes go-test check the stdout
@@ -19,7 +19,7 @@ func init() {
 
 func Test_topFunc(t *testing.T) {
 	type args struct {
-		conn aeternity.GetTopBlocker
+		conn naet.GetTopBlocker
 		args []string
 	}
 	tests := []struct {
@@ -63,7 +63,7 @@ func Test_topFunc(t *testing.T) {
 
 func Test_broadcastFunc(t *testing.T) {
 	type args struct {
-		conn aeternity.PostTransactioner
+		conn naet.PostTransactioner
 		args []string
 	}
 	tests := []struct {
@@ -91,7 +91,7 @@ func Test_broadcastFunc(t *testing.T) {
 
 func Test_statusFunc(t *testing.T) {
 	type args struct {
-		conn aeternity.GetStatuser
+		conn naet.GetStatuser
 		args []string
 	}
 	tests := []struct {
@@ -133,7 +133,7 @@ func Test_statusFunc(t *testing.T) {
 
 func Test_ttlFunc(t *testing.T) {
 	type args struct {
-		conn aeternity.GetHeighter
+		conn naet.GetHeighter
 		args []string
 	}
 	tests := []struct {
@@ -161,7 +161,7 @@ func Test_ttlFunc(t *testing.T) {
 
 func Test_networkIDFunc(t *testing.T) {
 	type args struct {
-		conn aeternity.GetStatuser
+		conn naet.GetStatuser
 		args []string
 	}
 	tests := []struct {

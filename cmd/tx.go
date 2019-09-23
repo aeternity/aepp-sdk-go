@@ -5,6 +5,10 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/aeternity/aepp-sdk-go/binary"
+	"github.com/aeternity/aepp-sdk-go/config"
+	"github.com/aeternity/aepp-sdk-go/models"
+	"github.com/aeternity/aepp-sdk-go/naet"
 	"github.com/aeternity/aepp-sdk-go/v5/utils"
 
 	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
@@ -75,14 +79,14 @@ func txSpendFunc(ttlFunc aeternity.GetTTLFunc, nonceFunc aeternity.GetNextNonceF
 	// If TTL was not specified as an argument, connect to the node to calculate
 	// it
 	if ttl == 0 {
-		ttl, err = ttlFunc(aeternity.Config.Client.TTL)
+		ttl, err = ttlFunc(config.Config.Client.TTL)
 		if err != nil {
 			return err
 		}
 	}
 
-	tx := aeternity.NewSpendTx(sender, recipient, amount, feeBigInt, []byte(spendTxPayload), ttl, nonce)
-	base64Tx, err := aeternity.SerializeTx(tx)
+	tx := models.NewSpendTx(sender, recipient, amount, feeBigInt, []byte(spendTxPayload), ttl, nonce)
+	base64Tx, err := models.SerializeTx(tx)
 	if err != nil {
 		return err
 	}
@@ -115,8 +119,8 @@ var txContractCreateCmd = &cobra.Command{
 }
 
 type getHeightAccounter interface {
-	aeternity.GetHeighter
-	aeternity.GetAccounter
+	naet.GetHeighter
+	naet.GetAccounter
 }
 
 func txContractCreateFunc(ttlFunc aeternity.GetTTLFunc, nonceFunc aeternity.GetNextNonceFunc, args []string) (err error) {
@@ -152,15 +156,15 @@ func txContractCreateFunc(ttlFunc aeternity.GetTTLFunc, nonceFunc aeternity.GetN
 	// If TTL was not specified as an argument, connect to the node to calculate
 	// it
 	if ttl == 0 {
-		ttl, err = ttlFunc(aeternity.Config.Client.TTL)
+		ttl, err = ttlFunc(config.Config.Client.TTL)
 		if err != nil {
 			return err
 		}
 	}
 
-	tx := aeternity.NewContractCreateTx(owner, nonce, contract, aeternity.Config.Client.Contracts.VMVersion, aeternity.Config.Client.Contracts.ABIVersion, aeternity.Config.Client.Contracts.Deposit, aeternity.Config.Client.Contracts.Amount, aeternity.Config.Client.Contracts.GasLimit, aeternity.Config.Client.GasPrice, aeternity.Config.Client.Fee, ttl, calldata)
+	tx := models.NewContractCreateTx(owner, nonce, contract, config.Config.Client.Contracts.VMVersion, config.Config.Client.Contracts.ABIVersion, config.Config.Client.Contracts.Deposit, config.Config.Client.Contracts.Amount, config.Config.Client.Contracts.GasLimit, config.Config.Client.GasPrice, config.Config.Client.Fee, ttl, calldata)
 
-	txStr, err := aeternity.SerializeTx(tx)
+	txStr, err := models.SerializeTx(tx)
 	if err != nil {
 		return err
 	}
@@ -207,15 +211,15 @@ func txVerifyFunc(cmd *cobra.Command, args []string) (err error) {
 	if !IsTransaction(txSignedBase64) {
 		return errors.New("Error, missing or invalid base64 encoded transaction")
 	}
-	valid, err := aeternity.VerifySignedTx(sender, txSignedBase64, aeternity.Config.Node.NetworkID)
+	valid, err := aeternity.VerifySignedTx(sender, txSignedBase64, config.Config.Node.NetworkID)
 	if err != nil {
 		err := fmt.Errorf("error while verifying signature: %s", err)
 		return err
 	}
 	if valid {
-		fmt.Printf("The signature is valid (network-id: %s)\n", aeternity.Config.Node.NetworkID)
+		fmt.Printf("The signature is valid (network-id: %s)\n", config.Config.Node.NetworkID)
 	} else {
-		message := fmt.Sprintf("The signature is invalid (expecting network-id: %s)", aeternity.Config.Node.NetworkID)
+		message := fmt.Sprintf("The signature is invalid (expecting network-id: %s)", config.Config.Node.NetworkID)
 		// fmt.Println(message)
 		err = errors.New(message)
 	}
@@ -237,11 +241,11 @@ func txDumpRawFunc(cmd *cobra.Command, args []string) (err error) {
 	if !IsTransaction(tx) {
 		return errors.New("Error, missing or invalid base64 encoded transaction")
 	}
-	txRaw, err := aeternity.Decode(tx)
+	txRaw, err := binary.Decode(tx)
 	if err != nil {
 		return err
 	}
-	res := aeternity.DecodeRLPMessage(txRaw)
+	res := binary.DecodeRLPMessage(txRaw)
 	fmt.Println(res)
 	return nil
 }
@@ -254,7 +258,7 @@ func init() {
 	txCmd.AddCommand(txDumpRawCmd)
 
 	// tx spend command
-	txSpendCmd.Flags().StringVar(&fee, "fee", aeternity.Config.Client.Fee.String(), fmt.Sprintf("Set the transaction fee (default=%s)", aeternity.Config.Client.Fee.String()))
+	txSpendCmd.Flags().StringVar(&fee, "fee", config.Config.Client.Fee.String(), fmt.Sprintf("Set the transaction fee (default=%s)", config.Config.Client.Fee.String()))
 	txSpendCmd.Flags().Uint64Var(&ttl, "ttl", 0, fmt.Sprintf("Set the TTL in keyblocks (default=%d)", 0))
 	txSpendCmd.Flags().Uint64Var(&nonce, "nonce", 0, fmt.Sprint("Set the sender account nonce, if not the chain will be queried for its value"))
 	txSpendCmd.Flags().StringVar(&spendTxPayload, "payload", "", fmt.Sprint("Optional text payload for Spend Transactions, which will be turned into a bytearray"))

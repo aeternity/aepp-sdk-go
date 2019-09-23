@@ -21,7 +21,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
+	"github.com/aeternity/aepp-sdk-go/binary"
+	"github.com/aeternity/aepp-sdk-go/naet"
 
 	"github.com/spf13/cobra"
 )
@@ -64,17 +65,17 @@ func printResult(title string, v interface{}, err error) {
 }
 
 type nodeGetters interface {
-	aeternity.GetGenerationByHeighter
-	aeternity.GetNameEntryByNamer
-	aeternity.GetAccounter
-	aeternity.GetMicroBlockHeaderByHasher
-	aeternity.GetMicroBlockTransactionsByHasher
-	aeternity.GetKeyBlockByHasher
-	aeternity.GetTransactionByHasher
-	aeternity.GetOracleByPubkeyer
+	naet.GetGenerationByHeighter
+	naet.GetNameEntryByNamer
+	naet.GetAccounter
+	naet.GetMicroBlockHeaderByHasher
+	naet.GetMicroBlockTransactionsByHasher
+	naet.GetKeyBlockByHasher
+	naet.GetTransactionByHasher
+	naet.GetOracleByPubkeyer
 }
 
-func printNameEntry(conn aeternity.GetNameEntryByNamer, name string) (err error) {
+func printNameEntry(conn naet.GetNameEntryByNamer, name string) (err error) {
 	v, err := conn.GetNameEntryByName(name)
 	if err != nil {
 		return err
@@ -83,7 +84,7 @@ func printNameEntry(conn aeternity.GetNameEntryByNamer, name string) (err error)
 	return err
 }
 
-func printAccount(conn aeternity.GetAccounter, accountID string) (err error) {
+func printAccount(conn naet.GetAccounter, accountID string) (err error) {
 	v, err := conn.GetAccount(accountID)
 	if err != nil {
 		return err
@@ -93,8 +94,8 @@ func printAccount(conn aeternity.GetAccounter, accountID string) (err error) {
 }
 
 type getMicroBlockHeaderTransactions interface {
-	aeternity.GetMicroBlockHeaderByHasher
-	aeternity.GetMicroBlockTransactionsByHasher
+	naet.GetMicroBlockHeaderByHasher
+	naet.GetMicroBlockTransactionsByHasher
 }
 
 func printMicroBlockAndTransactions(conn getMicroBlockHeaderTransactions, mbHash string) (err error) {
@@ -111,7 +112,7 @@ func printMicroBlockAndTransactions(conn getMicroBlockHeaderTransactions, mbHash
 	return err
 }
 
-func printKeyBlockByHash(conn aeternity.GetKeyBlockByHasher, kbHash string) (err error) {
+func printKeyBlockByHash(conn naet.GetKeyBlockByHasher, kbHash string) (err error) {
 	v, err := conn.GetKeyBlockByHash(kbHash)
 	if err != nil {
 		return err
@@ -121,7 +122,7 @@ func printKeyBlockByHash(conn aeternity.GetKeyBlockByHasher, kbHash string) (err
 	return err
 }
 
-func printTransactionByHash(conn aeternity.GetTransactionByHasher, txHash string) (err error) {
+func printTransactionByHash(conn naet.GetTransactionByHasher, txHash string) (err error) {
 	v, err := conn.GetTransactionByHash(txHash)
 	if err != nil {
 		return err
@@ -130,7 +131,7 @@ func printTransactionByHash(conn aeternity.GetTransactionByHasher, txHash string
 	return err
 }
 
-func printOracleByPubkey(conn aeternity.GetOracleByPubkeyer, oracleID string) (err error) {
+func printOracleByPubkey(conn naet.GetOracleByPubkeyer, oracleID string) (err error) {
 	v, err := conn.GetOracleByPubkey(oracleID)
 	if err != nil {
 		return err
@@ -153,16 +154,16 @@ func inspectFunc(conn nodeGetters, args []string) (err error) {
 			continue
 		}
 
-		switch aeternity.GetHashPrefix(object) {
-		case aeternity.PrefixAccountPubkey:
+		switch binary.GetHashPrefix(object) {
+		case binary.PrefixAccountPubkey:
 			printAccount(conn, object)
-		case aeternity.PrefixMicroBlockHash:
+		case binary.PrefixMicroBlockHash:
 			printMicroBlockAndTransactions(conn, object)
-		case aeternity.PrefixKeyBlockHash:
+		case binary.PrefixKeyBlockHash:
 			printKeyBlockByHash(conn, object)
-		case aeternity.PrefixTransactionHash:
+		case binary.PrefixTransactionHash:
 			printTransactionByHash(conn, object)
-		case aeternity.PrefixOraclePubkey:
+		case binary.PrefixOraclePubkey:
 			printOracleByPubkey(conn, object)
 		default:
 			return fmt.Errorf("Object %v not yet supported", object)

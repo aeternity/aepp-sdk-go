@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
+	"github.com/aeternity/aepp-sdk-go/v5/naet"
 
 	"github.com/spf13/cobra"
 )
@@ -21,7 +21,7 @@ var nameCmd = &cobra.Command{
 	},
 }
 
-func nameFunc(conn aeternity.GetNameEntryByNamer, name string) (err error) {
+func nameFunc(conn naet.GetNameEntryByNamer, name string) (err error) {
 	ans, err := conn.GetNameEntryByName(name)
 	if err != nil {
 		return err
