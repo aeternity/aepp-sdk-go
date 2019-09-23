@@ -17,7 +17,7 @@ func TestOracleWorkflow(t *testing.T) {
 	node := setupNetwork(t, privatenetURL, false)
 
 	// Setup temporary test account and fund it
-	testAccount, err := account.NewAccount()
+	testAccount, err := account.New()
 	if err != nil {
 		t.Fatal(err)
 	}

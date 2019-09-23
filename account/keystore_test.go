@@ -12,13 +12,13 @@ func TestWrite(t *testing.T) {
 	// pub := []byte{201, 101, 152, 238, 118, 129, 16, 165, 224, 51, 1, 186, 46, 47, 63, 47, 70, 67, 232, 228, 202, 93, 46, 182, 144, 182, 8, 152, 185, 3, 23, 233}
 	// pubAdd := "ak_2XhQw1o9UwvHNFTe1vCaLEDfUQv9Y4APSVRomFgQtTjHukMbdH"
 
-	// ac, _ := NewAccount()
+	// ac, _ := New()
 	// fmt.Println(ac.SigningKey)
 	// fmt.Println(ac.SigningKeyToHexString())
 	// fmt.Println(ac.SigningKey.Public())
 	// fmt.Println(ac.Address)
 
-	ac, _ := loadAccountFromPrivateKeyRaw(prv)
+	ac, _ := loadFromPrivateKeyRaw(prv)
 
 	type args struct {
 		account  *Account

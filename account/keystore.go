@@ -79,7 +79,7 @@ func KeystoreOpen(data []byte, password string) (account *Account, err error) {
 		return
 	}
 	// now load the account
-	account, err = loadAccountFromPrivateKeyRaw(decrypted)
+	account, err = loadFromPrivateKeyRaw(decrypted)
 	return
 }
 

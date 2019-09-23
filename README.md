@@ -18,7 +18,7 @@ No matter what kind of transaction you're making, it always follows the same rul
 4. Broadcast it to a node of your choosing
 
 ```
-acc, err := aeternity.AccountFromHexString(senderPrivateKey)
+acc, err := aeternity.FromHexString(senderPrivateKey)
 if err != nil {
     fmt.Println(err)
     return

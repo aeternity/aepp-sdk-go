@@ -18,17 +18,17 @@ type Account struct {
 	Address    string
 }
 
-func loadAccountFromPrivateKeyRaw(privb []byte) (account *Account, err error) {
+func loadFromPrivateKeyRaw(privb []byte) (account *Account, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("Invalid private key")
 		}
 	}()
-	account = loadAccountFromPrivateKey(ed25519.PrivateKey(privb))
+	account = loadFromPrivateKey(ed25519.PrivateKey(privb))
 	return
 }
 
-func loadAccountFromPrivateKey(priv ed25519.PrivateKey) (account *Account) {
+func loadFromPrivateKey(priv ed25519.PrivateKey) (account *Account) {
 	account = &Account{
 		SigningKey: priv,
 		Address:    binary.Encode(binary.PrefixAccountPubkey, []byte(fmt.Sprintf("%s", priv.Public()))),
@@ -36,23 +36,23 @@ func loadAccountFromPrivateKey(priv ed25519.PrivateKey) (account *Account) {
 	return
 }
 
-// NewAccount generates a new Account
-func NewAccount() (account *Account, err error) {
+// New generates a new Account
+func New() (account *Account, err error) {
 	_, priv, err := ed25519.GenerateKey(rand.Reader)
 	if err != nil {
 		return
 	}
-	account = loadAccountFromPrivateKey(priv)
+	account = loadFromPrivateKey(priv)
 	return
 }
 
-// AccountFromHexString creates an Account from a hexstring
-func AccountFromHexString(hexPrivateKey string) (account *Account, err error) {
+// FromHexString creates an Account from a hexstring
+func FromHexString(hexPrivateKey string) (account *Account, err error) {
 	raw, err := hex.DecodeString(hexPrivateKey)
 	if err != nil {
 		return
 	}
-	return loadAccountFromPrivateKeyRaw(raw)
+	return loadFromPrivateKeyRaw(raw)
 }
 
 // SigningKeyToHexString returns the SigningKey as an hex string
@@ -77,8 +77,8 @@ func Verify(address string, message, signature []byte) (valid bool, err error) {
 	return
 }
 
-// StoreAccountToKeyStoreFile saves an encrypted Account to a JSON file
-func StoreAccountToKeyStoreFile(account *Account, password, walletName string) (filePath string, err error) {
+// StoreToKeyStoreFile saves an encrypted Account to a JSON file
+func StoreToKeyStoreFile(account *Account, password, walletName string) (filePath string, err error) {
 	// keystore will be saved in current directory
 	basePath, _ := os.Getwd()
 
@@ -97,8 +97,8 @@ func StoreAccountToKeyStoreFile(account *Account, password, walletName string) (
 	return
 }
 
-// LoadAccountFromKeyStoreFile loads an encrypted Account from a JSON file
-func LoadAccountFromKeyStoreFile(keyFile, password string) (account *Account, err error) {
+// LoadFromKeyStoreFile loads an encrypted Account from a JSON file
+func LoadFromKeyStoreFile(keyFile, password string) (account *Account, err error) {
 	// find out the real path of the wallet
 	filePath, err := GetWalletPath(keyFile)
 	if err != nil {
