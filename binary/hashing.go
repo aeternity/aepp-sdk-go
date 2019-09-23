@@ -1,4 +1,4 @@
-package aeternity
+package binary
 
 import (
 	"crypto/sha256"

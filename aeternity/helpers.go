@@ -3,13 +3,15 @@ package aeternity
 import (
 	"crypto/rand"
 	"fmt"
-	"io/ioutil"
 	"math/big"
-	"os"
-	"path/filepath"
 	"strings"
 	"time"
 
+	"github.com/aeternity/aepp-sdk-go/account"
+	"github.com/aeternity/aepp-sdk-go/binary"
+	"github.com/aeternity/aepp-sdk-go/config"
+	"github.com/aeternity/aepp-sdk-go/models"
+	"github.com/aeternity/aepp-sdk-go/naet"
 	rlp "github.com/randomshinichi/rlpae"
 )
 
@@ -26,7 +28,7 @@ type GetNextNonceFunc func(accountID string) (nonce uint64, err error)
 type GetTTLNonceFunc func(address string, offset uint64) (ttl, nonce uint64, err error)
 
 // GenerateGetTTL returns the chain height + offset
-func GenerateGetTTL(n GetHeighter) GetTTLFunc {
+func GenerateGetTTL(n naet.GetHeighter) GetTTLFunc {
 	return func(offset uint64) (ttl uint64, err error) {
 		height, err := n.GetHeight()
 		if err != nil {
@@ -39,7 +41,7 @@ func GenerateGetTTL(n GetHeighter) GetTTLFunc {
 
 // GenerateGetNextNonce retrieves the current accountNonce and adds 1 to it for
 // use in transaction building
-func GenerateGetNextNonce(n GetAccounter) GetNextNonceFunc {
+func GenerateGetNextNonce(n naet.GetAccounter) GetNextNonceFunc {
 	return func(accountID string) (nextNonce uint64, err error) {
 		a, err := n.GetAccount(accountID)
 		if err != nil {
@@ -71,7 +73,7 @@ func GenerateGetTTLNonce(ttlFunc GetTTLFunc, nonceFunc GetNextNonceFunc) GetTTLN
 type GetAnythingByNameFunc func(name, key string) (results []string, err error)
 
 // GenerateGetAnythingByName is the underlying implementation of Get*ByName
-func GenerateGetAnythingByName(n GetNameEntryByNamer) GetAnythingByNameFunc {
+func GenerateGetAnythingByName(n naet.GetNameEntryByNamer) GetAnythingByNameFunc {
 	return func(name string, key string) (results []string, err error) {
 		nameEntry, err := n.GetNameEntryByName(name)
 		if err != nil {
@@ -124,14 +126,14 @@ type Context struct {
 
 // NewContextFromURL is a convenience function that creates a Context and its
 // TTL/Nonce closures from a URL
-func NewContextFromURL(url string, address string, debug bool) (ctx *Context, node *Node) {
-	node = NewNode(url, debug)
+func NewContextFromURL(url string, address string, debug bool) (ctx *Context, node *naet.Node) {
+	node = naet.NewNode(url, debug)
 	return NewContextFromNode(node, address), node
 }
 
 // NewContextFromNode is a convenience function that creates a Context and its
 // TTL/Nonce closures from a Node instance
-func NewContextFromNode(node *Node, address string) (ctx *Context) {
+func NewContextFromNode(node *naet.Node, address string) (ctx *Context) {
 	ttlFunc := GenerateGetTTL(node)
 	nonceFunc := GenerateGetNextNonce(node)
 	ttlNonceFunc := GenerateGetTTLNonce(ttlFunc, nonceFunc)
@@ -146,21 +148,21 @@ func NewContextFromNode(node *Node, address string) (ctx *Context) {
 
 // SpendTx creates a spend transaction, filling in the account nonce and
 // transaction TTL automatically.
-func (c *Context) SpendTx(senderID string, recipientID string, amount, fee *big.Int, payload []byte) (tx *SpendTx, err error) {
-	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
+func (c *Context) SpendTx(senderID string, recipientID string, amount, fee *big.Int, payload []byte) (tx *models.SpendTx, err error) {
+	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, config.Config.Client.TTL)
 	if err != nil {
 		return
 	}
 
 	// create the transaction
-	return NewSpendTx(senderID, recipientID, amount, fee, payload, txTTL, accountNonce), err
+	return models.NewSpendTx(senderID, recipientID, amount, fee, payload, txTTL, accountNonce), err
 }
 
 // NamePreclaimTx creates a name preclaim transaction, filling in the account
 // nonce and transaction TTL automatically. It also generates a commitment ID
 // and salt, later used to claim the name.
-func (c *Context) NamePreclaimTx(name string, fee *big.Int) (tx *NamePreclaimTx, nameSalt *big.Int, err error) {
-	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
+func (c *Context) NamePreclaimTx(name string, fee *big.Int) (tx *models.NamePreclaimTx, nameSalt *big.Int, err error) {
+	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, config.Config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -173,189 +175,142 @@ func (c *Context) NamePreclaimTx(name string, fee *big.Int) (tx *NamePreclaimTx,
 	}
 
 	// build the transaction
-	tx = NewNamePreclaimTx(c.Address, cm, fee, txTTL, accountNonce)
+	tx = models.NewNamePreclaimTx(c.Address, cm, fee, txTTL, accountNonce)
 
 	return
 }
 
 // NameClaimTx creates a claim transaction, filling in the account nonce and
 // transaction TTL automatically.
-func (c *Context) NameClaimTx(name string, nameSalt, fee *big.Int) (tx *NameClaimTx, err error) {
-	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
+func (c *Context) NameClaimTx(name string, nameSalt, fee *big.Int) (tx *models.NameClaimTx, err error) {
+	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, config.Config.Client.TTL)
 	if err != nil {
 		return
 	}
 
 	// create the transaction
-	tx = NewNameClaimTx(c.Address, name, nameSalt, fee, txTTL, accountNonce)
+	tx = models.NewNameClaimTx(c.Address, name, nameSalt, fee, txTTL, accountNonce)
 
 	return tx, err
 }
 
 // NameUpdateTx creates a name update transaction, filling in the account nonce
 // and transaction TTL automatically.
-func (c *Context) NameUpdateTx(name string, targetAddress string) (tx *NameUpdateTx, err error) {
-	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
+func (c *Context) NameUpdateTx(name string, targetAddress string) (tx *models.NameUpdateTx, err error) {
+	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, config.Config.Client.TTL)
 	if err != nil {
 		return
 	}
 
-	encodedNameHash := Encode(PrefixName, Namehash(name))
-	absNameTTL, err := c.GetTTL(Config.Client.Names.NameTTL)
+	encodedNameHash := binary.Encode(binary.PrefixName, Namehash(name))
+	absNameTTL, err := c.GetTTL(config.Config.Client.Names.NameTTL)
 	if err != nil {
 		return
 	}
 	// create the transaction
-	tx = NewNameUpdateTx(c.Address, encodedNameHash, []string{targetAddress}, absNameTTL, Config.Client.Names.ClientTTL, Config.Client.Fee, txTTL, accountNonce)
+	tx = models.NewNameUpdateTx(c.Address, encodedNameHash, []string{targetAddress}, absNameTTL, config.Config.Client.Names.ClientTTL, config.Config.Client.Fee, txTTL, accountNonce)
 
 	return
 }
 
 // NameTransferTx creates a name transfer transaction, filling in the account
 // nonce and transaction TTL automatically.
-func (c *Context) NameTransferTx(name string, recipientAddress string) (tx *NameTransferTx, err error) {
-	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
+func (c *Context) NameTransferTx(name string, recipientAddress string) (tx *models.NameTransferTx, err error) {
+	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, config.Config.Client.TTL)
 	if err != nil {
 		return
 	}
 
-	encodedNameHash := Encode(PrefixName, Namehash(name))
+	encodedNameHash := binary.Encode(binary.PrefixName, Namehash(name))
 
-	tx = NewNameTransferTx(c.Address, encodedNameHash, recipientAddress, Config.Client.Fee, txTTL, accountNonce)
+	tx = models.NewNameTransferTx(c.Address, encodedNameHash, recipientAddress, config.Config.Client.Fee, txTTL, accountNonce)
 	return
 }
 
 // NameRevokeTx creates a name revoke transaction, filling in the account nonce
 // and transaction TTL automatically.
-func (c *Context) NameRevokeTx(name string) (tx *NameRevokeTx, err error) {
-	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
+func (c *Context) NameRevokeTx(name string) (tx *models.NameRevokeTx, err error) {
+	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, config.Config.Client.TTL)
 	if err != nil {
 		return
 	}
 
-	encodedNameHash := Encode(PrefixName, Namehash(name))
+	encodedNameHash := binary.Encode(binary.PrefixName, Namehash(name))
 
-	tx = NewNameRevokeTx(c.Address, encodedNameHash, Config.Client.Fee, txTTL, accountNonce)
+	tx = models.NewNameRevokeTx(c.Address, encodedNameHash, config.Config.Client.Fee, txTTL, accountNonce)
 	return
 }
 
 // OracleRegisterTx creates an oracle register transaction, filling in the
 // account nonce and transaction TTL automatically.
-func (c *Context) OracleRegisterTx(querySpec, responseSpec string, queryFee *big.Int, oracleTTLType, oracleTTLValue uint64, VMVersion uint16) (tx *OracleRegisterTx, err error) {
-	ttl, nonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
+func (c *Context) OracleRegisterTx(querySpec, responseSpec string, queryFee *big.Int, oracleTTLType, oracleTTLValue uint64, VMVersion uint16) (tx *models.OracleRegisterTx, err error) {
+	ttl, nonce, err := c.GetTTLNonce(c.Address, config.Config.Client.TTL)
 	if err != nil {
 		return
 	}
 
-	tx = NewOracleRegisterTx(c.Address, nonce, querySpec, responseSpec, queryFee, oracleTTLType, oracleTTLValue, VMVersion, Config.Client.Fee, ttl)
+	tx = models.NewOracleRegisterTx(c.Address, nonce, querySpec, responseSpec, queryFee, oracleTTLType, oracleTTLValue, VMVersion, config.Config.Client.Fee, ttl)
 	return tx, nil
 }
 
 // OracleExtendTx creates an oracle extend transaction, filling in the account
 // nonce and transaction TTL automatically.
-func (c *Context) OracleExtendTx(oracleID string, ttlType, ttlValue uint64) (tx *OracleExtendTx, err error) {
-	ttl, nonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
+func (c *Context) OracleExtendTx(oracleID string, ttlType, ttlValue uint64) (tx *models.OracleExtendTx, err error) {
+	ttl, nonce, err := c.GetTTLNonce(c.Address, config.Config.Client.TTL)
 	if err != nil {
 		return
 	}
 
-	tx = NewOracleExtendTx(oracleID, nonce, ttlType, ttlValue, Config.Client.Fee, ttl)
+	tx = models.NewOracleExtendTx(oracleID, nonce, ttlType, ttlValue, config.Config.Client.Fee, ttl)
 	return tx, nil
 }
 
 // OracleQueryTx creates an oracle query transaction, filling in the account
 // nonce and transaction TTL automatically.
-func (c *Context) OracleQueryTx(OracleID, Query string, QueryFee *big.Int, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64) (tx *OracleQueryTx, err error) {
-	ttl, nonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
+func (c *Context) OracleQueryTx(OracleID, Query string, QueryFee *big.Int, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64) (tx *models.OracleQueryTx, err error) {
+	ttl, nonce, err := c.GetTTLNonce(c.Address, config.Config.Client.TTL)
 	if err != nil {
 		return
 	}
 
-	tx = NewOracleQueryTx(c.Address, nonce, OracleID, Query, QueryFee, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue, Config.Client.Fee, ttl)
+	tx = models.NewOracleQueryTx(c.Address, nonce, OracleID, Query, QueryFee, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue, config.Config.Client.Fee, ttl)
 	return tx, nil
 }
 
 // OracleRespondTx creates an oracle response transaction, filling in the
 // account nonce and transaction TTL automatically.
-func (c *Context) OracleRespondTx(OracleID string, QueryID string, Response string, TTLType uint64, TTLValue uint64) (tx *OracleRespondTx, err error) {
-	ttl, nonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
+func (c *Context) OracleRespondTx(OracleID string, QueryID string, Response string, TTLType uint64, TTLValue uint64) (tx *models.OracleRespondTx, err error) {
+	ttl, nonce, err := c.GetTTLNonce(c.Address, config.Config.Client.TTL)
 	if err != nil {
 		return
 	}
 
-	tx = NewOracleRespondTx(OracleID, nonce, QueryID, Response, TTLType, TTLValue, Config.Client.Fee, ttl)
+	tx = models.NewOracleRespondTx(OracleID, nonce, QueryID, Response, TTLType, TTLValue, config.Config.Client.Fee, ttl)
 	return tx, nil
 }
 
 // ContractCreateTx creates a contract create transaction, filling in the
 // account nonce and transaction TTL automatically.
-func (c *Context) ContractCreateTx(Code string, CallData string, VMVersion, AbiVersion uint16, Deposit, Amount, GasLimit, Fee *big.Int) (tx *ContractCreateTx, err error) {
-	ttl, nonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
+func (c *Context) ContractCreateTx(Code string, CallData string, VMVersion, AbiVersion uint16, Deposit, Amount, GasLimit, Fee *big.Int) (tx *models.ContractCreateTx, err error) {
+	ttl, nonce, err := c.GetTTLNonce(c.Address, config.Config.Client.TTL)
 	if err != nil {
 		return
 	}
 
-	tx = NewContractCreateTx(c.Address, nonce, Code, VMVersion, AbiVersion, Deposit, Amount, GasLimit, Config.Client.GasPrice, Fee, ttl, CallData)
+	tx = models.NewContractCreateTx(c.Address, nonce, Code, VMVersion, AbiVersion, Deposit, Amount, GasLimit, config.Config.Client.GasPrice, Fee, ttl, CallData)
 	return tx, nil
 }
 
 // ContractCallTx creates a contract call transaction,, filling in the account
 // nonce and transaction TTL automatically.
-func (c *Context) ContractCallTx(ContractID, CallData string, AbiVersion uint16, Amount, GasLimit, GasPrice, Fee *big.Int) (tx *ContractCallTx, err error) {
-	ttl, nonce, err := c.GetTTLNonce(c.Address, Config.Client.TTL)
+func (c *Context) ContractCallTx(ContractID, CallData string, AbiVersion uint16, Amount, GasLimit, GasPrice, Fee *big.Int) (tx *models.ContractCallTx, err error) {
+	ttl, nonce, err := c.GetTTLNonce(c.Address, config.Config.Client.TTL)
 	if err != nil {
 		return
 	}
 
-	tx = NewContractCallTx(c.Address, nonce, ContractID, Amount, GasLimit, GasPrice, AbiVersion, CallData, Fee, ttl)
+	tx = models.NewContractCallTx(c.Address, nonce, ContractID, Amount, GasLimit, GasPrice, AbiVersion, CallData, Fee, ttl)
 	return tx, nil
-}
-
-// StoreAccountToKeyStoreFile saves an encrypted Account to a JSON file
-func StoreAccountToKeyStoreFile(account *Account, password, walletName string) (filePath string, err error) {
-	// keystore will be saved in current directory
-	basePath, _ := os.Getwd()
-
-	// generate the keystore file
-	jks, err := KeystoreSeal(account, password)
-	if err != nil {
-		return
-	}
-	// build the wallet path
-	filePath = filepath.Join(basePath, keyFileName(account.Address))
-	if len(walletName) > 0 {
-		filePath = filepath.Join(basePath, walletName)
-	}
-	// write the file to disk
-	err = ioutil.WriteFile(filePath, jks, 0600)
-	return
-}
-
-// LoadAccountFromKeyStoreFile loads an encrypted Account from a JSON file
-func LoadAccountFromKeyStoreFile(keyFile, password string) (account *Account, err error) {
-	// find out the real path of the wallet
-	filePath, err := GetWalletPath(keyFile)
-	if err != nil {
-		return
-	}
-	// load the json file
-	jks, err := ioutil.ReadFile(filePath)
-	if err != nil {
-		return
-	}
-	// decrypt keystore
-	account, err = KeystoreOpen(jks, password)
-	return
-}
-
-// GetWalletPath checks if a file exists at the specified path.
-func GetWalletPath(path string) (walletPath string, err error) {
-	// if file exists then load the file
-	if _, err = os.Stat(path); !os.IsNotExist(err) {
-		walletPath = path
-		return
-	}
-	return
 }
 
 // VerifySignedTx verifies the signature of a signed transaction, in its RLP
@@ -364,8 +319,8 @@ func GetWalletPath(path string) (walletPath string, err error) {
 // The network ID is also used when calculating the signature, so the network ID
 // that the transaction was intended for should be provided too.
 func VerifySignedTx(accountID string, txSigned string, networkID string) (valid bool, err error) {
-	txRawSigned, _ := Decode(txSigned)
-	txRLP := DecodeRLPMessage(txRawSigned)
+	txRawSigned, _ := binary.Decode(txSigned)
+	txRLP := binary.DecodeRLPMessage(txRawSigned)
 
 	// RLP format of signed signature: [[Tag], [Version], [Signatures...],
 	// [Transaction]]
@@ -374,7 +329,7 @@ func VerifySignedTx(accountID string, txSigned string, networkID string) (valid 
 
 	msg := append([]byte(networkID), tx...)
 
-	valid, err = Verify(accountID, msg, txSignature)
+	valid, err = account.Verify(accountID, msg, txSignature)
 	if err != nil {
 		return
 	}
@@ -385,13 +340,13 @@ func VerifySignedTx(accountID string, txSigned string, networkID string) (valid 
 // specify that the node/mock node passed in should support
 // GetTransactionByHash() and GetHeight()
 type getTransactionByHashHeighter interface {
-	GetTransactionByHasher
-	GetHeighter
+	naet.GetTransactionByHasher
+	naet.GetHeighter
 }
 
 // WaitForTransactionForXBlocks blocks until a transaction has been mined or X
 // blocks have gone by, after which it returns an error. The node polling
-// interval can be configured with Config.Tuning.ChainPollInterval.
+// interval can be config.Configured with config.Config.Tuning.ChainPollInterval.
 func WaitForTransactionForXBlocks(c getTransactionByHashHeighter, txHash string, x uint64) (blockHeight uint64, blockHash string, err error) {
 	nodeHeight, err := c.GetHeight()
 	if err != nil {
@@ -412,19 +367,19 @@ func WaitForTransactionForXBlocks(c getTransactionByHashHeighter, txHash string,
 			bh := big.Int(tx.BlockHeight)
 			return bh.Uint64(), *tx.BlockHash, nil
 		}
-		time.Sleep(time.Millisecond * time.Duration(Config.Tuning.ChainPollInterval))
+		time.Sleep(time.Millisecond * time.Duration(config.Config.Tuning.ChainPollInterval))
 	}
 	return 0, "", fmt.Errorf("%v blocks have gone by and %v still isn't in a block", x, txHash)
 }
 
 // SignBroadcastTransaction signs a transaction and broadcasts it to a node.
-func SignBroadcastTransaction(tx rlp.Encoder, signingAccount *Account, n *Node, networkID string) (signedTxStr, hash, signature string, err error) {
-	signedTx, hash, signature, err := SignHashTx(signingAccount, tx, networkID)
+func SignBroadcastTransaction(tx rlp.Encoder, signingAccount *account.Account, n *naet.Node, networkID string) (signedTxStr, hash, signature string, err error) {
+	signedTx, hash, signature, err := models.SignHashTx(signingAccount, tx, networkID)
 	if err != nil {
 		return
 	}
 
-	signedTxStr, err = SerializeTx(signedTx)
+	signedTxStr, err = models.SerializeTx(signedTx)
 	if err != nil {
 		return
 	}
@@ -438,7 +393,7 @@ func SignBroadcastTransaction(tx rlp.Encoder, signingAccount *Account, n *Node, 
 
 // SignBroadcastWaitTransaction is a convenience function that combines
 // SignBroadcastTransaction and WaitForTransactionForXBlocks.
-func SignBroadcastWaitTransaction(tx rlp.Encoder, signingAccount *Account, n *Node, networkID string, x uint64) (signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
+func SignBroadcastWaitTransaction(tx rlp.Encoder, signingAccount *account.Account, n *naet.Node, networkID string, x uint64) (signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
 	signedTxStr, hash, signature, err = SignBroadcastTransaction(tx, signingAccount, n, networkID)
 	if err != nil {
 		return
@@ -474,8 +429,8 @@ func generateCommitmentID(name string) (ch string, salt *big.Int, err error) {
 
 func computeCommitmentID(name string, salt []byte) (ch string, err error) {
 	nh := append(Namehash(name), salt...)
-	nh, _ = Blake2bHash(nh)
-	ch = Encode(PrefixCommitment, nh)
+	nh, _ = binary.Blake2bHash(nh)
+	ch = binary.Encode(binary.PrefixCommitment, nh)
 	return
 }
 
@@ -488,8 +443,8 @@ func computeCommitmentID(name string, salt []byte) (ch string, err error) {
 func Namehash(name string) []byte {
 	buf := make([]byte, 32)
 	for _, s := range strings.Split(name, ".") {
-		sh, _ := Blake2bHash([]byte(s))
-		buf, _ = Blake2bHash(append(buf, sh...))
+		sh, _ := binary.Blake2bHash([]byte(s))
+		buf, _ = binary.Blake2bHash(append(buf, sh...))
 	}
 	return buf
 }

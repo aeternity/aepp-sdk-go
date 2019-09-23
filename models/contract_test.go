@@ -1,4 +1,4 @@
-package aeternity
+package models
 
 import (
 	"reflect"

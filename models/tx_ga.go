@@ -1,9 +1,10 @@
-package aeternity
+package models
 
 import (
 	"io"
 	"math/big"
 
+	"github.com/aeternity/aepp-sdk-go/v5/binary"
 	rlp "github.com/randomshinichi/rlpae"
 )
 
@@ -31,11 +32,11 @@ func (tx *GAAttachTx) EncodeRLP(w io.Writer) (err error) {
 	if err != nil {
 		return
 	}
-	codeBinary, err := Decode(tx.Code)
+	codeBinary, err := binary.Decode(tx.Code)
 	if err != nil {
 		return
 	}
-	callDataBinary, err := Decode(tx.CallData)
+	callDataBinary, err := binary.Decode(tx.CallData)
 	if err != nil {
 		return
 	}
@@ -91,8 +92,8 @@ func (g *gaAttachRLP) ReadRLP(s *rlp.Stream) (aID, code, calldata string, vmvers
 	if _, aID, err = readIDTag(g.AccountID); err != nil {
 		return
 	}
-	code = Encode(PrefixContractByteArray, g.CodeBinary)
-	calldata = Encode(PrefixContractByteArray, g.CallDataBinary)
+	code = binary.Encode(binary.PrefixContractByteArray, g.CodeBinary)
+	calldata = binary.Encode(binary.PrefixContractByteArray, g.CallDataBinary)
 	vmversion, abiversion = decodeVMABI(g.VMABI)
 	return
 }
@@ -155,7 +156,7 @@ func (tx *GAMetaTx) EncodeRLP(w io.Writer) (err error) {
 	if err != nil {
 		return
 	}
-	authDataBinary, err := Decode(tx.AuthData)
+	authDataBinary, err := binary.Decode(tx.AuthData)
 	if err != nil {
 		return
 	}
@@ -212,7 +213,7 @@ func (g *gaMetaRLP) ReadRLP(s *rlp.Stream) (aID, authdata string, err error) {
 		return
 	}
 
-	authdata = Encode(PrefixContractByteArray, g.AuthDataBinary)
+	authdata = binary.Encode(binary.PrefixContractByteArray, g.AuthDataBinary)
 	return
 }
 

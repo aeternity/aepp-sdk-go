@@ -1,9 +1,10 @@
-package aeternity
+package models
 
 import (
 	"io"
 	"math/big"
 
+	"github.com/aeternity/aepp-sdk-go/binary"
 	"github.com/aeternity/aepp-sdk-go/v5/swagguard/node/models"
 	"github.com/aeternity/aepp-sdk-go/v5/utils"
 	rlp "github.com/randomshinichi/rlpae"
@@ -103,7 +104,7 @@ func (tx *SpendTx) DecodeRLP(s *rlp.Stream) (err error) {
 
 // JSON representation of a Tx is useful for querying the node's debug endpoint
 func (tx *SpendTx) JSON() (string, error) {
-	baseEncodedPayload := Encode(PrefixByteArray, tx.Payload)
+	baseEncodedPayload := binary.Encode(binary.PrefixByteArray, tx.Payload)
 	swaggerT := models.SpendTx{
 		Amount:      utils.BigInt(*tx.Amount),
 		Fee:         utils.BigInt(*tx.Fee),

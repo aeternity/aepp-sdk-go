@@ -1,4 +1,4 @@
-package aeternity
+package config
 
 import (
 	"math/big"

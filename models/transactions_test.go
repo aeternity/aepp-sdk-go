@@ -1,18 +1,19 @@
-package aeternity
+package models
 
 import (
 	"fmt"
 	"reflect"
 	"testing"
 
+	"github.com/aeternity/aepp-sdk-go/binary"
 	"github.com/aeternity/aepp-sdk-go/v5/utils"
 )
 
 func getRLPSerialized(tx1 string, tx2 string) ([]interface{}, []interface{}) {
-	tx1Bytes, _ := Decode(tx1)
-	tx1RLP := DecodeRLPMessage(tx1Bytes)
-	tx2Bytes, _ := Decode(tx2)
-	tx2RLP := DecodeRLPMessage(tx2Bytes)
+	tx1Bytes, _ := binary.Decode(tx1)
+	tx1RLP := binary.DecodeRLPMessage(tx1Bytes)
+	tx2Bytes, _ := binary.Decode(tx2)
+	tx2RLP := binary.DecodeRLPMessage(tx2Bytes)
 	return tx1RLP, tx2RLP
 }
 
@@ -145,8 +146,8 @@ func Test_buildOracleQueryID(t *testing.T) {
 				return
 			}
 			if gotID != tt.wantID {
-				gotIDBytes, _ := Decode(gotID)
-				wantIDBytes, _ := Decode(tt.wantID)
+				gotIDBytes, _ := binary.Decode(gotID)
+				wantIDBytes, _ := binary.Decode(tt.wantID)
 				t.Errorf("buildOracleQueryID() = \n%v\n%v, want \n%v\n%v", gotID, gotIDBytes, tt.wantID, wantIDBytes)
 			}
 		})

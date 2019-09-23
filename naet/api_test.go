@@ -7,4 +7,4 @@ so you can't test all the endpoints anyway. Best to do this in a controlled envi
 
 Therefore this is an integration test, to live in integration_test/api_test.go
 */
-package aeternity
+package naet

@@ -1,4 +1,4 @@
-package aeternity
+package models
 
 import (
 	"bytes"
@@ -6,6 +6,10 @@ import (
 	"io"
 	"math/big"
 
+	"github.com/aeternity/aepp-sdk-go/binary"
+	"github.com/aeternity/aepp-sdk-go/config"
+
+	"github.com/aeternity/aepp-sdk-go/account"
 	"github.com/aeternity/aepp-sdk-go/v5/utils"
 	rlp "github.com/randomshinichi/rlpae"
 )
@@ -103,7 +107,7 @@ func leftPadByteSlice(length int, data []byte) []byte {
 
 func buildOracleQueryID(sender string, senderNonce uint64, recipient string) (id string, err error) {
 	queryIDBin := []byte{}
-	senderBin, err := Decode(sender)
+	senderBin, err := binary.Decode(sender)
 	if err != nil {
 		return
 	}
@@ -113,22 +117,22 @@ func buildOracleQueryID(sender string, senderNonce uint64, recipient string) (id
 	senderNonceBytesPadded := leftPadByteSlice(32, senderNonceBytes)
 	queryIDBin = append(queryIDBin, senderNonceBytesPadded...)
 
-	recipientBin, err := Decode(recipient)
+	recipientBin, err := binary.Decode(recipient)
 	if err != nil {
 		return
 	}
 	queryIDBin = append(queryIDBin, recipientBin...)
 
-	hashedQueryID, err := Blake2bHash(queryIDBin)
+	hashedQueryID, err := binary.Blake2bHash(queryIDBin)
 	if err != nil {
 		return
 	}
-	id = Encode(PrefixOracleQueryID, hashedQueryID)
+	id = binary.Encode(binary.PrefixOracleQueryID, hashedQueryID)
 	return
 }
 
 func buildContractID(sender string, senderNonce uint64) (ctID string, err error) {
-	senderBin, err := Decode(sender)
+	senderBin, err := binary.Decode(sender)
 	if err != nil {
 		return ctID, err
 	}
@@ -137,12 +141,12 @@ func buildContractID(sender string, senderNonce uint64) (ctID string, err error)
 	l.SetUint64(senderNonce)
 
 	ctIDUnhashed := append(senderBin, l.Bytes()...)
-	ctIDHashed, err := Blake2bHash(ctIDUnhashed)
+	ctIDHashed, err := binary.Blake2bHash(ctIDUnhashed)
 	if err != nil {
 		return ctID, err
 	}
 
-	ctID = Encode(PrefixContractPubkey, ctIDHashed)
+	ctID = binary.Encode(binary.PrefixContractPubkey, ctIDHashed)
 	return ctID, err
 }
 
@@ -155,7 +159,7 @@ type Transaction interface {
 // the SignedTx itself, it takes a SignedTx as an argument because if it took a
 // rlp.Encoder as an interface, one might expect the signature to be of the
 // SignedTx itself, which won't work.
-func Sign(kp *Account, tx *SignedTx, networkID string) (signature []byte, err error) {
+func Sign(kp *account.Account, tx *SignedTx, networkID string) (signature []byte, err error) {
 	txRaw, err := rlp.EncodeToBytes(tx.Tx)
 	if err != nil {
 		return []byte{}, err
@@ -174,18 +178,18 @@ func Hash(tx *SignedTx) (txhash string, err error) {
 	if err != nil {
 		return "", err
 	}
-	rlpTxHashRaw, err := Blake2bHash(rlpTxRaw)
+	rlpTxHashRaw, err := binary.Blake2bHash(rlpTxRaw)
 	if err != nil {
 		return "", err
 	}
 
-	txhash = Encode(PrefixTransactionHash, rlpTxHashRaw)
+	txhash = binary.Encode(binary.PrefixTransactionHash, rlpTxHashRaw)
 	return txhash, nil
 }
 
 // SignHashTx wraps a *Tx struct in a SignedTx, then returns its signature and
 // hash.
-func SignHashTx(kp *Account, tx Transaction, networkID string) (signedTx *SignedTx, txhash, signature string, err error) {
+func SignHashTx(kp *account.Account, tx Transaction, networkID string) (signedTx *SignedTx, txhash, signature string, err error) {
 	signedTx = NewSignedTx([][]byte{}, tx)
 	var signatureBytes []byte
 
@@ -195,7 +199,7 @@ func SignHashTx(kp *Account, tx Transaction, networkID string) (signedTx *Signed
 			return
 		}
 		signedTx.Signatures = append(signedTx.Signatures, signatureBytes)
-		signature = Encode(PrefixSignature, signatureBytes)
+		signature = binary.Encode(binary.PrefixSignature, signatureBytes)
 
 	}
 
@@ -220,15 +224,15 @@ func buildPointers(pointers []string) (ptrs []*NamePointer, err error) {
 	// TODO: handle errors
 	ptrs = make([]*NamePointer, len(pointers))
 	for i, p := range pointers {
-		switch GetHashPrefix(p) {
-		case PrefixAccountPubkey:
+		switch binary.GetHashPrefix(p) {
+		case binary.PrefixAccountPubkey:
 			// pID, err := buildIDTag(IDTagAccount, p)
 			key := "account_pubkey"
 			ptrs[i] = NewNamePointer(key, p)
 			if err != nil {
 				break
 			}
-		case PrefixOraclePubkey:
+		case binary.PrefixOraclePubkey:
 			// pID, err := buildIDTag(IDTagOracle, p)
 			key := "oracle_pubkey"
 			ptrs[i] = NewNamePointer(key, p)
@@ -243,32 +247,32 @@ func buildPointers(pointers []string) (ptrs []*NamePointer, err error) {
 }
 
 func calcFeeStd(tx rlp.Encoder, txLen int) *big.Int {
-	// (Config.Client.BaseGas + len(txRLP) * Config.Client.GasPerByte) * Config.Client.GasPrice
+	// (config.Config.Client.BaseGas + len(txRLP) * config.Config.Client.GasPerByte) * config.Config.Client.GasPrice
 	//                                   txLenGasPerByte
 	fee := new(big.Int)
 	txLenGasPerByte := new(big.Int)
 
-	txLenGasPerByte.Mul(utils.NewIntFromUint64(uint64(txLen)), Config.Client.GasPerByte)
-	fee.Add(Config.Client.BaseGas, txLenGasPerByte)
-	fee.Mul(fee, Config.Client.GasPrice)
+	txLenGasPerByte.Mul(utils.NewIntFromUint64(uint64(txLen)), config.Config.Client.GasPerByte)
+	fee.Add(config.Config.Client.BaseGas, txLenGasPerByte)
+	fee.Mul(fee, config.Config.Client.GasPrice)
 	return fee
 }
 
 func calcFeeContract(gas *big.Int, baseGasMultiplier int64, length int) *big.Int {
-	// (Config.Client.BaseGas * 5) + gaslimit + (len(txRLP) * Config.Client.GasPerByte) * Config.Client.GasPrice
+	// (config.Config.Client.BaseGas * 5) + gaslimit + (len(txRLP) * config.Config.Client.GasPerByte) * config.Config.Client.GasPrice
 	//           baseGas5                                txLenGasPerByte
 	baseGas5 := new(big.Int)
 	txLenBig := new(big.Int)
 	answer := new(big.Int)
 
-	baseGas5.Mul(Config.Client.BaseGas, big.NewInt(baseGasMultiplier))
+	baseGas5.Mul(config.Config.Client.BaseGas, big.NewInt(baseGasMultiplier))
 	txLenBig.SetUint64(uint64(length))
 	txLenGasPerByte := new(big.Int)
-	txLenGasPerByte.Mul(txLenBig, Config.Client.GasPerByte)
+	txLenGasPerByte.Mul(txLenBig, config.Config.Client.GasPerByte)
 
 	answer.Add(baseGas5, gas)
 	answer.Add(answer, txLenGasPerByte)
-	answer.Mul(answer, Config.Client.GasPrice)
+	answer.Mul(answer, config.Config.Client.GasPrice)
 	return answer
 }
 
@@ -297,13 +301,13 @@ func SerializeTx(tx rlp.Encoder) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	txStr := Encode(PrefixTransaction, w.Bytes())
+	txStr := binary.Encode(binary.PrefixTransaction, w.Bytes())
 	return txStr, nil
 }
 
 // DeserializeTxStr takes a tx_ string and returns the corresponding Tx struct
 func DeserializeTxStr(txRLP string) (Transaction, error) {
-	rawRLP, err := Decode(txRLP)
+	rawRLP, err := binary.Decode(txRLP)
 	if err != nil {
 		return nil, err
 	}
@@ -323,8 +327,8 @@ func DeserializeTx(rawRLP []byte) (Transaction, error) {
 
 // GetTransactionType reads the RLP input and returns a blank Tx struct of the correct type
 func GetTransactionType(rawRLP []byte) (tx Transaction, err error) {
-	f := DecodeRLPMessage(rawRLP)[0] // [33] interface, needs to be cast to []uint8
-	objTag := uint(f.([]uint8)[0])   // [33] cast to []uint8, get rid of the slice, cast to uint
+	f := binary.DecodeRLPMessage(rawRLP)[0] // [33] interface, needs to be cast to []uint8
+	objTag := uint(f.([]uint8)[0])          // [33] cast to []uint8, get rid of the slice, cast to uint
 	return TransactionTypes[objTag], nil
 }
 
@@ -445,7 +449,7 @@ func buildRLPMessage(tag uint, version uint, fields ...interface{}) (rlpRawMsg [
 // buildIDTag assemble an id() object see
 // https://github.com/aeternity/protocol/blob/master/serializations.md#the-id-type
 func buildIDTag(IDTag uint8, encodedHash string) (v []uint8, err error) {
-	raw, err := Decode(encodedHash)
+	raw, err := binary.Decode(encodedHash)
 	v = []uint8{IDTag}
 	for _, x := range raw {
 		v = append(v, uint8(x))
@@ -462,24 +466,24 @@ func readIDTag(v []uint8) (IDTag uint8, encodedHash string, err error) {
 		hash = append(hash, byte(x))
 	}
 
-	var prefix HashPrefix
+	var prefix binary.HashPrefix
 	switch IDTag {
 	case IDTagAccount:
-		prefix = PrefixAccountPubkey
+		prefix = binary.PrefixAccountPubkey
 	case IDTagName:
-		prefix = PrefixName
+		prefix = binary.PrefixName
 	case IDTagCommitment:
-		prefix = PrefixCommitment
+		prefix = binary.PrefixCommitment
 	case IDTagOracle:
-		prefix = PrefixOraclePubkey
+		prefix = binary.PrefixOraclePubkey
 	case IDTagContract:
-		prefix = PrefixContractPubkey
+		prefix = binary.PrefixContractPubkey
 	case IDTagChannel:
-		prefix = PrefixChannel
+		prefix = binary.PrefixChannel
 	default:
 		return 0, "", fmt.Errorf("readIDTag() does not recognize this IDTag (first byte in input array): %v", IDTag)
 	}
 
-	encodedHash = Encode(prefix, hash)
+	encodedHash = binary.Encode(prefix, hash)
 	return
 }

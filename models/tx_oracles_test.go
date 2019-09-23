@@ -1,10 +1,11 @@
-package aeternity
+package models
 
 import (
 	"fmt"
 	"reflect"
 	"testing"
 
+	"github.com/aeternity/aepp-sdk-go/config"
 	"github.com/aeternity/aepp-sdk-go/v5/utils"
 )
 
@@ -41,7 +42,7 @@ func TestOracleTx(t *testing.T) {
 				AccountNonce:   uint64(1),
 				QuerySpec:      "query Specification",
 				ResponseSpec:   "response Specification",
-				QueryFee:       Config.Client.Oracles.QueryFee,
+				QueryFee:       config.Config.Client.Oracles.QueryFee,
 				OracleTTLType:  0,
 				OracleTTLValue: uint64(100),
 				AbiVersion:     1,
@@ -60,11 +61,11 @@ func TestOracleTx(t *testing.T) {
 				AccountNonce:   uint64(17),
 				QuerySpec:      "query Specification",
 				ResponseSpec:   "response Specification",
-				QueryFee:       Config.Client.Oracles.QueryFee,
+				QueryFee:       config.Config.Client.Oracles.QueryFee,
 				OracleTTLType:  0,
 				OracleTTLValue: uint64(100),
 				AbiVersion:     0,
-				Fee:            Config.Client.Fee,
+				Fee:            config.Config.Client.Fee,
 				TTL:            uint64(50000),
 			},
 			// from the node's debug endpoint
@@ -114,13 +115,13 @@ func TestOracleTx(t *testing.T) {
 				AccountNonce:     uint64(1),
 				OracleID:         "ok_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
 				Query:            "Are you okay?",
-				QueryFee:         Config.Client.Oracles.QueryFee,
-				QueryTTLType:     Config.Client.Oracles.QueryTTLType,
-				QueryTTLValue:    Config.Client.Oracles.QueryTTLValue,
-				ResponseTTLType:  Config.Client.Oracles.ResponseTTLType,
-				ResponseTTLValue: Config.Client.Oracles.ResponseTTLValue,
-				Fee:              Config.Client.Fee,
-				TTL:              Config.Client.TTL,
+				QueryFee:         config.Config.Client.Oracles.QueryFee,
+				QueryTTLType:     config.Config.Client.Oracles.QueryTTLType,
+				QueryTTLValue:    config.Config.Client.Oracles.QueryTTLValue,
+				ResponseTTLType:  config.Config.Client.Oracles.ResponseTTLType,
+				ResponseTTLValue: config.Config.Client.Oracles.ResponseTTLValue,
+				Fee:              config.Config.Client.Fee,
+				TTL:              config.Config.Client.TTL,
 			},
 			// from the node
 			wantJSON: `{"fee":200000000000000,"nonce":1,"oracle_id":"ok_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi","query":"Are you okay?","query_fee":0,"query_ttl":{"type":"delta","value":300},"response_ttl":{"type":"delta","value":300},"sender_id":"ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v","ttl":500}`,
@@ -152,8 +153,8 @@ func TestOracleTx(t *testing.T) {
 				Response:         "Hello back",
 				ResponseTTLType:  0,
 				ResponseTTLValue: 100,
-				Fee:              Config.Client.Fee,
-				TTL:              Config.Client.TTL,
+				Fee:              config.Config.Client.Fee,
+				TTL:              config.Config.Client.TTL,
 			},
 			wantJSON: `{"fee":200000000000000,"nonce":1,"oracle_id":"ok_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi","query_id":"oq_2NhMjBdKHJYnQjDbAxanmxoXiSiWDoG9bqDgk2MfK2X6AB9Bwx","response":"Hello back","response_ttl":{"type":"delta","value":100},"ttl":500}`,
 			wantRLP:  "tx_+F0YAaEEzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vMBoLT1h6fjQDFn1a7j+6wVQ886V47xiFwvkbL+x2yR3J9cikhlbGxvIGJhY2sAZIa15iD0gACCAfQC7+L+",

@@ -1,9 +1,10 @@
-package aeternity
+package models
 
 import (
 	"io"
 	"math/big"
 
+	"github.com/aeternity/aepp-sdk-go/binary"
 	"github.com/aeternity/aepp-sdk-go/v5/swagguard/node/models"
 	"github.com/aeternity/aepp-sdk-go/v5/utils"
 	rlp "github.com/randomshinichi/rlpae"
@@ -207,7 +208,7 @@ func (tx *NameClaimTx) DecodeRLP(s *rlp.Stream) (err error) {
 func (tx *NameClaimTx) JSON() (string, error) {
 	// When talking JSON to the node, the name should be 'API encoded'
 	// (base58), not namehash-ed.
-	nameAPIEncoded := Encode(PrefixName, []byte(tx.Name))
+	nameAPIEncoded := binary.Encode(binary.PrefixName, []byte(tx.Name))
 	swaggerT := models.NameClaimTx{
 		AccountID: &tx.AccountID,
 		Fee:       utils.BigInt(*tx.Fee),
