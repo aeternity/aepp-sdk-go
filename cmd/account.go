@@ -22,8 +22,8 @@ import (
 
 	"github.com/aeternity/aepp-sdk-go/account"
 	"github.com/aeternity/aepp-sdk-go/config"
-	"github.com/aeternity/aepp-sdk-go/models"
 	"github.com/aeternity/aepp-sdk-go/naet"
+	"github.com/aeternity/aepp-sdk-go/transactions"
 
 	"github.com/spf13/cobra"
 )
@@ -169,12 +169,12 @@ func signFunc(cmd *cobra.Command, args []string) (err error) {
 	}
 
 	txUnsignedBase64 := args[1]
-	tx, err := models.DeserializeTxStr(txUnsignedBase64)
+	tx, err := transactions.DeserializeTxStr(txUnsignedBase64)
 	if err != nil {
 		return err
 	}
 
-	txSignedBase64, txHash, signature, err := models.SignHashTx(account, tx, config.Node.NetworkID)
+	txSignedBase64, txHash, signature, err := transactions.SignHashTx(account, tx, config.Node.NetworkID)
 	if err != nil {
 		return err
 	}
