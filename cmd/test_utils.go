@@ -12,8 +12,8 @@ import (
 )
 
 func setPrivateNetParams() {
-	config.Config.Node.URL = "http://localhost:3013"
-	config.Config.Node.NetworkID = "ae_docker"
+	config.Node.URL = "http://localhost:3013"
+	config.Node.NetworkID = "ae_docker"
 }
 
 // dumpV serializes and prints out any swagger model in JSON. Useful when

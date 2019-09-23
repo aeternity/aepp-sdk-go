@@ -42,7 +42,7 @@ func TestAENSWorkflow(t *testing.T) {
 
 	name := randomName(6)
 	// Preclaim the name
-	preclaimTx, salt, err := aensAlice.NamePreclaimTx(name, config.Config.Client.Fee)
+	preclaimTx, salt, err := aensAlice.NamePreclaimTx(name, config.Client.Fee)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -56,7 +56,7 @@ func TestAENSWorkflow(t *testing.T) {
 	_, _, _ = waitForTransaction(node, hash)
 
 	// Claim the name
-	claimTx, err := aensAlice.NameClaimTx(name, salt, config.Config.Client.Fee)
+	claimTx, err := aensAlice.NameClaimTx(name, salt, config.Client.Fee)
 	if err != nil {
 		t.Fatal(err)
 	}

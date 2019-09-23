@@ -4,7 +4,9 @@ import (
 	"math/big"
 )
 
-// Acceptable values for various parameters
+// The main purpose of these constants is to relieve the user from having to
+// remember the exact underlying value for a particular setting. They are also
+// unlikely to change.
 const (
 	// NetworkIDMainnet is the network ID for aeternity mainnet
 	NetworkIDMainnet = "ae_mainnet"
@@ -138,56 +140,69 @@ type ProfileConfig struct {
 	Tuning   TuningConfig   `json:"tuning" yaml:"tuning" mapstructure:"tuning"`
 }
 
-// Config specifies defaults for all configuration parameters
-var Config = ProfileConfig{
-	Name: "Default Config",
-	Node: NodeConfig{
-		URL:         "https://sdk-mainnet.aepps.com",
-		URLInternal: "https://sdk-mainnet.aepps.com",
-		URLChannels: "https://sdk-mainnet.aepps.com",
-		NetworkID:   "ae_mainnet",
+// Node holds default settings for NodeConfig
+var Node = NodeConfig{
+	URL:         "https://sdk-mainnet.aepps.com",
+	URLInternal: "https://sdk-mainnet.aepps.com",
+	URLChannels: "https://sdk-mainnet.aepps.com",
+	NetworkID:   "ae_mainnet",
+}
+
+// Compiler holds default settings for CompilerConfig
+var Compiler = CompilerConfig{
+	URL:     "http://localhost:3080",
+	Backend: CompilerBackendAEVM,
+}
+
+// Client holds default settings for ClientConfig
+var Client = ClientConfig{
+	BaseGas:    big.NewInt(15000),
+	GasPerByte: big.NewInt(20),
+	GasPrice:   big.NewInt(1e9),
+	TTL:        500,
+	Fee:        big.NewInt(2e14),
+	Names: AensConfig{
+		NameTTL:   500,
+		ClientTTL: 500,
 	},
-	Compiler: CompilerConfig{
-		URL:     "http://localhost:3080",
-		Backend: CompilerBackendAEVM,
+	Contracts: ContractConfig{
+		CompilerURL: "http://localhost:3080",
+		GasLimit:    big.NewInt(1e9),
+		Amount:      new(big.Int),
+		Deposit:     new(big.Int),
+		VMVersion:   4,
+		ABIVersion:  1,
 	},
-	Client: ClientConfig{
-		BaseGas:    big.NewInt(15000),
-		GasPerByte: big.NewInt(20),
-		GasPrice:   big.NewInt(1e9),
-		TTL:        500,
-		Fee:        big.NewInt(2e14),
-		Names: AensConfig{
-			NameTTL:   500,
-			ClientTTL: 500,
-		},
-		Contracts: ContractConfig{
-			CompilerURL: "http://localhost:3080",
-			GasLimit:    big.NewInt(1e9),
-			Amount:      new(big.Int),
-			Deposit:     new(big.Int),
-			VMVersion:   4,
-			ABIVersion:  1,
-		},
-		Oracles: OracleConfig{
-			QueryFee:         big.NewInt(0),
-			QueryTTLType:     OracleTTLTypeDelta,
-			QueryTTLValue:    300,
-			ResponseTTLType:  OracleTTLTypeDelta,
-			ResponseTTLValue: 300,
-			VMVersion:        0,
-		},
-		StateChannels: StateChannelConfig{ // UNUSED
-			LockPeriod:     0,
-			ChannelReserve: 0,
-		},
+	Oracles: OracleConfig{
+		QueryFee:         big.NewInt(0),
+		QueryTTLType:     OracleTTLTypeDelta,
+		QueryTTLValue:    300,
+		ResponseTTLType:  OracleTTLTypeDelta,
+		ResponseTTLValue: 300,
+		VMVersion:        0,
 	},
-	Tuning: TuningConfig{
-		ChainPollInterval: 100,
-		ChainTimeout:      5000,
-		CryptoKdfMemlimit: 1024 * 32, // 32MB
-		CryptoKdfOpslimit: 3,
-		CryptoKdfThreads:  1,
-		OutputFormatJSON:  false,
+	StateChannels: StateChannelConfig{ // UNUSED
+		LockPeriod:     0,
+		ChannelReserve: 0,
 	},
+}
+
+// Tuning holds default settings for TuningConfig
+var Tuning = TuningConfig{
+	ChainPollInterval: 100,
+	ChainTimeout:      5000,
+	CryptoKdfMemlimit: 1024 * 32, // 32MB
+	CryptoKdfOpslimit: 3,
+	CryptoKdfThreads:  1,
+	OutputFormatJSON:  false,
+}
+
+// Profile collects the default settings together to form a settings profile
+// that can be saved/loaded.
+var Profile = ProfileConfig{
+	Name:     "Default Config",
+	Node:     Node,
+	Compiler: Compiler,
+	Client:   Client,
+	Tuning:   Tuning,
 }

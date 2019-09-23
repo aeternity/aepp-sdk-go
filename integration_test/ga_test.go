@@ -27,7 +27,7 @@ func EncodeRLPToBytes(tx rlp.Encoder) (b []byte, err error) {
 func TestGeneralizedAccounts(t *testing.T) {
 	alice, bob := setupAccounts(t)
 	node := setupNetwork(t, privatenetURL, false)
-	compiler := naet.NewCompiler(config.Config.Client.Contracts.CompilerURL, false)
+	compiler := naet.NewCompiler(config.Client.Contracts.CompilerURL, false)
 	ttlFunc := aeternity.GenerateGetTTL(node)
 
 	// Take note of Bob's balance, and after this test, we expect it to have this much more AE
@@ -43,11 +43,11 @@ func TestGeneralizedAccounts(t *testing.T) {
 
 	authorizeSource := string(golden.Get(t, "authorize.aes"))
 	// Read the auth contract from a file, compile and prepare its init() calldata
-	authBytecode, err := compiler.CompileContract(authorizeSource, config.Config.Compiler.Backend)
+	authBytecode, err := compiler.CompileContract(authorizeSource, config.Compiler.Backend)
 	if err != nil {
 		t.Fatal(err)
 	}
-	authInitCalldata, err := compiler.EncodeCalldata(authorizeSource, "init", []string{alice.Address}, config.Config.Compiler.Backend)
+	authInitCalldata, err := compiler.EncodeCalldata(authorizeSource, "init", []string{alice.Address}, config.Compiler.Backend)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -72,11 +72,11 @@ func TestGeneralizedAccounts(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	ttl, err := ttlFunc(config.Config.Client.TTL)
+	ttl, err := ttlFunc(config.Client.TTL)
 	if err != nil {
 		t.Fatal(err)
 	}
-	gaTx := models.NewGAAttachTx(testAccount.Address, 1, authBytecode, auth.TypeInfo[0].FuncHash, config.Config.Client.Contracts.VMVersion, config.Config.Client.Contracts.ABIVersion, config.Config.Client.BaseGas, config.Config.Client.GasPrice, config.Config.Client.Fee, ttl, authInitCalldata)
+	gaTx := models.NewGAAttachTx(testAccount.Address, 1, authBytecode, auth.TypeInfo[0].FuncHash, config.Client.Contracts.VMVersion, config.Client.Contracts.ABIVersion, config.Client.BaseGas, config.Client.GasPrice, config.Client.Fee, ttl, authInitCalldata)
 	_, txHash, _, err := aeternity.SignBroadcastTransaction(gaTx, testAccount, node, networkID)
 	if err != nil {
 		t.Fatal(err)
@@ -100,7 +100,7 @@ func TestGeneralizedAccounts(t *testing.T) {
 
 	// GAMetaTx
 	// Get the TTL (not really needed, could be 0 too)
-	ttl, err = ttlFunc(config.Config.Client.TTL)
+	ttl, err = ttlFunc(config.Client.TTL)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -110,10 +110,10 @@ func TestGeneralizedAccounts(t *testing.T) {
 	// authData is authorize(3)
 	authData := "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACBGtXufEG2HuMYcRcNwsGAeqymslunKf692bHnvwI5K6wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAU3aKBNm"
 	gas := utils.NewIntFromUint64(10000) // the node will fail the authentication if there isn't enough gas
-	spendTx := models.NewSpendTx(testAccount.Address, bob.Address, big.NewInt(5000), config.Config.Client.Fee, []byte{}, ttl, 0)
-	gaMetaTx := models.NewGAMetaTx(testAccount.Address, authData, config.Config.Client.Contracts.ABIVersion, gas, config.Config.Client.GasPrice, config.Config.Client.Fee, ttl, spendTx)
+	spendTx := models.NewSpendTx(testAccount.Address, bob.Address, big.NewInt(5000), config.Client.Fee, []byte{}, ttl, 0)
+	gaMetaTx := models.NewGAMetaTx(testAccount.Address, authData, config.Client.Contracts.ABIVersion, gas, config.Client.GasPrice, config.Client.Fee, ttl, spendTx)
 
-	gaMetaTxFinal, hash, _, err := models.SignHashTx(testAccount, gaMetaTx, config.Config.Node.NetworkID)
+	gaMetaTxFinal, hash, _, err := models.SignHashTx(testAccount, gaMetaTx, config.Node.NetworkID)
 	if err != nil {
 		t.Fatal(err)
 	}

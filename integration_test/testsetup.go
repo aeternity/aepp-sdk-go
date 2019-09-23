@@ -22,9 +22,9 @@ var testnetURL = "http://sdk-testnet.aepps.com"
 var networkID = "ae_docker"
 
 func setupNetwork(t *testing.T, nodeURL string, debug bool) *naet.Node {
-	config.Config.Node.NetworkID = networkID
+	config.Node.NetworkID = networkID
 	client := naet.NewNode(nodeURL, debug)
-	t.Logf("nodeURL: %s, networkID: %s", nodeURL, config.Config.Node.NetworkID)
+	t.Logf("nodeURL: %s, networkID: %s", nodeURL, config.Node.NetworkID)
 	return client
 }
 
@@ -81,7 +81,7 @@ func fundAccount(t *testing.T, node *naet.Node, source, destination *account.Acc
 	ctx := aeternity.NewContextFromNode(node, source.Address)
 
 	fmt.Println("Funding account", destination.Address)
-	tx, err := ctx.SpendTx(source.Address, destination.Address, amount, config.Config.Client.Fee, []byte{})
+	tx, err := ctx.SpendTx(source.Address, destination.Address, amount, config.Client.Fee, []byte{})
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -174,7 +174,7 @@ func ttlFunc(conn naet.GetHeighter, args []string) (err error) {
 		errFinal := fmt.Errorf("Error getting height from the node: %v", err)
 		return errFinal
 	}
-	ttl = height + config.Config.Client.TTL
+	ttl = height + config.Client.TTL
 	fmt.Println(ttl)
 	return nil
 }

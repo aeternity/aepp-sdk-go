@@ -174,7 +174,7 @@ func signFunc(cmd *cobra.Command, args []string) (err error) {
 		return err
 	}
 
-	txSignedBase64, txHash, signature, err := models.SignHashTx(account, tx, config.Config.Node.NetworkID)
+	txSignedBase64, txHash, signature, err := models.SignHashTx(account, tx, config.Node.NetworkID)
 	if err != nil {
 		return err
 	}

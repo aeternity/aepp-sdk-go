@@ -79,7 +79,7 @@ func txSpendFunc(ttlFunc aeternity.GetTTLFunc, nonceFunc aeternity.GetNextNonceF
 	// If TTL was not specified as an argument, connect to the node to calculate
 	// it
 	if ttl == 0 {
-		ttl, err = ttlFunc(config.Config.Client.TTL)
+		ttl, err = ttlFunc(config.Client.TTL)
 		if err != nil {
 			return err
 		}
@@ -156,13 +156,13 @@ func txContractCreateFunc(ttlFunc aeternity.GetTTLFunc, nonceFunc aeternity.GetN
 	// If TTL was not specified as an argument, connect to the node to calculate
 	// it
 	if ttl == 0 {
-		ttl, err = ttlFunc(config.Config.Client.TTL)
+		ttl, err = ttlFunc(config.Client.TTL)
 		if err != nil {
 			return err
 		}
 	}
 
-	tx := models.NewContractCreateTx(owner, nonce, contract, config.Config.Client.Contracts.VMVersion, config.Config.Client.Contracts.ABIVersion, config.Config.Client.Contracts.Deposit, config.Config.Client.Contracts.Amount, config.Config.Client.Contracts.GasLimit, config.Config.Client.GasPrice, config.Config.Client.Fee, ttl, calldata)
+	tx := models.NewContractCreateTx(owner, nonce, contract, config.Client.Contracts.VMVersion, config.Client.Contracts.ABIVersion, config.Client.Contracts.Deposit, config.Client.Contracts.Amount, config.Client.Contracts.GasLimit, config.Client.GasPrice, config.Client.Fee, ttl, calldata)
 
 	txStr, err := models.SerializeTx(tx)
 	if err != nil {
@@ -211,15 +211,15 @@ func txVerifyFunc(cmd *cobra.Command, args []string) (err error) {
 	if !IsTransaction(txSignedBase64) {
 		return errors.New("Error, missing or invalid base64 encoded transaction")
 	}
-	valid, err := aeternity.VerifySignedTx(sender, txSignedBase64, config.Config.Node.NetworkID)
+	valid, err := aeternity.VerifySignedTx(sender, txSignedBase64, config.Node.NetworkID)
 	if err != nil {
 		err := fmt.Errorf("error while verifying signature: %s", err)
 		return err
 	}
 	if valid {
-		fmt.Printf("The signature is valid (network-id: %s)\n", config.Config.Node.NetworkID)
+		fmt.Printf("The signature is valid (network-id: %s)\n", config.Node.NetworkID)
 	} else {
-		message := fmt.Sprintf("The signature is invalid (expecting network-id: %s)", config.Config.Node.NetworkID)
+		message := fmt.Sprintf("The signature is invalid (expecting network-id: %s)", config.Node.NetworkID)
 		// fmt.Println(message)
 		err = errors.New(message)
 	}
@@ -258,7 +258,7 @@ func init() {
 	txCmd.AddCommand(txDumpRawCmd)
 
 	// tx spend command
-	txSpendCmd.Flags().StringVar(&fee, "fee", config.Config.Client.Fee.String(), fmt.Sprintf("Set the transaction fee (default=%s)", config.Config.Client.Fee.String()))
+	txSpendCmd.Flags().StringVar(&fee, "fee", config.Client.Fee.String(), fmt.Sprintf("Set the transaction fee (default=%s)", config.Client.Fee.String()))
 	txSpendCmd.Flags().Uint64Var(&ttl, "ttl", 0, fmt.Sprintf("Set the TTL in keyblocks (default=%d)", 0))
 	txSpendCmd.Flags().Uint64Var(&nonce, "nonce", 0, fmt.Sprint("Set the sender account nonce, if not the chain will be queried for its value"))
 	txSpendCmd.Flags().StringVar(&spendTxPayload, "payload", "", fmt.Sprint("Optional text payload for Spend Transactions, which will be turned into a bytearray"))
