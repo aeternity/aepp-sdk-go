@@ -10,6 +10,90 @@ import (
 	rlp "github.com/randomshinichi/rlpae"
 )
 
+// TransactionTypes is a map between the ObjectTags defined above and the
+// corresponding Tx struct
+var TransactionTypes = map[uint]Transaction{
+	ObjectTagSignedTransaction:                   &SignedTx{},
+	ObjectTagSpendTransaction:                    &SpendTx{},
+	ObjectTagNameServiceClaimTransaction:         &NameClaimTx{},
+	ObjectTagNameServicePreclaimTransaction:      &NamePreclaimTx{},
+	ObjectTagNameServiceUpdateTransaction:        &NameUpdateTx{},
+	ObjectTagNameServiceRevokeTransaction:        &NameRevokeTx{},
+	ObjectTagNameServiceTransferTransaction:      &NameTransferTx{},
+	ObjectTagOracleRegisterTransaction:           &OracleRegisterTx{},
+	ObjectTagOracleQueryTransaction:              &OracleQueryTx{},
+	ObjectTagOracleResponseTransaction:           &OracleRespondTx{},
+	ObjectTagOracleExtendTransaction:             &OracleExtendTx{},
+	ObjectTagContractCreateTransaction:           &ContractCreateTx{},
+	ObjectTagContractCallTransaction:             &ContractCallTx{},
+	ObjectTagGeneralizedAccountAttachTransaction: &GAAttachTx{},
+	ObjectTagGeneralizedAccountMetaTransaction:   &GAMetaTx{},
+}
+
+// RLP message version used in RLP serialization
+const (
+	rlpMessageVersion uint = 1
+)
+
+// Address-like bytearrays are converted in to an ID (uint8 bytearray) for RLP
+// serialization. ID Tags differentiate between them.
+// https://github.com/aeternity/protocol/blob/master/serializations.md#the-id-type
+const (
+	IDTagAccount    uint8 = 1
+	IDTagName       uint8 = 2
+	IDTagCommitment uint8 = 3
+	IDTagOracle     uint8 = 4
+	IDTagContract   uint8 = 5
+	IDTagChannel    uint8 = 6
+)
+
+// Object tags are used to differentiate between different types of bytearrays
+// in RLP serialization. see
+// https://github.com/aeternity/protocol/blob/master/serializations.md#binary-serialization
+const (
+	ObjectTagAccount                             uint = 10
+	ObjectTagSignedTransaction                   uint = 11
+	ObjectTagSpendTransaction                    uint = 12
+	ObjectTagOracle                              uint = 20
+	ObjectTagOracleQuery                         uint = 21
+	ObjectTagOracleRegisterTransaction           uint = 22
+	ObjectTagOracleQueryTransaction              uint = 23
+	ObjectTagOracleResponseTransaction           uint = 24
+	ObjectTagOracleExtendTransaction             uint = 25
+	ObjectTagNameServiceName                     uint = 30
+	ObjectTagNameServiceCommitment               uint = 31
+	ObjectTagNameServiceClaimTransaction         uint = 32
+	ObjectTagNameServicePreclaimTransaction      uint = 33
+	ObjectTagNameServiceUpdateTransaction        uint = 34
+	ObjectTagNameServiceRevokeTransaction        uint = 35
+	ObjectTagNameServiceTransferTransaction      uint = 36
+	ObjectTagContract                            uint = 40
+	ObjectTagContractCall                        uint = 41
+	ObjectTagContractCreateTransaction           uint = 42
+	ObjectTagContractCallTransaction             uint = 43
+	ObjectTagChannelCreateTransaction            uint = 50
+	ObjectTagChannelDepositTransaction           uint = 51
+	ObjectTagChannelWithdrawTransaction          uint = 52
+	ObjectTagChannelForceProgressTransaction     uint = 521
+	ObjectTagChannelCloseMutualTransaction       uint = 53
+	ObjectTagChannelCloseSoloTransaction         uint = 54
+	ObjectTagChannelSlashTransaction             uint = 55
+	ObjectTagChannelSettleTransaction            uint = 56
+	ObjectTagChannelOffChainTransaction          uint = 57
+	ObjectTagChannelOffChainUpdateTransfer       uint = 570
+	ObjectTagChannelOffChainUpdateDeposit        uint = 571
+	ObjectTagChannelOffChainUpdateWithdrawal     uint = 572
+	ObjectTagChannelOffChainUpdateCreateContract uint = 573
+	ObjectTagChannelOffChainUpdateCallContract   uint = 574
+	ObjectTagChannel                             uint = 58
+	ObjectTagChannelSnapshotTransaction          uint = 59
+	ObjectTagPoi                                 uint = 60
+	ObjectTagGeneralizedAccountAttachTransaction uint = 80
+	ObjectTagGeneralizedAccountMetaTransaction   uint = 81
+	ObjectTagMicroBody                           uint = 101
+	ObjectTagLightMicroBlock                     uint = 102
+)
+
 func leftPadByteSlice(length int, data []byte) []byte {
 	dataLen := len(data)
 	t := make([]byte, length-dataLen)
