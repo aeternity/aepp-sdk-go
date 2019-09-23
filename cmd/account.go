@@ -74,7 +74,7 @@ func addressFunc(cmd *cobra.Command, args []string) error {
 	}
 
 	// load the account
-	account, err := account.LoadAccountFromKeyStoreFile(args[0], p)
+	account, err := account.LoadFromKeyStoreFile(args[0], p)
 	if err != nil {
 		return err
 	}
@@ -99,7 +99,7 @@ var createCmd = &cobra.Command{
 }
 
 func createFunc(cmd *cobra.Command, args []string) (err error) {
-	acc, _ := account.NewAccount()
+	acc, _ := account.New()
 	p, err := getPassword()
 	if err != nil {
 		return err
@@ -107,7 +107,7 @@ func createFunc(cmd *cobra.Command, args []string) (err error) {
 	accountFileName = args[0]
 
 	// check if a name was given
-	f, err := account.StoreAccountToKeyStoreFile(acc, p, accountFileName)
+	f, err := account.StoreToKeyStoreFile(acc, p, accountFileName)
 	if err != nil {
 		return err
 	}
@@ -136,7 +136,7 @@ func balanceFunc(conn naet.GetAccounter, args []string) (err error) {
 	p, err := getPassword()
 
 	// load the account
-	account, err := account.LoadAccountFromKeyStoreFile(args[0], p)
+	account, err := account.LoadFromKeyStoreFile(args[0], p)
 	if err != nil {
 		return err
 	}
@@ -163,7 +163,7 @@ func signFunc(cmd *cobra.Command, args []string) (err error) {
 	p, err := getPassword()
 
 	// load the account
-	account, err := account.LoadAccountFromKeyStoreFile(args[0], p)
+	account, err := account.LoadFromKeyStoreFile(args[0], p)
 	if err != nil {
 		return err
 	}
@@ -200,14 +200,14 @@ var saveCmd = &cobra.Command{
 
 func saveFunc(cmd *cobra.Command, args []string) (err error) {
 	accountFileName := args[0]
-	acc, err := account.AccountFromHexString(args[1])
+	acc, err := account.FromHexString(args[1])
 	if err != nil {
 		return err
 	}
 
 	p, err := getPassword()
 
-	f, err := account.StoreAccountToKeyStoreFile(acc, p, accountFileName)
+	f, err := account.StoreToKeyStoreFile(acc, p, accountFileName)
 	if err != nil {
 		return err
 	}
@@ -244,7 +244,7 @@ func vanityFunc(cmd *cobra.Command, args []string) {
 	for i := 0; i < runtime.NumCPU(); i++ {
 		go func() {
 			for {
-				a, _ := account.NewAccount()
+				a, _ := account.New()
 
 				if r.MatchString(a.Address[3:]) {
 					fmt.Println("FOUND!")

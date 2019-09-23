@@ -24,7 +24,7 @@ func TestLoad(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			kp, err := AccountFromHexString(tt.args.pk)
+			kp, err := FromHexString(tt.args.pk)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Load() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -39,7 +39,7 @@ func TestKeyPair_Sign(t *testing.T) {
 
 	priv := "4d881dd1917036cc231f9881a0db978c8899dd76a817252418606b02bf6ab9d22378f892b7cc82c2d2739e994ec9953aa36461f1eb5a4a49a5b0de17b3d23ae8"
 	pub := "ak_Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm"
-	kp, _ := AccountFromHexString(priv)
+	kp, _ := FromHexString(priv)
 
 	if kp.Address != pub {
 		t.Errorf("Load() expected = %v, got %v", pub, kp.Address)
@@ -88,7 +88,7 @@ func TestLoadFromFile(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := LoadAccountFromKeyStoreFile(tt.args.path, tt.args.password)
+			_, err := LoadFromKeyStoreFile(tt.args.path, tt.args.password)
 			if tt.wantErr {
 				if err == nil {
 					t.Errorf("LoadFromFile() error = %v, wantErr %v", err, tt.wantErr)
@@ -115,7 +115,7 @@ func TestGenerate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotKp, err := NewAccount()
+			gotKp, err := New()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Generate() error = %v, wantErr %v", err, tt.wantErr)
 				return

@@ -29,12 +29,12 @@ func setupNetwork(t *testing.T, nodeURL string, debug bool) *naet.Node {
 }
 
 func setupAccounts(t *testing.T) (*account.Account, *account.Account) {
-	alice, err := account.AccountFromHexString(senderPrivateKey)
+	alice, err := account.FromHexString(senderPrivateKey)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	bob, err := account.AccountFromHexString(recipientPrivateKey)
+	bob, err := account.FromHexString(recipientPrivateKey)
 	if err != nil {
 		t.Fatal(err)
 	}

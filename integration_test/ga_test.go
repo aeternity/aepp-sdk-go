@@ -53,7 +53,7 @@ func TestGeneralizedAccounts(t *testing.T) {
 	}
 
 	// Create throwaway test account, fund it and ensure it is a POA
-	testAccount, err := account.NewAccount()
+	testAccount, err := account.New()
 	if err != nil {
 		t.Fatal(err)
 	}
