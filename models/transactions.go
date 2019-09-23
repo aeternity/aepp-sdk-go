@@ -247,32 +247,32 @@ func buildPointers(pointers []string) (ptrs []*NamePointer, err error) {
 }
 
 func calcFeeStd(tx rlp.Encoder, txLen int) *big.Int {
-	// (config.Config.Client.BaseGas + len(txRLP) * config.Config.Client.GasPerByte) * config.Config.Client.GasPrice
+	// (config.Client.BaseGas + len(txRLP) * config.Client.GasPerByte) * config.Client.GasPrice
 	//                                   txLenGasPerByte
 	fee := new(big.Int)
 	txLenGasPerByte := new(big.Int)
 
-	txLenGasPerByte.Mul(utils.NewIntFromUint64(uint64(txLen)), config.Config.Client.GasPerByte)
-	fee.Add(config.Config.Client.BaseGas, txLenGasPerByte)
-	fee.Mul(fee, config.Config.Client.GasPrice)
+	txLenGasPerByte.Mul(utils.NewIntFromUint64(uint64(txLen)), config.Client.GasPerByte)
+	fee.Add(config.Client.BaseGas, txLenGasPerByte)
+	fee.Mul(fee, config.Client.GasPrice)
 	return fee
 }
 
 func calcFeeContract(gas *big.Int, baseGasMultiplier int64, length int) *big.Int {
-	// (config.Config.Client.BaseGas * 5) + gaslimit + (len(txRLP) * config.Config.Client.GasPerByte) * config.Config.Client.GasPrice
+	// (config.Client.BaseGas * 5) + gaslimit + (len(txRLP) * config.Client.GasPerByte) * config.Client.GasPrice
 	//           baseGas5                                txLenGasPerByte
 	baseGas5 := new(big.Int)
 	txLenBig := new(big.Int)
 	answer := new(big.Int)
 
-	baseGas5.Mul(config.Config.Client.BaseGas, big.NewInt(baseGasMultiplier))
+	baseGas5.Mul(config.Client.BaseGas, big.NewInt(baseGasMultiplier))
 	txLenBig.SetUint64(uint64(length))
 	txLenGasPerByte := new(big.Int)
-	txLenGasPerByte.Mul(txLenBig, config.Config.Client.GasPerByte)
+	txLenGasPerByte.Mul(txLenBig, config.Client.GasPerByte)
 
 	answer.Add(baseGas5, gas)
 	answer.Add(answer, txLenGasPerByte)
-	answer.Mul(answer, config.Config.Client.GasPrice)
+	answer.Mul(answer, config.Client.GasPrice)
 	return answer
 }
 

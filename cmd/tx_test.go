@@ -45,7 +45,7 @@ func TestTxVerify(t *testing.T) {
 	// unsigned tx_+FMMAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vOhAR8To7CL8AFABmKmi2nYdfeAPOxMCGR/btXYTHiXvVCjCoa15iD0gACCAfQBgIHqJ/Y=
 	// sign with ae_mainnet
 	signedTx := "tx_+J0LAfhCuEBcvwtyCo3FYqmINcP6lHLH/dRDcj5rUiKDqYKhPpiQ+1SBQ66rF3gdVQ1IcANcw/IayK//YgK2dsDF1VtroQEAuFX4UwwBoQHOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+86EBHxOjsIvwAUAGYqaLadh194A87EwIZH9u1dhMeJe9UKMKhrXmIPSAAIIB9AGAx+EjLg=="
-	config.Config.Node.NetworkID = "ae_mainnet"
+	config.Node.NetworkID = "ae_mainnet"
 	emptyCmd := cobra.Command{}
 
 	err := txVerifyFunc(&emptyCmd, []string{alice, signedTx})

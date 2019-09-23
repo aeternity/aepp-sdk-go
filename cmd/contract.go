@@ -35,7 +35,7 @@ func compileFunc(conn naet.CompileContracter, args []string) (err error) {
 		return err
 	}
 
-	bytecode, err := conn.CompileContract(s, config.Config.Compiler.Backend)
+	bytecode, err := conn.CompileContract(s, config.Compiler.Backend)
 	fmt.Println(bytecode)
 	return err
 }
@@ -58,7 +58,7 @@ func encodeCalldataFunc(conn naet.EncodeCalldataer, args []string) (err error) {
 		return err
 	}
 
-	callData, err := conn.EncodeCalldata(s, args[1], args[2:], config.Config.Compiler.Backend)
+	callData, err := conn.EncodeCalldata(s, args[1], args[2:], config.Compiler.Backend)
 	if err != nil {
 		return err
 	}
@@ -91,7 +91,7 @@ func decodeCalldataBytecodeFunc(conn decodeCalldataer, args []string) (err error
 		return fmt.Errorf("%s is not bytecode", args[0])
 	}
 
-	r, err := conn.DecodeCalldataBytecode(args[0], args[1], config.Config.Compiler.Backend)
+	r, err := conn.DecodeCalldataBytecode(args[0], args[1], config.Compiler.Backend)
 	if err != nil {
 		return
 	}
@@ -121,7 +121,7 @@ func decodeCalldataSourceFunc(conn decodeCalldataer, args []string) (err error) 
 		return fmt.Errorf("%s is not bytecode", args[0])
 	}
 
-	r, err := conn.DecodeCalldataSource(source, args[1], args[2], config.Config.Compiler.Backend)
+	r, err := conn.DecodeCalldataSource(source, args[1], args[2], config.Compiler.Backend)
 
 	fmt.Println(*r.Function, r.Arguments)
 	return
@@ -145,7 +145,7 @@ func generateAciFunc(conn naet.GenerateACIer, args []string) (err error) {
 		return
 	}
 
-	aci, err := conn.GenerateACI(source, config.Config.Compiler.Backend)
+	aci, err := conn.GenerateACI(source, config.Compiler.Backend)
 	if err != nil {
 		return
 	}

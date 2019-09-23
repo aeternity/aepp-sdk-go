@@ -52,7 +52,7 @@ func Execute(v string) {
 // read immediately, with this helper function you can defer the reading of the
 // variables until the subcommand's execution)
 func newAeNode() naet.NodeInterface {
-	return naet.NewNode(config.Config.Node.URL, debug)
+	return naet.NewNode(config.Node.URL, debug)
 }
 
 // newCompiler is just a helper function that gives you a Compiler so that you don't
@@ -67,15 +67,15 @@ func init() {
 	// cobra.OnInitialize(initConfig)
 	viper.AutomaticEnv() // read in environment variables that match
 	viper.SetEnvPrefix("AETERNITY")
-	viper.SetDefault("external-api", config.Config.Node.URL)
-	viper.SetDefault("network-id", config.Config.Node.NetworkID)
+	viper.SetDefault("external-api", config.Node.URL)
+	viper.SetDefault("network-id", config.Node.NetworkID)
 
 	// Here you will define your flags and configuration settings.
 	// Cobra supports Persistent Flags, which, if defined here,
 	// will be global for your application.
-	RootCmd.PersistentFlags().StringVarP(&config.Config.Node.URL, "external-api", "u", config.Config.Node.URL, "node external API endpoint")
-	RootCmd.PersistentFlags().StringVarP(&config.Config.Node.NetworkID, "network-id", "n", config.Config.Node.NetworkID, "network ID for custom private net")
+	RootCmd.PersistentFlags().StringVarP(&config.Node.URL, "external-api", "u", config.Node.URL, "node external API endpoint")
+	RootCmd.PersistentFlags().StringVarP(&config.Node.NetworkID, "network-id", "n", config.Node.NetworkID, "network ID for custom private net")
 	RootCmd.PersistentFlags().StringVarP(&compilerURL, "compiler-url", "c", "http://localhost:3080", "Compiler URL")
 	RootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "enable debug")
-	RootCmd.PersistentFlags().BoolVar(&config.Config.Tuning.OutputFormatJSON, "json", false, "print output in json format")
+	RootCmd.PersistentFlags().BoolVar(&config.Tuning.OutputFormatJSON, "json", false, "print output in json format")
 }

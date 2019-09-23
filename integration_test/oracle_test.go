@@ -25,7 +25,7 @@ func TestOracleWorkflow(t *testing.T) {
 	oracleAccount := aeternity.NewContextFromNode(node, testAccount.Address)
 
 	// Register
-	register, err := oracleAccount.OracleRegisterTx("hello", "helloback", config.Config.Client.Oracles.QueryFee, config.Config.Client.Oracles.QueryTTLType, config.Config.Client.Oracles.QueryTTLValue, config.Config.Client.Oracles.VMVersion)
+	register, err := oracleAccount.OracleRegisterTx("hello", "helloback", config.Client.Oracles.QueryFee, config.Client.Oracles.QueryTTLType, config.Client.Oracles.QueryTTLValue, config.Client.Oracles.VMVersion)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -71,7 +71,7 @@ func TestOracleWorkflow(t *testing.T) {
 	}
 
 	// Query
-	query, err := oracleAccount.OracleQueryTx(oraclePubKey, "How was your day?", config.Config.Client.Oracles.QueryFee, 0, 100, 0, 100)
+	query, err := oracleAccount.OracleQueryTx(oraclePubKey, "How was your day?", config.Client.Oracles.QueryFee, 0, 100, 0, 100)
 	if err != nil {
 		t.Fatal(err)
 	}

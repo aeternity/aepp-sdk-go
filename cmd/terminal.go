@@ -101,7 +101,7 @@ func printIf(title string, v interface{}) {
 
 // PrintObject pretty print an object obtained from the api with a title
 func PrintObject(title string, i interface{}) {
-	if config.Config.Tuning.OutputFormatJSON {
+	if config.Tuning.OutputFormatJSON {
 		j, _ := json.MarshalIndent(i, "", "  ")
 		fmt.Printf("%s\n", j)
 		return

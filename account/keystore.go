@@ -104,9 +104,9 @@ func KeystoreSeal(account *Account, password string) (j []byte, e error) {
 		return
 	}
 	argonKey := argon2.IDKey([]byte(password), salt,
-		config.Config.Tuning.CryptoKdfOpslimit,
-		config.Config.Tuning.CryptoKdfMemlimit,
-		config.Config.Tuning.CryptoKdfThreads,
+		config.Tuning.CryptoKdfOpslimit,
+		config.Tuning.CryptoKdfMemlimit,
+		config.Tuning.CryptoKdfThreads,
 		kdfKeySize)
 
 	var key [kdfKeySize]byte
@@ -134,10 +134,10 @@ func KeystoreSeal(account *Account, password string) (j []byte, e error) {
 			Ciphertext:   hex.EncodeToString(encrypted),
 			Kdf:          kdf,
 			KdfParams: kdfParams{
-				Memlimit:    config.Config.Tuning.CryptoKdfMemlimit,
-				Opslimit:    config.Config.Tuning.CryptoKdfOpslimit,
+				Memlimit:    config.Tuning.CryptoKdfMemlimit,
+				Opslimit:    config.Tuning.CryptoKdfOpslimit,
 				Salt:        hex.EncodeToString(salt),
-				Parallelism: config.Config.Tuning.CryptoKdfThreads,
+				Parallelism: config.Tuning.CryptoKdfThreads,
 			},
 		},
 	}
