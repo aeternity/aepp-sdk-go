@@ -9,6 +9,7 @@ import (
 	"github.com/aeternity/aepp-sdk-go/config"
 	"github.com/aeternity/aepp-sdk-go/models"
 	"github.com/aeternity/aepp-sdk-go/naet"
+	"github.com/aeternity/aepp-sdk-go/transactions"
 	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
 	"github.com/aeternity/aepp-sdk-go/v5/utils"
 	rlp "github.com/randomshinichi/rlpae"
@@ -76,7 +77,7 @@ func TestGeneralizedAccounts(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	gaTx := models.NewGAAttachTx(testAccount.Address, 1, authBytecode, auth.TypeInfo[0].FuncHash, config.Client.Contracts.VMVersion, config.Client.Contracts.ABIVersion, config.Client.BaseGas, config.Client.GasPrice, config.Client.Fee, ttl, authInitCalldata)
+	gaTx := transactions.NewGAAttachTx(testAccount.Address, 1, authBytecode, auth.TypeInfo[0].FuncHash, config.Client.Contracts.VMVersion, config.Client.Contracts.ABIVersion, config.Client.BaseGas, config.Client.GasPrice, config.Client.Fee, ttl, authInitCalldata)
 	_, txHash, _, err := aeternity.SignBroadcastTransaction(gaTx, testAccount, node, networkID)
 	if err != nil {
 		t.Fatal(err)
@@ -110,15 +111,15 @@ func TestGeneralizedAccounts(t *testing.T) {
 	// authData is authorize(3)
 	authData := "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACBGtXufEG2HuMYcRcNwsGAeqymslunKf692bHnvwI5K6wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAU3aKBNm"
 	gas := utils.NewIntFromUint64(10000) // the node will fail the authentication if there isn't enough gas
-	spendTx := models.NewSpendTx(testAccount.Address, bob.Address, big.NewInt(5000), config.Client.Fee, []byte{}, ttl, 0)
-	gaMetaTx := models.NewGAMetaTx(testAccount.Address, authData, config.Client.Contracts.ABIVersion, gas, config.Client.GasPrice, config.Client.Fee, ttl, spendTx)
+	spendTx := transactions.NewSpendTx(testAccount.Address, bob.Address, big.NewInt(5000), config.Client.Fee, []byte{}, ttl, 0)
+	gaMetaTx := transactions.NewGAMetaTx(testAccount.Address, authData, config.Client.Contracts.ABIVersion, gas, config.Client.GasPrice, config.Client.Fee, ttl, spendTx)
 
-	gaMetaTxFinal, hash, _, err := models.SignHashTx(testAccount, gaMetaTx, config.Node.NetworkID)
+	gaMetaTxFinal, hash, _, err := transactions.SignHashTx(testAccount, gaMetaTx, config.Node.NetworkID)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	gaMetaTxStr, err := models.SerializeTx(gaMetaTxFinal)
+	gaMetaTxStr, err := transactions.SerializeTx(gaMetaTxFinal)
 	if err != nil {
 		t.Fatal(err)
 	}

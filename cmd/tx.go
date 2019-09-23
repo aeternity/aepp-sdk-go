@@ -7,8 +7,8 @@ import (
 
 	"github.com/aeternity/aepp-sdk-go/binary"
 	"github.com/aeternity/aepp-sdk-go/config"
-	"github.com/aeternity/aepp-sdk-go/models"
 	"github.com/aeternity/aepp-sdk-go/naet"
+	"github.com/aeternity/aepp-sdk-go/transactions"
 	"github.com/aeternity/aepp-sdk-go/v5/utils"
 
 	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
@@ -85,8 +85,8 @@ func txSpendFunc(ttlFunc aeternity.GetTTLFunc, nonceFunc aeternity.GetNextNonceF
 		}
 	}
 
-	tx := models.NewSpendTx(sender, recipient, amount, feeBigInt, []byte(spendTxPayload), ttl, nonce)
-	base64Tx, err := models.SerializeTx(tx)
+	tx := transactions.NewSpendTx(sender, recipient, amount, feeBigInt, []byte(spendTxPayload), ttl, nonce)
+	base64Tx, err := transactions.SerializeTx(tx)
 	if err != nil {
 		return err
 	}
@@ -162,9 +162,9 @@ func txContractCreateFunc(ttlFunc aeternity.GetTTLFunc, nonceFunc aeternity.GetN
 		}
 	}
 
-	tx := models.NewContractCreateTx(owner, nonce, contract, config.Client.Contracts.VMVersion, config.Client.Contracts.ABIVersion, config.Client.Contracts.Deposit, config.Client.Contracts.Amount, config.Client.Contracts.GasLimit, config.Client.GasPrice, config.Client.Fee, ttl, calldata)
+	tx := transactions.NewContractCreateTx(owner, nonce, contract, config.Client.Contracts.VMVersion, config.Client.Contracts.ABIVersion, config.Client.Contracts.Deposit, config.Client.Contracts.Amount, config.Client.Contracts.GasLimit, config.Client.GasPrice, config.Client.Fee, ttl, calldata)
 
-	txStr, err := models.SerializeTx(tx)
+	txStr, err := transactions.SerializeTx(tx)
 	if err != nil {
 		return err
 	}

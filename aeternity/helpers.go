@@ -10,8 +10,8 @@ import (
 	"github.com/aeternity/aepp-sdk-go/account"
 	"github.com/aeternity/aepp-sdk-go/binary"
 	"github.com/aeternity/aepp-sdk-go/config"
-	"github.com/aeternity/aepp-sdk-go/models"
 	"github.com/aeternity/aepp-sdk-go/naet"
+	"github.com/aeternity/aepp-sdk-go/transactions"
 	rlp "github.com/randomshinichi/rlpae"
 )
 
@@ -148,20 +148,20 @@ func NewContextFromNode(node *naet.Node, address string) (ctx *Context) {
 
 // SpendTx creates a spend transaction, filling in the account nonce and
 // transaction TTL automatically.
-func (c *Context) SpendTx(senderID string, recipientID string, amount, fee *big.Int, payload []byte) (tx *models.SpendTx, err error) {
+func (c *Context) SpendTx(senderID string, recipientID string, amount, fee *big.Int, payload []byte) (tx *transactions.SpendTx, err error) {
 	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, config.Client.TTL)
 	if err != nil {
 		return
 	}
 
 	// create the transaction
-	return models.NewSpendTx(senderID, recipientID, amount, fee, payload, txTTL, accountNonce), err
+	return transactions.NewSpendTx(senderID, recipientID, amount, fee, payload, txTTL, accountNonce), err
 }
 
 // NamePreclaimTx creates a name preclaim transaction, filling in the account
 // nonce and transaction TTL automatically. It also generates a commitment ID
 // and salt, later used to claim the name.
-func (c *Context) NamePreclaimTx(name string, fee *big.Int) (tx *models.NamePreclaimTx, nameSalt *big.Int, err error) {
+func (c *Context) NamePreclaimTx(name string, fee *big.Int) (tx *transactions.NamePreclaimTx, nameSalt *big.Int, err error) {
 	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, config.Client.TTL)
 	if err != nil {
 		return
@@ -175,28 +175,28 @@ func (c *Context) NamePreclaimTx(name string, fee *big.Int) (tx *models.NamePrec
 	}
 
 	// build the transaction
-	tx = models.NewNamePreclaimTx(c.Address, cm, fee, txTTL, accountNonce)
+	tx = transactions.NewNamePreclaimTx(c.Address, cm, fee, txTTL, accountNonce)
 
 	return
 }
 
 // NameClaimTx creates a claim transaction, filling in the account nonce and
 // transaction TTL automatically.
-func (c *Context) NameClaimTx(name string, nameSalt, fee *big.Int) (tx *models.NameClaimTx, err error) {
+func (c *Context) NameClaimTx(name string, nameSalt, fee *big.Int) (tx *transactions.NameClaimTx, err error) {
 	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, config.Client.TTL)
 	if err != nil {
 		return
 	}
 
 	// create the transaction
-	tx = models.NewNameClaimTx(c.Address, name, nameSalt, fee, txTTL, accountNonce)
+	tx = transactions.NewNameClaimTx(c.Address, name, nameSalt, fee, txTTL, accountNonce)
 
 	return tx, err
 }
 
 // NameUpdateTx creates a name update transaction, filling in the account nonce
 // and transaction TTL automatically.
-func (c *Context) NameUpdateTx(name string, targetAddress string) (tx *models.NameUpdateTx, err error) {
+func (c *Context) NameUpdateTx(name string, targetAddress string) (tx *transactions.NameUpdateTx, err error) {
 	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, config.Client.TTL)
 	if err != nil {
 		return
@@ -208,14 +208,14 @@ func (c *Context) NameUpdateTx(name string, targetAddress string) (tx *models.Na
 		return
 	}
 	// create the transaction
-	tx = models.NewNameUpdateTx(c.Address, encodedNameHash, []string{targetAddress}, absNameTTL, config.Client.Names.ClientTTL, config.Client.Fee, txTTL, accountNonce)
+	tx = transactions.NewNameUpdateTx(c.Address, encodedNameHash, []string{targetAddress}, absNameTTL, config.Client.Names.ClientTTL, config.Client.Fee, txTTL, accountNonce)
 
 	return
 }
 
 // NameTransferTx creates a name transfer transaction, filling in the account
 // nonce and transaction TTL automatically.
-func (c *Context) NameTransferTx(name string, recipientAddress string) (tx *models.NameTransferTx, err error) {
+func (c *Context) NameTransferTx(name string, recipientAddress string) (tx *transactions.NameTransferTx, err error) {
 	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, config.Client.TTL)
 	if err != nil {
 		return
@@ -223,13 +223,13 @@ func (c *Context) NameTransferTx(name string, recipientAddress string) (tx *mode
 
 	encodedNameHash := binary.Encode(binary.PrefixName, Namehash(name))
 
-	tx = models.NewNameTransferTx(c.Address, encodedNameHash, recipientAddress, config.Client.Fee, txTTL, accountNonce)
+	tx = transactions.NewNameTransferTx(c.Address, encodedNameHash, recipientAddress, config.Client.Fee, txTTL, accountNonce)
 	return
 }
 
 // NameRevokeTx creates a name revoke transaction, filling in the account nonce
 // and transaction TTL automatically.
-func (c *Context) NameRevokeTx(name string) (tx *models.NameRevokeTx, err error) {
+func (c *Context) NameRevokeTx(name string) (tx *transactions.NameRevokeTx, err error) {
 	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, config.Client.TTL)
 	if err != nil {
 		return
@@ -237,79 +237,79 @@ func (c *Context) NameRevokeTx(name string) (tx *models.NameRevokeTx, err error)
 
 	encodedNameHash := binary.Encode(binary.PrefixName, Namehash(name))
 
-	tx = models.NewNameRevokeTx(c.Address, encodedNameHash, config.Client.Fee, txTTL, accountNonce)
+	tx = transactions.NewNameRevokeTx(c.Address, encodedNameHash, config.Client.Fee, txTTL, accountNonce)
 	return
 }
 
 // OracleRegisterTx creates an oracle register transaction, filling in the
 // account nonce and transaction TTL automatically.
-func (c *Context) OracleRegisterTx(querySpec, responseSpec string, queryFee *big.Int, oracleTTLType, oracleTTLValue uint64, VMVersion uint16) (tx *models.OracleRegisterTx, err error) {
+func (c *Context) OracleRegisterTx(querySpec, responseSpec string, queryFee *big.Int, oracleTTLType, oracleTTLValue uint64, VMVersion uint16) (tx *transactions.OracleRegisterTx, err error) {
 	ttl, nonce, err := c.GetTTLNonce(c.Address, config.Client.TTL)
 	if err != nil {
 		return
 	}
 
-	tx = models.NewOracleRegisterTx(c.Address, nonce, querySpec, responseSpec, queryFee, oracleTTLType, oracleTTLValue, VMVersion, config.Client.Fee, ttl)
+	tx = transactions.NewOracleRegisterTx(c.Address, nonce, querySpec, responseSpec, queryFee, oracleTTLType, oracleTTLValue, VMVersion, config.Client.Fee, ttl)
 	return tx, nil
 }
 
 // OracleExtendTx creates an oracle extend transaction, filling in the account
 // nonce and transaction TTL automatically.
-func (c *Context) OracleExtendTx(oracleID string, ttlType, ttlValue uint64) (tx *models.OracleExtendTx, err error) {
+func (c *Context) OracleExtendTx(oracleID string, ttlType, ttlValue uint64) (tx *transactions.OracleExtendTx, err error) {
 	ttl, nonce, err := c.GetTTLNonce(c.Address, config.Client.TTL)
 	if err != nil {
 		return
 	}
 
-	tx = models.NewOracleExtendTx(oracleID, nonce, ttlType, ttlValue, config.Client.Fee, ttl)
+	tx = transactions.NewOracleExtendTx(oracleID, nonce, ttlType, ttlValue, config.Client.Fee, ttl)
 	return tx, nil
 }
 
 // OracleQueryTx creates an oracle query transaction, filling in the account
 // nonce and transaction TTL automatically.
-func (c *Context) OracleQueryTx(OracleID, Query string, QueryFee *big.Int, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64) (tx *models.OracleQueryTx, err error) {
+func (c *Context) OracleQueryTx(OracleID, Query string, QueryFee *big.Int, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64) (tx *transactions.OracleQueryTx, err error) {
 	ttl, nonce, err := c.GetTTLNonce(c.Address, config.Client.TTL)
 	if err != nil {
 		return
 	}
 
-	tx = models.NewOracleQueryTx(c.Address, nonce, OracleID, Query, QueryFee, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue, config.Client.Fee, ttl)
+	tx = transactions.NewOracleQueryTx(c.Address, nonce, OracleID, Query, QueryFee, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue, config.Client.Fee, ttl)
 	return tx, nil
 }
 
 // OracleRespondTx creates an oracle response transaction, filling in the
 // account nonce and transaction TTL automatically.
-func (c *Context) OracleRespondTx(OracleID string, QueryID string, Response string, TTLType uint64, TTLValue uint64) (tx *models.OracleRespondTx, err error) {
+func (c *Context) OracleRespondTx(OracleID string, QueryID string, Response string, TTLType uint64, TTLValue uint64) (tx *transactions.OracleRespondTx, err error) {
 	ttl, nonce, err := c.GetTTLNonce(c.Address, config.Client.TTL)
 	if err != nil {
 		return
 	}
 
-	tx = models.NewOracleRespondTx(OracleID, nonce, QueryID, Response, TTLType, TTLValue, config.Client.Fee, ttl)
+	tx = transactions.NewOracleRespondTx(OracleID, nonce, QueryID, Response, TTLType, TTLValue, config.Client.Fee, ttl)
 	return tx, nil
 }
 
 // ContractCreateTx creates a contract create transaction, filling in the
 // account nonce and transaction TTL automatically.
-func (c *Context) ContractCreateTx(Code string, CallData string, VMVersion, AbiVersion uint16, Deposit, Amount, GasLimit, Fee *big.Int) (tx *models.ContractCreateTx, err error) {
+func (c *Context) ContractCreateTx(Code string, CallData string, VMVersion, AbiVersion uint16, Deposit, Amount, GasLimit, Fee *big.Int) (tx *transactions.ContractCreateTx, err error) {
 	ttl, nonce, err := c.GetTTLNonce(c.Address, config.Client.TTL)
 	if err != nil {
 		return
 	}
 
-	tx = models.NewContractCreateTx(c.Address, nonce, Code, VMVersion, AbiVersion, Deposit, Amount, GasLimit, config.Client.GasPrice, Fee, ttl, CallData)
+	tx = transactions.NewContractCreateTx(c.Address, nonce, Code, VMVersion, AbiVersion, Deposit, Amount, GasLimit, config.Client.GasPrice, Fee, ttl, CallData)
 	return tx, nil
 }
 
 // ContractCallTx creates a contract call transaction,, filling in the account
 // nonce and transaction TTL automatically.
-func (c *Context) ContractCallTx(ContractID, CallData string, AbiVersion uint16, Amount, GasLimit, GasPrice, Fee *big.Int) (tx *models.ContractCallTx, err error) {
+func (c *Context) ContractCallTx(ContractID, CallData string, AbiVersion uint16, Amount, GasLimit, GasPrice, Fee *big.Int) (tx *transactions.ContractCallTx, err error) {
 	ttl, nonce, err := c.GetTTLNonce(c.Address, config.Client.TTL)
 	if err != nil {
 		return
 	}
 
-	tx = models.NewContractCallTx(c.Address, nonce, ContractID, Amount, GasLimit, GasPrice, AbiVersion, CallData, Fee, ttl)
+	tx = transactions.NewContractCallTx(c.Address, nonce, ContractID, Amount, GasLimit, GasPrice, AbiVersion, CallData, Fee, ttl)
 	return tx, nil
 }
 
@@ -374,12 +374,12 @@ func WaitForTransactionForXBlocks(c getTransactionByHashHeighter, txHash string,
 
 // SignBroadcastTransaction signs a transaction and broadcasts it to a node.
 func SignBroadcastTransaction(tx rlp.Encoder, signingAccount *account.Account, n *naet.Node, networkID string) (signedTxStr, hash, signature string, err error) {
-	signedTx, hash, signature, err := models.SignHashTx(signingAccount, tx, networkID)
+	signedTx, hash, signature, err := transactions.SignHashTx(signingAccount, tx, networkID)
 	if err != nil {
 		return
 	}
 
-	signedTxStr, err = models.SerializeTx(signedTx)
+	signedTxStr, err = transactions.SerializeTx(signedTx)
 	if err != nil {
 		return
 	}
