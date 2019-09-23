@@ -6,6 +6,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/aeternity/aepp-sdk-go/account"
+	"github.com/aeternity/aepp-sdk-go/config"
 	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
 	"github.com/aeternity/aepp-sdk-go/v5/swagguard/node/models"
 )
@@ -15,7 +17,7 @@ func TestOracleWorkflow(t *testing.T) {
 	node := setupNetwork(t, privatenetURL, false)
 
 	// Setup temporary test account and fund it
-	testAccount, err := aeternity.NewAccount()
+	testAccount, err := account.NewAccount()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -23,7 +25,7 @@ func TestOracleWorkflow(t *testing.T) {
 	oracleAccount := aeternity.NewContextFromNode(node, testAccount.Address)
 
 	// Register
-	register, err := oracleAccount.OracleRegisterTx("hello", "helloback", aeternity.Config.Client.Oracles.QueryFee, aeternity.Config.Client.Oracles.QueryTTLType, aeternity.Config.Client.Oracles.QueryTTLValue, aeternity.Config.Client.Oracles.VMVersion)
+	register, err := oracleAccount.OracleRegisterTx("hello", "helloback", config.Config.Client.Oracles.QueryFee, config.Config.Client.Oracles.QueryTTLType, config.Config.Client.Oracles.QueryTTLValue, config.Config.Client.Oracles.VMVersion)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -69,7 +71,7 @@ func TestOracleWorkflow(t *testing.T) {
 	}
 
 	// Query
-	query, err := oracleAccount.OracleQueryTx(oraclePubKey, "How was your day?", aeternity.Config.Client.Oracles.QueryFee, 0, 100, 0, 100)
+	query, err := oracleAccount.OracleQueryTx(oraclePubKey, "How was your day?", config.Config.Client.Oracles.QueryFee, 0, 100, 0, 100)
 	if err != nil {
 		t.Fatal(err)
 	}
