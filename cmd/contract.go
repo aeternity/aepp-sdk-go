@@ -5,7 +5,8 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
+	"github.com/aeternity/aepp-sdk-go/config"
+	"github.com/aeternity/aepp-sdk-go/naet"
 	"github.com/spf13/cobra"
 )
 
@@ -28,13 +29,13 @@ var compileCmd = &cobra.Command{
 	SilenceUsage: true,
 }
 
-func compileFunc(conn aeternity.CompileContracter, args []string) (err error) {
+func compileFunc(conn naet.CompileContracter, args []string) (err error) {
 	s, err := readSource(args[0])
 	if err != nil {
 		return err
 	}
 
-	bytecode, err := conn.CompileContract(s, aeternity.Config.Compiler.Backend)
+	bytecode, err := conn.CompileContract(s, config.Config.Compiler.Backend)
 	fmt.Println(bytecode)
 	return err
 }
@@ -51,13 +52,13 @@ var encodeCalldataCmd = &cobra.Command{
 	SilenceUsage: true,
 }
 
-func encodeCalldataFunc(conn aeternity.EncodeCalldataer, args []string) (err error) {
+func encodeCalldataFunc(conn naet.EncodeCalldataer, args []string) (err error) {
 	s, err := readSource(args[0])
 	if err != nil {
 		return err
 	}
 
-	callData, err := conn.EncodeCalldata(s, args[1], args[2:], aeternity.Config.Compiler.Backend)
+	callData, err := conn.EncodeCalldata(s, args[1], args[2:], config.Config.Compiler.Backend)
 	if err != nil {
 		return err
 	}
@@ -66,8 +67,8 @@ func encodeCalldataFunc(conn aeternity.EncodeCalldataer, args []string) (err err
 }
 
 type decodeCalldataer interface {
-	aeternity.DecodeCalldataBytecoder
-	aeternity.DecodeCalldataSourcer
+	naet.DecodeCalldataBytecoder
+	naet.DecodeCalldataSourcer
 }
 
 var decodeCalldataBytecodeCmd = &cobra.Command{
@@ -90,7 +91,7 @@ func decodeCalldataBytecodeFunc(conn decodeCalldataer, args []string) (err error
 		return fmt.Errorf("%s is not bytecode", args[0])
 	}
 
-	r, err := conn.DecodeCalldataBytecode(args[0], args[1], aeternity.Config.Compiler.Backend)
+	r, err := conn.DecodeCalldataBytecode(args[0], args[1], config.Config.Compiler.Backend)
 	if err != nil {
 		return
 	}
@@ -120,7 +121,7 @@ func decodeCalldataSourceFunc(conn decodeCalldataer, args []string) (err error) 
 		return fmt.Errorf("%s is not bytecode", args[0])
 	}
 
-	r, err := conn.DecodeCalldataSource(source, args[1], args[2], aeternity.Config.Compiler.Backend)
+	r, err := conn.DecodeCalldataSource(source, args[1], args[2], config.Config.Compiler.Backend)
 
 	fmt.Println(*r.Function, r.Arguments)
 	return
@@ -138,13 +139,13 @@ var generateAciCmd = &cobra.Command{
 	SilenceUsage: true,
 }
 
-func generateAciFunc(conn aeternity.GenerateACIer, args []string) (err error) {
+func generateAciFunc(conn naet.GenerateACIer, args []string) (err error) {
 	source, err := readSource(args[0])
 	if err != nil {
 		return
 	}
 
-	aci, err := conn.GenerateACI(source, aeternity.Config.Compiler.Backend)
+	aci, err := conn.GenerateACI(source, config.Config.Compiler.Backend)
 	if err != nil {
 		return
 	}

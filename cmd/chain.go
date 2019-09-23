@@ -18,7 +18,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
+	"github.com/aeternity/aepp-sdk-go/binary"
+	"github.com/aeternity/aepp-sdk-go/config"
+	"github.com/aeternity/aepp-sdk-go/naet"
 	"github.com/spf13/cobra"
 )
 
@@ -39,7 +41,7 @@ var topCmd = &cobra.Command{
 	},
 }
 
-func topFunc(conn aeternity.GetTopBlocker, args []string) error {
+func topFunc(conn naet.GetTopBlocker, args []string) error {
 	v, err := conn.GetTopBlock()
 	if err != nil {
 		return err
@@ -58,7 +60,7 @@ var statusCmd = &cobra.Command{
 	},
 }
 
-func statusFunc(conn aeternity.GetStatuser, args []string) (err error) {
+func statusFunc(conn naet.GetStatuser, args []string) (err error) {
 	v, err := conn.GetStatus()
 	if err != nil {
 		return err
@@ -79,7 +81,7 @@ var playCmd = &cobra.Command{
 }
 
 type playFuncInterface interface {
-	aeternity.GetHeighter
+	naet.GetHeighter
 	getGenerationMicroBlockTransactioner
 }
 
@@ -126,7 +128,7 @@ var broadcastCmd = &cobra.Command{
 	},
 }
 
-func broadcastFunc(conn aeternity.PostTransactioner, args []string) (err error) {
+func broadcastFunc(conn naet.PostTransactioner, args []string) (err error) {
 	// Load variables from arguments
 	txSignedBase64 := args[0]
 
@@ -136,15 +138,15 @@ func broadcastFunc(conn aeternity.PostTransactioner, args []string) (err error) 
 	}
 
 	// Transform tx_ string back to an RLP bytearray to calculate its hash
-	txRLP, err := aeternity.Decode(txSignedBase64)
+	txRLP, err := binary.Decode(txSignedBase64)
 	if err != nil {
 		return err
 	}
-	rlpTxHashRaw, err := aeternity.Blake2bHash(txRLP)
+	rlpTxHashRaw, err := binary.Blake2bHash(txRLP)
 	if err != nil {
 		return err
 	}
-	signedEncodedTxHash := aeternity.Encode(aeternity.PrefixTransactionHash, rlpTxHashRaw)
+	signedEncodedTxHash := binary.Encode(binary.PrefixTransactionHash, rlpTxHashRaw)
 
 	err = conn.PostTransaction(txSignedBase64, signedEncodedTxHash)
 	if err != nil {
@@ -166,13 +168,13 @@ var ttlCmd = &cobra.Command{
 	},
 }
 
-func ttlFunc(conn aeternity.GetHeighter, args []string) (err error) {
+func ttlFunc(conn naet.GetHeighter, args []string) (err error) {
 	height, err := conn.GetHeight()
 	if err != nil {
 		errFinal := fmt.Errorf("Error getting height from the node: %v", err)
 		return errFinal
 	}
-	ttl = height + aeternity.Config.Client.TTL
+	ttl = height + config.Config.Client.TTL
 	fmt.Println(ttl)
 	return nil
 }
@@ -188,7 +190,7 @@ var networkIDCmd = &cobra.Command{
 	},
 }
 
-func networkIDFunc(conn aeternity.GetStatuser, args []string) (err error) {
+func networkIDFunc(conn naet.GetStatuser, args []string) (err error) {
 	resp, err := conn.GetStatus()
 	if err != nil {
 		errFinal := fmt.Errorf("Error getting status information from the node: %v", err)

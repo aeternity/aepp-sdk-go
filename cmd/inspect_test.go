@@ -3,12 +3,12 @@ package cmd
 import (
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
+	"github.com/aeternity/aepp-sdk-go/naet"
 )
 
 func Test_printNameEntry(t *testing.T) {
 	type args struct {
-		conn aeternity.GetNameEntryByNamer
+		conn naet.GetNameEntryByNamer
 		name string
 	}
 	tests := []struct {
@@ -38,7 +38,7 @@ func Test_printNameEntry(t *testing.T) {
 
 func Test_printAccount(t *testing.T) {
 	type args struct {
-		conn      aeternity.GetAccounter
+		conn      naet.GetAccounter
 		accountID string
 	}
 	tests := []struct {
@@ -97,7 +97,7 @@ func Test_printMicroBlockAndTransactions(t *testing.T) {
 
 func Test_printKeyBlockByHash(t *testing.T) {
 	type args struct {
-		conn   aeternity.GetKeyBlockByHasher
+		conn   naet.GetKeyBlockByHasher
 		kbHash string
 	}
 	tests := []struct {
@@ -127,7 +127,7 @@ func Test_printKeyBlockByHash(t *testing.T) {
 
 func Test_printTransactionByHash(t *testing.T) {
 	type args struct {
-		conn   aeternity.GetTransactionByHasher
+		conn   naet.GetTransactionByHasher
 		txHash string
 	}
 	tests := []struct {
@@ -174,7 +174,7 @@ func Test_printTransactionByHash(t *testing.T) {
 }
 func Test_printOracleByPubkey(t *testing.T) {
 	type args struct {
-		conn     aeternity.GetOracleByPubkeyer
+		conn     naet.GetOracleByPubkeyer
 		oracleID string
 	}
 	tests := []struct {

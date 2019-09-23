@@ -20,7 +20,10 @@ import (
 	"runtime"
 	"sync"
 
-	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
+	"github.com/aeternity/aepp-sdk-go/account"
+	"github.com/aeternity/aepp-sdk-go/config"
+	"github.com/aeternity/aepp-sdk-go/models"
+	"github.com/aeternity/aepp-sdk-go/naet"
 
 	"github.com/spf13/cobra"
 )
@@ -71,7 +74,7 @@ func addressFunc(cmd *cobra.Command, args []string) error {
 	}
 
 	// load the account
-	account, err := aeternity.LoadAccountFromKeyStoreFile(args[0], p)
+	account, err := account.LoadAccountFromKeyStoreFile(args[0], p)
 	if err != nil {
 		return err
 	}
@@ -96,7 +99,7 @@ var createCmd = &cobra.Command{
 }
 
 func createFunc(cmd *cobra.Command, args []string) (err error) {
-	account, _ := aeternity.NewAccount()
+	acc, _ := account.NewAccount()
 	p, err := getPassword()
 	if err != nil {
 		return err
@@ -104,14 +107,14 @@ func createFunc(cmd *cobra.Command, args []string) (err error) {
 	accountFileName = args[0]
 
 	// check if a name was given
-	f, err := aeternity.StoreAccountToKeyStoreFile(account, p, accountFileName)
+	f, err := account.StoreAccountToKeyStoreFile(acc, p, accountFileName)
 	if err != nil {
 		return err
 	}
 
 	Pp(
 		"Wallet path", f,
-		"Account address", account.Address,
+		"Account address", acc.Address,
 	)
 
 	return nil
@@ -129,11 +132,11 @@ var balanceCmd = &cobra.Command{
 	},
 }
 
-func balanceFunc(conn aeternity.GetAccounter, args []string) (err error) {
+func balanceFunc(conn naet.GetAccounter, args []string) (err error) {
 	p, err := getPassword()
 
 	// load the account
-	account, err := aeternity.LoadAccountFromKeyStoreFile(args[0], p)
+	account, err := account.LoadAccountFromKeyStoreFile(args[0], p)
 	if err != nil {
 		return err
 	}
@@ -160,18 +163,18 @@ func signFunc(cmd *cobra.Command, args []string) (err error) {
 	p, err := getPassword()
 
 	// load the account
-	account, err := aeternity.LoadAccountFromKeyStoreFile(args[0], p)
+	account, err := account.LoadAccountFromKeyStoreFile(args[0], p)
 	if err != nil {
 		return err
 	}
 
 	txUnsignedBase64 := args[1]
-	tx, err := aeternity.DeserializeTxStr(txUnsignedBase64)
+	tx, err := models.DeserializeTxStr(txUnsignedBase64)
 	if err != nil {
 		return err
 	}
 
-	txSignedBase64, txHash, signature, err := aeternity.SignHashTx(account, tx, aeternity.Config.Node.NetworkID)
+	txSignedBase64, txHash, signature, err := models.SignHashTx(account, tx, config.Config.Node.NetworkID)
 	if err != nil {
 		return err
 	}
@@ -197,14 +200,14 @@ var saveCmd = &cobra.Command{
 
 func saveFunc(cmd *cobra.Command, args []string) (err error) {
 	accountFileName := args[0]
-	account, err := aeternity.AccountFromHexString(args[1])
+	acc, err := account.AccountFromHexString(args[1])
 	if err != nil {
 		return err
 	}
 
 	p, err := getPassword()
 
-	f, err := aeternity.StoreAccountToKeyStoreFile(account, p, accountFileName)
+	f, err := account.StoreAccountToKeyStoreFile(acc, p, accountFileName)
 	if err != nil {
 		return err
 	}
@@ -241,7 +244,7 @@ func vanityFunc(cmd *cobra.Command, args []string) {
 	for i := 0; i < runtime.NumCPU(); i++ {
 		go func() {
 			for {
-				a, _ := aeternity.NewAccount()
+				a, _ := account.NewAccount()
 
 				if r.MatchString(a.Address[3:]) {
 					fmt.Println("FOUND!")

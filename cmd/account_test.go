@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
+	"github.com/aeternity/aepp-sdk-go/naet"
 	"github.com/spf13/cobra"
 )
 
@@ -75,7 +75,7 @@ func TestAccountSign(t *testing.T) {
 func Test_balanceFunc(t *testing.T) {
 	setPrivateNetParams()
 	type args struct {
-		conn              aeternity.GetAccounter
+		conn              naet.GetAccounter
 		args              []string
 		accountPrivateKey string
 		password          string

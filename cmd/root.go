@@ -18,7 +18,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
+	"github.com/aeternity/aepp-sdk-go/config"
+	"github.com/aeternity/aepp-sdk-go/naet"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -50,31 +51,31 @@ func Execute(v string) {
 // have to maintain a Node global variable (which needs the config vars to be
 // read immediately, with this helper function you can defer the reading of the
 // variables until the subcommand's execution)
-func newAeNode() aeternity.NodeInterface {
-	return aeternity.NewNode(aeternity.Config.Node.URL, debug)
+func newAeNode() naet.NodeInterface {
+	return naet.NewNode(config.Config.Node.URL, debug)
 }
 
 // newCompiler is just a helper function that gives you a Compiler so that you don't
 // have to maintain a Compiler global variable (which needs the config vars to be
 // read immediately, with this helper function you can defer the reading of the
 // variables until the subcommand's execution)
-func newCompiler() *aeternity.Compiler {
-	return aeternity.NewCompiler(compilerURL, debug)
+func newCompiler() *naet.Compiler {
+	return naet.NewCompiler(compilerURL, debug)
 }
 
 func init() {
 	// cobra.OnInitialize(initConfig)
 	viper.AutomaticEnv() // read in environment variables that match
 	viper.SetEnvPrefix("AETERNITY")
-	viper.SetDefault("external-api", aeternity.Config.Node.URL)
-	viper.SetDefault("network-id", aeternity.Config.Node.NetworkID)
+	viper.SetDefault("external-api", config.Config.Node.URL)
+	viper.SetDefault("network-id", config.Config.Node.NetworkID)
 
 	// Here you will define your flags and configuration settings.
 	// Cobra supports Persistent Flags, which, if defined here,
 	// will be global for your application.
-	RootCmd.PersistentFlags().StringVarP(&aeternity.Config.Node.URL, "external-api", "u", aeternity.Config.Node.URL, "node external API endpoint")
-	RootCmd.PersistentFlags().StringVarP(&aeternity.Config.Node.NetworkID, "network-id", "n", aeternity.Config.Node.NetworkID, "network ID for custom private net")
+	RootCmd.PersistentFlags().StringVarP(&config.Config.Node.URL, "external-api", "u", config.Config.Node.URL, "node external API endpoint")
+	RootCmd.PersistentFlags().StringVarP(&config.Config.Node.NetworkID, "network-id", "n", config.Config.Node.NetworkID, "network ID for custom private net")
 	RootCmd.PersistentFlags().StringVarP(&compilerURL, "compiler-url", "c", "http://localhost:3080", "Compiler URL")
 	RootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "enable debug")
-	RootCmd.PersistentFlags().BoolVar(&aeternity.Config.Tuning.OutputFormatJSON, "json", false, "print output in json format")
+	RootCmd.PersistentFlags().BoolVar(&config.Config.Tuning.OutputFormatJSON, "json", false, "print output in json format")
 }

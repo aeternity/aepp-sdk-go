@@ -8,12 +8,12 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
+	"github.com/aeternity/aepp-sdk-go/config"
 )
 
 func setPrivateNetParams() {
-	aeternity.Config.Node.URL = "http://localhost:3013"
-	aeternity.Config.Node.NetworkID = "ae_docker"
+	config.Config.Node.URL = "http://localhost:3013"
+	config.Config.Node.NetworkID = "ae_docker"
 }
 
 // dumpV serializes and prints out any swagger model in JSON. Useful when
