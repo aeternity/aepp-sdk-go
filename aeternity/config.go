@@ -2,8 +2,6 @@ package aeternity
 
 import (
 	"math/big"
-
-	"github.com/aeternity/aepp-sdk-go/v5/utils"
 )
 
 // Acceptable values for various parameters
@@ -154,25 +152,25 @@ var Config = ProfileConfig{
 		Backend: CompilerBackendAEVM,
 	},
 	Client: ClientConfig{
-		BaseGas:    utils.NewIntFromUint64(15000),
-		GasPerByte: utils.NewIntFromUint64(20),
-		GasPrice:   utils.NewIntFromUint64(1e9),
+		BaseGas:    big.NewInt(15000),
+		GasPerByte: big.NewInt(20),
+		GasPrice:   big.NewInt(1e9),
 		TTL:        500,
-		Fee:        utils.RequireIntFromString("200000000000000"),
+		Fee:        big.NewInt(2e14),
 		Names: AensConfig{
 			NameTTL:   500,
 			ClientTTL: 500,
 		},
 		Contracts: ContractConfig{
 			CompilerURL: "http://localhost:3080",
-			GasLimit:    utils.NewIntFromUint64(1e9),
+			GasLimit:    big.NewInt(1e9),
 			Amount:      new(big.Int),
 			Deposit:     new(big.Int),
 			VMVersion:   4,
 			ABIVersion:  1,
 		},
 		Oracles: OracleConfig{
-			QueryFee:         utils.NewIntFromUint64(0),
+			QueryFee:         big.NewInt(0),
 			QueryTTLType:     OracleTTLTypeDelta,
 			QueryTTLValue:    300,
 			ResponseTTLType:  OracleTTLTypeDelta,
