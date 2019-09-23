@@ -7,10 +7,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/aeternity/aepp-sdk-go/config"
+	"github.com/aeternity/aepp-sdk-go/naet"
 	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
 )
 
-func getNameEntry(t *testing.T, node *aeternity.Node, name string) (responseJSON string) {
+func getNameEntry(t *testing.T, node *naet.Node, name string) (responseJSON string) {
 	response, err := node.GetNameEntryByName(name)
 	if err != nil {
 		t.Fatal(err)
@@ -40,7 +42,7 @@ func TestAENSWorkflow(t *testing.T) {
 
 	name := randomName(6)
 	// Preclaim the name
-	preclaimTx, salt, err := aensAlice.NamePreclaimTx(name, aeternity.Config.Client.Fee)
+	preclaimTx, salt, err := aensAlice.NamePreclaimTx(name, config.Config.Client.Fee)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -54,7 +56,7 @@ func TestAENSWorkflow(t *testing.T) {
 	_, _, _ = waitForTransaction(node, hash)
 
 	// Claim the name
-	claimTx, err := aensAlice.NameClaimTx(name, salt, aeternity.Config.Client.Fee)
+	claimTx, err := aensAlice.NameClaimTx(name, salt, config.Config.Client.Fee)
 	if err != nil {
 		t.Fatal(err)
 	}

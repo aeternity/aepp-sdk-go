@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/aeternity/aepp-sdk-go/config"
 	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
 	"github.com/aeternity/aepp-sdk-go/v5/utils"
 	"gotest.tools/golden"
@@ -19,7 +20,7 @@ func TestContracts(t *testing.T) {
 
 	identityBytecode := string(golden.Get(t, "identity_bytecode.txt"))
 	identityInitCalldata := string(golden.Get(t, "identity_initcalldata.txt"))
-	create, err := contractsAlice.ContractCreateTx(identityBytecode, identityInitCalldata, aeternity.Config.Client.Contracts.VMVersion, aeternity.Config.Client.Contracts.ABIVersion, aeternity.Config.Client.Contracts.Deposit, aeternity.Config.Client.Contracts.Amount, utils.NewIntFromUint64(1e5), utils.NewIntFromUint64(564480000000000))
+	create, err := contractsAlice.ContractCreateTx(identityBytecode, identityInitCalldata, config.Config.Client.Contracts.VMVersion, config.Config.Client.Contracts.ABIVersion, config.Config.Client.Contracts.Deposit, config.Config.Client.Contracts.Amount, utils.NewIntFromUint64(1e5), utils.NewIntFromUint64(564480000000000))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -44,7 +45,7 @@ func TestContracts(t *testing.T) {
 	delay(getContract)
 
 	identityMain42Calldata := string(golden.Get(t, "identity_main42.txt"))
-	callTx, err := contractsAlice.ContractCallTx(ctID, identityMain42Calldata, aeternity.Config.Client.Contracts.ABIVersion, aeternity.Config.Client.Contracts.Amount, utils.NewIntFromUint64(1e5), aeternity.Config.Client.GasPrice, utils.NewIntFromUint64(665480000000000))
+	callTx, err := contractsAlice.ContractCallTx(ctID, identityMain42Calldata, config.Config.Client.Contracts.ABIVersion, config.Config.Client.Contracts.Amount, utils.NewIntFromUint64(1e5), config.Config.Client.GasPrice, utils.NewIntFromUint64(665480000000000))
 	if err != nil {
 		t.Fatal(err)
 	}

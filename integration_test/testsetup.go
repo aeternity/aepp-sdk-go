@@ -8,6 +8,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/aeternity/aepp-sdk-go/account"
+	"github.com/aeternity/aepp-sdk-go/config"
+	"github.com/aeternity/aepp-sdk-go/naet"
 	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
 )
 
@@ -18,20 +21,20 @@ var privatenetURL = "http://localhost:3013"
 var testnetURL = "http://sdk-testnet.aepps.com"
 var networkID = "ae_docker"
 
-func setupNetwork(t *testing.T, nodeURL string, debug bool) *aeternity.Node {
-	aeternity.Config.Node.NetworkID = networkID
-	client := aeternity.NewNode(nodeURL, debug)
-	t.Logf("nodeURL: %s, networkID: %s", nodeURL, aeternity.Config.Node.NetworkID)
+func setupNetwork(t *testing.T, nodeURL string, debug bool) *naet.Node {
+	config.Config.Node.NetworkID = networkID
+	client := naet.NewNode(nodeURL, debug)
+	t.Logf("nodeURL: %s, networkID: %s", nodeURL, config.Config.Node.NetworkID)
 	return client
 }
 
-func setupAccounts(t *testing.T) (*aeternity.Account, *aeternity.Account) {
-	alice, err := aeternity.AccountFromHexString(senderPrivateKey)
+func setupAccounts(t *testing.T) (*account.Account, *account.Account) {
+	alice, err := account.AccountFromHexString(senderPrivateKey)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	bob, err := aeternity.AccountFromHexString(recipientPrivateKey)
+	bob, err := account.AccountFromHexString(recipientPrivateKey)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -54,7 +57,7 @@ func delay(f delayableCode) {
 	f()
 }
 
-func getHeight(node *aeternity.Node) (h uint64) {
+func getHeight(node *naet.Node) (h uint64) {
 	h, err := node.GetHeight()
 	if err != nil {
 		fmt.Println("Could not retrieve chain height")
@@ -64,7 +67,7 @@ func getHeight(node *aeternity.Node) (h uint64) {
 	return
 }
 
-func waitForTransaction(node *aeternity.Node, hash string) (height uint64, microblockHash string, err error) {
+func waitForTransaction(node *naet.Node, hash string) (height uint64, microblockHash string, err error) {
 	height, microblockHash, err = aeternity.WaitForTransactionForXBlocks(node, hash, 10)
 	if err != nil {
 		// Sometimes, the tests want the tx to fail. Return the err to let them know.
@@ -74,11 +77,11 @@ func waitForTransaction(node *aeternity.Node, hash string) (height uint64, micro
 	return height, microblockHash, err
 }
 
-func fundAccount(t *testing.T, node *aeternity.Node, source, destination *aeternity.Account, amount *big.Int) {
+func fundAccount(t *testing.T, node *naet.Node, source, destination *account.Account, amount *big.Int) {
 	ctx := aeternity.NewContextFromNode(node, source.Address)
 
 	fmt.Println("Funding account", destination.Address)
-	tx, err := ctx.SpendTx(source.Address, destination.Address, amount, aeternity.Config.Client.Fee, []byte{})
+	tx, err := ctx.SpendTx(source.Address, destination.Address, amount, config.Config.Client.Fee, []byte{})
 	if err != nil {
 		t.Fatal(err)
 	}
