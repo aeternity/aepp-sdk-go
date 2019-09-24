@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/aeternity/aepp-sdk-go/binary"
+	"github.com/aeternity/aepp-sdk-go/v5/binary"
 	"golang.org/x/crypto/ed25519"
 )
 

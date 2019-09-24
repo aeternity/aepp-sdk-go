@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/config"
+	"github.com/aeternity/aepp-sdk-go/v5/config"
 	"github.com/aeternity/aepp-sdk-go/v5/utils"
 )
 

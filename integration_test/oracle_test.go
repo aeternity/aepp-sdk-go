@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/account"
-	"github.com/aeternity/aepp-sdk-go/config"
+	"github.com/aeternity/aepp-sdk-go/v5/account"
+	"github.com/aeternity/aepp-sdk-go/v5/config"
 	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
 	"github.com/aeternity/aepp-sdk-go/v5/swagguard/node/models"
 )
