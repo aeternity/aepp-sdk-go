@@ -211,7 +211,7 @@ func txVerifyFunc(cmd *cobra.Command, args []string) (err error) {
 	if !IsTransaction(txSignedBase64) {
 		return errors.New("Error, missing or invalid base64 encoded transaction")
 	}
-	valid, err := aeternity.VerifySignedTx(sender, txSignedBase64, config.Node.NetworkID)
+	valid, err := transactions.VerifySignedTx(sender, txSignedBase64, config.Node.NetworkID)
 	if err != nil {
 		err := fmt.Errorf("error while verifying signature: %s", err)
 		return err
