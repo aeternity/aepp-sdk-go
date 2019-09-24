@@ -487,3 +487,26 @@ func readIDTag(v []uint8) (IDTag uint8, encodedHash string, err error) {
 	encodedHash = binary.Encode(prefix, hash)
 	return
 }
+
+// VerifySignedTx verifies the signature of a signed transaction, in its RLP
+// serialized, base64 encoded tx_ form.
+//
+// The network ID is also used when calculating the signature, so the network ID
+// that the transaction was intended for should be provided too.
+func VerifySignedTx(accountID string, txSigned string, networkID string) (valid bool, err error) {
+	txRawSigned, _ := binary.Decode(txSigned)
+	txRLP := binary.DecodeRLPMessage(txRawSigned)
+
+	// RLP format of signed signature: [[Tag], [Version], [Signatures...],
+	// [Transaction]]
+	tx := txRLP[3].([]byte)
+	txSignature := txRLP[2].([]interface{})[0].([]byte)
+
+	msg := append([]byte(networkID), tx...)
+
+	valid, err = account.Verify(accountID, msg, txSignature)
+	if err != nil {
+		return
+	}
+	return
+}
