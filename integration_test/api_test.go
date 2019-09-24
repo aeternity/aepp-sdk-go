@@ -10,9 +10,9 @@ import (
 
 	"gotest.tools/golden"
 
-	"github.com/aeternity/aepp-sdk-go/account"
-	"github.com/aeternity/aepp-sdk-go/config"
-	"github.com/aeternity/aepp-sdk-go/naet"
+	"github.com/aeternity/aepp-sdk-go/v5/account"
+	"github.com/aeternity/aepp-sdk-go/v5/config"
+	"github.com/aeternity/aepp-sdk-go/v5/naet"
 	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
 	"github.com/aeternity/aepp-sdk-go/v5/swagguard/node/models"
 	"github.com/aeternity/aepp-sdk-go/v5/utils"

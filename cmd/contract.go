@@ -5,8 +5,8 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/aeternity/aepp-sdk-go/config"
-	"github.com/aeternity/aepp-sdk-go/naet"
+	"github.com/aeternity/aepp-sdk-go/v5/config"
+	"github.com/aeternity/aepp-sdk-go/v5/naet"
 	"github.com/spf13/cobra"
 )
 

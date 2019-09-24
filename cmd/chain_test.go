@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/naet"
+	"github.com/aeternity/aepp-sdk-go/v5/naet"
 )
 
 // Prefixing each test with Example makes go-test check the stdout
