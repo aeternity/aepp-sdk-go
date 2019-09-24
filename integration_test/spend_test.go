@@ -9,8 +9,8 @@ import (
 	"github.com/aeternity/aepp-sdk-go/v5/utils"
 )
 
-// Tests for 2 things: sending an amount that is max uint64, and that the node accepts the minimum fee
-// that is calculated via tx.EstimateFee().
+// Tests for 2 things: sending an amount that is max uint64, and that the node
+// accepts the minimum fee that is calculated via tx.EstimateFee().
 func TestSpendTx(t *testing.T) {
 	node := setupNetwork(t, privatenetURL, false)
 	alice, bob := setupAccounts(t)
@@ -19,7 +19,8 @@ func TestSpendTx(t *testing.T) {
 	fee := utils.NewIntFromUint64(uint64(2e13))
 	msg := "Hello World"
 
-	// In case the recipient account already has funds, get recipient's account info. If it exists, expectedAmount = existing balance + amount + fee
+	// In case the recipient account already has funds, get recipient's account
+	// info. If it exists, expectedAmount = existing balance + amount + fee
 	expected := new(big.Int)
 	bobState, err := node.GetAccount(bob.Address)
 	if err != nil {
