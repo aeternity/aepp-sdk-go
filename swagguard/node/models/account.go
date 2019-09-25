@@ -42,6 +42,9 @@ type Account struct {
 	// Nonce
 	// Required: true
 	Nonce *uint64 `json:"nonce"`
+
+	// Payable
+	Payable bool `json:"payable,omitempty"`
 }
 
 // Validate validates this account

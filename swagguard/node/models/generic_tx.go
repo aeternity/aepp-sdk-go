@@ -183,6 +183,20 @@ func unmarshalGenericTx(data []byte, consumer runtime.Consumer) (GenericTx, erro
 		}
 		return &result, nil
 
+	case "GAAttachTxJSON", "GAAttachTx":
+		var result GAAttachTxJSON
+		if err := consumer.Consume(buf2, &result); err != nil {
+			return nil, err
+		}
+		return &result, nil
+
+	case "GAMetaTxJSON", "GAMetaTx":
+		var result GAMetaTxJSON
+		if err := consumer.Consume(buf2, &result); err != nil {
+			return nil, err
+		}
+		return &result, nil
+
 	case "GenericTx":
 		var result genericTx
 		if err := consumer.Consume(buf2, &result); err != nil {

@@ -31,6 +31,9 @@ type NameClaimTx struct {
 	// Required: true
 	Name *string `json:"name"`
 
+	// name fee
+	NameFee utils.BigInt `json:"name_fee,omitempty"`
+
 	// name salt
 	// Required: true
 	NameSalt utils.BigInt `json:"name_salt"`
@@ -55,6 +58,10 @@ func (m *NameClaimTx) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateName(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateNameFee(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -92,6 +99,22 @@ func (m *NameClaimTx) validateFee(formats strfmt.Registry) error {
 func (m *NameClaimTx) validateName(formats strfmt.Registry) error {
 
 	if err := validate.Required("name", "body", m.Name); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *NameClaimTx) validateNameFee(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.NameFee) { // not required
+		return nil
+	}
+
+	if err := m.NameFee.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("name_fee")
+		}
 		return err
 	}
 

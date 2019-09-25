@@ -21,7 +21,7 @@ type ContractStore struct {
 
 	// store
 	// Required: true
-	Store []*ContractStoreStore `json:"store"`
+	Store []*ContractStoreStoreItems0 `json:"store"`
 }
 
 // Validate validates this contract store
@@ -74,6 +74,40 @@ func (m *ContractStore) MarshalBinary() ([]byte, error) {
 // UnmarshalBinary interface implementation
 func (m *ContractStore) UnmarshalBinary(b []byte) error {
 	var res ContractStore
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*m = res
+	return nil
+}
+
+// ContractStoreStoreItems0 contract store store items0
+// swagger:model ContractStoreStoreItems0
+type ContractStoreStoreItems0 struct {
+
+	// key
+	Key string `json:"key,omitempty"`
+
+	// value
+	Value string `json:"value,omitempty"`
+}
+
+// Validate validates this contract store store items0
+func (m *ContractStoreStoreItems0) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (m *ContractStoreStoreItems0) MarshalBinary() ([]byte, error) {
+	if m == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(m)
+}
+
+// UnmarshalBinary interface implementation
+func (m *ContractStoreStoreItems0) UnmarshalBinary(b []byte) error {
+	var res ContractStoreStoreItems0
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}
