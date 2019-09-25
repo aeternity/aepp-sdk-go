@@ -40,7 +40,7 @@ func TestCompiler(t *testing.T) {
 			ae_addres
 	`
 
-		_, err := c.CompileContract(wontcompileSource, aeternity.Config.Compiler.Backend)
+		_, err := c.CompileContract(wontcompileSource, config.Compiler.Backend)
 		errtype := reflect.TypeOf(err).String()
 		if errtype != "*operations.CompileContractForbidden" {
 			t.Error(err)
