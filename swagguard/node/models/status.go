@@ -47,6 +47,10 @@ type Status struct {
 	// Required: true
 	PeerCount *uint32 `json:"peer_count"`
 
+	// peer pubkey
+	// Required: true
+	PeerPubkey *string `json:"peer_pubkey"`
+
 	// pending transactions count
 	// Required: true
 	PendingTransactionsCount *uint32 `json:"pending_transactions_count"`
@@ -67,6 +71,14 @@ type Status struct {
 	// syncing
 	// Required: true
 	Syncing *bool `json:"syncing"`
+
+	// top block height
+	// Required: true
+	TopBlockHeight *uint64 `json:"top_block_height"`
+
+	// top key block hash
+	// Required: true
+	TopKeyBlockHash *string `json:"top_key_block_hash"`
 }
 
 // Validate validates this status
@@ -101,6 +113,10 @@ func (m *Status) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validatePeerPubkey(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validatePendingTransactionsCount(formats); err != nil {
 		res = append(res, err)
 	}
@@ -118,6 +134,14 @@ func (m *Status) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateSyncing(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateTopBlockHeight(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateTopKeyBlockHash(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -190,6 +214,15 @@ func (m *Status) validatePeerCount(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *Status) validatePeerPubkey(formats strfmt.Registry) error {
+
+	if err := validate.Required("peer_pubkey", "body", m.PeerPubkey); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (m *Status) validatePendingTransactionsCount(formats strfmt.Registry) error {
 
 	if err := validate.Required("pending_transactions_count", "body", m.PendingTransactionsCount); err != nil {
@@ -253,6 +286,24 @@ func (m *Status) validateSyncProgress(formats strfmt.Registry) error {
 func (m *Status) validateSyncing(formats strfmt.Registry) error {
 
 	if err := validate.Required("syncing", "body", m.Syncing); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Status) validateTopBlockHeight(formats strfmt.Registry) error {
+
+	if err := validate.Required("top_block_height", "body", m.TopBlockHeight); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Status) validateTopKeyBlockHash(formats strfmt.Registry) error {
+
+	if err := validate.Required("top_key_block_hash", "body", m.TopKeyBlockHash); err != nil {
 		return err
 	}
 

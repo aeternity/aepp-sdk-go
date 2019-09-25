@@ -12,19 +12,15 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// Uint16 uint16
-// swagger:model UInt16
-type Uint16 uint64
+// TxBlockHeight tx block height
+// swagger:model TxBlockHeight
+type TxBlockHeight uint64
 
-// Validate validates this uint16
-func (m Uint16) Validate(formats strfmt.Registry) error {
+// Validate validates this tx block height
+func (m TxBlockHeight) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := validate.MinimumInt("", "body", int64(m), 0, false); err != nil {
-		return err
-	}
-
-	if err := validate.MaximumInt("", "body", int64(m), 65535, false); err != nil {
+	if err := validate.MinimumInt("", "body", int64(m), -1, false); err != nil {
 		return err
 	}
 

@@ -7,6 +7,9 @@ package models
 
 import (
 	strfmt "github.com/go-openapi/strfmt"
+
+	"github.com/go-openapi/errors"
+	"github.com/go-openapi/validate"
 )
 
 // Uint64 uint64
@@ -15,5 +18,14 @@ type Uint64 uint64
 
 // Validate validates this uint64
 func (m Uint64) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := validate.MinimumInt("", "body", int64(m), 0, false); err != nil {
+		return err
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
 	return nil
 }

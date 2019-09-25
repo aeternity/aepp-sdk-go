@@ -16,38 +16,38 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// OracleRespondTxJSON oracle response tx JSON
-// swagger:model OracleRespondTxJSON
-type OracleRespondTxJSON struct {
+// GAAttachTxJSON g a attach tx JSON
+// swagger:model GAAttachTxJSON
+type GAAttachTxJSON struct {
 	versionField *uint32
 
-	OracleRespondTx
+	GAAttachTx
 }
 
 // Type gets the type of this subtype
-func (m *OracleRespondTxJSON) Type() string {
-	return "OracleRespondTx"
+func (m *GAAttachTxJSON) Type() string {
+	return "GAAttachTx"
 }
 
 // SetType sets the type of this subtype
-func (m *OracleRespondTxJSON) SetType(val string) {
+func (m *GAAttachTxJSON) SetType(val string) {
 
 }
 
 // Version gets the version of this subtype
-func (m *OracleRespondTxJSON) Version() *uint32 {
+func (m *GAAttachTxJSON) Version() *uint32 {
 	return m.versionField
 }
 
 // SetVersion sets the version of this subtype
-func (m *OracleRespondTxJSON) SetVersion(val *uint32) {
+func (m *GAAttachTxJSON) SetVersion(val *uint32) {
 	m.versionField = val
 }
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
-func (m *OracleRespondTxJSON) UnmarshalJSON(raw []byte) error {
+func (m *GAAttachTxJSON) UnmarshalJSON(raw []byte) error {
 	var data struct {
-		OracleRespondTx
+		GAAttachTx
 	}
 	buf := bytes.NewBuffer(raw)
 	dec := json.NewDecoder(buf)
@@ -72,7 +72,7 @@ func (m *OracleRespondTxJSON) UnmarshalJSON(raw []byte) error {
 		return err
 	}
 
-	var result OracleRespondTxJSON
+	var result GAAttachTxJSON
 
 	if base.Type != result.Type() {
 		/* Not the type we're looking for. */
@@ -81,7 +81,7 @@ func (m *OracleRespondTxJSON) UnmarshalJSON(raw []byte) error {
 
 	result.versionField = base.Version
 
-	result.OracleRespondTx = data.OracleRespondTx
+	result.GAAttachTx = data.GAAttachTx
 
 	*m = result
 
@@ -89,14 +89,14 @@ func (m *OracleRespondTxJSON) UnmarshalJSON(raw []byte) error {
 }
 
 // MarshalJSON marshals this object with a polymorphic type to a JSON structure
-func (m OracleRespondTxJSON) MarshalJSON() ([]byte, error) {
+func (m GAAttachTxJSON) MarshalJSON() ([]byte, error) {
 	var b1, b2, b3 []byte
 	var err error
 	b1, err = json.Marshal(struct {
-		OracleRespondTx
+		GAAttachTx
 	}{
 
-		OracleRespondTx: m.OracleRespondTx,
+		GAAttachTx: m.GAAttachTx,
 	},
 	)
 	if err != nil {
@@ -120,16 +120,16 @@ func (m OracleRespondTxJSON) MarshalJSON() ([]byte, error) {
 	return swag.ConcatJSON(b1, b2, b3), nil
 }
 
-// Validate validates this oracle response tx JSON
-func (m *OracleRespondTxJSON) Validate(formats strfmt.Registry) error {
+// Validate validates this g a attach tx JSON
+func (m *GAAttachTxJSON) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateVersion(formats); err != nil {
 		res = append(res, err)
 	}
 
-	// validation for a type composition with OracleRespondTx
-	if err := m.OracleRespondTx.Validate(formats); err != nil {
+	// validation for a type composition with GAAttachTx
+	if err := m.GAAttachTx.Validate(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -139,7 +139,7 @@ func (m *OracleRespondTxJSON) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *OracleRespondTxJSON) validateVersion(formats strfmt.Registry) error {
+func (m *GAAttachTxJSON) validateVersion(formats strfmt.Registry) error {
 
 	if err := validate.Required("version", "body", m.Version()); err != nil {
 		return err
@@ -149,7 +149,7 @@ func (m *OracleRespondTxJSON) validateVersion(formats strfmt.Registry) error {
 }
 
 // MarshalBinary interface implementation
-func (m *OracleRespondTxJSON) MarshalBinary() ([]byte, error) {
+func (m *GAAttachTxJSON) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -157,8 +157,8 @@ func (m *OracleRespondTxJSON) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *OracleRespondTxJSON) UnmarshalBinary(b []byte) error {
-	var res OracleRespondTxJSON
+func (m *GAAttachTxJSON) UnmarshalBinary(b []byte) error {
+	var res GAAttachTxJSON
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

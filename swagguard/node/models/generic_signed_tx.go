@@ -36,8 +36,7 @@ type GenericSignedTx struct {
 	// Required: true
 	Hash *string `json:"hash"`
 
-	// signatures required unless for Generalized Account Meta transactions
-	// Min Items: 1
+	// At least one signature is required unless for Generalized Account Meta transactions
 	Signatures []string `json:"signatures"`
 
 	txField GenericTx
@@ -157,10 +156,6 @@ func (m *GenericSignedTx) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateSignatures(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.validateTx(formats); err != nil {
 		res = append(res, err)
 	}
@@ -195,21 +190,6 @@ func (m *GenericSignedTx) validateBlockHeight(formats strfmt.Registry) error {
 func (m *GenericSignedTx) validateHash(formats strfmt.Registry) error {
 
 	if err := validate.Required("hash", "body", m.Hash); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *GenericSignedTx) validateSignatures(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.Signatures) { // not required
-		return nil
-	}
-
-	iSignaturesSize := int64(len(m.Signatures))
-
-	if err := validate.MinItems("signatures", "body", iSignaturesSize, 1); err != nil {
 		return err
 	}
 

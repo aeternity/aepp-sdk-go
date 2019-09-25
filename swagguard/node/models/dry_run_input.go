@@ -27,7 +27,7 @@ type DryRunInput struct {
 
 	// Txs
 	// Required: true
-	Txs []string `json:"txs"`
+	Txs []*DryRunInputItem `json:"txs"`
 }
 
 // Validate validates this dry run input
@@ -77,6 +77,22 @@ func (m *DryRunInput) validateTxs(formats strfmt.Registry) error {
 
 	if err := validate.Required("txs", "body", m.Txs); err != nil {
 		return err
+	}
+
+	for i := 0; i < len(m.Txs); i++ {
+		if swag.IsZero(m.Txs[i]) { // not required
+			continue
+		}
+
+		if m.Txs[i] != nil {
+			if err := m.Txs[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("txs" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil
