@@ -2,8 +2,11 @@ package transactions
 
 import (
 	"fmt"
+	"math/big"
 	"reflect"
 	"testing"
+
+	"github.com/aeternity/aepp-sdk-go/v5/account"
 
 	"github.com/aeternity/aepp-sdk-go/v5/binary"
 	"github.com/aeternity/aepp-sdk-go/v5/utils"
@@ -368,4 +371,85 @@ func Test_readIDTag(t *testing.T) {
 			}
 		})
 	}
+}
+
+func ExampleSerializeTx() {
+	tx := &SpendTx{
+		SenderID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+		RecipientID: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
+		Amount:      &big.Int{},
+		Fee:         &big.Int{},
+		Payload:     nil,
+		TTL:         3627,
+		Nonce:       3,
+	}
+	txStr, err := SerializeTx(tx)
+	if err != nil {
+		return
+	}
+
+	fmt.Println(txStr)
+	// Output: tx_+E0MAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vOhAR8To7CL8AFABmKmi2nYdfeAPOxMCGR/btXYTHiXvVCjAACCDisDgLzTETQ=
+}
+
+func ExampleDeserializeTx() {
+	txRLP, err := binary.Decode("tx_+E0MAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vOhAR8To7CL8AFABmKmi2nYdfeAPOxMCGR/btXYTHiXvVCjAACCDisDgLzTETQ=")
+	if err != nil {
+		return
+	}
+	tx, err := DeserializeTx(txRLP)
+	fmt.Printf("%T %+v", tx, tx)
+	//Output: *transactions.SpendTx &{SenderID:ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi RecipientID:ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v Amount:+0 Fee:+0 Payload:[] TTL:3627 Nonce:3}
+}
+
+func ExampleDeserializeTxStr() {
+	tx, err := DeserializeTxStr("tx_+E0MAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vOhAR8To7CL8AFABmKmi2nYdfeAPOxMCGR/btXYTHiXvVCjAACCDisDgLzTETQ=")
+	if err != nil {
+		return
+	}
+	fmt.Printf("%T, %+v", tx, tx)
+	//Output: *transactions.SpendTx, &{SenderID:ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi RecipientID:ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v Amount:+0 Fee:+0 Payload:[] TTL:3627 Nonce:3}
+}
+
+func ExampleGetTransactionType() {
+	txRLP, err := binary.Decode("tx_+E0MAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vOhAR8To7CL8AFABmKmi2nYdfeAPOxMCGR/btXYTHiXvVCjAACCDisDgLzTETQ=")
+	if err != nil {
+		return
+	}
+	tx, err := GetTransactionType(txRLP)
+	fmt.Printf("%T, %+v", tx, tx)
+	//Output: *transactions.SpendTx, &{SenderID: RecipientID: Amount:<nil> Fee:<nil> Payload:[] TTL:0 Nonce:0}
+}
+
+func ExampleSignHashTx() {
+	acc, err := account.New()
+	if err != nil {
+		return
+	}
+
+	tx := &SpendTx{
+		SenderID:    acc.Address, // If the SenderID differs from the signing account, the transaction will not validate.
+		RecipientID: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
+		Amount:      &big.Int{},
+		Fee:         &big.Int{},
+		Payload:     nil,
+		TTL:         3627,
+		Nonce:       3,
+	}
+
+	stx, txhash, sig, err := SignHashTx(acc, tx, "ae_testnet")
+	if err != nil {
+		return
+	}
+
+	fmt.Println(stx, txhash, sig, err)
+}
+
+func ExampleVerifySignedTx() {
+	valid, err := VerifySignedTx("ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi", "tx_+JcLAfhCuEB42YQL7o806SO319qTPOiHRPKPPwJpcMbPry9PrAMLVmAZWdoEQNY1Ly5Bo5A2br1MaDrss6zkeR6sotxbf/kCuE/4TQwBoQHOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+86EBHxOjsIvwAUAGYqaLadh194A87EwIZH9u1dhMeJe9UKMAAIIOKwOA4+Wjcw==", "ae_testnet")
+	if err != nil {
+		return
+	}
+	fmt.Println(valid)
+	//Output: true
 }

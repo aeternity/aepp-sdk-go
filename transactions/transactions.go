@@ -155,11 +155,11 @@ type Transaction interface {
 	rlp.Encoder
 }
 
-// Sign calculates the signature of the SignedTx.Tx. Although it does not use
+// calculateSignature calculates the signature of the SignedTx.Tx. Although it does not use
 // the SignedTx itself, it takes a SignedTx as an argument because if it took a
 // rlp.Encoder as an interface, one might expect the signature to be of the
 // SignedTx itself, which won't work.
-func Sign(kp *account.Account, tx *SignedTx, networkID string) (signature []byte, err error) {
+func calculateSignature(kp *account.Account, tx *SignedTx, networkID string) (signature []byte, err error) {
 	txRaw, err := rlp.EncodeToBytes(tx.Tx)
 	if err != nil {
 		return []byte{}, err
@@ -194,7 +194,7 @@ func SignHashTx(kp *account.Account, tx Transaction, networkID string) (signedTx
 	var signatureBytes []byte
 
 	if _, ok := tx.(*GAMetaTx); !ok {
-		signatureBytes, err = Sign(kp, signedTx, networkID)
+		signatureBytes, err = calculateSignature(kp, signedTx, networkID)
 		if err != nil {
 			return
 		}
