@@ -257,28 +257,12 @@ func buildPointers(pointers []string) (ptrs []*NamePointer, err error) {
 	return
 }
 
-// calcSizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
-func calcSizeEstimate(tx TransactionFeeCalculable) (estSize int64, err error) {
-	feeRlpLen, err := calcRlpLen(tx.GetFee())
-	if err != nil {
-		return
-	}
-
-	txRlpLen, err := calcRlpLen(tx)
-	if err != nil {
-		return
-	}
-
-	estSize = int64(txRlpLen - feeRlpLen + 8)
-	return
-}
-
-func calcRlpLen(o interface{}) (size int, err error) {
+func calcRlpLen(o interface{}) (size int64, err error) {
 	rlpEncoded, err := rlp.EncodeToBytes(o)
 	if err != nil {
 		return
 	}
-	size = len(rlpEncoded)
+	size = int64(len(rlpEncoded))
 	return
 }
 
@@ -300,7 +284,7 @@ func calcFee(tx TransactionFeeCalculable) (fee *big.Int, err error) {
 	baseGas := baseGasForTxType(tx)
 	gas.Add(gas, baseGas)
 
-	s, err := calcSizeEstimate(tx)
+	s, err := calcRlpLen(tx)
 	if err != nil {
 		return
 	}
