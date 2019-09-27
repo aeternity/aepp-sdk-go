@@ -171,24 +171,24 @@ func (tx *ContractCreateTx) JSON() (string, error) {
 	return string(output), err
 }
 
-// sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
-func (tx *ContractCreateTx) sizeEstimate() (int, error) {
-	return calcSizeEstimate(tx, tx.Fee)
-}
-
-// FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
-func (tx *ContractCreateTx) FeeEstimate() (*big.Int, error) {
-	txLenEstimated, err := tx.sizeEstimate()
-	if err != nil {
-		return new(big.Int), err
-	}
-	estimatedFee := calcFeeContract(tx.GasLimit, 5, txLenEstimated)
-	return estimatedFee, nil
-}
-
 // ContractID returns the ct_ ID that this transaction would produce, which depends on the OwnerID and AccountNonce.
 func (tx *ContractCreateTx) ContractID() (string, error) {
 	return buildContractID(tx.OwnerID, tx.AccountNonce)
+}
+
+// SetFee implements TransactionFeeCalculable
+func (tx *ContractCreateTx) SetFee(f *big.Int) {
+	tx.Fee = f
+}
+
+// GetFee implements TransactionFeeCalculable
+func (tx *ContractCreateTx) GetFee() *big.Int {
+	return tx.Fee
+}
+
+// GetGasLimit implements TransactionFeeCalculable
+func (tx *ContractCreateTx) GetGasLimit() *big.Int {
+	return tx.GasLimit
 }
 
 // NewContractCreateTx is a constructor for a ContractCreateTx struct
@@ -337,19 +337,19 @@ func (tx *ContractCallTx) JSON() (string, error) {
 	return string(output), err
 }
 
-// sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
-func (tx *ContractCallTx) sizeEstimate() (int, error) {
-	return calcSizeEstimate(tx, tx.Fee)
+// SetFee implements TransactionFeeCalculable
+func (tx *ContractCallTx) SetFee(f *big.Int) {
+	tx.Fee = f
 }
 
-// FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
-func (tx *ContractCallTx) FeeEstimate() (*big.Int, error) {
-	txLenEstimated, err := tx.sizeEstimate()
-	if err != nil {
-		return new(big.Int), err
-	}
-	estimatedFee := calcFeeContract(tx.GasLimit, 30, txLenEstimated)
-	return estimatedFee, nil
+// GetFee implements TransactionFeeCalculable
+func (tx *ContractCallTx) GetFee() *big.Int {
+	return tx.Fee
+}
+
+// GetGasLimit implements TransactionFeeCalculable
+func (tx *ContractCallTx) GetGasLimit() *big.Int {
+	return tx.GasLimit
 }
 
 // NewContractCallTx is a constructor for a ContractCallTx struct

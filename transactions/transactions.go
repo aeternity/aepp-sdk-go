@@ -155,6 +155,17 @@ type Transaction interface {
 	rlp.Encoder
 }
 
+// TransactionFeeCalculable is a set of methods that simplify calculating the tx
+// fee. In particular, SetFee and GetFee let the code increase the fee further
+// in case the newer, calculated fee ends up increasing the size of the
+// transaction (and thus necessitates an even larger fee)
+type TransactionFeeCalculable interface {
+	Transaction
+	SetFee(*big.Int)
+	GetFee() *big.Int
+	GetGasLimit() *big.Int
+}
+
 // calculateSignature calculates the signature of the SignedTx.Tx. Although it does not use
 // the SignedTx itself, it takes a SignedTx as an argument because if it took a
 // rlp.Encoder as an interface, one might expect the signature to be of the
@@ -246,52 +257,82 @@ func buildPointers(pointers []string) (ptrs []*NamePointer, err error) {
 	return
 }
 
-func calcFeeStd(tx rlp.Encoder, txLen int) *big.Int {
-	// (config.Client.BaseGas + len(txRLP) * config.Client.GasPerByte) * config.Client.GasPrice
-	//                                   txLenGasPerByte
-	fee := new(big.Int)
-	txLenGasPerByte := new(big.Int)
-
-	txLenGasPerByte.Mul(utils.NewIntFromUint64(uint64(txLen)), config.Client.GasPerByte)
-	fee.Add(config.Client.BaseGas, txLenGasPerByte)
-	fee.Mul(fee, config.Client.GasPrice)
-	return fee
-}
-
-func calcFeeContract(gas *big.Int, baseGasMultiplier int64, length int) *big.Int {
-	// (config.Client.BaseGas * 5) + gaslimit + (len(txRLP) * config.Client.GasPerByte) * config.Client.GasPrice
-	//           baseGas5                                txLenGasPerByte
-	baseGas5 := new(big.Int)
-	txLenBig := new(big.Int)
-	answer := new(big.Int)
-
-	baseGas5.Mul(config.Client.BaseGas, big.NewInt(baseGasMultiplier))
-	txLenBig.SetUint64(uint64(length))
-	txLenGasPerByte := new(big.Int)
-	txLenGasPerByte.Mul(txLenBig, config.Client.GasPerByte)
-
-	answer.Add(baseGas5, gas)
-	answer.Add(answer, txLenGasPerByte)
-	answer.Mul(answer, config.Client.GasPrice)
-	return answer
-}
-
-// sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
-func calcSizeEstimate(tx rlp.Encoder, fee *big.Int) (int, error) {
-	feeRlp, err := rlp.EncodeToBytes(fee)
+// calcSizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
+func calcSizeEstimate(tx TransactionFeeCalculable) (estSize int64, err error) {
+	feeRlpLen, err := calcRlpLen(tx.GetFee())
 	if err != nil {
-		return 0, err
-	}
-	feeRlpLen := len(feeRlp)
-
-	w := &bytes.Buffer{}
-	err = rlp.Encode(w, tx)
-	if err != nil {
-		return 0, err
+		return
 	}
 
-	rlpRawMsg := w.Bytes()
-	return len(rlpRawMsg) - feeRlpLen + 8, nil
+	txRlpLen, err := calcRlpLen(tx)
+	if err != nil {
+		return
+	}
+
+	estSize = int64(txRlpLen - feeRlpLen + 8)
+	return
+}
+
+func calcRlpLen(o interface{}) (size int, err error) {
+	rlpEncoded, err := rlp.EncodeToBytes(o)
+	if err != nil {
+		return
+	}
+	size = len(rlpEncoded)
+	return
+}
+
+func baseGasForTxType(tx Transaction) (baseGas *big.Int) {
+	baseGas = big.NewInt(0)
+	switch tx.(type) {
+	case *ContractCreateTx, *GAAttachTx, *GAMetaTx:
+		return baseGas.Mul(big.NewInt(5), config.Client.BaseGas)
+	case *ContractCallTx:
+		return baseGas.Mul(big.NewInt(30), config.Client.BaseGas)
+	default:
+		return config.Client.BaseGas
+	}
+}
+
+func calcFee(tx TransactionFeeCalculable) (fee *big.Int, err error) {
+	gas := big.NewInt(0)
+	// baseGas + len(tx)*GasPerByte + contractExecutionGas
+	baseGas := baseGasForTxType(tx)
+	gas.Add(gas, baseGas)
+
+	s, err := calcSizeEstimate(tx)
+	if err != nil {
+		return
+	}
+	txLenGasPerByte := big.NewInt(s)
+	txLenGasPerByte.Mul(txLenGasPerByte, config.Client.GasPerByte)
+	gas.Add(gas, txLenGasPerByte)
+
+	gas.Add(gas, tx.GetGasLimit())
+
+	fee = new(big.Int)
+	fee = gas.Mul(gas, config.Client.GasPrice)
+
+	tx.SetFee(fee)
+	return
+}
+
+// CalculateFee calculates the required transaction fee, and increases the fee
+// further in case the newer fee ends up increasing the transaction size.
+func CalculateFee(tx TransactionFeeCalculable) (err error) {
+	var fee, newFee *big.Int
+	for {
+		fee = tx.GetFee()
+		newFee, err = calcFee(tx)
+		if err != nil {
+			break
+		}
+
+		if fee.Cmp(newFee) == 0 {
+			break
+		}
+	}
+	return
 }
 
 // SerializeTx takes a Tx, runs its RLP() method, and base encodes the result.

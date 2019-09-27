@@ -143,6 +143,21 @@ func (tx *OracleRegisterTx) JSON() (string, error) {
 	return string(output), err
 }
 
+// SetFee implements TransactionFeeCalculable
+func (tx *OracleRegisterTx) SetFee(f *big.Int) {
+	tx.Fee = f
+}
+
+// GetFee implements TransactionFeeCalculable
+func (tx *OracleRegisterTx) GetFee() *big.Int {
+	return tx.Fee
+}
+
+// GetGasLimit implements TransactionFeeCalculable
+func (tx *OracleRegisterTx) GetGasLimit() *big.Int {
+	return big.NewInt(0)
+}
+
 // NewOracleRegisterTx is a constructor for a OracleRegisterTx struct
 func NewOracleRegisterTx(accountID string, accountNonce uint64, querySpec, responseSpec string, queryFee *big.Int, oracleTTLType, oracleTTLValue uint64, abiVersion uint16, txFee *big.Int, txTTL uint64) *OracleRegisterTx {
 	return &OracleRegisterTx{accountID, accountNonce, querySpec, responseSpec, queryFee, oracleTTLType, oracleTTLValue, abiVersion, txFee, txTTL}
@@ -242,6 +257,21 @@ func (tx *OracleExtendTx) JSON() (string, error) {
 
 	output, err := swaggerT.MarshalBinary()
 	return string(output), err
+}
+
+// SetFee implements TransactionFeeCalculable
+func (tx *OracleExtendTx) SetFee(f *big.Int) {
+	tx.Fee = f
+}
+
+// GetFee implements TransactionFeeCalculable
+func (tx *OracleExtendTx) GetFee() *big.Int {
+	return tx.Fee
+}
+
+// GetGasLimit implements TransactionFeeCalculable
+func (tx *OracleExtendTx) GetGasLimit() *big.Int {
+	return big.NewInt(0)
 }
 
 // NewOracleExtendTx is a constructor for a OracleExtendTx struct
@@ -381,6 +411,21 @@ func (tx *OracleQueryTx) JSON() (string, error) {
 	return string(output), err
 }
 
+// SetFee implements TransactionFeeCalculable
+func (tx *OracleQueryTx) SetFee(f *big.Int) {
+	tx.Fee = f
+}
+
+// GetFee implements TransactionFeeCalculable
+func (tx *OracleQueryTx) GetFee() *big.Int {
+	return tx.Fee
+}
+
+// GetGasLimit implements TransactionFeeCalculable
+func (tx *OracleQueryTx) GetGasLimit() *big.Int {
+	return big.NewInt(0)
+}
+
 // NewOracleQueryTx is a constructor for a OracleQueryTx struct
 func NewOracleQueryTx(SenderID string, AccountNonce uint64, OracleID, Query string, QueryFee *big.Int, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64, Fee *big.Int, TTL uint64) *OracleQueryTx {
 	return &OracleQueryTx{SenderID, AccountNonce, OracleID, Query, QueryFee, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue, Fee, TTL}
@@ -497,6 +542,21 @@ func (tx *OracleRespondTx) JSON() (string, error) {
 	output, err := swaggerT.MarshalBinary()
 	return string(output), err
 
+}
+
+// SetFee implements TransactionFeeCalculable
+func (tx *OracleRespondTx) SetFee(f *big.Int) {
+	tx.Fee = f
+}
+
+// GetFee implements TransactionFeeCalculable
+func (tx *OracleRespondTx) GetFee() *big.Int {
+	return tx.Fee
+}
+
+// GetGasLimit implements TransactionFeeCalculable
+func (tx *OracleRespondTx) GetGasLimit() *big.Int {
+	return big.NewInt(0)
 }
 
 // NewOracleRespondTx is a constructor for a OracleRespondTx struct

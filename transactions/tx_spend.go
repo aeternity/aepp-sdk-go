@@ -118,19 +118,19 @@ func (tx *SpendTx) JSON() (string, error) {
 	return string(output), err
 }
 
-// sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
-func (tx *SpendTx) sizeEstimate() (int, error) {
-	return calcSizeEstimate(tx, tx.Fee)
+// SetFee implements TransactionFeeCalculable
+func (tx *SpendTx) SetFee(f *big.Int) {
+	tx.Fee = f
 }
 
-// FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
-func (tx *SpendTx) FeeEstimate() (*big.Int, error) {
-	txLenEstimated, err := tx.sizeEstimate()
-	if err != nil {
-		return new(big.Int), err
-	}
-	estimatedFee := calcFeeStd(tx, txLenEstimated)
-	return estimatedFee, nil
+// GetFee implements TransactionFeeCalculable
+func (tx *SpendTx) GetFee() *big.Int {
+	return tx.Fee
+}
+
+// GetGasLimit implements TransactionFeeCalculable
+func (tx *SpendTx) GetGasLimit() *big.Int {
+	return big.NewInt(0)
 }
 
 // NewSpendTx is a constructor for a SpendTx struct

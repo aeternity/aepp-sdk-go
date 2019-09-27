@@ -102,19 +102,19 @@ func (tx *NamePreclaimTx) JSON() (string, error) {
 	return string(output), err
 }
 
-// sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
-func (tx *NamePreclaimTx) sizeEstimate() (int, error) {
-	return calcSizeEstimate(tx, tx.Fee)
+// SetFee implements TransactionFeeCalculable
+func (tx *NamePreclaimTx) SetFee(f *big.Int) {
+	tx.Fee = f
 }
 
-// FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
-func (tx *NamePreclaimTx) FeeEstimate() (*big.Int, error) {
-	txLenEstimated, err := tx.sizeEstimate()
-	if err != nil {
-		return new(big.Int), err
-	}
-	estimatedFee := calcFeeStd(tx, txLenEstimated)
-	return estimatedFee, nil
+// GetFee implements TransactionFeeCalculable
+func (tx *NamePreclaimTx) GetFee() *big.Int {
+	return tx.Fee
+}
+
+// GetGasLimit implements TransactionFeeCalculable
+func (tx *NamePreclaimTx) GetGasLimit() *big.Int {
+	return big.NewInt(0)
 }
 
 // NewNamePreclaimTx is a constructor for a NamePreclaimTx struct
@@ -222,19 +222,19 @@ func (tx *NameClaimTx) JSON() (string, error) {
 	return string(output), err
 }
 
-// sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
-func (tx *NameClaimTx) sizeEstimate() (int, error) {
-	return calcSizeEstimate(tx, tx.Fee)
+// SetFee implements TransactionFeeCalculable
+func (tx *NameClaimTx) SetFee(f *big.Int) {
+	tx.Fee = f
 }
 
-// FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
-func (tx *NameClaimTx) FeeEstimate() (*big.Int, error) {
-	txLenEstimated, err := tx.sizeEstimate()
-	if err != nil {
-		return new(big.Int), err
-	}
-	estimatedFee := calcFeeStd(tx, txLenEstimated)
-	return estimatedFee, nil
+// GetFee implements TransactionFeeCalculable
+func (tx *NameClaimTx) GetFee() *big.Int {
+	return tx.Fee
+}
+
+// GetGasLimit implements TransactionFeeCalculable
+func (tx *NameClaimTx) GetGasLimit() *big.Int {
+	return big.NewInt(0)
 }
 
 // NewNameClaimTx is a constructor for a NameClaimTx struct
@@ -439,19 +439,19 @@ func (tx *NameUpdateTx) JSON() (string, error) {
 	return string(output), err
 }
 
-// sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
-func (tx *NameUpdateTx) sizeEstimate() (int, error) {
-	return calcSizeEstimate(tx, tx.Fee)
+// SetFee implements TransactionFeeCalculable
+func (tx *NameUpdateTx) SetFee(f *big.Int) {
+	tx.Fee = f
 }
 
-// FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
-func (tx *NameUpdateTx) FeeEstimate() (*big.Int, error) {
-	txLenEstimated, err := tx.sizeEstimate()
-	if err != nil {
-		return new(big.Int), err
-	}
-	estimatedFee := calcFeeStd(tx, txLenEstimated)
-	return estimatedFee, nil
+// GetFee implements TransactionFeeCalculable
+func (tx *NameUpdateTx) GetFee() *big.Int {
+	return tx.Fee
+}
+
+// GetGasLimit implements TransactionFeeCalculable
+func (tx *NameUpdateTx) GetGasLimit() *big.Int {
+	return big.NewInt(0)
 }
 
 // NewNameUpdateTx is a constructor for a NameUpdateTx struct
@@ -561,19 +561,19 @@ func (tx *NameRevokeTx) JSON() (string, error) {
 	return string(output), err
 }
 
-// sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
-func (tx *NameRevokeTx) sizeEstimate() (int, error) {
-	return calcSizeEstimate(tx, tx.Fee)
+// SetFee implements TransactionFeeCalculable
+func (tx *NameRevokeTx) SetFee(f *big.Int) {
+	tx.Fee = f
 }
 
-// FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
-func (tx *NameRevokeTx) FeeEstimate() (*big.Int, error) {
-	txLenEstimated, err := tx.sizeEstimate()
-	if err != nil {
-		return new(big.Int), err
-	}
-	estimatedFee := calcFeeStd(tx, txLenEstimated)
-	return estimatedFee, nil
+// GetFee implements TransactionFeeCalculable
+func (tx *NameRevokeTx) GetFee() *big.Int {
+	return tx.Fee
+}
+
+// GetGasLimit implements TransactionFeeCalculable
+func (tx *NameRevokeTx) GetGasLimit() *big.Int {
+	return big.NewInt(0)
 }
 
 // NewNameRevokeTx is a constructor for a NameRevokeTx struct
@@ -696,19 +696,19 @@ func (tx *NameTransferTx) JSON() (string, error) {
 	return string(output), err
 }
 
-// sizeEstimate returns the size of the transaction when RLP serialized, assuming the Fee has a length of 8 bytes.
-func (tx *NameTransferTx) sizeEstimate() (int, error) {
-	return calcSizeEstimate(tx, tx.Fee)
+// SetFee implements TransactionFeeCalculable
+func (tx *NameTransferTx) SetFee(f *big.Int) {
+	tx.Fee = f
 }
 
-// FeeEstimate estimates the fee needed for the node to accept this transaction, assuming the fee is 8 bytes long when RLP serialized.
-func (tx *NameTransferTx) FeeEstimate() (*big.Int, error) {
-	txLenEstimated, err := tx.sizeEstimate()
-	if err != nil {
-		return new(big.Int), err
-	}
-	estimatedFee := calcFeeStd(tx, txLenEstimated)
-	return estimatedFee, nil
+// GetFee implements TransactionFeeCalculable
+func (tx *NameTransferTx) GetFee() *big.Int {
+	return tx.Fee
+}
+
+// GetGasLimit implements TransactionFeeCalculable
+func (tx *NameTransferTx) GetGasLimit() *big.Int {
+	return big.NewInt(0)
 }
 
 // NewNameTransferTx is a constructor for a NameTransferTx struct
