@@ -1,7 +1,6 @@
 package integrationtest
 
 import (
-	"fmt"
 	"math/big"
 	"testing"
 
@@ -39,11 +38,6 @@ func TestSpendTx(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
-	// minimize the fee to save money!
-	est, _ := tx.FeeEstimate()
-	fmt.Println("Estimated vs Actual Fee:", est, tx.Fee)
-	tx.Fee = est
 
 	// sign the transaction, output params for debugging
 	_, hash, _, err := aeternity.SignBroadcastTransaction(tx, alice, node, networkID)

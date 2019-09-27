@@ -120,6 +120,21 @@ func (tx *GAAttachTx) DecodeRLP(s *rlp.Stream) (err error) {
 	return
 }
 
+// SetFee implements TransactionFeeCalculable
+func (tx *GAAttachTx) SetFee(f *big.Int) {
+	tx.Fee = f
+}
+
+// GetFee implements TransactionFeeCalculable
+func (tx *GAAttachTx) GetFee() *big.Int {
+	return tx.Fee
+}
+
+// GetGasLimit implements TransactionFeeCalculable
+func (tx *GAAttachTx) GetGasLimit() *big.Int {
+	return tx.GasLimit
+}
+
 // NewGAAttachTx creates a GAAttachTx
 func NewGAAttachTx(OwnerID string, AccountNonce uint64, Code string, AuthFunc []byte, VMVersion uint16, AbiVersion uint16, GasLimit *big.Int, GasPrice *big.Int, Fee *big.Int, TTL uint64, CallData string) *GAAttachTx {
 	return &GAAttachTx{
@@ -238,6 +253,21 @@ func (tx *GAMetaTx) DecodeRLP(s *rlp.Stream) (err error) {
 	tx.TTL = gtx.TTL
 	tx.Tx = wtx.(*SignedTx)
 	return
+}
+
+// SetFee implements TransactionFeeCalculable
+func (tx *GAMetaTx) SetFee(f *big.Int) {
+	tx.Fee = f
+}
+
+// GetFee implements TransactionFeeCalculable
+func (tx *GAMetaTx) GetFee() *big.Int {
+	return tx.Fee
+}
+
+// GetGasLimit implements TransactionFeeCalculable
+func (tx *GAMetaTx) GetGasLimit() *big.Int {
+	return tx.GasLimit
 }
 
 // NewGAMetaTx creates a GAMetaTx

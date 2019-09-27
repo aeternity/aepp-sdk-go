@@ -5,6 +5,7 @@ import (
 	"math/big"
 	"time"
 
+	"github.com/aeternity/aepp-sdk-go/transactions"
 	"github.com/aeternity/aepp-sdk-go/v5/account"
 	"github.com/aeternity/aepp-sdk-go/v5/config"
 )
@@ -36,9 +37,10 @@ func ExampleContext() {
 	}
 
 	// Optional: minimize the fee to save money!
-	est, _ := tx.FeeEstimate()
-	fmt.Println("Estimated vs Actual Fee:", est, tx.Fee)
-	tx.Fee = est
+	err = transactions.CalculateFee(tx)
+	if err != nil {
+		fmt.Println("Could not calculate the transaction fee", err)
+	}
 
 	_, _, _, _, _, err = SignBroadcastWaitTransaction(tx, alice, node, config.Node.NetworkID, 10)
 	if err != nil {

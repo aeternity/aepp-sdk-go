@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/aeternity/aepp-sdk-go/v5/account"
+	"github.com/aeternity/aepp-sdk-go/v5/config"
 
 	"github.com/aeternity/aepp-sdk-go/v5/binary"
 	"github.com/aeternity/aepp-sdk-go/v5/utils"
@@ -368,6 +369,154 @@ func Test_readIDTag(t *testing.T) {
 			}
 			if gotEncodedHash != tt.wantEncodedHash {
 				t.Errorf("readIDTag() gotEncodedHash = %v, want %v", gotEncodedHash, tt.wantEncodedHash)
+			}
+		})
+	}
+}
+
+func Test_CalculateFee(t *testing.T) {
+	tests := []TransactionFeeCalculable{
+		&SpendTx{
+			SenderID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+			RecipientID: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
+			Amount:      big.NewInt(10),
+			Fee:         big.NewInt(10),
+			Payload:     []byte("Hello World"),
+			TTL:         uint64(10),
+			Nonce:       uint64(1),
+		},
+		&NamePreclaimTx{
+			AccountID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+			CommitmentID: "cm_2jrPGyFKCEFFrsVvQsUzfnSURV5igr2WxvMR679S5DnuFEjet4", // name: fdsa.test, salt: 12345
+			Fee:          big.NewInt(10),
+			TTL:          uint64(10),
+			AccountNonce: uint64(1),
+		},
+		&NameClaimTx{
+			AccountID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+			Name:         "fdsa.test",
+			NameSalt:     utils.RequireIntFromString("9795159241593061970"),
+			Fee:          utils.NewIntFromUint64(10),
+			TTL:          uint64(10),
+			AccountNonce: uint64(1),
+		},
+		&NameUpdateTx{
+			AccountID: "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+			NameID:    "nm_ie148R2qZYBfo1Ek3sZpfTLwBhkkqCRKi2Ce8JJ7yyWVRw2Sb", // fdsa.test
+			Pointers: []*NamePointer{
+				&NamePointer{Key: "account_pubkey", ID: "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"},
+			},
+			NameTTL:      uint64(0),
+			ClientTTL:    uint64(6),
+			Fee:          utils.NewIntFromUint64(1),
+			TTL:          5,
+			AccountNonce: 5,
+		},
+		&NameTransferTx{
+			AccountID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+			NameID:       "nm_ie148R2qZYBfo1Ek3sZpfTLwBhkkqCRKi2Ce8JJ7yyWVRw2Sb", // fdsa.test
+			RecipientID:  "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
+			Fee:          utils.NewIntFromUint64(1),
+			TTL:          5,
+			AccountNonce: 5,
+		},
+		&NameRevokeTx{
+			AccountID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+			NameID:       "nm_ie148R2qZYBfo1Ek3sZpfTLwBhkkqCRKi2Ce8JJ7yyWVRw2Sb", // fdsa.test
+			Fee:          utils.NewIntFromUint64(1),
+			TTL:          5,
+			AccountNonce: 5,
+		},
+		&OracleRegisterTx{
+			AccountID:      "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+			AccountNonce:   uint64(1),
+			QuerySpec:      "query Specification",
+			ResponseSpec:   "response Specification",
+			QueryFee:       config.Client.Oracles.QueryFee,
+			OracleTTLType:  0,
+			OracleTTLValue: uint64(100),
+			AbiVersion:     1,
+			Fee:            utils.RequireIntFromString("200000000000000"),
+			TTL:            500,
+		},
+		&OracleExtendTx{
+			OracleID:       "ok_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+			AccountNonce:   1,
+			OracleTTLType:  0,
+			OracleTTLValue: 300,
+			Fee:            utils.NewIntFromUint64(10),
+			TTL:            0,
+		},
+		&OracleQueryTx{
+			SenderID:         "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
+			AccountNonce:     uint64(1),
+			OracleID:         "ok_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+			Query:            "Are you okay?",
+			QueryFee:         utils.NewIntFromUint64(0),
+			QueryTTLType:     0,
+			QueryTTLValue:    300,
+			ResponseTTLType:  0,
+			ResponseTTLValue: 300,
+			Fee:              utils.RequireIntFromString("200000000000000"),
+			TTL:              500,
+		},
+		&OracleRespondTx{
+			OracleID:         "ok_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+			AccountNonce:     uint64(1),
+			QueryID:          "oq_2NhMjBdKHJYnQjDbAxanmxoXiSiWDoG9bqDgk2MfK2X6AB9Bwx",
+			Response:         "Hello back",
+			ResponseTTLType:  0,
+			ResponseTTLValue: 100,
+			Fee:              config.Client.Fee,
+			TTL:              config.Client.TTL,
+		},
+		&ContractCreateTx{
+			OwnerID:      "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+			AccountNonce: 1,
+			// encoded "contract Identity =\n  type state = ()\n  function main(z : int) = z"
+			Code:       `cb_+QP1RgKgpVq1Ib2r2ug+UktHvfWSQ8P35HJQHM6qikqBu1DwgtT5Avv5ASqgaPJnYzj/UIg5q6R3Se/6i+h+8oTyB/s9mZhwHNU4h8WEbWFpbrjAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKD//////////////////////////////////////////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+QHLoLnJVvKLMUmp9Zh6pQXz2hsiCcxXOSNABiu2wb2fn5nqhGluaXS4YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//////////////////////////////////////////7kBQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEA//////////////////////////////////////////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA///////////////////////////////////////////uMxiAABkYgAAhJGAgIBRf7nJVvKLMUmp9Zh6pQXz2hsiCcxXOSNABiu2wb2fn5nqFGIAAMBXUIBRf2jyZ2M4/1CIOaukd0nv+ovofvKE8gf7PZmYcBzVOIfFFGIAAK9XUGABGVEAW2AAGVlgIAGQgVJgIJADYAOBUpBZYABRWVJgAFJgAPNbYACAUmAA81tZWWAgAZCBUmAgkANgABlZYCABkIFSYCCQA2ADgVKBUpBWW2AgAVFRWVCAkVBQgJBQkFZbUFCCkVBQYgAAjFaFMi4xLjBJtQib`,
+			VMVersion:  4,
+			AbiVersion: 1,
+			Deposit:    config.Client.Contracts.Deposit,
+			Amount:     config.Client.Contracts.Amount,
+			GasLimit:   config.Client.Contracts.GasLimit,
+			GasPrice:   config.Client.GasPrice,
+			Fee:        config.Client.Fee,
+			TTL:        config.Client.TTL,
+			CallData:   "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACC5yVbyizFJqfWYeqUF89obIgnMVzkjQAYrtsG9n5+Z6gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAnHQYrA==",
+		},
+		&ContractCallTx{
+			CallerID:     "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+			AccountNonce: uint64(2),
+			ContractID:   "ct_2pfWWzeRzWSdm68HXZJn61KhxdsBA46wzYgvo1swkdJZij1rKm",
+			Amount:       config.Client.Contracts.Amount,
+			GasLimit:     config.Client.Contracts.GasLimit,
+			GasPrice:     config.Client.GasPrice,
+			AbiVersion:   config.Client.Contracts.ABIVersion,
+			CallData:     "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACDiIx1s38k5Ft5Ms6mFe/Zc9A/CVvShSYs/fnyYDBmTRAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACo7j+li",
+			Fee:          config.Client.Fee,
+			TTL:          config.Client.TTL,
+		},
+		&GAAttachTx{
+			OwnerID:      "ak_oeoYuVx1wmPxSADDCY6GFVorfJHFYBKia9KonSiWjtbvNQv9Y",
+			AccountNonce: 1,
+			Code:         "cb_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9246K2XN/CAWn0QFGSjvFGIAAYlXUIBRf2vehD2STuvi98Sjn0btXkSUDTn62IZgndZlXQVNK20SFGIAAg5XUGABGVEAW2AAGVlgIAGQgVJgIJADYABZkIFSgVJZYCABkIFSYCCQA2AAWZCBUoFSWWAgAZCBUmAgkANgA4FSkFlgAFFZUmAAUmAA81tgAIBSYADzW2AA/ZBQkFZbYCABUVGQUFlQgJFQUGAAYABgAGEB9FmQgVJgAGAAWvGAUWAAFGIAASBXgFFgARRiAAFZV1BgARlRAFtQf05vdCBpbiBBdXRoIGNvbnRleHQAAAAAAAAAAAAAAAAAWWAgAZCBUmAgkANgE4FSkFBiAADdVltgIAFRYABRgGAgAVFZYCABkIFSYCCQA2ABYABRUQGBUpBQYABSWVBgAZBQkFCQVltgIAFRgFGQYCABUZFQWVCAgpJQklBQYABgAGAAg1lgIAGQgVJgIJADhYFSWWBAAZCBUmAgkANgABlZYCABkIFSYCCQA2AAWZCBUoFSWWAgAZCBUmAgkANgAFmQgVKBUllgIAGQgVJgIJADYAOBUoFSYCCQA2EBk4FSYABgAFrxkVBQkFZbYCABUVGDklCAkVBQgFlgIAGQgVJgIJADYAGBUllgIAGQgVJgIJADYAAZWWAgAZCBUmAgkANgAFmQgVKBUllgIAGQgVJgIJADYABZkIFSgVJZYCABkIFSYCCQA2ADgVKBUpBQkFaFMy4xLjA3jzdH",
+			AuthFunc:     []byte{96, 0, 184, 90, 183, 93, 180, 49, 139, 122, 45, 0, 88, 192, 16, 175, 167, 85, 183, 183, 4, 214, 35, 12, 90, 196, 201, 236, 49, 59, 255, 71},
+			VMVersion:    4,
+			AbiVersion:   1,
+			GasLimit:     big.NewInt(500),
+			GasPrice:     big.NewInt(1000000000),
+			Fee:          big.NewInt(126720000000000),
+			TTL:          0,
+			CallData:     "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACBr3oQ9kk7r4vfEo59G7V5ElA05+tiGYJ3WZV0FTSttEgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgae21UoMYpb0U8XZCTsTvUGUNeF/kxvl/87SxMDOBYASarBTN",
+		},
+	}
+	for _, tt := range tests {
+		ttType := reflect.TypeOf(tt).String()
+		t.Run(ttType, func(t *testing.T) {
+			err := CalculateFee(tt)
+			if err != nil {
+				t.Error(err)
 			}
 		})
 	}
