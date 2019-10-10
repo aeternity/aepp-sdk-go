@@ -39,13 +39,6 @@ func (o *DecodeCallResultReader) ReadResponse(response runtime.ClientResponse, c
 		}
 		return nil, result
 
-	case 403:
-		result := NewDecodeCallResultForbidden()
-		if err := result.readResponse(response, consumer, o.formats); err != nil {
-			return nil, err
-		}
-		return nil, result
-
 	default:
 		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
@@ -88,7 +81,7 @@ func NewDecodeCallResultBadRequest() *DecodeCallResultBadRequest {
 Invalid data
 */
 type DecodeCallResultBadRequest struct {
-	Payload *models.Error
+	Payload models.CompilerErrors
 }
 
 func (o *DecodeCallResultBadRequest) Error() string {
@@ -96,35 +89,6 @@ func (o *DecodeCallResultBadRequest) Error() string {
 }
 
 func (o *DecodeCallResultBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.Error)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
-
-	return nil
-}
-
-// NewDecodeCallResultForbidden creates a DecodeCallResultForbidden with default headers values
-func NewDecodeCallResultForbidden() *DecodeCallResultForbidden {
-	return &DecodeCallResultForbidden{}
-}
-
-/*DecodeCallResultForbidden handles this case with default header values.
-
-Invalid data
-*/
-type DecodeCallResultForbidden struct {
-	Payload models.CompilerErrors
-}
-
-func (o *DecodeCallResultForbidden) Error() string {
-	return fmt.Sprintf("[POST /decode-call-result][%d] decodeCallResultForbidden  %+v", 403, o.Payload)
-}
-
-func (o *DecodeCallResultForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	// response payload
 	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {

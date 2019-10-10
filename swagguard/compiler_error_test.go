@@ -11,10 +11,10 @@ import (
 
 func TestCompilerErrorModelDereferencing(t *testing.T) {
 	reason := "A Very Good Reason"
-	compileContractBadRequest := operations.NewCompileContractBadRequest()
+	internalServerErr := operations.APIVersionInternalServerError{}
 	err := models.Error{Reason: &reason}
-	compileContractBadRequest.Payload = &err
-	printedError := fmt.Sprintf("BadRequest %s", compileContractBadRequest)
+	internalServerErr.Payload = &err
+	printedError := fmt.Sprintf("BadRequest %s", internalServerErr)
 	if !strings.Contains(printedError, reason) {
 		t.Errorf("Expected to find %s when printing out the models.Error: got %s instead", reason, printedError)
 	}
@@ -26,10 +26,10 @@ func TestCompilerCompilationErrorsModelDereferencing(t *testing.T) {
 	err2 := &models.CompilerError{}
 	err2.UnmarshalBinary([]byte(`{"message":"Also I don't like your face","pos":{"col":0,"line":0},"type":"wrong_programmer_error"}`))
 
-	compileContractForbidden := operations.CompileContractForbidden{
+	compileContractErr := operations.CompileContractBadRequest{
 		Payload: []*models.CompilerError{err1, err2},
 	}
-	printedError := fmt.Sprintf("%s", compileContractForbidden)
+	printedError := fmt.Sprintf("%s", compileContractErr)
 	lookForError1 := "Unbound variable ae_addres"
 	lookForError2 := "Also I don't like your face"
 

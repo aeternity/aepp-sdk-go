@@ -39,13 +39,6 @@ func (o *GenerateACIReader) ReadResponse(response runtime.ClientResponse, consum
 		}
 		return nil, result
 
-	case 403:
-		result := NewGenerateACIForbidden()
-		if err := result.readResponse(response, consumer, o.formats); err != nil {
-			return nil, err
-		}
-		return nil, result
-
 	default:
 		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
@@ -87,10 +80,10 @@ func NewGenerateACIBadRequest() *GenerateACIBadRequest {
 
 /*GenerateACIBadRequest handles this case with default header values.
 
-Invalid input
+Compiler errors
 */
 type GenerateACIBadRequest struct {
-	Payload *models.Error
+	Payload models.CompilerErrors
 }
 
 func (o *GenerateACIBadRequest) Error() string {
@@ -98,35 +91,6 @@ func (o *GenerateACIBadRequest) Error() string {
 }
 
 func (o *GenerateACIBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.Error)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
-
-	return nil
-}
-
-// NewGenerateACIForbidden creates a GenerateACIForbidden with default headers values
-func NewGenerateACIForbidden() *GenerateACIForbidden {
-	return &GenerateACIForbidden{}
-}
-
-/*GenerateACIForbidden handles this case with default header values.
-
-Compiler errors
-*/
-type GenerateACIForbidden struct {
-	Payload models.CompilerErrors
-}
-
-func (o *GenerateACIForbidden) Error() string {
-	return fmt.Sprintf("[POST /aci][%d] generateACIForbidden  %+v", 403, o.Payload)
-}
-
-func (o *GenerateACIForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	// response payload
 	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {

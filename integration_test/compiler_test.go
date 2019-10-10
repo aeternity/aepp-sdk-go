@@ -41,7 +41,7 @@ func TestCompiler(t *testing.T) {
 
 		_, err := c.CompileContract(wontcompileSource, config.Compiler.Backend)
 		errtype := reflect.TypeOf(err).String()
-		if errtype != "*operations.CompileContractForbidden" {
+		if errtype != "*operations.CompileContractBadRequest" {
 			t.Error(err)
 		}
 	})

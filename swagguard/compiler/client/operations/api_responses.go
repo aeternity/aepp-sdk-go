@@ -32,8 +32,8 @@ func (o *APIReader) ReadResponse(response runtime.ClientResponse, consumer runti
 		}
 		return result, nil
 
-	case 403:
-		result := NewAPIForbidden()
+	case 400:
+		result := NewAPIBadRequest()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
@@ -71,24 +71,24 @@ func (o *APIOK) readResponse(response runtime.ClientResponse, consumer runtime.C
 	return nil
 }
 
-// NewAPIForbidden creates a APIForbidden with default headers values
-func NewAPIForbidden() *APIForbidden {
-	return &APIForbidden{}
+// NewAPIBadRequest creates a APIBadRequest with default headers values
+func NewAPIBadRequest() *APIBadRequest {
+	return &APIBadRequest{}
 }
 
-/*APIForbidden handles this case with default header values.
+/*APIBadRequest handles this case with default header values.
 
 Error
 */
-type APIForbidden struct {
+type APIBadRequest struct {
 	Payload *models.Error
 }
 
-func (o *APIForbidden) Error() string {
-	return fmt.Sprintf("[GET /api][%d] apiForbidden  %+v", 403, o.Payload)
+func (o *APIBadRequest) Error() string {
+	return fmt.Sprintf("[GET /api][%d] apiBadRequest  %+v", 400, o.Payload)
 }
 
-func (o *APIForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *APIBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.Error)
 

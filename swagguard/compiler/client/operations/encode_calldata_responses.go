@@ -39,13 +39,6 @@ func (o *EncodeCalldataReader) ReadResponse(response runtime.ClientResponse, con
 		}
 		return nil, result
 
-	case 403:
-		result := NewEncodeCalldataForbidden()
-		if err := result.readResponse(response, consumer, o.formats); err != nil {
-			return nil, err
-		}
-		return nil, result
-
 	default:
 		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
@@ -87,10 +80,10 @@ func NewEncodeCalldataBadRequest() *EncodeCalldataBadRequest {
 
 /*EncodeCalldataBadRequest handles this case with default header values.
 
-Invalid data
+Invalid contract
 */
 type EncodeCalldataBadRequest struct {
-	Payload *models.Error
+	Payload models.CompilerErrors
 }
 
 func (o *EncodeCalldataBadRequest) Error() string {
@@ -98,35 +91,6 @@ func (o *EncodeCalldataBadRequest) Error() string {
 }
 
 func (o *EncodeCalldataBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.Error)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
-
-	return nil
-}
-
-// NewEncodeCalldataForbidden creates a EncodeCalldataForbidden with default headers values
-func NewEncodeCalldataForbidden() *EncodeCalldataForbidden {
-	return &EncodeCalldataForbidden{}
-}
-
-/*EncodeCalldataForbidden handles this case with default header values.
-
-Invalid contract
-*/
-type EncodeCalldataForbidden struct {
-	Payload models.CompilerErrors
-}
-
-func (o *EncodeCalldataForbidden) Error() string {
-	return fmt.Sprintf("[POST /encode-calldata][%d] encodeCalldataForbidden  %+v", 403, o.Payload)
-}
-
-func (o *EncodeCalldataForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	// response payload
 	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {

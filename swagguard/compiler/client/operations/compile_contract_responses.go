@@ -39,13 +39,6 @@ func (o *CompileContractReader) ReadResponse(response runtime.ClientResponse, co
 		}
 		return nil, result
 
-	case 403:
-		result := NewCompileContractForbidden()
-		if err := result.readResponse(response, consumer, o.formats); err != nil {
-			return nil, err
-		}
-		return nil, result
-
 	default:
 		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
@@ -87,10 +80,10 @@ func NewCompileContractBadRequest() *CompileContractBadRequest {
 
 /*CompileContractBadRequest handles this case with default header values.
 
-Invalid data
+Invalid contract
 */
 type CompileContractBadRequest struct {
-	Payload *models.Error
+	Payload models.CompilerErrors
 }
 
 func (o *CompileContractBadRequest) Error() string {
@@ -98,35 +91,6 @@ func (o *CompileContractBadRequest) Error() string {
 }
 
 func (o *CompileContractBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.Error)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
-
-	return nil
-}
-
-// NewCompileContractForbidden creates a CompileContractForbidden with default headers values
-func NewCompileContractForbidden() *CompileContractForbidden {
-	return &CompileContractForbidden{}
-}
-
-/*CompileContractForbidden handles this case with default header values.
-
-Invalid contract
-*/
-type CompileContractForbidden struct {
-	Payload models.CompilerErrors
-}
-
-func (o *CompileContractForbidden) Error() string {
-	return fmt.Sprintf("[POST /compile][%d] compileContractForbidden  %+v", 403, o.Payload)
-}
-
-func (o *CompileContractForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	// response payload
 	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
