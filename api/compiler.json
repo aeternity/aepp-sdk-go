@@ -54,6 +54,48 @@
             ],
             "type": "object"
         },
+        "BytecodeCallResultInput": {
+            "example": {
+                "backend": "fate",
+                "bytecode": {},
+                "call-result": "call-result",
+                "call-value": "call-value",
+                "function": "function"
+            },
+            "properties": {
+                "backend": {
+                    "description": "Compiler backend; fate | aevm",
+                    "enum": [
+                        "fate",
+                        "aevm"
+                    ],
+                    "type": "string"
+                },
+                "bytecode": {
+                    "$ref": "#/definitions/EncodedByteArray",
+                    "description": "Compiled contract"
+                },
+                "call-result": {
+                    "description": "Call result type (ok | revert | error)",
+                    "type": "string"
+                },
+                "call-value": {
+                    "description": "Call result value (ABI encoded data or error string)",
+                    "type": "string"
+                },
+                "function": {
+                    "description": "Name of the called function",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "bytecode",
+                "call-result",
+                "call-value",
+                "function"
+            ],
+            "type": "object"
+        },
         "Calldata": {
             "example": {
                 "calldata": {}
@@ -252,6 +294,26 @@
             ],
             "type": "object"
         },
+        "DecodedCallresult": {
+            "example": {
+                "function": "function",
+                "result": "{}"
+            },
+            "properties": {
+                "function": {
+                    "type": "string"
+                },
+                "result": {
+                    "properties": {},
+                    "type": "object"
+                }
+            },
+            "required": [
+                "function",
+                "result"
+            ],
+            "type": "object"
+        },
         "EncodedByteArray": {
             "description": "Prefixed (cb_) Base64Check encoded byte array",
             "type": "string"
@@ -410,7 +472,7 @@
         "description": "This is the [Aeternity](https://www.aeternity.com/) compiler API.",
         "termsOfService": "https://www.aeternity.com/terms/",
         "title": "Aeternity node",
-        "version": "4.0.0-rc4"
+        "version": "4.0.0-rc5"
     },
     "paths": {
         "/aci": {
@@ -442,12 +504,6 @@
                         }
                     },
                     "400": {
-                        "description": "Invalid input",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    },
-                    "403": {
                         "description": "Compiler errors",
                         "schema": {
                             "$ref": "#/definitions/CompilerErrors"
@@ -471,7 +527,7 @@
                             "$ref": "#/definitions/API"
                         }
                     },
-                    "403": {
+                    "400": {
                         "description": "Error",
                         "schema": {
                             "$ref": "#/definitions/Error"
@@ -533,12 +589,6 @@
                         }
                     },
                     "400": {
-                        "description": "Invalid data",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    },
-                    "403": {
                         "description": "Invalid contract",
                         "schema": {
                             "$ref": "#/definitions/CompilerErrors"
@@ -578,10 +628,41 @@
                     "400": {
                         "description": "Invalid data",
                         "schema": {
-                            "$ref": "#/definitions/Error"
+                            "$ref": "#/definitions/CompilerErrors"
+                        }
+                    }
+                }
+            }
+        },
+        "/decode-call-result/bytecode": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "description": "Decode the result of contract call from Bytecode",
+                "operationId": "DecodeCallResultBytecode",
+                "parameters": [
+                    {
+                        "description": "Call result + compiled contract",
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/BytecodeCallResultInput"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Json encoded data",
+                        "schema": {
+                            "$ref": "#/definitions/DecodedCallresult"
                         }
                     },
-                    "403": {
+                    "400": {
                         "description": "Invalid data",
                         "schema": {
                             "$ref": "#/definitions/CompilerErrors"
@@ -619,12 +700,6 @@
                         }
                     },
                     "400": {
-                        "description": "Invalid data",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    },
-                    "403": {
                         "description": "Invalid contract",
                         "schema": {
                             "$ref": "#/definitions/Error"
@@ -664,12 +739,6 @@
                     "400": {
                         "description": "Invalid data",
                         "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    },
-                    "403": {
-                        "description": "Invalid data",
-                        "schema": {
                             "$ref": "#/definitions/CompilerErrors"
                         }
                     }
@@ -707,12 +776,6 @@
                     "400": {
                         "description": "Invalid data",
                         "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    },
-                    "403": {
-                        "description": "Invalid data",
-                        "schema": {
                             "$ref": "#/definitions/CompilerErrors"
                         }
                     }
@@ -748,12 +811,6 @@
                         }
                     },
                     "400": {
-                        "description": "Invalid data",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    },
-                    "403": {
                         "description": "Invalid contract",
                         "schema": {
                             "$ref": "#/definitions/CompilerErrors"
