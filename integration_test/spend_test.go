@@ -4,8 +4,8 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
-	"github.com/aeternity/aepp-sdk-go/v5/utils"
+	"github.com/aeternity/aepp-sdk-go/v6/aeternity"
+	"github.com/aeternity/aepp-sdk-go/v6/utils"
 )
 
 // Tests for 2 things: sending an amount that is max uint64, and that the node

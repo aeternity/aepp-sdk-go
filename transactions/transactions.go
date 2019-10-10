@@ -6,11 +6,11 @@ import (
 	"io"
 	"math/big"
 
-	"github.com/aeternity/aepp-sdk-go/v5/binary"
-	"github.com/aeternity/aepp-sdk-go/v5/config"
+	"github.com/aeternity/aepp-sdk-go/v6/binary"
+	"github.com/aeternity/aepp-sdk-go/v6/config"
 
-	"github.com/aeternity/aepp-sdk-go/v5/account"
-	"github.com/aeternity/aepp-sdk-go/v5/utils"
+	"github.com/aeternity/aepp-sdk-go/v6/account"
+	"github.com/aeternity/aepp-sdk-go/v6/utils"
 	rlp "github.com/randomshinichi/rlpae"
 )
 

@@ -7,11 +7,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/aeternity/aepp-sdk-go/v5/account"
-	"github.com/aeternity/aepp-sdk-go/v5/binary"
-	"github.com/aeternity/aepp-sdk-go/v5/config"
-	"github.com/aeternity/aepp-sdk-go/v5/naet"
-	"github.com/aeternity/aepp-sdk-go/v5/transactions"
+	"github.com/aeternity/aepp-sdk-go/v6/account"
+	"github.com/aeternity/aepp-sdk-go/v6/binary"
+	"github.com/aeternity/aepp-sdk-go/v6/config"
+	"github.com/aeternity/aepp-sdk-go/v6/naet"
+	"github.com/aeternity/aepp-sdk-go/v6/transactions"
 	rlp "github.com/randomshinichi/rlpae"
 )
 

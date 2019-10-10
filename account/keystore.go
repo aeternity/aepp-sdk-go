@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	config "github.com/aeternity/aepp-sdk-go/v5/config"
+	config "github.com/aeternity/aepp-sdk-go/v6/config"
 	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/argon2"
 	"golang.org/x/crypto/nacl/secretbox"

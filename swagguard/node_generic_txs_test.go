@@ -3,7 +3,7 @@ package swagguard_test
 import (
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/v5/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v6/swagguard/node/models"
 )
 
 // Unfortunately, one must patch the generated go-swagger code to correctly parse the GenericTx into a specific Transaction type.

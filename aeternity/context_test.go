@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/aeternity/aepp-sdk-go/transactions"
-	"github.com/aeternity/aepp-sdk-go/v5/account"
-	"github.com/aeternity/aepp-sdk-go/v5/config"
+	"github.com/aeternity/aepp-sdk-go/v6/account"
+	"github.com/aeternity/aepp-sdk-go/v6/config"
 )
 
 func ExampleContext() {

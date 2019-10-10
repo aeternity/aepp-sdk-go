@@ -13,7 +13,7 @@ import (
 
 	strfmt "github.com/go-openapi/strfmt"
 
-	models "github.com/aeternity/aepp-sdk-go/v5/swagguard/compiler/models"
+	models "github.com/aeternity/aepp-sdk-go/v6/swagguard/compiler/models"
 )
 
 // VersionReader is a Reader for the Version structure.

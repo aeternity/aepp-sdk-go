@@ -3,8 +3,8 @@ package cmd
 import (
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/v5/config"
-	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
+	"github.com/aeternity/aepp-sdk-go/v6/config"
+	"github.com/aeternity/aepp-sdk-go/v6/aeternity"
 	"github.com/spf13/cobra"
 )
 

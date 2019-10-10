@@ -1,6 +1,6 @@
 package cmd
 
-import "github.com/aeternity/aepp-sdk-go/v5/binary"
+import "github.com/aeternity/aepp-sdk-go/v6/binary"
 
 // IsAddress does some minor checks to ensure that the string is an ak_ address
 func IsAddress(a string) bool {

@@ -3,7 +3,7 @@ package naet
 import (
 	"strings"
 
-	apiclient "github.com/aeternity/aepp-sdk-go/v5/swagguard/node/client"
+	apiclient "github.com/aeternity/aepp-sdk-go/v6/swagguard/node/client"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 )

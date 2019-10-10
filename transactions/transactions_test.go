@@ -6,11 +6,11 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/v5/account"
-	"github.com/aeternity/aepp-sdk-go/v5/config"
+	"github.com/aeternity/aepp-sdk-go/v6/account"
+	"github.com/aeternity/aepp-sdk-go/v6/config"
 
-	"github.com/aeternity/aepp-sdk-go/v5/binary"
-	"github.com/aeternity/aepp-sdk-go/v5/utils"
+	"github.com/aeternity/aepp-sdk-go/v6/binary"
+	"github.com/aeternity/aepp-sdk-go/v6/utils"
 )
 
 func getRLPSerialized(tx1 string, tx2 string) ([]interface{}, []interface{}) {

@@ -14,7 +14,7 @@ import (
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 
-	utils "github.com/aeternity/aepp-sdk-go/v5/utils"
+	utils "github.com/aeternity/aepp-sdk-go/v6/utils"
 )
 
 // NameUpdateTx name update tx

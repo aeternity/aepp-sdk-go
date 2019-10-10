@@ -6,10 +6,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/v5/account"
-	"github.com/aeternity/aepp-sdk-go/v5/config"
-	"github.com/aeternity/aepp-sdk-go/v5/aeternity"
-	"github.com/aeternity/aepp-sdk-go/v5/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v6/account"
+	"github.com/aeternity/aepp-sdk-go/v6/config"
+	"github.com/aeternity/aepp-sdk-go/v6/aeternity"
+	"github.com/aeternity/aepp-sdk-go/v6/swagguard/node/models"
 )
 
 func TestOracleWorkflow(t *testing.T) {
