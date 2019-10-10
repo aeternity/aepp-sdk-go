@@ -15,23 +15,26 @@ import (
 )
 
 // TransactionTypes is a map between the ObjectTags defined above and the
-// corresponding Tx struct
-var TransactionTypes = map[uint]Transaction{
-	ObjectTagSignedTransaction:                   &SignedTx{},
-	ObjectTagSpendTransaction:                    &SpendTx{},
-	ObjectTagNameServiceClaimTransaction:         &NameClaimTx{},
-	ObjectTagNameServicePreclaimTransaction:      &NamePreclaimTx{},
-	ObjectTagNameServiceUpdateTransaction:        &NameUpdateTx{},
-	ObjectTagNameServiceRevokeTransaction:        &NameRevokeTx{},
-	ObjectTagNameServiceTransferTransaction:      &NameTransferTx{},
-	ObjectTagOracleRegisterTransaction:           &OracleRegisterTx{},
-	ObjectTagOracleQueryTransaction:              &OracleQueryTx{},
-	ObjectTagOracleResponseTransaction:           &OracleRespondTx{},
-	ObjectTagOracleExtendTransaction:             &OracleExtendTx{},
-	ObjectTagContractCreateTransaction:           &ContractCreateTx{},
-	ObjectTagContractCallTransaction:             &ContractCallTx{},
-	ObjectTagGeneralizedAccountAttachTransaction: &GAAttachTx{},
-	ObjectTagGeneralizedAccountMetaTransaction:   &GAMetaTx{},
+// corresponding Tx struct. It is wrapped by a function to guarantee you cannot
+// modify this map, because Golang does not have const maps.
+func TransactionTypes() map[uint]Transaction {
+	return map[uint]Transaction{
+		ObjectTagSignedTransaction:                   &SignedTx{},
+		ObjectTagSpendTransaction:                    &SpendTx{},
+		ObjectTagNameServiceClaimTransaction:         &NameClaimTx{},
+		ObjectTagNameServicePreclaimTransaction:      &NamePreclaimTx{},
+		ObjectTagNameServiceUpdateTransaction:        &NameUpdateTx{},
+		ObjectTagNameServiceRevokeTransaction:        &NameRevokeTx{},
+		ObjectTagNameServiceTransferTransaction:      &NameTransferTx{},
+		ObjectTagOracleRegisterTransaction:           &OracleRegisterTx{},
+		ObjectTagOracleQueryTransaction:              &OracleQueryTx{},
+		ObjectTagOracleResponseTransaction:           &OracleRespondTx{},
+		ObjectTagOracleExtendTransaction:             &OracleExtendTx{},
+		ObjectTagContractCreateTransaction:           &ContractCreateTx{},
+		ObjectTagContractCallTransaction:             &ContractCallTx{},
+		ObjectTagGeneralizedAccountAttachTransaction: &GAAttachTx{},
+		ObjectTagGeneralizedAccountMetaTransaction:   &GAMetaTx{},
+	}
 }
 
 // RLP message version used in RLP serialization
@@ -354,7 +357,7 @@ func DeserializeTx(rawRLP []byte) (Transaction, error) {
 func GetTransactionType(rawRLP []byte) (tx Transaction, err error) {
 	f := binary.DecodeRLPMessage(rawRLP)[0] // [33] interface, needs to be cast to []uint8
 	objTag := uint(f.([]uint8)[0])          // [33] cast to []uint8, get rid of the slice, cast to uint
-	return TransactionTypes[objTag], nil
+	return TransactionTypes()[objTag], nil
 }
 
 // SignedTx wraps around other Tx structs to hold the signature.
