@@ -1,6 +1,7 @@
 from pprint import pprint
 from dotted.collection import DottedDict
 import json
+import argparse
 
 json_objects = []
 json_leaves = []
@@ -47,8 +48,12 @@ def add_uint_bigint(data):
     data["definitions"]["UInt"] = bigint
     return data
 
-with open('rc2.json') as f:
-    swagger = json.load(f)
+parser = argparse.ArgumentParser(description="Modify a swagger.json in ways that cannot be done via simple search/replace")
+parser.add_argument('infile', type=open)
+parser.add_argument('outfile', type=argparse.FileType('w'))
+args = parser.parse_args()
+
+swagger = json.load(args.infile)
 traverse(swagger, [])
 
 
@@ -56,5 +61,4 @@ swagger_n = add_uint_bigint(swagger)
 swagger_n = no_implicit_int64(swagger_n)
 
 
-with open('swaggerD.json', 'w') as fnew:
-    json.dump(swagger_n, fnew, indent=2)
+json.dump(swagger_n, args.outfile, indent=2)

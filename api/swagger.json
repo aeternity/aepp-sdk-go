@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "description": "This is the [Aeternity](https://www.aeternity.com/) node API.",
-    "version": "5.0.0-rc.2",
+    "version": "5.0.0-rc.4",
     "title": "Aeternity node",
     "termsOfService": "https://www.aeternity.com/terms/",
     "contact": {
@@ -75,6 +75,7 @@
         "produces": [
           "application/json"
         ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "Successful operation",
@@ -102,6 +103,7 @@
         "produces": [
           "application/json"
         ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "Successful operation",
@@ -129,6 +131,7 @@
         "produces": [
           "application/json"
         ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "Successful operation",
@@ -161,6 +164,7 @@
         "produces": [
           "application/json"
         ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "Successful operation",
@@ -194,6 +198,7 @@
         "produces": [
           "application/json"
         ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "Successful operation",
@@ -271,7 +276,12 @@
         ],
         "parameters": [
           {
-            "$ref": "#/parameters/HeightIn"
+            "in": "path",
+            "name": "height",
+            "description": "The height",
+            "required": true,
+            "type": "integer",
+            "format": "uint64"
           }
         ],
         "responses": {
@@ -522,6 +532,7 @@
         "produces": [
           "application/json"
         ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "Successful operation",
@@ -593,7 +604,12 @@
         ],
         "parameters": [
           {
-            "$ref": "#/parameters/HeightIn"
+            "in": "path",
+            "name": "height",
+            "description": "The height",
+            "required": true,
+            "type": "integer",
+            "format": "uint64"
           }
         ],
         "responses": {
@@ -674,7 +690,12 @@
             "type": "string"
           },
           {
-            "$ref": "#/parameters/HeightIn"
+            "in": "path",
+            "name": "height",
+            "description": "The height",
+            "required": true,
+            "type": "integer",
+            "format": "uint64"
           }
         ],
         "responses": {
@@ -1332,6 +1353,7 @@
         "produces": [
           "application/json"
         ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "Successful operation",
@@ -1353,6 +1375,7 @@
         "produces": [
           "application/json"
         ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "Successful operation",
@@ -2235,6 +2258,7 @@
         "produces": [
           "application/json"
         ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "Successful operation",
@@ -2266,7 +2290,13 @@
             "type": "string"
           },
           {
-            "$ref": "#/parameters/SaltIn"
+            "in": "query",
+            "name": "salt",
+            "description": "Salt",
+            "required": true,
+            "type": "integer",
+            "format": "uint64",
+            "minimum": 0
           }
         ],
         "responses": {
@@ -2297,6 +2327,7 @@
         "produces": [
           "application/json"
         ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "Successful operation",
@@ -2325,6 +2356,7 @@
         "produces": [
           "application/json"
         ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "Successful operation",
@@ -2353,6 +2385,7 @@
         "produces": [
           "application/json"
         ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -2423,7 +2456,12 @@
         ],
         "parameters": [
           {
-            "$ref": "#/parameters/HeightIn"
+            "in": "path",
+            "name": "height",
+            "description": "The height",
+            "required": true,
+            "type": "integer",
+            "format": "uint64"
           }
         ],
         "responses": {
@@ -2441,27 +2479,6 @@
           }
         }
       }
-    }
-  },
-  "parameters": {
-    "HeightIn": {
-      "in": "path",
-      "name": "height",
-      "description": "The height",
-      "required": true,
-      "type": "integer",
-      "minimum": 0,
-      "maximum": 18446744073709551615,
-      "format": "uint64"
-    },
-    "SaltIn": {
-      "in": "query",
-      "name": "salt",
-      "description": "Salt",
-      "required": true,
-      "type": "integer",
-      "minimum": 0,
-      "format": "uint64"
     }
   },
   "definitions": {
