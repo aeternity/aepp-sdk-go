@@ -137,6 +137,34 @@ func (a *Client) DecodeCallResult(params *DecodeCallResultParams) (*DecodeCallRe
 }
 
 /*
+DecodeCallResultBytecode Decode the result of contract call from Bytecode
+*/
+func (a *Client) DecodeCallResultBytecode(params *DecodeCallResultBytecodeParams) (*DecodeCallResultBytecodeOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewDecodeCallResultBytecodeParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "DecodeCallResultBytecode",
+		Method:             "POST",
+		PathPattern:        "/decode-call-result/bytecode",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &DecodeCallResultBytecodeReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*DecodeCallResultBytecodeOK), nil
+
+}
+
+/*
 DecodeCalldataBytecode Identify function name and arguments in Calldata for a compiled contract
 */
 func (a *Client) DecodeCalldataBytecode(params *DecodeCalldataBytecodeParams) (*DecodeCalldataBytecodeOK, error) {
