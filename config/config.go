@@ -114,7 +114,9 @@ type ClientConfig struct {
 	// height to determine a transaction's TTL.
 	TTL uint64 `json:"ttl" yaml:"ttl" mapstructure:"ttl"`
 	// Fee is a default transaction fee that should be big enough for most transaction types.
-	Fee           *big.Int           `json:"fee" yaml:"fee" mapstructure:"fee"`
+	Fee *big.Int `json:"fee" yaml:"fee" mapstructure:"fee"`
+	// WaitBlocks is a suggested maximum amount of time (in blocks) to wait for a transaction to be included in a block.
+	WaitBlocks    uint64             `json:"txwaitblocks" yaml:"txwaitblocks" mapstructure:"txwaitblocks"`
 	Names         AensConfig         `json:"names" yaml:"names" mapstructure:"names"`
 	Contracts     ContractConfig     `json:"contracts" yaml:"contracts" mapstructure:"contracts"`
 	Oracles       OracleConfig       `json:"oracles" yaml:"oracles" mapstructure:"oracles"`
@@ -161,6 +163,7 @@ var Client = ClientConfig{
 	GasPrice:   big.NewInt(1e9),
 	TTL:        500,
 	Fee:        big.NewInt(2e14),
+	WaitBlocks: 10,
 	Names: AensConfig{
 		NameTTL:   500,
 		ClientTTL: 500,
