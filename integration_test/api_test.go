@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"math/big"
+	"os"
 	"reflect"
 	"strings"
 	"testing"
@@ -11,9 +12,9 @@ import (
 	"gotest.tools/golden"
 
 	"github.com/aeternity/aepp-sdk-go/v6/account"
+	"github.com/aeternity/aepp-sdk-go/v6/aeternity"
 	"github.com/aeternity/aepp-sdk-go/v6/config"
 	"github.com/aeternity/aepp-sdk-go/v6/naet"
-	"github.com/aeternity/aepp-sdk-go/v6/aeternity"
 	"github.com/aeternity/aepp-sdk-go/v6/swagguard/node/models"
 	"github.com/aeternity/aepp-sdk-go/v6/utils"
 	rlp "github.com/randomshinichi/rlpae"
@@ -105,9 +106,10 @@ func signBroadcastWaitForTransaction(t *testing.T, tx rlp.Encoder, acc *account.
 	return height, txHash, mbHash
 }
 
-func init() {
+func TestMain(m *testing.M) {
 	flag.BoolVar(&useTestNet, "testnet", false, "Run tests that need an internet connection to testnet")
 	flag.Parse()
+	os.Exit(m.Run())
 }
 
 func TestAPI(t *testing.T) {
