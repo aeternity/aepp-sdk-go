@@ -350,7 +350,7 @@ func WaitForTransactionForXBlocks(c getTransactionByHashHeighter, txHash string,
 }
 
 // SignBroadcastTransaction signs a transaction and broadcasts it to a node.
-func SignBroadcastTransaction(tx rlp.Encoder, signingAccount *account.Account, n *naet.Node, networkID string) (signedTxStr, hash, signature string, err error) {
+func SignBroadcastTransaction(tx rlp.Encoder, signingAccount *account.Account, n naet.PostTransactioner, networkID string) (signedTxStr, hash, signature string, err error) {
 	signedTx, hash, signature, err := transactions.SignHashTx(signingAccount, tx, networkID)
 	if err != nil {
 		return
@@ -368,9 +368,14 @@ func SignBroadcastTransaction(tx rlp.Encoder, signingAccount *account.Account, n
 	return
 }
 
+type broadcastWaitTransactionNodeCapabilities interface {
+	naet.PostTransactioner
+	getTransactionByHashHeighter
+}
+
 // SignBroadcastWaitTransaction is a convenience function that combines
 // SignBroadcastTransaction and WaitForTransactionForXBlocks.
-func SignBroadcastWaitTransaction(tx rlp.Encoder, signingAccount *account.Account, n *naet.Node, networkID string, x uint64) (signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
+func SignBroadcastWaitTransaction(tx rlp.Encoder, signingAccount *account.Account, n broadcastWaitTransactionNodeCapabilities, networkID string, x uint64) (signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
 	signedTxStr, hash, signature, err = SignBroadcastTransaction(tx, signingAccount, n, networkID)
 	if err != nil {
 		return
