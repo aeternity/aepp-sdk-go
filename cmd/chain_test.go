@@ -3,6 +3,7 @@ package cmd
 import (
 	"flag"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/aeternity/aepp-sdk-go/v6/naet"
@@ -11,10 +12,11 @@ import (
 // Prefixing each test with Example makes go-test check the stdout
 // For now, just verify that none of the commands segfault.
 
-func init() {
+func TestMain(m *testing.M) {
 	flag.BoolVar(&online, "online", false, "Run tests that need a running node on localhost:3013, Network ID ae_docker")
 	flag.Parse()
 	setPrivateNetParams()
+	os.Exit(m.Run())
 }
 
 func Test_topFunc(t *testing.T) {
