@@ -153,7 +153,7 @@ var Node = NodeConfig{
 // Compiler holds default settings for CompilerConfig
 var Compiler = CompilerConfig{
 	URL:     "http://localhost:3080",
-	Backend: CompilerBackendAEVM,
+	Backend: CompilerBackendFATE,
 }
 
 // Client holds default settings for ClientConfig
@@ -170,11 +170,11 @@ var Client = ClientConfig{
 	},
 	Contracts: ContractConfig{
 		CompilerURL: "http://localhost:3080",
-		GasLimit:    big.NewInt(1e9),
+		GasLimit:    big.NewInt(1e6),
 		Amount:      new(big.Int),
 		Deposit:     new(big.Int),
-		VMVersion:   4,
-		ABIVersion:  1,
+		VMVersion:   5,
+		ABIVersion:  3,
 	},
 	Oracles: OracleConfig{
 		QueryFee:         big.NewInt(0),
