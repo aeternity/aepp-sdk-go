@@ -5,9 +5,9 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/aeternity/aepp-sdk-go/v6/transactions"
 	"github.com/aeternity/aepp-sdk-go/v6/account"
 	"github.com/aeternity/aepp-sdk-go/v6/config"
+	"github.com/aeternity/aepp-sdk-go/v6/transactions"
 )
 
 func ExampleContext() {
