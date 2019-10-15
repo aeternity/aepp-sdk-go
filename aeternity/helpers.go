@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"math/big"
+	"strconv"
 	"strings"
 	"time"
 
@@ -409,9 +410,34 @@ func generateCommitmentID(name string) (ch string, salt *big.Int, err error) {
 	return ch, salt, err
 }
 
+func isPrintable(s string) bool {
+	for _, r := range s {
+		if !strconv.IsPrint(r) {
+			return false
+		}
+	}
+	return true
+}
+
 func computeCommitmentID(name string, salt []byte) (ch string, err error) {
-	nh := append(Namehash(name), salt...)
-	nh, _ = binary.Blake2bHash(nh)
+	var nh = []byte{}
+	if strings.HasSuffix(name, ".test") {
+		nh = append(Namehash(name), salt...)
+
+	} else {
+		// Since UTF-8 ~ ASCII, just use the string directly. QuoteToASCII
+		// includes an extra byte at the start and end of the string, messing up
+		// the hashing process.
+		if !isPrintable(name) {
+			return "", fmt.Errorf("The name %s must contain only printable characters", name)
+		}
+
+		nh = append([]byte(name), salt...)
+	}
+	nh, err = binary.Blake2bHash(nh)
+	if err != nil {
+		return
+	}
 	ch = binary.Encode(binary.PrefixCommitment, nh)
 	return
 }
