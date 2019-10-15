@@ -114,10 +114,27 @@ func Test_computeCommitmentID(t *testing.T) {
 			wantCh:  "cm_QhtcYow8krP3xQSTsAhFihfBstTjQMiApaPCgZuciDHZmMNtZ",
 			wantErr: false,
 		},
+		{
+			name: "aeternity.chain, 10692426485854419779",
+			args: args{
+				name: "aeternity.chain",
+				salt: []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 148, 99, 33, 60, 236, 84, 187, 67},
+			},
+			wantCh:  "cm_j5Aa3senWdNskwSSHh3M182ucbqrAaSE5DVjejM8fBCgR97kq",
+			wantErr: false,
+		},
+		{
+			name: "whatever.chain, 4703192432112",
+			args: args{
+				name: "whatever.chain",
+				salt: []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 71, 12, 29, 61, 240},
+			},
+			wantCh:  "cm_2Hd42FoCDfYxcG3MyZkiN9wXiBKfHHzBWycEvrazPYgoEh1ien",
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// fmt.Println(saltBytes)
 			gotCh, err := computeCommitmentID(tt.args.name, tt.args.salt)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("computeCommitmentID() error = %v, wantErr %v", err, tt.wantErr)
