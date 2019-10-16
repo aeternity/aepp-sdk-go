@@ -83,12 +83,13 @@ func TestAENSTx(t *testing.T) {
 				AccountID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
 				Name:         "fdsa.test",
 				NameSalt:     utils.RequireIntFromString("9795159241593061970"),
+				NameFee:      utils.NewIntFromUint64(0),
 				Fee:          utils.NewIntFromUint64(10),
 				TTL:          uint64(10),
 				AccountNonce: uint64(1),
 			},
-			wantJSON: `{"account_id":"ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi","fee":10,"name":"nm_9XeniQagC6u2QHpP8f","name_salt":9795159241593061970,"nonce":1,"ttl":10}`,
-			wantRLP:  "tx_+DogAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vMBiWZkc2EudGVzdIiH72Vu6YoCUgoKx4dL6Q==",
+			wantJSON: `{"account_id":"ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi","fee":10,"name":"nm_9XeniQagC6u2QHpP8f","name_salt":9795159241593061970,"name_fee":0,"nonce":1,"ttl":10}`,
+			wantRLP:  "tx_+DsgAqEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vMBiWZkc2EudGVzdIiH72Vu6YoCUgAKCildFnc=",
 			wantErr:  false,
 		},
 		{
@@ -197,6 +198,37 @@ func TestAENSTx(t *testing.T) {
 			}
 			if !(reflect.DeepEqual(tx, tt.tx)) {
 				t.Errorf("Deserialized Transaction %+v does not deep equal %+v", tx, tt.tx)
+			}
+		})
+	}
+}
+
+func TestNameID(t *testing.T) {
+	type args struct {
+		name string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantNm  string
+		wantErr bool
+	}{
+		{
+			name:    "yelimfpisfxrr.chain",
+			args:    args{name: "yelimfpisfxrr.chain"},
+			wantNm:  "nm_o1kMCHjWxBSiUsf8FTQhZso5rr3YorjVEhsgHNb1P3bnPhiYt",
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotNm, err := NameID(tt.args.name)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("NameID() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if gotNm != tt.wantNm {
+				t.Errorf("NameID() = %v, want %v", gotNm, tt.wantNm)
 			}
 		})
 	}
