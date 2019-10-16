@@ -7,9 +7,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/aeternity/aepp-sdk-go/v6/aeternity"
 	"github.com/aeternity/aepp-sdk-go/v6/config"
 	"github.com/aeternity/aepp-sdk-go/v6/naet"
-	"github.com/aeternity/aepp-sdk-go/v6/aeternity"
+	"github.com/aeternity/aepp-sdk-go/v6/transactions"
 )
 
 func getNameEntry(t *testing.T, node *naet.Node, name string) (responseJSON string) {
@@ -31,7 +32,7 @@ func randomName(length int) string {
 		b[i] = letters[r]
 	}
 
-	ans := fmt.Sprintf("%s.test", string(b))
+	ans := fmt.Sprintf("%s.chain", string(b))
 	return ans
 }
 
@@ -40,9 +41,9 @@ func TestAENSWorkflow(t *testing.T) {
 	alice, bob := setupAccounts(t)
 	aensAlice := aeternity.NewContextFromNode(node, alice.Address)
 
-	name := randomName(6)
+	name := randomName(int(config.Client.Names.NameAuctionMaxLength + 1))
 	// Preclaim the name
-	preclaimTx, salt, err := aensAlice.NamePreclaimTx(name, config.Client.Fee)
+	preclaimTx, nameSalt, err := aensAlice.NamePreclaimTx(name, config.Client.Fee)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -56,7 +57,8 @@ func TestAENSWorkflow(t *testing.T) {
 	_, _, _ = waitForTransaction(node, hash)
 
 	// Claim the name
-	claimTx, err := aensAlice.NameClaimTx(name, salt, config.Client.Fee)
+	nameFee := transactions.CalculateMinNameFee(name)
+	claimTx, err := aensAlice.NameClaimTx(name, nameSalt, nameFee, config.Client.Fee)
 	if err != nil {
 		t.Fatal(err)
 	}

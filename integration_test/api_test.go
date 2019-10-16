@@ -16,6 +16,7 @@ import (
 	"github.com/aeternity/aepp-sdk-go/v6/config"
 	"github.com/aeternity/aepp-sdk-go/v6/naet"
 	"github.com/aeternity/aepp-sdk-go/v6/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v6/transactions"
 	"github.com/aeternity/aepp-sdk-go/v6/utils"
 	rlp "github.com/randomshinichi/rlpae"
 )
@@ -118,7 +119,7 @@ func TestAPI(t *testing.T) {
 
 	alice, bob := setupAccounts(t)
 
-	name := randomName(6)
+	name := randomName(int(config.Client.Names.NameAuctionMaxLength + 1))
 	ctxAlice := aeternity.NewContextFromNode(privateNet, alice.Address)
 	ctxBob := aeternity.NewContextFromNode(privateNet, bob.Address)
 	// SpendTx
@@ -139,7 +140,8 @@ func TestAPI(t *testing.T) {
 
 	// NameClaimTx
 	fmt.Println("NameClaimTx")
-	claimTx, err := ctxAlice.NameClaimTx(name, salt, config.Client.Fee)
+	nameFee := transactions.CalculateMinNameFee(name)
+	claimTx, err := ctxAlice.NameClaimTx(name, salt, nameFee, config.Client.Fee)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -169,7 +171,7 @@ func TestAPI(t *testing.T) {
 	}
 	_, _, _ = signBroadcastWaitForTransaction(t, revokeTx, bob, privateNet)
 
-	sentTxs.name = randomName(8)
+	sentTxs.name = randomName(int(config.Client.Names.NameAuctionMaxLength + 2))
 	// NamePreClaimTx
 	fmt.Println("NamePreClaimTx 2nd name for other tests")
 	preclaimTx, salt, err = ctxAlice.NamePreclaimTx(sentTxs.name, config.Client.Fee)
@@ -180,7 +182,8 @@ func TestAPI(t *testing.T) {
 
 	// NameClaimTx
 	fmt.Println("NameClaimTx 2nd name for other tests")
-	claimTx, err = ctxAlice.NameClaimTx(sentTxs.name, salt, config.Client.Fee)
+	nameFee2 := transactions.CalculateMinNameFee(sentTxs.name)
+	claimTx, err = ctxAlice.NameClaimTx(sentTxs.name, nameFee2, salt, config.Client.Fee)
 	if err != nil {
 		t.Fatal(err)
 	}
