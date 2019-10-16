@@ -52,6 +52,9 @@ type AensConfig struct {
 	NameTTL uint64 `json:"name_ttl" yaml:"name_ttl" mapstructure:"name_ttl"`
 	// ClientTTL suggests how long (in seconds) AENS clients should cache an AENS entry.
 	ClientTTL uint64 `json:"client_ttl" yaml:"client_ttl" mapstructure:"client_ttl"`
+	// NameAuctionMaxLength is the maximum name length (excluding TLD) below
+	// which names enter the auction bidding process.
+	NameAuctionMaxLength uint64 `json:"name_auction_max_length" yaml:"name_auction_max_length" mapstructure:"name_auction_max_length"`
 }
 
 // ContractConfig contains default parameters for contracts
@@ -165,8 +168,9 @@ var Client = ClientConfig{
 	Fee:        big.NewInt(2e14),
 	WaitBlocks: 10,
 	Names: AensConfig{
-		NameTTL:   500,
-		ClientTTL: 500,
+		NameTTL:              500,
+		ClientTTL:            500,
+		NameAuctionMaxLength: 12,
 	},
 	Contracts: ContractConfig{
 		CompilerURL: "http://localhost:3080",
@@ -208,4 +212,47 @@ var Profile = ProfileConfig{
 	Compiler: Compiler,
 	Client:   Client,
 	Tuning:   Tuning,
+}
+
+// NameAuctionFee lists the initial bid prices (NameFee) for names in AENS
+// auctions.
+func NameAuctionFee(length int) uint64 {
+	multiplier := 100000000000000
+	t := map[int]uint64{
+		1:  uint64(5702887 * multiplier),
+		2:  uint64(3524578 * multiplier),
+		3:  uint64(2178309 * multiplier),
+		4:  uint64(1346269 * multiplier),
+		5:  uint64(832040 * multiplier),
+		6:  uint64(514229 * multiplier),
+		7:  uint64(317811 * multiplier),
+		8:  uint64(196418 * multiplier),
+		9:  uint64(121393 * multiplier),
+		10: uint64(75025 * multiplier),
+		11: uint64(46368 * multiplier),
+		12: uint64(28657 * multiplier),
+		13: uint64(17711 * multiplier),
+		14: uint64(10946 * multiplier),
+		15: uint64(6765 * multiplier),
+		16: uint64(4181 * multiplier),
+		17: uint64(2584 * multiplier),
+		18: uint64(1597 * multiplier),
+		19: uint64(987 * multiplier),
+		20: uint64(610 * multiplier),
+		21: uint64(377 * multiplier),
+		22: uint64(233 * multiplier),
+		23: uint64(144 * multiplier),
+		24: uint64(89 * multiplier),
+		25: uint64(55 * multiplier),
+		26: uint64(34 * multiplier),
+		27: uint64(21 * multiplier),
+		28: uint64(13 * multiplier),
+		29: uint64(8 * multiplier),
+		30: uint64(5 * multiplier),
+		31: uint64(3 * multiplier),
+	}
+	if length > len(t) {
+		return t[31]
+	}
+	return t[length]
 }
