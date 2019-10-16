@@ -183,14 +183,14 @@ func (c *Context) NamePreclaimTx(name string, fee *big.Int) (tx *transactions.Na
 
 // NameClaimTx creates a claim transaction, filling in the account nonce and
 // transaction TTL automatically.
-func (c *Context) NameClaimTx(name string, nameSalt, fee *big.Int) (tx *transactions.NameClaimTx, err error) {
+func (c *Context) NameClaimTx(name string, nameSalt, nameFee, fee *big.Int) (tx *transactions.NameClaimTx, err error) {
 	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, config.Client.TTL)
 	if err != nil {
 		return
 	}
 
 	// create the transaction
-	tx = transactions.NewNameClaimTx(c.Address, name, nameSalt, fee, txTTL, accountNonce)
+	tx = transactions.NewNameClaimTx(c.Address, name, nameSalt, nameFee, fee, txTTL, accountNonce)
 
 	return tx, err
 }
@@ -203,13 +203,17 @@ func (c *Context) NameUpdateTx(name string, targetAddress string) (tx *transacti
 		return
 	}
 
-	encodedNameHash := binary.Encode(binary.PrefixName, Namehash(name))
+	nm, err := transactions.NameID(name)
+	if err != nil {
+		return
+	}
+
 	absNameTTL, err := c.GetTTL(config.Client.Names.NameTTL)
 	if err != nil {
 		return
 	}
 	// create the transaction
-	tx = transactions.NewNameUpdateTx(c.Address, encodedNameHash, []string{targetAddress}, absNameTTL, config.Client.Names.ClientTTL, config.Client.Fee, txTTL, accountNonce)
+	tx = transactions.NewNameUpdateTx(c.Address, nm, []string{targetAddress}, absNameTTL, config.Client.Names.ClientTTL, config.Client.Fee, txTTL, accountNonce)
 
 	return
 }
@@ -222,9 +226,12 @@ func (c *Context) NameTransferTx(name string, recipientAddress string) (tx *tran
 		return
 	}
 
-	encodedNameHash := binary.Encode(binary.PrefixName, Namehash(name))
+	nm, err := transactions.NameID(name)
+	if err != nil {
+		return
+	}
 
-	tx = transactions.NewNameTransferTx(c.Address, encodedNameHash, recipientAddress, config.Client.Fee, txTTL, accountNonce)
+	tx = transactions.NewNameTransferTx(c.Address, nm, recipientAddress, config.Client.Fee, txTTL, accountNonce)
 	return
 }
 
@@ -236,9 +243,12 @@ func (c *Context) NameRevokeTx(name string) (tx *transactions.NameRevokeTx, err 
 		return
 	}
 
-	encodedNameHash := binary.Encode(binary.PrefixName, Namehash(name))
+	nm, err := transactions.NameID(name)
+	if err != nil {
+		return
+	}
 
-	tx = transactions.NewNameRevokeTx(c.Address, encodedNameHash, config.Client.Fee, txTTL, accountNonce)
+	tx = transactions.NewNameRevokeTx(c.Address, nm, config.Client.Fee, txTTL, accountNonce)
 	return
 }
 
