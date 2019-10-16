@@ -3,12 +3,23 @@ package transactions
 import (
 	"io"
 	"math/big"
+	"strings"
 
 	"github.com/aeternity/aepp-sdk-go/v6/binary"
+	"github.com/aeternity/aepp-sdk-go/v6/config"
 	"github.com/aeternity/aepp-sdk-go/v6/swagguard/node/models"
 	"github.com/aeternity/aepp-sdk-go/v6/utils"
 	rlp "github.com/randomshinichi/rlpae"
 )
+
+func NameID(name string) (nm string, err error) {
+	s, err := binary.Blake2bHash([]byte(name))
+	if err != nil {
+		return
+	}
+	return binary.Encode(binary.PrefixName, s), nil
+
+}
 
 // NamePreclaimTx represents a transaction where one reserves a name on AENS without revealing it yet
 type NamePreclaimTx struct {
@@ -129,6 +140,7 @@ type NameClaimTx struct {
 	AccountID    string
 	Name         string
 	NameSalt     *big.Int
+	NameFee      *big.Int
 	Fee          *big.Int
 	TTL          uint64
 	AccountNonce uint64
@@ -145,11 +157,12 @@ func (tx *NameClaimTx) EncodeRLP(w io.Writer) (err error) {
 	// create the transaction
 	rlpRawMsg, err := buildRLPMessage(
 		ObjectTagNameServiceClaimTransaction,
-		rlpMessageVersion,
+		2,
 		aID,
 		tx.AccountNonce,
 		tx.Name,
 		tx.NameSalt,
+		tx.NameFee,
 		tx.Fee,
 		tx.TTL)
 
@@ -170,6 +183,7 @@ type nameClaimRLP struct {
 	AccountNonce      uint64
 	Name              string
 	NameSalt          *big.Int
+	NameFee           *big.Int
 	Fee               *big.Int
 	TTL               uint64
 }
@@ -198,6 +212,7 @@ func (tx *NameClaimTx) DecodeRLP(s *rlp.Stream) (err error) {
 	tx.AccountID = aID
 	tx.Name = ntx.Name
 	tx.NameSalt = ntx.NameSalt
+	tx.NameFee = ntx.NameFee
 	tx.Fee = ntx.Fee
 	tx.TTL = ntx.TTL
 	tx.AccountNonce = ntx.AccountNonce
@@ -214,6 +229,7 @@ func (tx *NameClaimTx) JSON() (string, error) {
 		Fee:       utils.BigInt(*tx.Fee),
 		Name:      &nameAPIEncoded,
 		NameSalt:  utils.BigInt(*tx.NameSalt),
+		NameFee:   utils.BigInt(*tx.NameFee),
 		Nonce:     tx.AccountNonce,
 		TTL:       tx.TTL,
 	}
@@ -238,8 +254,19 @@ func (tx *NameClaimTx) GetGasLimit() *big.Int {
 }
 
 // NewNameClaimTx is a constructor for a NameClaimTx struct
-func NewNameClaimTx(accountID, name string, nameSalt, fee *big.Int, ttl, accountNonce uint64) *NameClaimTx {
-	return &NameClaimTx{accountID, name, nameSalt, fee, ttl, accountNonce}
+func NewNameClaimTx(accountID, name string, nameSalt, nameFee, fee *big.Int, ttl, accountNonce uint64) *NameClaimTx {
+	return &NameClaimTx{accountID, name, nameSalt, nameFee, fee, ttl, accountNonce}
+}
+
+// CalculateMinNameFee returns the starting bid price for a name on AENS. The
+// name argument should include its TLD, e.g. "fdsa.test".
+func CalculateMinNameFee(name string) (minNameFee *big.Int) {
+	n := strings.Split(name, ".") // n = ['fdsa', '.test']
+	minNameFee = new(big.Int)
+	l := len(n[0])
+	nf := config.NameAuctionFee(l)
+	minNameFee.SetUint64(nf)
+	return
 }
 
 // NamePointer is a go-native representation of swagger generated
