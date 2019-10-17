@@ -179,7 +179,7 @@ func TestAPI(t *testing.T) {
 	// NameClaimTx
 	fmt.Println("NameClaimTx 2nd name for other tests")
 	nameFee2 := transactions.CalculateMinNameFee(sentTxs.name)
-	claimTx, err = ctxAlice.NameClaimTx(sentTxs.name, nameFee2, salt, config.Client.Fee)
+	claimTx, err = ctxAlice.NameClaimTx(sentTxs.name, salt, nameFee2, config.Client.Fee)
 	if err != nil {
 		t.Fatal(err)
 	}
