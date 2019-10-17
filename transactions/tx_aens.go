@@ -12,13 +12,13 @@ import (
 	rlp "github.com/randomshinichi/rlpae"
 )
 
+// NameID computes the nm_ string of a given AENS name.
 func NameID(name string) (nm string, err error) {
 	s, err := binary.Blake2bHash([]byte(name))
 	if err != nil {
 		return
 	}
 	return binary.Encode(binary.PrefixName, s), nil
-
 }
 
 // NamePreclaimTx represents a transaction where one reserves a name on AENS without revealing it yet

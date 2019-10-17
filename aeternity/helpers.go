@@ -332,6 +332,8 @@ type getTransactionByHashHeighter interface {
 	naet.GetHeighter
 }
 
+// ErrWaitTransaction is returned by WaitForTransactionForXBlocks() to let
+// callers distinguish between network errors and transaction acceptance errors.
 type ErrWaitTransaction struct {
 	NetworkErr     bool
 	TransactionErr bool
