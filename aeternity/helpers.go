@@ -332,23 +332,55 @@ type getTransactionByHashHeighter interface {
 	naet.GetHeighter
 }
 
+type ErrWaitTransaction struct {
+	NetworkErr     bool
+	TransactionErr bool
+	Err            error
+}
+
+func (b ErrWaitTransaction) Error() string {
+	var errType string
+	if b.TransactionErr {
+		errType = "TransactionErr"
+	} else {
+		errType = "NetworkErr"
+	}
+
+	return fmt.Sprintf("%s: %s", errType, b.Err.Error())
+}
+
 // WaitForTransactionForXBlocks blocks until a transaction has been mined or X
 // blocks have gone by, after which it returns an error. The node polling
 // interval can be config.Configured with config.Tuning.ChainPollInterval.
-func WaitForTransactionForXBlocks(c getTransactionByHashHeighter, txHash string, x uint64) (blockHeight uint64, blockHash string, err error) {
+func WaitForTransactionForXBlocks(c getTransactionByHashHeighter, txHash string, x uint64) (blockHeight uint64, blockHash string, wtError error) {
 	nodeHeight, err := c.GetHeight()
 	if err != nil {
+		wtError = ErrWaitTransaction{
+			NetworkErr:     true,
+			TransactionErr: false,
+			Err:            err,
+		}
 		return
 	}
 	endHeight := nodeHeight + x
 	for nodeHeight <= endHeight {
 		nodeHeight, err = c.GetHeight()
 		if err != nil {
-			return 0, "", err
+			wtError = ErrWaitTransaction{
+				NetworkErr:     true,
+				TransactionErr: false,
+				Err:            err,
+			}
+			return
 		}
 		tx, err := c.GetTransactionByHash(txHash)
 		if err != nil {
-			return 0, "", err
+			wtError = ErrWaitTransaction{
+				NetworkErr:     false,
+				TransactionErr: true,
+				Err:            err,
+			}
+			return
 		}
 
 		if tx.BlockHeight.LargerThanZero() {
@@ -357,7 +389,12 @@ func WaitForTransactionForXBlocks(c getTransactionByHashHeighter, txHash string,
 		}
 		time.Sleep(time.Millisecond * time.Duration(config.Tuning.ChainPollInterval))
 	}
-	return 0, "", fmt.Errorf("%v blocks have gone by and %v still isn't in a block", x, txHash)
+	wtError = ErrWaitTransaction{
+		NetworkErr:     false,
+		TransactionErr: true,
+		Err:            fmt.Errorf("%v blocks have gone by and %v still isn't in a block", x, txHash),
+	}
+	return
 }
 
 // SignBroadcastTransaction signs a transaction and broadcasts it to a node.
