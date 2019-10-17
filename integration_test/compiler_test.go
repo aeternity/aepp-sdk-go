@@ -46,8 +46,8 @@ func TestCompiler(t *testing.T) {
 		}
 	})
 	t.Run("DecodeCallResult", func(t *testing.T) {
-		// taken from contract_test.go
-		_, err := c.DecodeCallResult("ok", "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACr8s/aY", "main", string(golden.Get(t, identitySource)), config.Compiler.Backend)
+		// taken from contract_test.go running main(42) on identity.aes, GET /transactions/th_.../info
+		_, err := c.DecodeCallResult("ok", "cb_VNLOFXc=", "main", string(golden.Get(t, identitySource)), config.Compiler.Backend)
 		if err != nil {
 			t.Error(err)
 		}

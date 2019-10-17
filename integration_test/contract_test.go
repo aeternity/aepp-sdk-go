@@ -24,11 +24,11 @@ func TestContracts(t *testing.T) {
 		t.Fatal(err)
 	}
 	ctID, _ = create.ContractID()
-	fmt.Printf("Create %s, %+v\n", ctID, create)
-	_, _, _, _, _, err = aeternity.SignBroadcastWaitTransaction(create, alice, node, networkID, config.Client.WaitBlocks)
+	_, txHash, _, _, _, err := aeternity.SignBroadcastWaitTransaction(create, alice, node, networkID, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}
+	fmt.Printf("Create %s, %+v %s\n", ctID, create, txHash)
 
 	// Confirm that contract was created
 	getContract := func() {
@@ -44,9 +44,9 @@ func TestContracts(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	fmt.Printf("Call %+v\n", callTx)
-	_, _, _, _, _, err = aeternity.SignBroadcastWaitTransaction(callTx, alice, node, networkID, config.Client.WaitBlocks)
+	_, txHash, _, _, _, err = aeternity.SignBroadcastWaitTransaction(callTx, alice, node, networkID, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}
+	fmt.Printf("Call %+v %s\n", callTx, txHash)
 }
