@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/v6/config"
 	"github.com/aeternity/aepp-sdk-go/v6/aeternity"
+	"github.com/aeternity/aepp-sdk-go/v6/config"
 	"github.com/aeternity/aepp-sdk-go/v6/utils"
 	"gotest.tools/golden"
 )
@@ -16,7 +16,6 @@ func TestContracts(t *testing.T) {
 	contractsAlice := aeternity.NewContextFromNode(node, alice.Address)
 
 	var ctID string
-	var txHash string
 
 	identityBytecode := string(golden.Get(t, "identity_bytecode.txt"))
 	identityInitCalldata := string(golden.Get(t, "identity_initcalldata.txt"))
@@ -26,11 +25,7 @@ func TestContracts(t *testing.T) {
 	}
 	ctID, _ = create.ContractID()
 	fmt.Printf("Create %s, %+v\n", ctID, create)
-	_, txHash, _, err = aeternity.SignBroadcastTransaction(create, alice, node, networkID)
-	if err != nil {
-		t.Fatal(err)
-	}
-	_, _, err = waitForTransaction(node, txHash)
+	_, _, _, _, _, err = aeternity.SignBroadcastWaitTransaction(create, alice, node, networkID, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -50,12 +45,7 @@ func TestContracts(t *testing.T) {
 		t.Fatal(err)
 	}
 	fmt.Printf("Call %+v\n", callTx)
-	_, txHash, _, err = aeternity.SignBroadcastTransaction(callTx, alice, node, networkID)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	_, _, err = waitForTransaction(node, txHash)
+	_, _, _, _, _, err = aeternity.SignBroadcastWaitTransaction(callTx, alice, node, networkID, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}
