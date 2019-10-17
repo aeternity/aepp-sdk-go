@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/aeternity/aepp-sdk-go/v6/account"
-	"github.com/aeternity/aepp-sdk-go/v6/config"
 	"github.com/aeternity/aepp-sdk-go/v6/aeternity"
+	"github.com/aeternity/aepp-sdk-go/v6/config"
 	"github.com/aeternity/aepp-sdk-go/v6/swagguard/node/models"
 )
 
@@ -30,11 +30,10 @@ func TestOracleWorkflow(t *testing.T) {
 		t.Fatal(err)
 	}
 	fmt.Printf("Register %+v\n", register)
-	_, registerHash, _, err := aeternity.SignBroadcastTransaction(register, testAccount, node, networkID)
+	_, _, _, _, _, err = aeternity.SignBroadcastWaitTransaction(register, testAccount, node, networkID, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, _ = waitForTransaction(node, registerHash)
 
 	// Confirm that the oracle exists
 	oraclePubKey := strings.Replace(testAccount.Address, "ak_", "ok_", 1)
@@ -55,11 +54,10 @@ func TestOracleWorkflow(t *testing.T) {
 		t.Fatal(err)
 	}
 	fmt.Printf("Extend %+v\n", extend)
-	_, extendHash, _, err := aeternity.SignBroadcastTransaction(extend, testAccount, node, networkID)
+	_, _, _, _, _, err = aeternity.SignBroadcastWaitTransaction(extend, testAccount, node, networkID, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, _ = waitForTransaction(node, extendHash)
 
 	// Confirm that the oracle's TTL changed
 	oracle, err = node.GetOracleByPubkey(oraclePubKey)
@@ -76,11 +74,10 @@ func TestOracleWorkflow(t *testing.T) {
 		t.Fatal(err)
 	}
 	fmt.Printf("Query %+v\n", query)
-	_, queryHash, _, err := aeternity.SignBroadcastTransaction(query, testAccount, node, networkID)
+	_, _, _, _, _, err = aeternity.SignBroadcastWaitTransaction(query, testAccount, node, networkID, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, _ = waitForTransaction(node, queryHash)
 
 	// Find the Oracle Query ID to reply to
 	fmt.Println("Sleeping a bit before querying node for OracleID")
@@ -98,9 +95,8 @@ func TestOracleWorkflow(t *testing.T) {
 	// Respond
 	respond, err := oracleAccount.OracleRespondTx(oraclePubKey, *oqID, "My day was fine thank you", 0, 100)
 	fmt.Printf("Respond %+v\n", respond)
-	_, respondHash, _, err := aeternity.SignBroadcastTransaction(respond, testAccount, node, networkID)
+	_, _, _, _, _, err = aeternity.SignBroadcastWaitTransaction(respond, testAccount, node, networkID, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, _ = waitForTransaction(node, respondHash)
 }

@@ -60,12 +60,8 @@ type txTypes struct {
 var sentTxs txTypes
 var useTestNet bool
 
-func signBroadcastWaitForTransaction(t *testing.T, tx rlp.Encoder, acc *account.Account, node *naet.Node) (height uint64, txHash string, mbHash string) {
-	_, txHash, _, err := aeternity.SignBroadcastTransaction(tx, acc, node, networkID)
-	if err != nil {
-		t.Fatal(err)
-	}
-	height, mbHash, err = waitForTransaction(node, txHash)
+func signBroadcastWaitKeepTrackOfTx(t *testing.T, tx rlp.Encoder, acc *account.Account, node *naet.Node) (height uint64, txHash string, mbHash string) {
+	_, txHash, _, height, mbHash, err := aeternity.SignBroadcastWaitTransaction(tx, acc, node, networkID, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -101,7 +97,7 @@ func signBroadcastWaitForTransaction(t *testing.T, tx rlp.Encoder, acc *account.
 	case "ContractCallTx":
 		sentTxs.ContractCallTx = info
 	default:
-		t.Fatalf("Where should I put this TxTpye: %s", txType)
+		t.Fatalf("Where should I put this TxType: %s", txType)
 	}
 
 	return height, txHash, mbHash
@@ -128,7 +124,7 @@ func TestAPI(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, _ = signBroadcastWaitForTransaction(t, spendTx, alice, privateNet)
+	_, _, _ = signBroadcastWaitKeepTrackOfTx(t, spendTx, alice, privateNet)
 
 	// NamePreClaimTx
 	fmt.Println("NamePreClaimTx")
@@ -136,7 +132,7 @@ func TestAPI(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, _ = signBroadcastWaitForTransaction(t, preclaimTx, alice, privateNet)
+	_, _, _ = signBroadcastWaitKeepTrackOfTx(t, preclaimTx, alice, privateNet)
 
 	// NameClaimTx
 	fmt.Println("NameClaimTx")
@@ -145,7 +141,7 @@ func TestAPI(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, _ = signBroadcastWaitForTransaction(t, claimTx, alice, privateNet)
+	_, _, _ = signBroadcastWaitKeepTrackOfTx(t, claimTx, alice, privateNet)
 
 	// NameUpdateTx
 	fmt.Println("NameUpdateTx")
@@ -153,7 +149,7 @@ func TestAPI(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, _ = signBroadcastWaitForTransaction(t, updateTx, alice, privateNet)
+	_, _, _ = signBroadcastWaitKeepTrackOfTx(t, updateTx, alice, privateNet)
 
 	// NameTransferTx
 	fmt.Println("NameTransferTx")
@@ -161,7 +157,7 @@ func TestAPI(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, _ = signBroadcastWaitForTransaction(t, transferTx, alice, privateNet)
+	_, _, _ = signBroadcastWaitKeepTrackOfTx(t, transferTx, alice, privateNet)
 
 	// NameRevokeTx
 	fmt.Println("NameRevokeTx")
@@ -169,7 +165,7 @@ func TestAPI(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, _ = signBroadcastWaitForTransaction(t, revokeTx, bob, privateNet)
+	_, _, _ = signBroadcastWaitKeepTrackOfTx(t, revokeTx, bob, privateNet)
 
 	sentTxs.name = randomName(int(config.Client.Names.NameAuctionMaxLength + 2))
 	// NamePreClaimTx
@@ -178,7 +174,7 @@ func TestAPI(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, _ = signBroadcastWaitForTransaction(t, preclaimTx, alice, privateNet)
+	_, _, _ = signBroadcastWaitKeepTrackOfTx(t, preclaimTx, alice, privateNet)
 
 	// NameClaimTx
 	fmt.Println("NameClaimTx 2nd name for other tests")
@@ -187,7 +183,7 @@ func TestAPI(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, _ = signBroadcastWaitForTransaction(t, claimTx, alice, privateNet)
+	_, _, _ = signBroadcastWaitKeepTrackOfTx(t, claimTx, alice, privateNet)
 
 	// OracleRegisterTx
 	fmt.Println("OracleRegisterTx")
@@ -195,7 +191,7 @@ func TestAPI(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, _ = signBroadcastWaitForTransaction(t, register, alice, privateNet)
+	_, _, _ = signBroadcastWaitKeepTrackOfTx(t, register, alice, privateNet)
 
 	// OracleExtendTx
 	fmt.Println("OracleExtendTx")
@@ -204,7 +200,7 @@ func TestAPI(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, _ = signBroadcastWaitForTransaction(t, extend, alice, privateNet)
+	_, _, _ = signBroadcastWaitKeepTrackOfTx(t, extend, alice, privateNet)
 
 	// OracleQueryTx
 	fmt.Println("OracleQueryTx")
@@ -212,7 +208,7 @@ func TestAPI(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, _ = signBroadcastWaitForTransaction(t, query, alice, privateNet)
+	_, _, _ = signBroadcastWaitKeepTrackOfTx(t, query, alice, privateNet)
 
 	// OracleRespondTx
 	fmt.Println("OracleRespondTx")
@@ -226,7 +222,7 @@ func TestAPI(t *testing.T) {
 	delay(getOracleQueries)
 	oqID := oracleQueries.OracleQueries[0].ID
 	respond, err := ctxAlice.OracleRespondTx(sentTxs.oracleID, *oqID, "My day was fine thank you", 0, 100)
-	_, _, _ = signBroadcastWaitForTransaction(t, respond, alice, privateNet)
+	_, _, _ = signBroadcastWaitKeepTrackOfTx(t, respond, alice, privateNet)
 
 	// ContractCreateTx
 	fmt.Println("ContractCreateTx")
@@ -241,7 +237,7 @@ func TestAPI(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, _ = signBroadcastWaitForTransaction(t, ctCreate, alice, privateNet)
+	_, _, _ = signBroadcastWaitKeepTrackOfTx(t, ctCreate, alice, privateNet)
 
 	// ContractCallTx
 	fmt.Println("ContractCallTx")
@@ -250,7 +246,7 @@ func TestAPI(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, _ = signBroadcastWaitForTransaction(t, ctCall, alice, privateNet)
+	_, _, _ = signBroadcastWaitKeepTrackOfTx(t, ctCall, alice, privateNet)
 
 	t.Logf("%+v\n", sentTxs)
 	t.Run("GetStatus", func(t *testing.T) {

@@ -78,13 +78,9 @@ func TestGeneralizedAccounts(t *testing.T) {
 		t.Fatal(err)
 	}
 	gaTx := transactions.NewGAAttachTx(testAccount.Address, 1, authBytecode, auth.TypeInfo[0].FuncHash, config.Client.Contracts.VMVersion, config.Client.Contracts.ABIVersion, config.Client.BaseGas, config.Client.GasPrice, config.Client.Fee, ttl, authInitCalldata)
-	_, txHash, _, err := aeternity.SignBroadcastTransaction(gaTx, testAccount, node, networkID)
+	_, _, _, _, _, err = aeternity.SignBroadcastWaitTransaction(gaTx, testAccount, node, networkID, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
-	}
-	_, _, err = waitForTransaction(node, txHash)
-	if err != nil {
-		t.Error(err)
 	}
 
 	// The test account should now be a generalized account

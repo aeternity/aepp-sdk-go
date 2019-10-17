@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/aeternity/aepp-sdk-go/v6/aeternity"
+	"github.com/aeternity/aepp-sdk-go/v6/config"
 	"github.com/aeternity/aepp-sdk-go/v6/utils"
 )
 
@@ -15,7 +16,6 @@ func TestSpendTx(t *testing.T) {
 	alice, bob := setupAccounts(t)
 
 	amount := utils.RequireIntFromString("18446744073709551615") // max uint64
-	fee := utils.NewIntFromUint64(uint64(2e13))
 	msg := "Hello World"
 
 	// In case the recipient account already has funds, get recipient's account
@@ -29,25 +29,16 @@ func TestSpendTx(t *testing.T) {
 		expected.Add(&bS, amount)
 	}
 
-	// create a Context for the address you're going to sign the transaction
-	// with, and an aeternity node to talk to/query the address's nonce.
 	ctx := aeternity.NewContextFromNode(node, alice.Address)
-
-	// create the SpendTransaction
-	tx, err := ctx.SpendTx(alice.Address, bob.Address, amount, fee, []byte(msg))
+	tx, err := ctx.SpendTx(alice.Address, bob.Address, amount, config.Client.Fee, []byte(msg))
 	if err != nil {
 		t.Error(err)
 	}
-
-	// sign the transaction, output params for debugging
-	_, hash, _, err := aeternity.SignBroadcastTransaction(tx, alice, node, networkID)
+	_, _, _, _, _, err = aeternity.SignBroadcastWaitTransaction(tx, alice, node, networkID, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}
 	// check the recipient's balance
-
-	// Wait for a bit
-	_, _, _ = waitForTransaction(node, hash)
 
 	getBobsAccount := func() {
 		bobState, err = node.GetAccount(bob.Address)
