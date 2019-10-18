@@ -5,6 +5,7 @@ import (
 	"math/big"
 
 	"github.com/aeternity/aepp-sdk-go/v6/binary"
+	"github.com/aeternity/aepp-sdk-go/v6/config"
 	"github.com/aeternity/aepp-sdk-go/v6/swagguard/node/models"
 	"github.com/aeternity/aepp-sdk-go/v6/utils"
 	rlp "github.com/randomshinichi/rlpae"
@@ -192,21 +193,28 @@ func (tx *ContractCreateTx) GetGasLimit() *big.Int {
 }
 
 // NewContractCreateTx is a constructor for a ContractCreateTx struct
-func NewContractCreateTx(OwnerID string, AccountNonce uint64, Code string, VMVersion, AbiVersion uint16, Deposit, Amount, GasLimit, GasPrice, Fee *big.Int, TTL uint64, CallData string) *ContractCreateTx {
-	return &ContractCreateTx{
-		OwnerID:      OwnerID,
-		AccountNonce: AccountNonce,
-		Code:         Code,
-		VMVersion:    VMVersion,
-		AbiVersion:   AbiVersion,
-		Deposit:      Deposit,
-		Amount:       Amount,
-		GasLimit:     GasLimit,
-		GasPrice:     GasPrice,
-		Fee:          Fee,
-		TTL:          TTL,
-		CallData:     CallData,
+func NewContractCreateTx(ownerID string, accountNonce uint64, code string, vmVersion, abiVersion uint16, deposit, amount, gasLimit, gasPrice *big.Int, callData string, ttlnoncer TTLNoncer) (tx *ContractCreateTx, err error) {
+	ttl, accountNonce, err := ttlnoncer(ownerID, config.Client.TTL)
+	if err != nil {
+		return
 	}
+
+	tx = &ContractCreateTx{
+		OwnerID:      ownerID,
+		AccountNonce: accountNonce,
+		Code:         code,
+		VMVersion:    vmVersion,
+		AbiVersion:   abiVersion,
+		Deposit:      deposit,
+		Amount:       amount,
+		GasLimit:     gasLimit,
+		GasPrice:     gasPrice,
+		Fee:          config.Client.Fee,
+		TTL:          ttl,
+		CallData:     callData,
+	}
+	CalculateFee(tx)
+	return
 }
 
 // ContractCallTx represents calling an existing smart contract
@@ -353,17 +361,24 @@ func (tx *ContractCallTx) GetGasLimit() *big.Int {
 }
 
 // NewContractCallTx is a constructor for a ContractCallTx struct
-func NewContractCallTx(CallerID string, AccountNonce uint64, ContractID string, Amount, GasLimit, GasPrice *big.Int, AbiVersion uint16, CallData string, Fee *big.Int, TTL uint64) *ContractCallTx {
-	return &ContractCallTx{
-		CallerID:     CallerID,
-		AccountNonce: AccountNonce,
-		ContractID:   ContractID,
-		Amount:       Amount,
-		GasLimit:     GasLimit,
-		GasPrice:     GasPrice,
-		AbiVersion:   AbiVersion,
-		CallData:     CallData,
-		Fee:          Fee,
-		TTL:          TTL,
+func NewContractCallTx(callerID string, accountNonce uint64, contractID string, amount, gasLimit, gasPrice *big.Int, abiVersion uint16, callData string, ttlnoncer TTLNoncer) (tx *ContractCallTx, err error) {
+	ttl, accountNonce, err := ttlnoncer(callerID, config.Client.TTL)
+	if err != nil {
+		return
 	}
+
+	tx = &ContractCallTx{
+		CallerID:     callerID,
+		AccountNonce: accountNonce,
+		ContractID:   contractID,
+		Amount:       amount,
+		GasLimit:     gasLimit,
+		GasPrice:     gasPrice,
+		AbiVersion:   abiVersion,
+		CallData:     callData,
+		Fee:          config.Client.Fee,
+		TTL:          ttl,
+	}
+	CalculateFee(tx)
+	return
 }
