@@ -5,6 +5,7 @@ import (
 	"math/big"
 
 	"github.com/aeternity/aepp-sdk-go/v6/binary"
+	"github.com/aeternity/aepp-sdk-go/v6/config"
 	"github.com/aeternity/aepp-sdk-go/v6/swagguard/node/models"
 	"github.com/aeternity/aepp-sdk-go/v6/utils"
 	rlp "github.com/randomshinichi/rlpae"
@@ -159,8 +160,15 @@ func (tx *OracleRegisterTx) GetGasLimit() *big.Int {
 }
 
 // NewOracleRegisterTx is a constructor for a OracleRegisterTx struct
-func NewOracleRegisterTx(accountID string, accountNonce uint64, querySpec, responseSpec string, queryFee *big.Int, oracleTTLType, oracleTTLValue uint64, abiVersion uint16, txFee *big.Int, txTTL uint64) *OracleRegisterTx {
-	return &OracleRegisterTx{accountID, accountNonce, querySpec, responseSpec, queryFee, oracleTTLType, oracleTTLValue, abiVersion, txFee, txTTL}
+func NewOracleRegisterTx(accountID string, querySpec, responseSpec string, queryFee *big.Int, oracleTTLType, oracleTTLValue uint64, abiVersion uint16, ttlnoncer TTLNoncer) (tx *OracleRegisterTx, err error) {
+	ttl, accountNonce, err := ttlnoncer(accountID, config.Client.TTL)
+	if err != nil {
+		return
+	}
+
+	tx = &OracleRegisterTx{accountID, accountNonce, querySpec, responseSpec, queryFee, oracleTTLType, oracleTTLValue, abiVersion, config.Client.Fee, ttl}
+	CalculateFee(tx)
+	return
 }
 
 // OracleExtendTx represents a transaction that extends the lifetime of an oracle
@@ -275,8 +283,15 @@ func (tx *OracleExtendTx) GetGasLimit() *big.Int {
 }
 
 // NewOracleExtendTx is a constructor for a OracleExtendTx struct
-func NewOracleExtendTx(oracleID string, accountNonce, oracleTTLType, oracleTTLValue uint64, Fee *big.Int, TTL uint64) *OracleExtendTx {
-	return &OracleExtendTx{oracleID, accountNonce, oracleTTLType, oracleTTLValue, Fee, TTL}
+func NewOracleExtendTx(oracleID string, accountNonce, oracleTTLType, oracleTTLValue uint64, ttlnoncer TTLNoncer) (tx *OracleExtendTx, err error) {
+	ttl, accountNonce, err := ttlnoncer(oracleID, config.Client.TTL)
+	if err != nil {
+		return
+	}
+
+	tx = &OracleExtendTx{oracleID, accountNonce, oracleTTLType, oracleTTLValue, config.Client.Fee, ttl}
+	CalculateFee(tx)
+	return
 }
 
 // OracleQueryTx represents a transaction that a program sends to query an oracle
@@ -427,8 +442,15 @@ func (tx *OracleQueryTx) GetGasLimit() *big.Int {
 }
 
 // NewOracleQueryTx is a constructor for a OracleQueryTx struct
-func NewOracleQueryTx(SenderID string, AccountNonce uint64, OracleID, Query string, QueryFee *big.Int, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64, Fee *big.Int, TTL uint64) *OracleQueryTx {
-	return &OracleQueryTx{SenderID, AccountNonce, OracleID, Query, QueryFee, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue, Fee, TTL}
+func NewOracleQueryTx(senderID string, oracleID, query string, queryFee *big.Int, queryTTLType, queryTTLValue, responseTTLType, responseTTLValue uint64, ttlnoncer TTLNoncer) (tx *OracleQueryTx, err error) {
+	ttl, accountNonce, err := ttlnoncer(senderID, config.Client.TTL)
+	if err != nil {
+		return
+	}
+
+	tx = &OracleQueryTx{senderID, accountNonce, oracleID, query, queryFee, queryTTLType, queryTTLValue, responseTTLType, responseTTLValue, config.Client.Fee, ttl}
+	CalculateFee(tx)
+	return
 }
 
 // OracleRespondTx represents a transaction that an oracle sends to respond to an incoming query
@@ -560,6 +582,13 @@ func (tx *OracleRespondTx) GetGasLimit() *big.Int {
 }
 
 // NewOracleRespondTx is a constructor for a OracleRespondTx struct
-func NewOracleRespondTx(OracleID string, AccountNonce uint64, QueryID string, Response string, TTLType uint64, TTLValue uint64, Fee *big.Int, TTL uint64) *OracleRespondTx {
-	return &OracleRespondTx{OracleID, AccountNonce, QueryID, Response, TTLType, TTLValue, Fee, TTL}
+func NewOracleRespondTx(oracleID string, queryID string, response string, responseTTLType uint64, responseTTLValue uint64, ttlnoncer TTLNoncer) (tx *OracleRespondTx, err error) {
+	ttl, accountNonce, err := ttlnoncer(oracleID, config.Client.TTL)
+	if err != nil {
+		return
+	}
+
+	tx = &OracleRespondTx{oracleID, accountNonce, queryID, response, responseTTLType, responseTTLValue, config.Client.Fee, ttl}
+	CalculateFee(tx)
+	return
 }
