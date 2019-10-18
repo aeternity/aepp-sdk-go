@@ -90,54 +90,6 @@ func NewContextFromNode(node *naet.Node, address string) (ctx *Context) {
 	return
 }
 
-// OracleRegisterTx creates an oracle register transaction, filling in the
-// account nonce and transaction TTL automatically.
-func (c *Context) OracleRegisterTx(querySpec, responseSpec string, queryFee *big.Int, oracleTTLType, oracleTTLValue uint64, VMVersion uint16) (tx *transactions.OracleRegisterTx, err error) {
-	ttl, nonce, err := c.GetTTLNonce(c.Address, config.Client.TTL)
-	if err != nil {
-		return
-	}
-
-	tx = transactions.NewOracleRegisterTx(c.Address, nonce, querySpec, responseSpec, queryFee, oracleTTLType, oracleTTLValue, VMVersion, config.Client.Fee, ttl)
-	return tx, nil
-}
-
-// OracleExtendTx creates an oracle extend transaction, filling in the account
-// nonce and transaction TTL automatically.
-func (c *Context) OracleExtendTx(oracleID string, ttlType, ttlValue uint64) (tx *transactions.OracleExtendTx, err error) {
-	ttl, nonce, err := c.GetTTLNonce(c.Address, config.Client.TTL)
-	if err != nil {
-		return
-	}
-
-	tx = transactions.NewOracleExtendTx(oracleID, nonce, ttlType, ttlValue, config.Client.Fee, ttl)
-	return tx, nil
-}
-
-// OracleQueryTx creates an oracle query transaction, filling in the account
-// nonce and transaction TTL automatically.
-func (c *Context) OracleQueryTx(OracleID, Query string, QueryFee *big.Int, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue uint64) (tx *transactions.OracleQueryTx, err error) {
-	ttl, nonce, err := c.GetTTLNonce(c.Address, config.Client.TTL)
-	if err != nil {
-		return
-	}
-
-	tx = transactions.NewOracleQueryTx(c.Address, nonce, OracleID, Query, QueryFee, QueryTTLType, QueryTTLValue, ResponseTTLType, ResponseTTLValue, config.Client.Fee, ttl)
-	return tx, nil
-}
-
-// OracleRespondTx creates an oracle response transaction, filling in the
-// account nonce and transaction TTL automatically.
-func (c *Context) OracleRespondTx(OracleID string, QueryID string, Response string, TTLType uint64, TTLValue uint64) (tx *transactions.OracleRespondTx, err error) {
-	ttl, nonce, err := c.GetTTLNonce(c.Address, config.Client.TTL)
-	if err != nil {
-		return
-	}
-
-	tx = transactions.NewOracleRespondTx(OracleID, nonce, QueryID, Response, TTLType, TTLValue, config.Client.Fee, ttl)
-	return tx, nil
-}
-
 // ContractCreateTx creates a contract create transaction, filling in the
 // account nonce and transaction TTL automatically.
 func (c *Context) ContractCreateTx(Code string, CallData string, VMVersion, AbiVersion uint16, Deposit, Amount, GasLimit, Fee *big.Int) (tx *transactions.ContractCreateTx, err error) {
