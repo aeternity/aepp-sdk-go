@@ -5,6 +5,7 @@ import (
 	"math/big"
 
 	"github.com/aeternity/aepp-sdk-go/v6/binary"
+	"github.com/aeternity/aepp-sdk-go/v6/config"
 	"github.com/aeternity/aepp-sdk-go/v6/swagguard/node/models"
 	"github.com/aeternity/aepp-sdk-go/v6/utils"
 	rlp "github.com/randomshinichi/rlpae"
@@ -134,6 +135,13 @@ func (tx *SpendTx) GetGasLimit() *big.Int {
 }
 
 // NewSpendTx is a constructor for a SpendTx struct
-func NewSpendTx(senderID, recipientID string, amount, fee *big.Int, payload []byte, ttl, nonce uint64) *SpendTx {
-	return &SpendTx{senderID, recipientID, amount, fee, payload, ttl, nonce}
+func NewSpendTx(senderID, recipientID string, amount *big.Int, payload []byte, ttlnoncer TTLNoncer) (tx *SpendTx, err error) {
+	ttl, nonce, err := ttlnoncer(senderID, config.Client.TTL)
+	if err != nil {
+		return
+	}
+
+	tx = &SpendTx{senderID, recipientID, amount, config.Client.Fee, payload, ttl, nonce}
+	CalculateFee(tx)
+	return
 }
