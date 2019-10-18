@@ -1,8 +1,11 @@
 package transactions
 
 import (
+	"crypto/rand"
+	"fmt"
 	"io"
 	"math/big"
+	"strconv"
 	"strings"
 
 	"github.com/aeternity/aepp-sdk-go/v6/binary"
@@ -19,6 +22,78 @@ func NameID(name string) (nm string, err error) {
 		return
 	}
 	return binary.Encode(binary.PrefixName, s), nil
+}
+
+// generateCommitmentID gives a commitment ID 'cm_...' given a particular AENS
+// name. It is split into the deterministic part computeCommitmentID(), which
+// can be tested, and the part incorporating random salt generateCommitmentID()
+//
+// since the salt is a uint256, which Erlang handles well, but Go has nothing
+// similar to it, it is imperative that the salt be kept as a bytearray unless
+// you really have to convert it into an integer. Which you usually don't,
+// because it's a salt.
+func generateCommitmentID(name string) (ch string, salt *big.Int, err error) {
+	// Generate 32 random bytes for a salt
+	saltBytes := make([]byte, 32)
+	_, err = rand.Read(saltBytes)
+	// Note that err == nil only if we read len(b) bytes.
+	if err != nil {
+		return
+	}
+
+	ch, err = computeCommitmentID(name, saltBytes)
+
+	salt = new(big.Int)
+	salt.SetBytes(saltBytes)
+
+	return ch, salt, err
+}
+
+func isPrintable(s string) bool {
+	for _, r := range s {
+		if !strconv.IsPrint(r) {
+			return false
+		}
+	}
+	return true
+}
+
+func computeCommitmentID(name string, salt []byte) (ch string, err error) {
+	var nh = []byte{}
+	if strings.HasSuffix(name, ".test") {
+		nh = append(Namehash(name), salt...)
+
+	} else {
+		// Since UTF-8 ~ ASCII, just use the string directly. QuoteToASCII
+		// includes an extra byte at the start and end of the string, messing up
+		// the hashing process.
+		if !isPrintable(name) {
+			return "", fmt.Errorf("The name %s must contain only printable characters", name)
+		}
+
+		nh = append([]byte(name), salt...)
+	}
+	nh, err = binary.Blake2bHash(nh)
+	if err != nil {
+		return
+	}
+	ch = binary.Encode(binary.PrefixCommitment, nh)
+	return
+}
+
+// Namehash calculate the Namehash of a string. Names within aeternity are
+// generally referred to only by their namehashes.
+//
+// The implementation is the same as ENS EIP-137
+// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-137.md#namehash-algorithm
+// but using Blake2b.
+func Namehash(name string) []byte {
+	buf := make([]byte, 32)
+	for _, s := range strings.Split(name, ".") {
+		sh, _ := binary.Blake2bHash([]byte(s))
+		buf, _ = binary.Blake2bHash(append(buf, sh...))
+	}
+	return buf
 }
 
 // NamePreclaimTx represents a transaction where one reserves a name on AENS without revealing it yet
@@ -129,8 +204,21 @@ func (tx *NamePreclaimTx) GetGasLimit() *big.Int {
 }
 
 // NewNamePreclaimTx is a constructor for a NamePreclaimTx struct
-func NewNamePreclaimTx(accountID, commitmentID string, fee *big.Int, ttl, accountNonce uint64) *NamePreclaimTx {
-	return &NamePreclaimTx{accountID, commitmentID, fee, ttl, accountNonce}
+func NewNamePreclaimTx(accountID, name string, ttlnoncer TTLNoncer) (tx *NamePreclaimTx, nameSalt *big.Int, err error) {
+	ttl, accountNonce, err := ttlnoncer(accountID, config.Client.TTL)
+	if err != nil {
+		return
+	}
+	// calculate the commitment and get the preclaim salt since the salt is 32
+	// bytes long, you must use a big.Int to convert it into an integer
+	cm, nameSalt, err := generateCommitmentID(name)
+	if err != nil {
+		return
+	}
+
+	tx = &NamePreclaimTx{accountID, cm, config.Client.Fee, ttl, accountNonce}
+	CalculateFee(tx)
+	return
 }
 
 // NameClaimTx represents a transaction where one claims a previously reserved name on AENS
@@ -254,8 +342,15 @@ func (tx *NameClaimTx) GetGasLimit() *big.Int {
 }
 
 // NewNameClaimTx is a constructor for a NameClaimTx struct
-func NewNameClaimTx(accountID, name string, nameSalt, nameFee, fee *big.Int, ttl, accountNonce uint64) *NameClaimTx {
-	return &NameClaimTx{accountID, name, nameSalt, nameFee, fee, ttl, accountNonce}
+func NewNameClaimTx(accountID, name string, nameSalt, nameFee *big.Int, ttlnoncer TTLNoncer) (tx *NameClaimTx, err error) {
+	ttl, accountNonce, err := ttlnoncer(accountID, config.Client.TTL)
+	if err != nil {
+		return
+	}
+
+	tx = &NameClaimTx{accountID, name, nameSalt, nameFee, config.Client.Fee, ttl, accountNonce}
+	CalculateFee(tx)
+	return
 }
 
 // CalculateMinNameFee returns the starting bid price for a name on AENS. The
@@ -482,12 +577,31 @@ func (tx *NameUpdateTx) GetGasLimit() *big.Int {
 }
 
 // NewNameUpdateTx is a constructor for a NameUpdateTx struct
-func NewNameUpdateTx(accountID, nameID string, pointers []string, nameTTL, clientTTL uint64, fee *big.Int, ttl, accountNonce uint64) *NameUpdateTx {
+func NewNameUpdateTx(accountID, name string, pointers []string, clientTTL uint64, ttler TTLer, noncer Noncer) (tx *NameUpdateTx, err error) {
+	ttl, err := ttler(config.Client.TTL)
+	if err != nil {
+		return
+	}
+	accountNonce, err := noncer(accountID)
+	if err != nil {
+		return
+	}
+	nm, err := NameID(name)
+	if err != nil {
+		return
+	}
+	nameTTL, err := ttler(config.Client.Names.NameTTL)
+	if err != nil {
+		return
+	}
 	parsedPointers, err := buildPointers(pointers)
 	if err != nil {
 		panic(err)
 	}
-	return &NameUpdateTx{accountID, nameID, parsedPointers, nameTTL, clientTTL, fee, ttl, accountNonce}
+
+	tx = &NameUpdateTx{accountID, nm, parsedPointers, nameTTL, clientTTL, config.Client.Fee, ttl, accountNonce}
+	CalculateFee(tx)
+	return
 }
 
 // NameRevokeTx represents a transaction that revokes the name, i.e. has the same effect as waiting for the Name's TTL to expire.
@@ -604,8 +718,20 @@ func (tx *NameRevokeTx) GetGasLimit() *big.Int {
 }
 
 // NewNameRevokeTx is a constructor for a NameRevokeTx struct
-func NewNameRevokeTx(accountID, name string, fee *big.Int, ttl, accountNonce uint64) *NameRevokeTx {
-	return &NameRevokeTx{accountID, name, fee, ttl, accountNonce}
+func NewNameRevokeTx(accountID, name string, ttlnoncer TTLNoncer) (tx *NameRevokeTx, err error) {
+	ttl, accountNonce, err := ttlnoncer(accountID, config.Client.TTL)
+	if err != nil {
+		return
+	}
+
+	nm, err := NameID(name)
+	if err != nil {
+		return
+	}
+
+	tx = &NameRevokeTx{accountID, nm, config.Client.Fee, ttl, accountNonce}
+	CalculateFee(tx)
+	return
 }
 
 // NameTransferTx represents a transaction that transfers ownership of one name to another account.
@@ -739,6 +865,18 @@ func (tx *NameTransferTx) GetGasLimit() *big.Int {
 }
 
 // NewNameTransferTx is a constructor for a NameTransferTx struct
-func NewNameTransferTx(AccountID, NameID, RecipientID string, Fee *big.Int, TTL, AccountNonce uint64) *NameTransferTx {
-	return &NameTransferTx{AccountID, NameID, RecipientID, Fee, TTL, AccountNonce}
+func NewNameTransferTx(accountID, name, recipientID string, ttlnoncer TTLNoncer) (tx *NameTransferTx, err error) {
+	ttl, accountNonce, err := ttlnoncer(accountID, config.Client.TTL)
+	if err != nil {
+		return
+	}
+
+	nm, err := NameID(name)
+	if err != nil {
+		return
+	}
+
+	tx = &NameTransferTx{accountID, nm, recipientID, config.Client.Fee, ttl, accountNonce}
+	CalculateFee(tx)
+	return
 }

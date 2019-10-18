@@ -3,7 +3,6 @@ package transactions
 import (
 	"bytes"
 	"fmt"
-	"math/big"
 	"reflect"
 	"testing"
 
@@ -12,45 +11,36 @@ import (
 )
 
 func TestSpendTx_EncodeRLP(t *testing.T) {
-	type fields struct {
-		senderID    string
-		recipientID string
-		amount      *big.Int
-		fee         *big.Int
-		payload     []byte
-		ttl         uint64
-		nonce       uint64
-	}
 	tests := []struct {
 		name    string
-		fields  fields
+		tx      *SpendTx
 		wantTx  string
 		wantErr bool
 	}{
 		{
 			name: "Spend 10, Fee 10, Hello World",
-			fields: fields{
-				senderID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
-				recipientID: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
-				amount:      utils.NewIntFromUint64(10),
-				fee:         utils.NewIntFromUint64(10),
-				payload:     []byte("Hello World"),
-				ttl:         uint64(10),
-				nonce:       uint64(1),
+			tx: &SpendTx{
+				SenderID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+				RecipientID: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
+				Amount:      utils.NewIntFromUint64(10),
+				Fee:         utils.NewIntFromUint64(10),
+				Payload:     []byte("Hello World"),
+				TTL:         uint64(10),
+				Nonce:       uint64(1),
 			},
 			wantTx:  "tx_+FYMAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vOhAR8To7CL8AFABmKmi2nYdfeAPOxMCGR/btXYTHiXvVCjCgoKAYtIZWxsbyBXb3JsZPSZjdM=",
 			wantErr: false,
 		},
 		{
 			name: "Spend 0, Fee 10, Hello World (check correct RLP serialization of 0)",
-			fields: fields{
-				senderID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
-				recipientID: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
-				amount:      utils.NewIntFromUint64(0),
-				fee:         utils.NewIntFromUint64(10),
-				payload:     []byte("Hello World"),
-				ttl:         uint64(10),
-				nonce:       uint64(1),
+			tx: &SpendTx{
+				SenderID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+				RecipientID: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
+				Amount:      utils.NewIntFromUint64(0),
+				Fee:         utils.NewIntFromUint64(10),
+				Payload:     []byte("Hello World"),
+				TTL:         uint64(10),
+				Nonce:       uint64(1),
 			},
 			wantTx:  "tx_+FYMAaEBzqet5HDJ+Z2dTkAIgKhvHUm7REti8Rqeu2S7z+tz/vOhAR8To7CL8AFABmKmi2nYdfeAPOxMCGR/btXYTHiXvVCjAAoKAYtIZWxsbyBXb3JsZICI5/w=",
 			wantErr: false,
@@ -58,20 +48,12 @@ func TestSpendTx_EncodeRLP(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tx := NewSpendTx(tt.fields.senderID, tt.fields.recipientID,
-				tt.fields.amount,
-				tt.fields.fee,
-				tt.fields.payload,
-				tt.fields.ttl,
-				tt.fields.nonce,
-			)
-
-			txJSON, err := tx.JSON()
+			txJSON, err := tt.tx.JSON()
 			fmt.Println(txJSON)
 
-			fmt.Println(rlp.EncodeToBytes(&tx))
+			fmt.Println(rlp.EncodeToBytes(tt.tx))
 
-			gotTx, err := SerializeTx(tx)
+			gotTx, err := SerializeTx(tt.tx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("SpendTx.RLP() error = %v, wantErr %v", err, tt.wantErr)
 				return

@@ -1,73 +1,16 @@
 package aeternity
 
 import (
-	"crypto/rand"
 	"fmt"
 	"math/big"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/aeternity/aepp-sdk-go/v6/account"
-	"github.com/aeternity/aepp-sdk-go/v6/binary"
 	"github.com/aeternity/aepp-sdk-go/v6/config"
 	"github.com/aeternity/aepp-sdk-go/v6/naet"
 	"github.com/aeternity/aepp-sdk-go/v6/transactions"
 	rlp "github.com/randomshinichi/rlpae"
 )
-
-// GetTTLFunc defines a function that will return an appropriate TTL for a
-// transaction.
-type GetTTLFunc func(offset uint64) (ttl uint64, err error)
-
-// GetNextNonceFunc defines a function that will return an unused account nonce
-// for making a transaction.
-type GetNextNonceFunc func(accountID string) (nonce uint64, err error)
-
-// GetTTLNonceFunc describes a function that combines the roles of GetTTLFunc
-// and GetNextNonceFunc
-type GetTTLNonceFunc func(address string, offset uint64) (ttl, nonce uint64, err error)
-
-// GenerateGetTTL returns the chain height + offset
-func GenerateGetTTL(n naet.GetHeighter) GetTTLFunc {
-	return func(offset uint64) (ttl uint64, err error) {
-		height, err := n.GetHeight()
-		if err != nil {
-			return
-		}
-		ttl = height + offset
-		return
-	}
-}
-
-// GenerateGetNextNonce retrieves the current accountNonce and adds 1 to it for
-// use in transaction building
-func GenerateGetNextNonce(n naet.GetAccounter) GetNextNonceFunc {
-	return func(accountID string) (nextNonce uint64, err error) {
-		a, err := n.GetAccount(accountID)
-		if err != nil {
-			return
-		}
-		nextNonce = *a.Nonce + 1
-		return
-	}
-}
-
-// GenerateGetTTLNonce combines the commonly used together functions of GetTTL
-// and GetNextNonce
-func GenerateGetTTLNonce(ttlFunc GetTTLFunc, nonceFunc GetNextNonceFunc) GetTTLNonceFunc {
-	return func(accountID string, offset uint64) (ttl, nonce uint64, err error) {
-		ttl, err = ttlFunc(offset)
-		if err != nil {
-			return
-		}
-		nonce, err = nonceFunc(accountID)
-		if err != nil {
-			return
-		}
-		return
-	}
-}
 
 // GetAnythingByNameFunc describes a function that returns lookup results for a
 // AENS name
@@ -144,111 +87,6 @@ func NewContextFromNode(node *naet.Node, address string) (ctx *Context) {
 		GetTTLNonce: ttlNonceFunc,
 		Address:     address,
 	}
-	return
-}
-
-// SpendTx creates a spend transaction, filling in the account nonce and
-// transaction TTL automatically.
-func (c *Context) SpendTx(senderID string, recipientID string, amount, fee *big.Int, payload []byte) (tx *transactions.SpendTx, err error) {
-	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, config.Client.TTL)
-	if err != nil {
-		return
-	}
-
-	// create the transaction
-	return transactions.NewSpendTx(senderID, recipientID, amount, fee, payload, txTTL, accountNonce), err
-}
-
-// NamePreclaimTx creates a name preclaim transaction, filling in the account
-// nonce and transaction TTL automatically. It also generates a commitment ID
-// and salt, later used to claim the name.
-func (c *Context) NamePreclaimTx(name string, fee *big.Int) (tx *transactions.NamePreclaimTx, nameSalt *big.Int, err error) {
-	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, config.Client.TTL)
-	if err != nil {
-		return
-	}
-
-	// calculate the commitment and get the preclaim salt since the salt is 32
-	// bytes long, you must use a big.Int to convert it into an integer
-	cm, nameSalt, err := generateCommitmentID(name)
-	if err != nil {
-		return
-	}
-
-	// build the transaction
-	tx = transactions.NewNamePreclaimTx(c.Address, cm, fee, txTTL, accountNonce)
-
-	return
-}
-
-// NameClaimTx creates a claim transaction, filling in the account nonce and
-// transaction TTL automatically.
-func (c *Context) NameClaimTx(name string, nameSalt, nameFee, fee *big.Int) (tx *transactions.NameClaimTx, err error) {
-	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, config.Client.TTL)
-	if err != nil {
-		return
-	}
-
-	// create the transaction
-	tx = transactions.NewNameClaimTx(c.Address, name, nameSalt, nameFee, fee, txTTL, accountNonce)
-
-	return tx, err
-}
-
-// NameUpdateTx creates a name update transaction, filling in the account nonce
-// and transaction TTL automatically.
-func (c *Context) NameUpdateTx(name string, targetAddress string) (tx *transactions.NameUpdateTx, err error) {
-	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, config.Client.TTL)
-	if err != nil {
-		return
-	}
-
-	nm, err := transactions.NameID(name)
-	if err != nil {
-		return
-	}
-
-	absNameTTL, err := c.GetTTL(config.Client.Names.NameTTL)
-	if err != nil {
-		return
-	}
-	// create the transaction
-	tx = transactions.NewNameUpdateTx(c.Address, nm, []string{targetAddress}, absNameTTL, config.Client.Names.ClientTTL, config.Client.Fee, txTTL, accountNonce)
-
-	return
-}
-
-// NameTransferTx creates a name transfer transaction, filling in the account
-// nonce and transaction TTL automatically.
-func (c *Context) NameTransferTx(name string, recipientAddress string) (tx *transactions.NameTransferTx, err error) {
-	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, config.Client.TTL)
-	if err != nil {
-		return
-	}
-
-	nm, err := transactions.NameID(name)
-	if err != nil {
-		return
-	}
-
-	tx = transactions.NewNameTransferTx(c.Address, nm, recipientAddress, config.Client.Fee, txTTL, accountNonce)
-	return
-}
-
-// NameRevokeTx creates a name revoke transaction, filling in the account nonce
-// and transaction TTL automatically.
-func (c *Context) NameRevokeTx(name string) (tx *transactions.NameRevokeTx, err error) {
-	txTTL, accountNonce, err := c.GetTTLNonce(c.Address, config.Client.TTL)
-	if err != nil {
-		return
-	}
-
-	nm, err := transactions.NameID(name)
-	if err != nil {
-		return
-	}
-
-	tx = transactions.NewNameRevokeTx(c.Address, nm, config.Client.Fee, txTTL, accountNonce)
 	return
 }
 
@@ -432,76 +270,4 @@ func SignBroadcastWaitTransaction(tx rlp.Encoder, signingAccount *account.Accoun
 	}
 	blockHeight, blockHash, err = WaitForTransactionForXBlocks(n, hash, x)
 	return
-}
-
-// generateCommitmentID gives a commitment ID 'cm_...' given a particular AENS
-// name. It is split into the deterministic part computeCommitmentID(), which
-// can be tested, and the part incorporating random salt generateCommitmentID()
-//
-// since the salt is a uint256, which Erlang handles well, but Go has nothing
-// similar to it, it is imperative that the salt be kept as a bytearray unless
-// you really have to convert it into an integer. Which you usually don't,
-// because it's a salt.
-func generateCommitmentID(name string) (ch string, salt *big.Int, err error) {
-	// Generate 32 random bytes for a salt
-	saltBytes := make([]byte, 32)
-	_, err = rand.Read(saltBytes)
-	// Note that err == nil only if we read len(b) bytes.
-	if err != nil {
-		return
-	}
-
-	ch, err = computeCommitmentID(name, saltBytes)
-
-	salt = new(big.Int)
-	salt.SetBytes(saltBytes)
-
-	return ch, salt, err
-}
-
-func isPrintable(s string) bool {
-	for _, r := range s {
-		if !strconv.IsPrint(r) {
-			return false
-		}
-	}
-	return true
-}
-
-func computeCommitmentID(name string, salt []byte) (ch string, err error) {
-	var nh = []byte{}
-	if strings.HasSuffix(name, ".test") {
-		nh = append(Namehash(name), salt...)
-
-	} else {
-		// Since UTF-8 ~ ASCII, just use the string directly. QuoteToASCII
-		// includes an extra byte at the start and end of the string, messing up
-		// the hashing process.
-		if !isPrintable(name) {
-			return "", fmt.Errorf("The name %s must contain only printable characters", name)
-		}
-
-		nh = append([]byte(name), salt...)
-	}
-	nh, err = binary.Blake2bHash(nh)
-	if err != nil {
-		return
-	}
-	ch = binary.Encode(binary.PrefixCommitment, nh)
-	return
-}
-
-// Namehash calculate the Namehash of a string. Names within aeternity are
-// generally referred to only by their namehashes.
-//
-// The implementation is the same as ENS EIP-137
-// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-137.md#namehash-algorithm
-// but using Blake2b.
-func Namehash(name string) []byte {
-	buf := make([]byte, 32)
-	for _, s := range strings.Split(name, ".") {
-		sh, _ := binary.Blake2bHash([]byte(s))
-		buf, _ = binary.Blake2bHash(append(buf, sh...))
-	}
-	return buf
 }

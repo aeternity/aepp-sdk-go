@@ -8,6 +8,7 @@ import (
 
 	"github.com/aeternity/aepp-sdk-go/v6/binary"
 	"github.com/aeternity/aepp-sdk-go/v6/config"
+	"github.com/aeternity/aepp-sdk-go/v6/naet"
 
 	"github.com/aeternity/aepp-sdk-go/v6/account"
 	"github.com/aeternity/aepp-sdk-go/v6/utils"
@@ -537,4 +538,57 @@ func VerifySignedTx(accountID string, txSigned string, networkID string) (valid 
 		return
 	}
 	return
+}
+
+// TTLer defines a function that will return an appropriate TTL for a
+// transaction.
+type TTLer func(offset uint64) (ttl uint64, err error)
+
+// Noncer defines a function that will return an unused account nonce
+// for making a transaction.
+type Noncer func(accountID string) (nonce uint64, err error)
+
+// TTLNoncer describes a function that combines the roles of TTLer
+// and Noncer
+type TTLNoncer func(address string, offset uint64) (ttl, nonce uint64, err error)
+
+// GenerateTTLer returns the chain height + offset
+func GenerateTTLer(n naet.GetHeighter) TTLer {
+	return func(offset uint64) (ttl uint64, err error) {
+		height, err := n.GetHeight()
+		if err != nil {
+			return
+		}
+		ttl = height + offset
+		return
+	}
+}
+
+// GenerateNoncer retrieves the current accountNonce and adds 1 to it for
+// use in transaction building
+func GenerateNoncer(n naet.GetAccounter) Noncer {
+	return func(accountID string) (nextNonce uint64, err error) {
+		a, err := n.GetAccount(accountID)
+		if err != nil {
+			return
+		}
+		nextNonce = *a.Nonce + 1
+		return
+	}
+}
+
+// GenerateTTLNoncer combines the commonly used together functions of TTLer
+// and Noncer
+func GenerateTTLNoncer(ttlFunc TTLer, nonceFunc Noncer) TTLNoncer {
+	return func(accountID string, offset uint64) (ttl, nonce uint64, err error) {
+		ttl, err = ttlFunc(offset)
+		if err != nil {
+			return
+		}
+		nonce, err = nonceFunc(accountID)
+		if err != nil {
+			return
+		}
+		return
+	}
 }
