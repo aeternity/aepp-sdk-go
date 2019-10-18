@@ -90,30 +90,6 @@ func NewContextFromNode(node *naet.Node, address string) (ctx *Context) {
 	return
 }
 
-// ContractCreateTx creates a contract create transaction, filling in the
-// account nonce and transaction TTL automatically.
-func (c *Context) ContractCreateTx(Code string, CallData string, VMVersion, AbiVersion uint16, Deposit, Amount, GasLimit, Fee *big.Int) (tx *transactions.ContractCreateTx, err error) {
-	ttl, nonce, err := c.GetTTLNonce(c.Address, config.Client.TTL)
-	if err != nil {
-		return
-	}
-
-	tx = transactions.NewContractCreateTx(c.Address, nonce, Code, VMVersion, AbiVersion, Deposit, Amount, GasLimit, config.Client.GasPrice, Fee, ttl, CallData)
-	return tx, nil
-}
-
-// ContractCallTx creates a contract call transaction,, filling in the account
-// nonce and transaction TTL automatically.
-func (c *Context) ContractCallTx(ContractID, CallData string, AbiVersion uint16, Amount, GasLimit, GasPrice, Fee *big.Int) (tx *transactions.ContractCallTx, err error) {
-	ttl, nonce, err := c.GetTTLNonce(c.Address, config.Client.TTL)
-	if err != nil {
-		return
-	}
-
-	tx = transactions.NewContractCallTx(c.Address, nonce, ContractID, Amount, GasLimit, GasPrice, AbiVersion, CallData, Fee, ttl)
-	return tx, nil
-}
-
 // getTransactionByHashHeighter is used by WaitForTransactionForXBlocks to
 // specify that the node/mock node passed in should support
 // GetTransactionByHash() and GetHeight()
