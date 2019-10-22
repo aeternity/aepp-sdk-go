@@ -39,11 +39,11 @@ func randomName(length int) string {
 func TestAENSWorkflow(t *testing.T) {
 	node := setupNetwork(t, privatenetURL, false)
 	alice, bob := setupAccounts(t)
-	aensAlice := aeternity.NewContextFromNode(node, alice.Address)
+	ttler, noncer, ttlnoncer := transactions.GenerateTTLNoncer(node)
 
 	name := randomName(int(config.Client.Names.NameAuctionMaxLength + 1))
 	// Preclaim the name
-	preclaimTx, nameSalt, err := aensAlice.NamePreclaimTx(name, config.Client.Fee)
+	preclaimTx, nameSalt, err := transactions.NewNamePreclaimTx(alice.Address, name, ttlnoncer)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -55,7 +55,7 @@ func TestAENSWorkflow(t *testing.T) {
 
 	// Claim the name
 	nameFee := transactions.CalculateMinNameFee(name)
-	claimTx, err := aensAlice.NameClaimTx(name, nameSalt, nameFee, config.Client.Fee)
+	claimTx, err := transactions.NewNameClaimTx(alice.Address, name, nameSalt, nameFee, ttlnoncer)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -74,7 +74,7 @@ func TestAENSWorkflow(t *testing.T) {
 	delay(printNameEntry)
 
 	// Update the name, make it point to something
-	updateTx, err := aensAlice.NameUpdateTx(name, alice.Address)
+	updateTx, err := transactions.NewNameUpdateTx(alice.Address, name, []string{alice.Address}, config.Client.Names.ClientTTL, ttler, noncer)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -91,7 +91,7 @@ func TestAENSWorkflow(t *testing.T) {
 	}
 
 	// Transfer the name to a recipient
-	transferTx, err := aensAlice.NameTransferTx(name, bob.Address)
+	transferTx, err := transactions.NewNameTransferTx(alice.Address, name, bob.Address, ttlnoncer)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -102,9 +102,7 @@ func TestAENSWorkflow(t *testing.T) {
 	}
 
 	// Receiver updates the name, makes it point to himself
-	aensBob := aeternity.NewContextFromNode(node, bob.Address)
-
-	updateTx2, err := aensBob.NameUpdateTx(name, bob.Address)
+	updateTx2, err := transactions.NewNameUpdateTx(bob.Address, name, []string{bob.Address}, config.Client.Names.ClientTTL, ttler, noncer)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -115,7 +113,7 @@ func TestAENSWorkflow(t *testing.T) {
 	}
 
 	// Revoke the name - shouldn't work because it is signed by the sender, who no longer owns the address
-	revokeTx, err := aensAlice.NameRevokeTx(name)
+	revokeTx, err := transactions.NewNameRevokeTx(alice.Address, name, ttlnoncer)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -130,7 +128,7 @@ func TestAENSWorkflow(t *testing.T) {
 	}
 
 	// Revoke the name - signed by the recipient
-	revokeTx2, err := aensBob.NameRevokeTx(name)
+	revokeTx2, err := transactions.NewNameRevokeTx(bob.Address, name, ttlnoncer)
 	if err != nil {
 		t.Fatal(err)
 	}

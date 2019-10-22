@@ -6,6 +6,7 @@ import (
 
 	"github.com/aeternity/aepp-sdk-go/v6/aeternity"
 	"github.com/aeternity/aepp-sdk-go/v6/config"
+	"github.com/aeternity/aepp-sdk-go/v6/transactions"
 	"github.com/aeternity/aepp-sdk-go/v6/utils"
 )
 
@@ -29,8 +30,8 @@ func TestSpendTx(t *testing.T) {
 		expected.Add(&bS, amount)
 	}
 
-	ctx := aeternity.NewContextFromNode(node, alice.Address)
-	tx, err := ctx.SpendTx(alice.Address, bob.Address, amount, config.Client.Fee, []byte(msg))
+	_, _, ttlnoncer := transactions.GenerateTTLNoncer(node)
+	tx, err := transactions.NewSpendTx(alice.Address, bob.Address, amount, []byte(msg), ttlnoncer)
 	if err != nil {
 		t.Error(err)
 	}

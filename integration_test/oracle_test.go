@@ -10,11 +10,13 @@ import (
 	"github.com/aeternity/aepp-sdk-go/v6/aeternity"
 	"github.com/aeternity/aepp-sdk-go/v6/config"
 	"github.com/aeternity/aepp-sdk-go/v6/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v6/transactions"
 )
 
 func TestOracleWorkflow(t *testing.T) {
 	alice, _ := setupAccounts(t)
 	node := setupNetwork(t, privatenetURL, false)
+	_, _, ttlnoncer := transactions.GenerateTTLNoncer(node)
 
 	// Setup temporary test account and fund it
 	testAccount, err := account.New()
@@ -22,10 +24,9 @@ func TestOracleWorkflow(t *testing.T) {
 		t.Fatal(err)
 	}
 	fundAccount(t, node, alice, testAccount, big.NewInt(1000000000000000000))
-	oracleAccount := aeternity.NewContextFromNode(node, testAccount.Address)
 
 	// Register
-	register, err := oracleAccount.OracleRegisterTx("hello", "helloback", config.Client.Oracles.QueryFee, config.Client.Oracles.QueryTTLType, config.Client.Oracles.QueryTTLValue, config.Client.Oracles.VMVersion)
+	register, err := transactions.NewOracleRegisterTx(testAccount.Address, "hello", "helloback", config.Client.Oracles.QueryFee, config.OracleTTLTypeDelta, config.Client.Oracles.OracleTTLValue, config.Client.Oracles.ABIVersion, ttlnoncer)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -49,7 +50,7 @@ func TestOracleWorkflow(t *testing.T) {
 	// Extend
 	// save the oracle's initial TTL so we can compare it with after OracleExtendTx
 	oracleTTL := oracle.TTL
-	extend, err := oracleAccount.OracleExtendTx(oraclePubKey, 0, 1000)
+	extend, err := transactions.NewOracleExtendTx(testAccount.Address, oraclePubKey, config.OracleTTLTypeDelta, config.Client.Oracles.OracleTTLValue, ttlnoncer)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -69,7 +70,7 @@ func TestOracleWorkflow(t *testing.T) {
 	}
 
 	// Query
-	query, err := oracleAccount.OracleQueryTx(oraclePubKey, "How was your day?", config.Client.Oracles.QueryFee, 0, 100, 0, 100)
+	query, err := transactions.NewOracleQueryTx(testAccount.Address, oraclePubKey, "How was your day?", config.Client.Oracles.QueryFee, 0, 100, 0, 100, ttlnoncer)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -91,9 +92,13 @@ func TestOracleWorkflow(t *testing.T) {
 	}
 	delay(getOracleQueries)
 	oqID := oracleQueries.OracleQueries[0].ID
+	fmt.Println(oraclePubKey, *oqID)
 
 	// Respond
-	respond, err := oracleAccount.OracleRespondTx(oraclePubKey, *oqID, "My day was fine thank you", 0, 100)
+	respond, err := transactions.NewOracleRespondTx(testAccount.Address, oraclePubKey, *oqID, "My day was fine thank you", config.OracleTTLTypeDelta, config.Client.Oracles.ResponseTTLValue, ttlnoncer)
+	if err != nil {
+		t.Fatal(err)
+	}
 	fmt.Printf("Respond %+v\n", respond)
 	_, _, _, _, _, err = aeternity.SignBroadcastWaitTransaction(respond, testAccount, node, networkID, config.Client.WaitBlocks)
 	if err != nil {

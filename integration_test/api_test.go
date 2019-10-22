@@ -17,7 +17,6 @@ import (
 	"github.com/aeternity/aepp-sdk-go/v6/naet"
 	"github.com/aeternity/aepp-sdk-go/v6/swagguard/node/models"
 	"github.com/aeternity/aepp-sdk-go/v6/transactions"
-	"github.com/aeternity/aepp-sdk-go/v6/utils"
 	rlp "github.com/randomshinichi/rlpae"
 )
 
@@ -112,15 +111,15 @@ func TestMain(m *testing.M) {
 func TestAPI(t *testing.T) {
 	privateNet := setupNetwork(t, privatenetURL, false)
 	testNet := setupNetwork(t, testnetURL, false)
+	ttler, noncer, ttlnoncer := transactions.GenerateTTLNoncer(privateNet)
 
 	alice, bob := setupAccounts(t)
 
 	name := randomName(int(config.Client.Names.NameAuctionMaxLength + 1))
-	ctxAlice := aeternity.NewContextFromNode(privateNet, alice.Address)
-	ctxBob := aeternity.NewContextFromNode(privateNet, bob.Address)
+
 	// SpendTx
 	fmt.Println("SpendTx")
-	spendTx, err := ctxAlice.SpendTx(sender, bob.Address, big.NewInt(1000), config.Client.Fee, []byte(""))
+	spendTx, err := transactions.NewSpendTx(alice.Address, bob.Address, big.NewInt(1000), []byte(""), ttlnoncer)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -128,7 +127,7 @@ func TestAPI(t *testing.T) {
 
 	// NamePreClaimTx
 	fmt.Println("NamePreClaimTx")
-	preclaimTx, salt, err := ctxAlice.NamePreclaimTx(name, config.Client.Fee)
+	preclaimTx, salt, err := transactions.NewNamePreclaimTx(alice.Address, name, ttlnoncer)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -137,7 +136,7 @@ func TestAPI(t *testing.T) {
 	// NameClaimTx
 	fmt.Println("NameClaimTx")
 	nameFee := transactions.CalculateMinNameFee(name)
-	claimTx, err := ctxAlice.NameClaimTx(name, salt, nameFee, config.Client.Fee)
+	claimTx, err := transactions.NewNameClaimTx(alice.Address, name, salt, nameFee, ttlnoncer)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -145,7 +144,7 @@ func TestAPI(t *testing.T) {
 
 	// NameUpdateTx
 	fmt.Println("NameUpdateTx")
-	updateTx, err := ctxAlice.NameUpdateTx(name, alice.Address)
+	updateTx, err := transactions.NewNameUpdateTx(alice.Address, name, []string{alice.Address}, config.Client.Names.ClientTTL, ttler, noncer)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -153,7 +152,7 @@ func TestAPI(t *testing.T) {
 
 	// NameTransferTx
 	fmt.Println("NameTransferTx")
-	transferTx, err := ctxAlice.NameTransferTx(name, bob.Address)
+	transferTx, err := transactions.NewNameTransferTx(alice.Address, name, bob.Address, ttlnoncer)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -161,7 +160,7 @@ func TestAPI(t *testing.T) {
 
 	// NameRevokeTx
 	fmt.Println("NameRevokeTx")
-	revokeTx, err := ctxBob.NameRevokeTx(name)
+	revokeTx, err := transactions.NewNameRevokeTx(bob.Address, name, ttlnoncer)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -170,7 +169,7 @@ func TestAPI(t *testing.T) {
 	sentTxs.name = randomName(int(config.Client.Names.NameAuctionMaxLength + 2))
 	// NamePreClaimTx
 	fmt.Println("NamePreClaimTx 2nd name for other tests")
-	preclaimTx, salt, err = ctxAlice.NamePreclaimTx(sentTxs.name, config.Client.Fee)
+	preclaimTx, salt, err = transactions.NewNamePreclaimTx(alice.Address, sentTxs.name, ttlnoncer)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -179,7 +178,7 @@ func TestAPI(t *testing.T) {
 	// NameClaimTx
 	fmt.Println("NameClaimTx 2nd name for other tests")
 	nameFee2 := transactions.CalculateMinNameFee(sentTxs.name)
-	claimTx, err = ctxAlice.NameClaimTx(sentTxs.name, salt, nameFee2, config.Client.Fee)
+	claimTx, err = transactions.NewNameClaimTx(alice.Address, sentTxs.name, salt, nameFee2, ttlnoncer)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -187,7 +186,7 @@ func TestAPI(t *testing.T) {
 
 	// OracleRegisterTx
 	fmt.Println("OracleRegisterTx")
-	register, err := ctxAlice.OracleRegisterTx("hello", "helloback", big.NewInt(1000), uint64(0), uint64(100), 0)
+	register, err := transactions.NewOracleRegisterTx(alice.Address, "hello", "helloback", config.Client.Oracles.QueryFee, config.OracleTTLTypeDelta, config.Client.Oracles.OracleTTLValue, config.Client.Oracles.ABIVersion, ttlnoncer)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -196,7 +195,7 @@ func TestAPI(t *testing.T) {
 	// OracleExtendTx
 	fmt.Println("OracleExtendTx")
 	sentTxs.oracleID = strings.Replace(alice.Address, "ak_", "ok_", 1)
-	extend, err := ctxAlice.OracleExtendTx(sentTxs.oracleID, 0, 1000)
+	extend, err := transactions.NewOracleExtendTx(alice.Address, sentTxs.oracleID, config.OracleTTLTypeDelta, config.Client.Oracles.QueryTTLValue, ttlnoncer)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -204,7 +203,7 @@ func TestAPI(t *testing.T) {
 
 	// OracleQueryTx
 	fmt.Println("OracleQueryTx")
-	query, err := ctxAlice.OracleQueryTx(sentTxs.oracleID, "How was your day?", big.NewInt(1000), 0, 100, 0, 100)
+	query, err := transactions.NewOracleQueryTx(alice.Address, sentTxs.oracleID, "How was your day?", config.Client.Oracles.QueryFee, config.OracleTTLTypeDelta, config.Client.Oracles.QueryTTLValue, config.OracleTTLTypeDelta, config.Client.Oracles.ResponseTTLValue, ttlnoncer)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -221,14 +220,14 @@ func TestAPI(t *testing.T) {
 	}
 	delay(getOracleQueries)
 	oqID := oracleQueries.OracleQueries[0].ID
-	respond, err := ctxAlice.OracleRespondTx(sentTxs.oracleID, *oqID, "My day was fine thank you", 0, 100)
+	respond, err := transactions.NewOracleRespondTx(alice.Address, sentTxs.oracleID, *oqID, "My day was fine thank you", config.OracleTTLTypeDelta, config.Client.Oracles.ResponseTTLValue, ttlnoncer)
 	_, _, _ = signBroadcastWaitKeepTrackOfTx(t, respond, alice, privateNet)
 
 	// ContractCreateTx
 	fmt.Println("ContractCreateTx")
-	ctCreateBytecode := golden.Get(t, "identity_bytecode.txt")
-	ctCreateInitCalldata := golden.Get(t, "identity_initcalldata.txt")
-	ctCreate, err := ctxAlice.ContractCreateTx(string(ctCreateBytecode), string(ctCreateInitCalldata), config.Client.Contracts.VMVersion, config.Client.Contracts.ABIVersion, config.Client.Contracts.Deposit, config.Client.Contracts.Amount, utils.NewIntFromUint64(1e5), utils.NewIntFromUint64(564480000000000))
+	ctCreateBytecode := string(golden.Get(t, "identity_bytecode.txt"))
+	ctCreateInitCalldata := string(golden.Get(t, "identity_initcalldata.txt"))
+	ctCreate, err := transactions.NewContractCreateTx(alice.Address, ctCreateBytecode, config.Client.Contracts.VMVersion, config.Client.Contracts.ABIVersion, config.Client.Contracts.Deposit, config.Client.Contracts.Amount, config.Client.Contracts.GasLimit, config.Client.GasPrice, ctCreateInitCalldata, ttlnoncer)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -241,8 +240,8 @@ func TestAPI(t *testing.T) {
 
 	// ContractCallTx
 	fmt.Println("ContractCallTx")
-	ctCallCalldata := golden.Get(t, "identity_main42.txt")
-	ctCall, err := ctxAlice.ContractCallTx(sentTxs.contractID, string(ctCallCalldata), config.Client.Contracts.ABIVersion, config.Client.Contracts.Amount, utils.NewIntFromUint64(1e5), config.Client.GasPrice, utils.NewIntFromUint64(665480000000000))
+	ctCallCalldata := string(golden.Get(t, "identity_main42.txt"))
+	ctCall, err := transactions.NewContractCallTx(alice.Address, sentTxs.contractID, config.Client.Contracts.Amount, config.Client.Contracts.GasLimit, config.Client.GasPrice, config.Client.Contracts.ABIVersion, ctCallCalldata, ttlnoncer)
 	if err != nil {
 		t.Fatal(err)
 	}
