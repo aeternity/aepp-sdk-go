@@ -552,8 +552,13 @@ type Noncer func(accountID string) (nonce uint64, err error)
 // and Noncer
 type TTLNoncer func(address string, offset uint64) (ttl, nonce uint64, err error)
 
-// GenerateTTLer returns the chain height + offset
-func GenerateTTLer(n naet.GetHeighter) TTLer {
+type getHeightAccounter interface {
+	naet.GetHeighter
+	naet.GetAccounter
+}
+
+// CreateTTLer returns the chain height + offset
+func CreateTTLer(n naet.GetHeighter) TTLer {
 	return func(offset uint64) (ttl uint64, err error) {
 		height, err := n.GetHeight()
 		if err != nil {
@@ -564,9 +569,9 @@ func GenerateTTLer(n naet.GetHeighter) TTLer {
 	}
 }
 
-// GenerateNoncer retrieves the current accountNonce and adds 1 to it for
+// CreateNoncer retrieves the current accountNonce and adds 1 to it for
 // use in transaction building
-func GenerateNoncer(n naet.GetAccounter) Noncer {
+func CreateNoncer(n naet.GetAccounter) Noncer {
 	return func(accountID string) (nextNonce uint64, err error) {
 		a, err := n.GetAccount(accountID)
 		if err != nil {
@@ -577,18 +582,28 @@ func GenerateNoncer(n naet.GetAccounter) Noncer {
 	}
 }
 
-// GenerateTTLNoncer combines the commonly used together functions of TTLer
-// and Noncer
-func GenerateTTLNoncer(ttlFunc TTLer, nonceFunc Noncer) TTLNoncer {
-	return func(accountID string, offset uint64) (ttl, nonce uint64, err error) {
-		ttl, err = ttlFunc(offset)
+// GenerateTTLNoncer is a convenience wrapper to CreateTTLNoncer, but instead of
+// taking TTLer and Noncer closures, it takes a connection to a node.
+func GenerateTTLNoncer(node getHeightAccounter) (ttler TTLer, noncer Noncer, ttlnoncer TTLNoncer) {
+	ttler = CreateTTLer(node)
+	noncer = CreateNoncer(node)
+
+	ttlnoncer = CreateTTLNoncer(ttler, noncer)
+	return
+}
+
+// CreateTTLNoncer combines TTLer and Noncer closures.
+func CreateTTLNoncer(t TTLer, n Noncer) (ttlnoncer TTLNoncer) {
+	ttlnoncer = func(accountID string, offset uint64) (ttl, nonce uint64, err error) {
+		ttl, err = t(offset)
 		if err != nil {
 			return
 		}
-		nonce, err = nonceFunc(accountID)
+		nonce, err = n(accountID)
 		if err != nil {
 			return
 		}
 		return
 	}
+	return
 }
