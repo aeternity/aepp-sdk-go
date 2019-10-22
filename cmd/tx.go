@@ -11,8 +11,6 @@ import (
 	"github.com/aeternity/aepp-sdk-go/v6/transactions"
 	"github.com/aeternity/aepp-sdk-go/v6/utils"
 
-	"github.com/aeternity/aepp-sdk-go/v6/aeternity"
-
 	"github.com/spf13/cobra"
 )
 
@@ -33,13 +31,13 @@ var txSpendCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(3),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		node := newAeNode()
-		ttlFunc := aeternity.GenerateGetTTL(node)
-		nonceFunc := aeternity.GenerateGetNextNonce(node)
+		ttlFunc := transactions.CreateTTLer(node)
+		nonceFunc := transactions.CreateNoncer(node)
 		return txSpendFunc(ttlFunc, nonceFunc, args)
 	},
 }
 
-func txSpendFunc(ttlFunc aeternity.GetTTLFunc, nonceFunc aeternity.GetNextNonceFunc, args []string) (err error) {
+func txSpendFunc(ttlFunc transactions.TTLer, nonceFunc transactions.Noncer, args []string) (err error) {
 	var (
 		sender    string
 		recipient string
@@ -69,23 +67,28 @@ func txSpendFunc(ttlFunc aeternity.GetTTLFunc, nonceFunc aeternity.GetNextNonceF
 
 	// If nonce was not specified as an argument, connect to the node to
 	// query it
-	if nonce == 0 {
-		nonce, err = nonceFunc(sender)
-		if err != nil {
-			return err
+	if nonce > 0 {
+		nonceFunc = func(accountID string) (uint64, error) {
+			return nonce, nil
 		}
 	}
-
 	// If TTL was not specified as an argument, connect to the node to calculate
 	// it
-	if ttl == 0 {
-		ttl, err = ttlFunc(config.Client.TTL)
-		if err != nil {
-			return err
+	if ttl > 0 {
+		ttlFunc = func(offset uint64) (uint64, error) {
+			return ttl, nil
 		}
 	}
+	ttlnoncer := transactions.CreateTTLNoncer(ttlFunc, nonceFunc)
+	tx, err := transactions.NewSpendTx(sender, recipient, amount, []byte(spendTxPayload), ttlnoncer)
+	if err != nil {
+		return err
+	}
 
-	tx := transactions.NewSpendTx(sender, recipient, amount, feeBigInt, []byte(spendTxPayload), ttl, nonce)
+	if feeBigInt.Cmp(big.NewInt(0)) != 0 {
+		tx.SetFee(feeBigInt)
+	}
+
 	base64Tx, err := transactions.SerializeTx(tx)
 	if err != nil {
 		return err
@@ -112,8 +115,8 @@ var txContractCreateCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(3),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		node := newAeNode()
-		ttlFunc := aeternity.GenerateGetTTL(node)
-		nonceFunc := aeternity.GenerateGetNextNonce(node)
+		ttlFunc := transactions.CreateTTLer(node)
+		nonceFunc := transactions.CreateNoncer(node)
 		return txContractCreateFunc(ttlFunc, nonceFunc, args)
 	},
 }
@@ -123,7 +126,7 @@ type getHeightAccounter interface {
 	naet.GetAccounter
 }
 
-func txContractCreateFunc(ttlFunc aeternity.GetTTLFunc, nonceFunc aeternity.GetNextNonceFunc, args []string) (err error) {
+func txContractCreateFunc(ttlFunc transactions.TTLer, nonceFunc transactions.Noncer, args []string) (err error) {
 	var (
 		owner    string
 		contract string
@@ -146,24 +149,24 @@ func txContractCreateFunc(ttlFunc aeternity.GetTTLFunc, nonceFunc aeternity.GetN
 
 	// If nonce was not specified as an argument, connect to the node to
 	// query it
-	if nonce == 0 {
-		nonce, err = nonceFunc(owner)
-		if err != nil {
-			return err
+	if nonce > 0 {
+		nonceFunc = func(accountID string) (uint64, error) {
+			return nonce, nil
 		}
 	}
-
 	// If TTL was not specified as an argument, connect to the node to calculate
 	// it
-	if ttl == 0 {
-		ttl, err = ttlFunc(config.Client.TTL)
-		if err != nil {
-			return err
+	if ttl > 0 {
+		ttlFunc = func(offset uint64) (uint64, error) {
+			return ttl, nil
 		}
 	}
+	ttlnoncer := transactions.CreateTTLNoncer(ttlFunc, nonceFunc)
 
-	tx := transactions.NewContractCreateTx(owner, nonce, contract, config.Client.Contracts.VMVersion, config.Client.Contracts.ABIVersion, config.Client.Contracts.Deposit, config.Client.Contracts.Amount, config.Client.Contracts.GasLimit, config.Client.GasPrice, config.Client.Fee, ttl, calldata)
-
+	tx, err := transactions.NewContractCreateTx(owner, contract, config.Client.Contracts.VMVersion, config.Client.Contracts.ABIVersion, config.Client.Contracts.Deposit, config.Client.Contracts.Amount, config.Client.Contracts.GasLimit, config.Client.GasPrice, calldata, ttlnoncer)
+	if err != nil {
+		return err
+	}
 	txStr, err := transactions.SerializeTx(tx)
 	if err != nil {
 		return err

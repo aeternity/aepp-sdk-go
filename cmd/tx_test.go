@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/aeternity/aepp-sdk-go/v6/config"
-	"github.com/aeternity/aepp-sdk-go/v6/aeternity"
+	"github.com/aeternity/aepp-sdk-go/v6/transactions"
 	"github.com/spf13/cobra"
 )
 
@@ -13,8 +13,8 @@ var bob = "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v"
 
 func Test_txSpendFunc(t *testing.T) {
 	type args struct {
-		ttlFunc   aeternity.GetTTLFunc
-		nonceFunc aeternity.GetNextNonceFunc
+		ttlFunc   transactions.TTLer
+		nonceFunc transactions.Noncer
 		args      []string
 	}
 	tests := []struct {
@@ -66,8 +66,8 @@ func TestTxDumpRaw(t *testing.T) {
 
 func Test_txContractCreateFunc(t *testing.T) {
 	type args struct {
-		ttlFunc   aeternity.GetTTLFunc
-		nonceFunc aeternity.GetNextNonceFunc
+		ttlFunc   transactions.TTLer
+		nonceFunc transactions.Noncer
 		args      []string
 	}
 	tests := []struct {
