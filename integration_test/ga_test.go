@@ -29,7 +29,7 @@ func TestGeneralizedAccounts(t *testing.T) {
 	alice, bob := setupAccounts(t)
 	node := setupNetwork(t, privatenetURL, false)
 	compiler := naet.NewCompiler(config.Client.Contracts.CompilerURL, false)
-	ttlFunc := aeternity.GenerateGetTTL(node)
+	ttler, _, ttlnoncer := transactions.GenerateTTLNoncer(node)
 
 	// Take note of Bob's balance, and after this test, we expect it to have this much more AE
 	amount := utils.NewIntFromUint64(5000)
@@ -73,11 +73,10 @@ func TestGeneralizedAccounts(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	ttl, err := ttlFunc(config.Client.TTL)
+	gaTx, err := transactions.NewGAAttachTx(testAccount.Address, authBytecode, auth.TypeInfo[0].FuncHash, config.Client.Contracts.VMVersion, config.Client.Contracts.ABIVersion, config.Client.Contracts.GasLimit, config.Client.GasPrice, authInitCalldata, ttlnoncer)
 	if err != nil {
 		t.Fatal(err)
 	}
-	gaTx := transactions.NewGAAttachTx(testAccount.Address, 1, authBytecode, auth.TypeInfo[0].FuncHash, config.Client.Contracts.VMVersion, config.Client.Contracts.ABIVersion, config.Client.BaseGas, config.Client.GasPrice, config.Client.Fee, ttl, authInitCalldata)
 	_, _, _, _, _, err = aeternity.SignBroadcastWaitTransaction(gaTx, testAccount, node, networkID, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
@@ -96,19 +95,16 @@ func TestGeneralizedAccounts(t *testing.T) {
 	}
 
 	// GAMetaTx
-	// Get the TTL (not really needed, could be 0 too)
-	ttl, err = ttlFunc(config.Client.TTL)
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	// spendTx will be wrapped in a SignedTx with 0 signatures before being
 	// included in GAMetaTx. The constructor NewGAMetaTx() does this for you.
 	// authData is authorize(3)
 	authData := "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACBGtXufEG2HuMYcRcNwsGAeqymslunKf692bHnvwI5K6wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAU3aKBNm"
-	gas := utils.NewIntFromUint64(10000) // the node will fail the authentication if there isn't enough gas
-	spendTx := transactions.NewSpendTx(testAccount.Address, bob.Address, big.NewInt(5000), config.Client.Fee, []byte{}, ttl, 0)
-	gaMetaTx := transactions.NewGAMetaTx(testAccount.Address, authData, config.Client.Contracts.ABIVersion, gas, config.Client.GasPrice, config.Client.Fee, ttl, spendTx)
+	zeroNoncer := func(accountID string) (nonce uint64, err error) {
+		return 0, nil
+	}
+	metaTxTTLNoncer := transactions.CreateTTLNoncer(ttler, zeroNoncer)
+	spendTx, err := transactions.NewSpendTx(testAccount.Address, bob.Address, big.NewInt(5000), []byte{}, metaTxTTLNoncer)
+	gaMetaTx, err := transactions.NewGAMetaTx(testAccount.Address, authData, config.Client.Contracts.ABIVersion, config.Client.GasPrice, config.Client.GasPrice, spendTx, ttler)
 
 	gaMetaTxFinal, hash, _, err := transactions.SignHashTx(testAccount, gaMetaTx, config.Node.NetworkID)
 	if err != nil {
