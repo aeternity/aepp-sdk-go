@@ -5,6 +5,7 @@ import (
 	"math/big"
 
 	"github.com/aeternity/aepp-sdk-go/v6/binary"
+	"github.com/aeternity/aepp-sdk-go/v6/config"
 	rlp "github.com/randomshinichi/rlpae"
 )
 
@@ -136,20 +137,27 @@ func (tx *GAAttachTx) GetGasLimit() *big.Int {
 }
 
 // NewGAAttachTx creates a GAAttachTx
-func NewGAAttachTx(OwnerID string, AccountNonce uint64, Code string, AuthFunc []byte, VMVersion uint16, AbiVersion uint16, GasLimit *big.Int, GasPrice *big.Int, Fee *big.Int, TTL uint64, CallData string) *GAAttachTx {
-	return &GAAttachTx{
-		OwnerID:      OwnerID,
-		AccountNonce: AccountNonce,
-		Code:         Code,
-		AuthFunc:     AuthFunc,
-		VMVersion:    VMVersion,
-		AbiVersion:   AbiVersion,
-		GasLimit:     GasLimit,
-		GasPrice:     GasPrice,
-		Fee:          Fee,
-		TTL:          TTL,
-		CallData:     CallData,
+func NewGAAttachTx(ownerID string, code string, authFunc []byte, vmVersion uint16, abiVersion uint16, gasLimit *big.Int, gasPrice *big.Int, callData string, ttlnoncer TTLNoncer) (tx *GAAttachTx, err error) {
+	ttl, accountNonce, err := ttlnoncer(ownerID, config.Client.TTL)
+	if err != nil {
+		return
 	}
+
+	tx = &GAAttachTx{
+		OwnerID:      ownerID,
+		AccountNonce: accountNonce,
+		Code:         code,
+		AuthFunc:     authFunc,
+		VMVersion:    vmVersion,
+		AbiVersion:   abiVersion,
+		GasLimit:     gasLimit,
+		GasPrice:     gasPrice,
+		Fee:          config.Client.Fee,
+		TTL:          ttl,
+		CallData:     callData,
+	}
+	CalculateFee(tx)
+	return
 }
 
 // GAMetaTx wraps a normal Tx (that is not a GAAttachTx) that will only be
@@ -271,18 +279,25 @@ func (tx *GAMetaTx) GetGasLimit() *big.Int {
 }
 
 // NewGAMetaTx creates a GAMetaTx
-func NewGAMetaTx(AccountID string, AuthData string, AbiVersion uint16, GasLimit *big.Int, GasPrice *big.Int, Fee *big.Int, TTL uint64, Tx rlp.Encoder) *GAMetaTx {
-	return &GAMetaTx{
-		AccountID:  AccountID,
-		AuthData:   AuthData,
-		AbiVersion: AbiVersion,
-		GasLimit:   GasLimit,
-		GasPrice:   GasPrice,
-		Fee:        Fee,
-		TTL:        TTL,
+func NewGAMetaTx(accountID string, authData string, abiVersion uint16, gasLimit *big.Int, gasPrice *big.Int, wrappedTx rlp.Encoder, ttler TTLer) (tx *GAMetaTx, err error) {
+	ttl, err := ttler(config.Client.TTL)
+	if err != nil {
+		return
+	}
+
+	tx = &GAMetaTx{
+		AccountID:  accountID,
+		AuthData:   authData,
+		AbiVersion: abiVersion,
+		GasLimit:   gasLimit,
+		GasPrice:   gasPrice,
+		Fee:        config.Client.Fee,
+		TTL:        ttl,
 		Tx: &SignedTx{
 			Signatures: [][]byte{},
-			Tx:         Tx,
+			Tx:         wrappedTx,
 		},
 	}
+	CalculateFee(tx)
+	return
 }
