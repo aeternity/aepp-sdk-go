@@ -193,7 +193,7 @@ func (tx *ContractCreateTx) GetGasLimit() *big.Int {
 }
 
 // NewContractCreateTx is a constructor for a ContractCreateTx struct
-func NewContractCreateTx(ownerID string, accountNonce uint64, code string, vmVersion, abiVersion uint16, deposit, amount, gasLimit, gasPrice *big.Int, callData string, ttlnoncer TTLNoncer) (tx *ContractCreateTx, err error) {
+func NewContractCreateTx(ownerID string, bytecode string, vmVersion, abiVersion uint16, deposit, amount, gasLimit, gasPrice *big.Int, callData string, ttlnoncer TTLNoncer) (tx *ContractCreateTx, err error) {
 	ttl, accountNonce, err := ttlnoncer(ownerID, config.Client.TTL)
 	if err != nil {
 		return
@@ -202,7 +202,7 @@ func NewContractCreateTx(ownerID string, accountNonce uint64, code string, vmVer
 	tx = &ContractCreateTx{
 		OwnerID:      ownerID,
 		AccountNonce: accountNonce,
-		Code:         code,
+		Code:         bytecode,
 		VMVersion:    vmVersion,
 		AbiVersion:   abiVersion,
 		Deposit:      deposit,
@@ -361,7 +361,7 @@ func (tx *ContractCallTx) GetGasLimit() *big.Int {
 }
 
 // NewContractCallTx is a constructor for a ContractCallTx struct
-func NewContractCallTx(callerID string, accountNonce uint64, contractID string, amount, gasLimit, gasPrice *big.Int, abiVersion uint16, callData string, ttlnoncer TTLNoncer) (tx *ContractCallTx, err error) {
+func NewContractCallTx(callerID string, contractID string, amount, gasLimit, gasPrice *big.Int, abiVersion uint16, callData string, ttlnoncer TTLNoncer) (tx *ContractCallTx, err error) {
 	ttl, accountNonce, err := ttlnoncer(callerID, config.Client.TTL)
 	if err != nil {
 		return
