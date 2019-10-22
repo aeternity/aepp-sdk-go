@@ -84,6 +84,8 @@ type ContractConfig struct {
 
 // OracleConfig contains default parameters for oracles
 type OracleConfig struct {
+	// OracleTTLValue is a relative TTL that indicates after how many blocks should the oracle expire.
+	OracleTTLValue uint64 `json:"oracle_ttl_value" yaml:"oracle_ttl_value" mapstructure:"oracle_ttl_value"`
 	// QueryFee is locked up until the oracle answers (and gets the fee) or the
 	// transaction TTL expires (and the sender is refunded). In other words, it
 	// is a bounty.
@@ -96,7 +98,7 @@ type OracleConfig struct {
 	ResponseTTLType uint64 `json:"response_ttl_type" yaml:"response_ttl_type" mapstructure:"response_ttl_type"`
 	// ResponseTTLValue indicates how long the response is available when given from the oracle.
 	ResponseTTLValue uint64 `json:"response_ttl_value" yaml:"response_ttl_value" mapstructure:"response_ttl_value"`
-	VMVersion        uint16 `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
+	ABIVersion       uint16 `json:"vm_version" yaml:"vm_version" mapstructure:"vm_version"`
 }
 
 // StateChannelConfig configurations for contracts TODO: not complete
@@ -181,12 +183,13 @@ var Client = ClientConfig{
 		ABIVersion:  3,
 	},
 	Oracles: OracleConfig{
+		OracleTTLValue:   500,
 		QueryFee:         big.NewInt(0),
 		QueryTTLType:     OracleTTLTypeDelta,
-		QueryTTLValue:    300,
+		QueryTTLValue:    100,
 		ResponseTTLType:  OracleTTLTypeDelta,
-		ResponseTTLValue: 300,
-		VMVersion:        0,
+		ResponseTTLValue: 100,
+		ABIVersion:       0,
 	},
 	StateChannels: StateChannelConfig{ // UNUSED
 		LockPeriod:     0,
