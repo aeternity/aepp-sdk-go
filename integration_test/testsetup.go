@@ -9,9 +9,10 @@ import (
 	"time"
 
 	"github.com/aeternity/aepp-sdk-go/v6/account"
+	"github.com/aeternity/aepp-sdk-go/v6/aeternity"
 	"github.com/aeternity/aepp-sdk-go/v6/config"
 	"github.com/aeternity/aepp-sdk-go/v6/naet"
-	"github.com/aeternity/aepp-sdk-go/v6/aeternity"
+	"github.com/aeternity/aepp-sdk-go/v6/transactions"
 )
 
 var sender = "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"
@@ -78,18 +79,13 @@ func waitForTransaction(node *naet.Node, hash string) (height uint64, microblock
 }
 
 func fundAccount(t *testing.T, node *naet.Node, source, destination *account.Account, amount *big.Int) {
-	ctx := aeternity.NewContextFromNode(node, source.Address)
-
+	_, _, ttlnoncer := transactions.GenerateTTLNoncer(node)
 	fmt.Println("Funding account", destination.Address)
-	tx, err := ctx.SpendTx(source.Address, destination.Address, amount, config.Client.Fee, []byte{})
+	tx, err := transactions.NewSpendTx(source.Address, destination.Address, amount, []byte{}, ttlnoncer)
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, hash, _, err := aeternity.SignBroadcastTransaction(tx, source, node, networkID)
-	if err != nil {
-		t.Fatal(err)
-	}
-	_, _, err = waitForTransaction(node, hash)
+	_, _, _, _, _, err = aeternity.SignBroadcastWaitTransaction(tx, source, node, networkID, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}
