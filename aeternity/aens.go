@@ -17,26 +17,22 @@ func RegisterName(n naet.NodeInterface, acc *account.Account, name string, nameF
 		return
 	}
 	networkID := *status.NetworkID
-	ttlNonceGetter := GenerateGetTTLNonce(GenerateGetTTL(n), GenerateGetNextNonce(n))
-	ttl, nonce, err := ttlNonceGetter(acc.Address, config.Client.TTL)
+	_, _, ttlnoncer := transactions.GenerateTTLNoncer(n)
+
+	preclaimTx, nameSalt, err := transactions.NewNamePreclaimTx(acc.Address, name, ttlnoncer)
 	if err != nil {
 		return
 	}
-
-	cm, nameSalt, err := generateCommitmentID(name)
-	preclaimTx := transactions.NewNamePreclaimTx(acc.Address, cm, config.Client.Fee, ttl, nonce)
-	transactions.CalculateFee(preclaimTx)
 	_, _, _, _, _, err = SignBroadcastWaitTransaction(preclaimTx, acc, n.(*naet.Node), networkID, config.Client.WaitBlocks)
 	if err != nil {
 		return
 	}
 
-	ttl, nonce, err = ttlNonceGetter(acc.Address, config.Client.TTL)
+	claimTx, err := transactions.NewNameClaimTx(acc.Address, name, nameSalt, nameFee, ttlnoncer)
 	if err != nil {
 		return
 	}
-	claimTx := transactions.NewNameClaimTx(acc.Address, name, nameSalt, nameFee, config.Client.Fee, ttl, nonce)
-	transactions.CalculateFee(claimTx)
+
 	signedTxStr, hash, signature, blockHeight, blockHash, err = SignBroadcastWaitTransaction(claimTx, acc, n.(*naet.Node), networkID, config.Client.WaitBlocks)
 	if err != nil {
 		return

@@ -56,40 +56,6 @@ func GetChannelsByName(n GetAnythingByNameFunc, name string) (channels []string,
 	return n(name, "channel")
 }
 
-// Context is a struct that eases transaction creation. Specifically, the role
-// of Context is to automate/hide the tedious details of transaction creation,
-// such as filling in an unused account nonce and an appropriate TTL, so that
-// the transaction creator only has to worry about the details relevant to the
-// task at hand.
-type Context struct {
-	GetTTL      GetTTLFunc
-	GetNonce    GetNextNonceFunc
-	GetTTLNonce GetTTLNonceFunc
-	Address     string
-}
-
-// NewContextFromURL is a convenience function that creates a Context and its
-// TTL/Nonce closures from a URL
-func NewContextFromURL(url string, address string, debug bool) (ctx *Context, node *naet.Node) {
-	node = naet.NewNode(url, debug)
-	return NewContextFromNode(node, address), node
-}
-
-// NewContextFromNode is a convenience function that creates a Context and its
-// TTL/Nonce closures from a Node instance
-func NewContextFromNode(node *naet.Node, address string) (ctx *Context) {
-	ttlFunc := GenerateGetTTL(node)
-	nonceFunc := GenerateGetNextNonce(node)
-	ttlNonceFunc := GenerateGetTTLNonce(ttlFunc, nonceFunc)
-	ctx = &Context{
-		GetTTL:      ttlFunc,
-		GetNonce:    nonceFunc,
-		GetTTLNonce: ttlNonceFunc,
-		Address:     address,
-	}
-	return
-}
-
 // getTransactionByHashHeighter is used by WaitForTransactionForXBlocks to
 // specify that the node/mock node passed in should support
 // GetTransactionByHash() and GetHeight()

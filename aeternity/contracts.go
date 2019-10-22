@@ -48,14 +48,13 @@ func CreateContract(n naet.NodeInterface, c compileencoder, acc *account.Account
 	if err != nil {
 		return
 	}
-	ttlNonceGetter := GenerateGetTTLNonce(GenerateGetTTL(n), GenerateGetNextNonce(n))
-	ttl, nonce, err := ttlNonceGetter(acc.Address, config.Client.TTL)
+	_, _, ttlnoncer := transactions.GenerateTTLNoncer(n)
+
+	createTx, err := transactions.NewContractCreateTx(acc.Address, bytecode, VMVersion, ABIVersion, config.Client.Contracts.Deposit, config.Client.Contracts.Amount, config.Client.Contracts.GasLimit, config.Client.GasPrice, calldata, ttlnoncer)
 	if err != nil {
 		return
 	}
 
-	createTx := transactions.NewContractCreateTx(acc.Address, nonce, bytecode, VMVersion, ABIVersion, config.Client.Contracts.Deposit, config.Client.Contracts.Amount, config.Client.Contracts.GasLimit, config.Client.GasPrice, config.Client.Fee, ttl, calldata)
-	transactions.CalculateFee(createTx)
 	createTxStr, _ := transactions.SerializeTx(createTx)
 	fmt.Printf("%+v\n", createTx)
 	fmt.Println(createTxStr)
