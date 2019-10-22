@@ -283,8 +283,8 @@ func (tx *OracleExtendTx) GetGasLimit() *big.Int {
 }
 
 // NewOracleExtendTx is a constructor for a OracleExtendTx struct
-func NewOracleExtendTx(oracleID string, accountNonce, oracleTTLType, oracleTTLValue uint64, ttlnoncer TTLNoncer) (tx *OracleExtendTx, err error) {
-	ttl, accountNonce, err := ttlnoncer(oracleID, config.Client.TTL)
+func NewOracleExtendTx(senderID, oracleID string, oracleTTLType, oracleTTLValue uint64, ttlnoncer TTLNoncer) (tx *OracleExtendTx, err error) {
+	ttl, accountNonce, err := ttlnoncer(senderID, config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -582,8 +582,8 @@ func (tx *OracleRespondTx) GetGasLimit() *big.Int {
 }
 
 // NewOracleRespondTx is a constructor for a OracleRespondTx struct
-func NewOracleRespondTx(oracleID string, queryID string, response string, responseTTLType uint64, responseTTLValue uint64, ttlnoncer TTLNoncer) (tx *OracleRespondTx, err error) {
-	ttl, accountNonce, err := ttlnoncer(oracleID, config.Client.TTL)
+func NewOracleRespondTx(senderID, oracleID string, queryID string, response string, responseTTLType uint64, responseTTLValue uint64, ttlnoncer TTLNoncer) (tx *OracleRespondTx, err error) {
+	ttl, accountNonce, err := ttlnoncer(senderID, config.Client.TTL)
 	if err != nil {
 		return
 	}
