@@ -7,10 +7,11 @@ import (
 
 	"github.com/aeternity/aepp-sdk-go/v6/account"
 	"github.com/aeternity/aepp-sdk-go/v6/config"
+	"github.com/aeternity/aepp-sdk-go/v6/naet"
 	"github.com/aeternity/aepp-sdk-go/v6/transactions"
 )
 
-func ExampleContext() {
+func Example() {
 	// Set the Network ID. For this example, setting the config.Node.NetworkID
 	// is actually not needed - but if you have other code that also needs to
 	// access NetworkID somehow, do it this way.
@@ -23,23 +24,17 @@ func ExampleContext() {
 
 	bobAddress := "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v"
 
-	// create a Context for the node you will use and address you're going to
-	// sign the transaction with
-	ctx, node := NewContextFromURL("http://localhost:3013", alice.Address, false)
+	// create a connection to a node, represented by *Node
+	node := naet.NewNode("http://localhost:3013", false)
+
+	// create the closures that autofill the correct account nonce and transaction TTL
+	_, _, ttlnoncer := transactions.GenerateTTLNoncer(node)
 
 	// create the SpendTransaction
-	amount := big.NewInt(1e9)
-	fee := big.NewInt(1e6)
 	msg := "Reason For Payment"
-	tx, err := ctx.SpendTx(alice.Address, bobAddress, amount, fee, []byte(msg))
+	tx, err := transactions.NewSpendTx(alice.Address, bobAddress, big.NewInt(1e9), []byte(msg), ttlnoncer)
 	if err != nil {
 		fmt.Println("Could not create the SpendTx:", err)
-	}
-
-	// Optional: minimize the fee to save money!
-	err = transactions.CalculateFee(tx)
-	if err != nil {
-		fmt.Println("Could not calculate the transaction fee", err)
 	}
 
 	_, _, _, _, _, err = SignBroadcastWaitTransaction(tx, alice, node, config.Node.NetworkID, 10)
