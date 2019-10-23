@@ -187,9 +187,17 @@ func (tx *ContractCreateTx) GetFee() *big.Int {
 	return tx.Fee
 }
 
-// GetGasLimit implements TransactionFeeCalculable
-func (tx *ContractCreateTx) GetGasLimit() *big.Int {
-	return tx.GasLimit
+// CalcGas implements TransactionFeeCalculable
+func (tx *ContractCreateTx) CalcGas() (g *big.Int, err error) {
+	baseGas := new(big.Int)
+	baseGas.Mul(config.Client.BaseGas, big.NewInt(5))
+	gasComponent, err := normalGasComponent(tx, tx.GasLimit)
+	if err != nil {
+		return
+	}
+	g = new(big.Int)
+	g = baseGas.Add(baseGas, gasComponent)
+	return
 }
 
 // NewContractCreateTx is a constructor for a ContractCreateTx struct
@@ -355,9 +363,17 @@ func (tx *ContractCallTx) GetFee() *big.Int {
 	return tx.Fee
 }
 
-// GetGasLimit implements TransactionFeeCalculable
-func (tx *ContractCallTx) GetGasLimit() *big.Int {
-	return tx.GasLimit
+// CalcGas implements TransactionFeeCalculable
+func (tx *ContractCallTx) CalcGas() (g *big.Int, err error) {
+	baseGas := new(big.Int)
+	baseGas.Mul(config.Client.BaseGas, big.NewInt(30))
+	gasComponent, err := normalGasComponent(tx, tx.GasLimit)
+	if err != nil {
+		return
+	}
+	g = new(big.Int)
+	g = baseGas.Add(baseGas, gasComponent)
+	return
 }
 
 // NewContractCallTx is a constructor for a ContractCallTx struct

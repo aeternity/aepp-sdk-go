@@ -129,9 +129,17 @@ func (tx *SpendTx) GetFee() *big.Int {
 	return tx.Fee
 }
 
-// GetGasLimit implements TransactionFeeCalculable
-func (tx *SpendTx) GetGasLimit() *big.Int {
-	return big.NewInt(0)
+// CalcGas implements TransactionFeeCalculable
+func (tx *SpendTx) CalcGas() (g *big.Int, err error) {
+	baseGas := new(big.Int)
+	baseGas.Add(baseGas, config.Client.BaseGas)
+	gasComponent, err := normalGasComponent(tx, big.NewInt(0))
+	if err != nil {
+		return
+	}
+	g = new(big.Int)
+	g = g.Add(baseGas, gasComponent)
+	return
 }
 
 // NewSpendTx is a constructor for a SpendTx struct

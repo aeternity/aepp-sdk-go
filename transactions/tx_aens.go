@@ -198,9 +198,17 @@ func (tx *NamePreclaimTx) GetFee() *big.Int {
 	return tx.Fee
 }
 
-// GetGasLimit implements TransactionFeeCalculable
-func (tx *NamePreclaimTx) GetGasLimit() *big.Int {
-	return big.NewInt(0)
+// CalcGas implements TransactionFeeCalculable
+func (tx *NamePreclaimTx) CalcGas() (g *big.Int, err error) {
+	baseGas := new(big.Int)
+	baseGas.Add(baseGas, config.Client.BaseGas)
+	gasComponent, err := normalGasComponent(tx, big.NewInt(0))
+	if err != nil {
+		return
+	}
+	g = new(big.Int)
+	g = baseGas.Add(baseGas, gasComponent)
+	return
 }
 
 // NewNamePreclaimTx is a constructor for a NamePreclaimTx struct
@@ -336,9 +344,17 @@ func (tx *NameClaimTx) GetFee() *big.Int {
 	return tx.Fee
 }
 
-// GetGasLimit implements TransactionFeeCalculable
-func (tx *NameClaimTx) GetGasLimit() *big.Int {
-	return big.NewInt(0)
+// CalcGas implements TransactionFeeCalculable
+func (tx *NameClaimTx) CalcGas() (g *big.Int, err error) {
+	baseGas := new(big.Int)
+	baseGas.Add(baseGas, config.Client.BaseGas)
+	gasComponent, err := normalGasComponent(tx, big.NewInt(0))
+	if err != nil {
+		return
+	}
+	g = new(big.Int)
+	g = baseGas.Add(baseGas, gasComponent)
+	return
 }
 
 // NewNameClaimTx is a constructor for a NameClaimTx struct
@@ -571,9 +587,17 @@ func (tx *NameUpdateTx) GetFee() *big.Int {
 	return tx.Fee
 }
 
-// GetGasLimit implements TransactionFeeCalculable
-func (tx *NameUpdateTx) GetGasLimit() *big.Int {
-	return big.NewInt(0)
+// CalcGas implements TransactionFeeCalculable
+func (tx *NameUpdateTx) CalcGas() (g *big.Int, err error) {
+	baseGas := new(big.Int)
+	baseGas.Add(baseGas, config.Client.BaseGas)
+	gasComponent, err := normalGasComponent(tx, big.NewInt(0))
+	if err != nil {
+		return
+	}
+	g = new(big.Int)
+	g = baseGas.Add(baseGas, gasComponent)
+	return
 }
 
 // NewNameUpdateTx is a constructor for a NameUpdateTx struct
@@ -712,9 +736,17 @@ func (tx *NameRevokeTx) GetFee() *big.Int {
 	return tx.Fee
 }
 
-// GetGasLimit implements TransactionFeeCalculable
-func (tx *NameRevokeTx) GetGasLimit() *big.Int {
-	return big.NewInt(0)
+// CalcGas implements TransactionFeeCalculable
+func (tx *NameRevokeTx) CalcGas() (g *big.Int, err error) {
+	baseGas := new(big.Int)
+	baseGas.Add(baseGas, config.Client.BaseGas)
+	gasComponent, err := normalGasComponent(tx, big.NewInt(0))
+	if err != nil {
+		return
+	}
+	g = new(big.Int)
+	g = baseGas.Add(baseGas, gasComponent)
+	return
 }
 
 // NewNameRevokeTx is a constructor for a NameRevokeTx struct
@@ -859,9 +891,17 @@ func (tx *NameTransferTx) GetFee() *big.Int {
 	return tx.Fee
 }
 
-// GetGasLimit implements TransactionFeeCalculable
-func (tx *NameTransferTx) GetGasLimit() *big.Int {
-	return big.NewInt(0)
+// CalcGas implements TransactionFeeCalculable
+func (tx *NameTransferTx) CalcGas() (g *big.Int, err error) {
+	baseGas := new(big.Int)
+	baseGas.Add(baseGas, config.Client.BaseGas)
+	gasComponent, err := normalGasComponent(tx, big.NewInt(0))
+	if err != nil {
+		return
+	}
+	g = new(big.Int)
+	g = baseGas.Add(baseGas, gasComponent)
+	return
 }
 
 // NewNameTransferTx is a constructor for a NameTransferTx struct

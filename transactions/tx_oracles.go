@@ -2,6 +2,7 @@ package transactions
 
 import (
 	"io"
+	"math"
 	"math/big"
 
 	"github.com/aeternity/aepp-sdk-go/v6/binary"
@@ -10,6 +11,11 @@ import (
 	"github.com/aeternity/aepp-sdk-go/v6/utils"
 	rlp "github.com/randomshinichi/rlpae"
 )
+
+func timeGas(ttl uint64) (timeGasComponent uint64) {
+	timeGasComponent = uint64(math.Ceil((32000 * float64(ttl)) / math.Floor(60*24*365/config.KeyBlockInterval)))
+	return
+}
 
 // OracleRegisterTx represents a transaction that registers an oracle on the blockchain's state
 type OracleRegisterTx struct {
@@ -154,9 +160,21 @@ func (tx *OracleRegisterTx) GetFee() *big.Int {
 	return tx.Fee
 }
 
-// GetGasLimit implements TransactionFeeCalculable
-func (tx *OracleRegisterTx) GetGasLimit() *big.Int {
-	return big.NewInt(0)
+// CalcGas implements TransactionFeeCalculable
+func (tx *OracleRegisterTx) CalcGas() (g *big.Int, err error) {
+	baseGas := new(big.Int)
+	baseGas.Add(baseGas, config.Client.BaseGas)
+	gasComponent, err := normalGasComponent(tx, big.NewInt(0))
+	if err != nil {
+		return
+	}
+	timeGasComponent := new(big.Int)
+	timeGasComponent.SetUint64(timeGas(tx.OracleTTLValue))
+
+	g = new(big.Int)
+	g.Add(baseGas, gasComponent)
+	g.Add(g, timeGasComponent)
+	return
 }
 
 // NewOracleRegisterTx is a constructor for a OracleRegisterTx struct
@@ -277,9 +295,21 @@ func (tx *OracleExtendTx) GetFee() *big.Int {
 	return tx.Fee
 }
 
-// GetGasLimit implements TransactionFeeCalculable
-func (tx *OracleExtendTx) GetGasLimit() *big.Int {
-	return big.NewInt(0)
+// CalcGas implements TransactionFeeCalculable
+func (tx *OracleExtendTx) CalcGas() (g *big.Int, err error) {
+	baseGas := new(big.Int)
+	baseGas.Add(baseGas, config.Client.BaseGas)
+	gasComponent, err := normalGasComponent(tx, big.NewInt(0))
+	if err != nil {
+		return
+	}
+	timeGasComponent := new(big.Int)
+	timeGasComponent.SetUint64(timeGas(tx.OracleTTLValue))
+
+	g = new(big.Int)
+	g.Add(baseGas, gasComponent)
+	g.Add(g, timeGasComponent)
+	return
 }
 
 // NewOracleExtendTx is a constructor for a OracleExtendTx struct
@@ -436,9 +466,21 @@ func (tx *OracleQueryTx) GetFee() *big.Int {
 	return tx.Fee
 }
 
-// GetGasLimit implements TransactionFeeCalculable
-func (tx *OracleQueryTx) GetGasLimit() *big.Int {
-	return big.NewInt(0)
+// CalcGas implements TransactionFeeCalculable
+func (tx *OracleQueryTx) CalcGas() (g *big.Int, err error) {
+	baseGas := new(big.Int)
+	baseGas.Add(baseGas, config.Client.BaseGas)
+	gasComponent, err := normalGasComponent(tx, big.NewInt(0))
+	if err != nil {
+		return
+	}
+	timeGasComponent := new(big.Int)
+	timeGasComponent.SetUint64(timeGas(tx.QueryTTLValue))
+
+	g = new(big.Int)
+	g.Add(baseGas, gasComponent)
+	g.Add(g, timeGasComponent)
+	return
 }
 
 // NewOracleQueryTx is a constructor for a OracleQueryTx struct
@@ -576,9 +618,21 @@ func (tx *OracleRespondTx) GetFee() *big.Int {
 	return tx.Fee
 }
 
-// GetGasLimit implements TransactionFeeCalculable
-func (tx *OracleRespondTx) GetGasLimit() *big.Int {
-	return big.NewInt(0)
+// CalcGas implements TransactionFeeCalculable
+func (tx *OracleRespondTx) CalcGas() (g *big.Int, err error) {
+	baseGas := new(big.Int)
+	baseGas.Add(baseGas, config.Client.BaseGas)
+	gasComponent, err := normalGasComponent(tx, big.NewInt(0))
+	if err != nil {
+		return
+	}
+	timeGasComponent := new(big.Int)
+	timeGasComponent.SetUint64(timeGas(tx.ResponseTTLValue))
+
+	g = new(big.Int)
+	g.Add(baseGas, gasComponent)
+	g.Add(g, timeGasComponent)
+	return
 }
 
 // NewOracleRespondTx is a constructor for a OracleRespondTx struct
