@@ -124,8 +124,8 @@ func TestOracleTx(t *testing.T) {
 				TTL:              config.Client.TTL,
 			},
 			// from the node
-			wantJSON: `{"fee":200000000000000,"nonce":1,"oracle_id":"ok_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi","query":"Are you okay?","query_fee":0,"query_ttl":{"type":"delta","value":300},"response_ttl":{"type":"delta","value":300},"sender_id":"ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v","ttl":500}`,
-			wantRLP:  "tx_+GgXAaEBHxOjsIvwAUAGYqaLadh194A87EwIZH9u1dhMeJe9UKMBoQTOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+841BcmUgeW91IG9rYXk/AACCASwAggEshrXmIPSAAIIB9GPfFkA=",
+			wantJSON: `{"fee":200000000000000,"nonce":1,"oracle_id":"ok_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi","query":"Are you okay?","query_fee":0,"query_ttl":{"type":"delta","value":100},"response_ttl":{"type":"delta","value":100},"sender_id":"ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v","ttl":500}`,
+			wantRLP:  "tx_+GQXAaEBHxOjsIvwAUAGYqaLadh194A87EwIZH9u1dhMeJe9UKMBoQTOp63kcMn5nZ1OQAiAqG8dSbtES2LxGp67ZLvP63P+841BcmUgeW91IG9rYXk/AABkAGSGteYg9IAAggH0Wyndyw==",
 			wantErr:  false,
 		},
 		{
