@@ -131,9 +131,17 @@ func (tx *GAAttachTx) GetFee() *big.Int {
 	return tx.Fee
 }
 
-// GetGasLimit implements TransactionFeeCalculable
-func (tx *GAAttachTx) GetGasLimit() *big.Int {
-	return tx.GasLimit
+// CalcGas implements TransactionFeeCalculable
+func (tx *GAAttachTx) CalcGas() (g *big.Int, err error) {
+	baseGas := new(big.Int)
+	baseGas.Mul(config.Client.BaseGas, big.NewInt(5))
+	gasComponent, err := normalGasComponent(tx, tx.GasLimit)
+	if err != nil {
+		return
+	}
+	g = new(big.Int)
+	g = baseGas.Add(baseGas, gasComponent)
+	return
 }
 
 // NewGAAttachTx creates a GAAttachTx
@@ -273,9 +281,18 @@ func (tx *GAMetaTx) GetFee() *big.Int {
 	return tx.Fee
 }
 
-// GetGasLimit implements TransactionFeeCalculable
-func (tx *GAMetaTx) GetGasLimit() *big.Int {
-	return tx.GasLimit
+// CalcGas implements TransactionFeeCalculable
+// TODO Recursive tx gas calculation not implemented
+func (tx *GAMetaTx) CalcGas() (g *big.Int, err error) {
+	baseGas := new(big.Int)
+	baseGas.Mul(config.Client.BaseGas, big.NewInt(5))
+	gasComponent, err := normalGasComponent(tx, tx.GasLimit)
+	if err != nil {
+		return
+	}
+	g = new(big.Int)
+	g = baseGas.Add(baseGas, gasComponent)
+	return
 }
 
 // NewGAMetaTx creates a GAMetaTx

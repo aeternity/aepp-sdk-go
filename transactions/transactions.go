@@ -167,7 +167,7 @@ type TransactionFeeCalculable interface {
 	Transaction
 	SetFee(*big.Int)
 	GetFee() *big.Int
-	GetGasLimit() *big.Int
+	CalcGas() (g *big.Int, err error)
 }
 
 // calculateSignature calculates the signature of the SignedTx.Tx. Although it does not use
@@ -270,54 +270,34 @@ func calcRlpLen(o interface{}) (size int64, err error) {
 	return
 }
 
-func baseGasForTxType(tx Transaction) (baseGas *big.Int) {
-	baseGas = big.NewInt(0)
-	switch tx.(type) {
-	case *ContractCreateTx, *GAAttachTx, *GAMetaTx:
-		return baseGas.Mul(big.NewInt(5), config.Client.BaseGas)
-	case *ContractCallTx:
-		return baseGas.Mul(big.NewInt(30), config.Client.BaseGas)
-	default:
-		return config.Client.BaseGas
-	}
-}
-
-func calcFee(tx TransactionFeeCalculable) (fee *big.Int, err error) {
-	gas := big.NewInt(0)
-	// baseGas + len(tx)*GasPerByte + contractExecutionGas
-	baseGas := baseGasForTxType(tx)
-	gas.Add(gas, baseGas)
-
-	s, err := calcRlpLen(tx)
+// normalGasComponent implements the equation byte_size(Transaction) *
+// GasPerByte + gas for contract execution if applicable.
+func normalGasComponent(tx Transaction, gasLimit *big.Int) (gas *big.Int, err error) {
+	l, err := calcRlpLen(tx)
 	if err != nil {
 		return
 	}
-	txLenGasPerByte := big.NewInt(s)
-	txLenGasPerByte.Mul(txLenGasPerByte, config.Client.GasPerByte)
-	gas.Add(gas, txLenGasPerByte)
-
-	gas.Add(gas, tx.GetGasLimit())
-
-	fee = new(big.Int)
-	fee = gas.Mul(gas, config.Client.GasPrice)
-
-	tx.SetFee(fee)
+	gas = big.NewInt(l)
+	gas.Mul(gas, config.Client.GasPerByte)
+	gas.Add(gas, gasLimit)
 	return
 }
 
 // CalculateFee calculates the required transaction fee, and increases the fee
 // further in case the newer fee ends up increasing the transaction size.
 func CalculateFee(tx TransactionFeeCalculable) (err error) {
-	var fee, newFee *big.Int
+	var fee, gas, newFee *big.Int
 	for {
 		fee = tx.GetFee()
-		newFee, err = calcFee(tx)
+		gas, err = tx.CalcGas()
 		if err != nil {
 			break
 		}
-
+		newFee = gas.Mul(gas, config.Client.GasPrice)
 		if fee.Cmp(newFee) == 0 {
 			break
+		} else {
+			tx.SetFee(newFee)
 		}
 	}
 	return

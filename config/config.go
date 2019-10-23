@@ -29,6 +29,8 @@ const (
 	// blocks) should be interpreted as an absolute block height, after which
 	// the TTL expires.
 	OracleTTLTypeAbsolute = 1
+	// KeyBlockInterval is the average time between key blocks in minutes
+	KeyBlockInterval = 3
 )
 
 // NodeConfig configuration for the node
