@@ -188,17 +188,17 @@ func (tx *NamePreclaimTx) JSON() (string, error) {
 	return string(output), err
 }
 
-// SetFee implements TransactionFeeCalculable
+// SetFee implements Transaction
 func (tx *NamePreclaimTx) SetFee(f *big.Int) {
 	tx.Fee = f
 }
 
-// GetFee implements TransactionFeeCalculable
+// GetFee implements Transaction
 func (tx *NamePreclaimTx) GetFee() *big.Int {
 	return tx.Fee
 }
 
-// CalcGas implements TransactionFeeCalculable
+// CalcGas implements Transaction
 func (tx *NamePreclaimTx) CalcGas() (g *big.Int, err error) {
 	baseGas := new(big.Int)
 	baseGas.Add(baseGas, config.Client.BaseGas)
@@ -334,17 +334,17 @@ func (tx *NameClaimTx) JSON() (string, error) {
 	return string(output), err
 }
 
-// SetFee implements TransactionFeeCalculable
+// SetFee implements Transaction
 func (tx *NameClaimTx) SetFee(f *big.Int) {
 	tx.Fee = f
 }
 
-// GetFee implements TransactionFeeCalculable
+// GetFee implements Transaction
 func (tx *NameClaimTx) GetFee() *big.Int {
 	return tx.Fee
 }
 
-// CalcGas implements TransactionFeeCalculable
+// CalcGas implements Transaction
 func (tx *NameClaimTx) CalcGas() (g *big.Int, err error) {
 	baseGas := new(big.Int)
 	baseGas.Add(baseGas, config.Client.BaseGas)
@@ -577,17 +577,17 @@ func (tx *NameUpdateTx) JSON() (string, error) {
 	return string(output), err
 }
 
-// SetFee implements TransactionFeeCalculable
+// SetFee implements Transaction
 func (tx *NameUpdateTx) SetFee(f *big.Int) {
 	tx.Fee = f
 }
 
-// GetFee implements TransactionFeeCalculable
+// GetFee implements Transaction
 func (tx *NameUpdateTx) GetFee() *big.Int {
 	return tx.Fee
 }
 
-// CalcGas implements TransactionFeeCalculable
+// CalcGas implements Transaction
 func (tx *NameUpdateTx) CalcGas() (g *big.Int, err error) {
 	baseGas := new(big.Int)
 	baseGas.Add(baseGas, config.Client.BaseGas)
@@ -726,17 +726,17 @@ func (tx *NameRevokeTx) JSON() (string, error) {
 	return string(output), err
 }
 
-// SetFee implements TransactionFeeCalculable
+// SetFee implements Transaction
 func (tx *NameRevokeTx) SetFee(f *big.Int) {
 	tx.Fee = f
 }
 
-// GetFee implements TransactionFeeCalculable
+// GetFee implements Transaction
 func (tx *NameRevokeTx) GetFee() *big.Int {
 	return tx.Fee
 }
 
-// CalcGas implements TransactionFeeCalculable
+// CalcGas implements Transaction
 func (tx *NameRevokeTx) CalcGas() (g *big.Int, err error) {
 	baseGas := new(big.Int)
 	baseGas.Add(baseGas, config.Client.BaseGas)
@@ -881,17 +881,17 @@ func (tx *NameTransferTx) JSON() (string, error) {
 	return string(output), err
 }
 
-// SetFee implements TransactionFeeCalculable
+// SetFee implements Transaction
 func (tx *NameTransferTx) SetFee(f *big.Int) {
 	tx.Fee = f
 }
 
-// GetFee implements TransactionFeeCalculable
+// GetFee implements Transaction
 func (tx *NameTransferTx) GetFee() *big.Int {
 	return tx.Fee
 }
 
-// CalcGas implements TransactionFeeCalculable
+// CalcGas implements Transaction
 func (tx *NameTransferTx) CalcGas() (g *big.Int, err error) {
 	baseGas := new(big.Int)
 	baseGas.Add(baseGas, config.Client.BaseGas)

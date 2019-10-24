@@ -9,7 +9,6 @@ import (
 	"github.com/aeternity/aepp-sdk-go/v6/config"
 	"github.com/aeternity/aepp-sdk-go/v6/naet"
 	"github.com/aeternity/aepp-sdk-go/v6/transactions"
-	rlp "github.com/randomshinichi/rlpae"
 )
 
 // GetAnythingByNameFunc describes a function that returns lookup results for a
@@ -132,7 +131,7 @@ func WaitForTransactionForXBlocks(c getTransactionByHashHeighter, txHash string,
 }
 
 // SignBroadcastTransaction signs a transaction and broadcasts it to a node.
-func SignBroadcastTransaction(tx rlp.Encoder, signingAccount *account.Account, n naet.PostTransactioner, networkID string) (signedTxStr, hash, signature string, err error) {
+func SignBroadcastTransaction(tx transactions.Transaction, signingAccount *account.Account, n naet.PostTransactioner, networkID string) (signedTxStr, hash, signature string, err error) {
 	signedTx, hash, signature, err := transactions.SignHashTx(signingAccount, tx, networkID)
 	if err != nil {
 		return
@@ -157,7 +156,7 @@ type broadcastWaitTransactionNodeCapabilities interface {
 
 // SignBroadcastWaitTransaction is a convenience function that combines
 // SignBroadcastTransaction and WaitForTransactionForXBlocks.
-func SignBroadcastWaitTransaction(tx rlp.Encoder, signingAccount *account.Account, n broadcastWaitTransactionNodeCapabilities, networkID string, x uint64) (signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
+func SignBroadcastWaitTransaction(tx transactions.Transaction, signingAccount *account.Account, n broadcastWaitTransactionNodeCapabilities, networkID string, x uint64) (signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
 	signedTxStr, hash, signature, err = SignBroadcastTransaction(tx, signingAccount, n, networkID)
 	if err != nil {
 		return

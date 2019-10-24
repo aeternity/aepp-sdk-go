@@ -121,17 +121,17 @@ func (tx *GAAttachTx) DecodeRLP(s *rlp.Stream) (err error) {
 	return
 }
 
-// SetFee implements TransactionFeeCalculable
+// SetFee implements Transaction
 func (tx *GAAttachTx) SetFee(f *big.Int) {
 	tx.Fee = f
 }
 
-// GetFee implements TransactionFeeCalculable
+// GetFee implements Transaction
 func (tx *GAAttachTx) GetFee() *big.Int {
 	return tx.Fee
 }
 
-// CalcGas implements TransactionFeeCalculable
+// CalcGas implements Transaction
 func (tx *GAAttachTx) CalcGas() (g *big.Int, err error) {
 	baseGas := new(big.Int)
 	baseGas.Mul(config.Client.BaseGas, big.NewInt(5))
@@ -271,17 +271,17 @@ func (tx *GAMetaTx) DecodeRLP(s *rlp.Stream) (err error) {
 	return
 }
 
-// SetFee implements TransactionFeeCalculable
+// SetFee implements Transaction
 func (tx *GAMetaTx) SetFee(f *big.Int) {
 	tx.Fee = f
 }
 
-// GetFee implements TransactionFeeCalculable
+// GetFee implements Transaction
 func (tx *GAMetaTx) GetFee() *big.Int {
 	return tx.Fee
 }
 
-// CalcGas implements TransactionFeeCalculable
+// CalcGas implements Transaction
 // TODO Recursive tx gas calculation not implemented
 func (tx *GAMetaTx) CalcGas() (g *big.Int, err error) {
 	baseGas := new(big.Int)
@@ -296,7 +296,7 @@ func (tx *GAMetaTx) CalcGas() (g *big.Int, err error) {
 }
 
 // NewGAMetaTx creates a GAMetaTx
-func NewGAMetaTx(accountID string, authData string, abiVersion uint16, gasLimit *big.Int, gasPrice *big.Int, wrappedTx rlp.Encoder, ttler TTLer) (tx *GAMetaTx, err error) {
+func NewGAMetaTx(accountID string, authData string, abiVersion uint16, gasLimit *big.Int, gasPrice *big.Int, wrappedTx Transaction, ttler TTLer) (tx *GAMetaTx, err error) {
 	ttl, err := ttler(config.Client.TTL)
 	if err != nil {
 		return

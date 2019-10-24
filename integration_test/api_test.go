@@ -17,7 +17,6 @@ import (
 	"github.com/aeternity/aepp-sdk-go/v6/naet"
 	"github.com/aeternity/aepp-sdk-go/v6/swagguard/node/models"
 	"github.com/aeternity/aepp-sdk-go/v6/transactions"
-	rlp "github.com/randomshinichi/rlpae"
 )
 
 /*
@@ -59,7 +58,7 @@ type txTypes struct {
 var sentTxs txTypes
 var useTestNet bool
 
-func signBroadcastWaitKeepTrackOfTx(t *testing.T, tx rlp.Encoder, acc *account.Account, node *naet.Node) (height uint64, txHash string, mbHash string) {
+func signBroadcastWaitKeepTrackOfTx(t *testing.T, tx transactions.Transaction, acc *account.Account, node *naet.Node) (height uint64, txHash string, mbHash string) {
 	_, txHash, _, height, mbHash, err := aeternity.SignBroadcastWaitTransaction(tx, acc, node, networkID, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)

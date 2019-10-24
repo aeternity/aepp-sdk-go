@@ -150,17 +150,17 @@ func (tx *OracleRegisterTx) JSON() (string, error) {
 	return string(output), err
 }
 
-// SetFee implements TransactionFeeCalculable
+// SetFee implements Transaction
 func (tx *OracleRegisterTx) SetFee(f *big.Int) {
 	tx.Fee = f
 }
 
-// GetFee implements TransactionFeeCalculable
+// GetFee implements Transaction
 func (tx *OracleRegisterTx) GetFee() *big.Int {
 	return tx.Fee
 }
 
-// CalcGas implements TransactionFeeCalculable
+// CalcGas implements Transaction
 func (tx *OracleRegisterTx) CalcGas() (g *big.Int, err error) {
 	baseGas := new(big.Int)
 	baseGas.Add(baseGas, config.Client.BaseGas)
@@ -285,17 +285,17 @@ func (tx *OracleExtendTx) JSON() (string, error) {
 	return string(output), err
 }
 
-// SetFee implements TransactionFeeCalculable
+// SetFee implements Transaction
 func (tx *OracleExtendTx) SetFee(f *big.Int) {
 	tx.Fee = f
 }
 
-// GetFee implements TransactionFeeCalculable
+// GetFee implements Transaction
 func (tx *OracleExtendTx) GetFee() *big.Int {
 	return tx.Fee
 }
 
-// CalcGas implements TransactionFeeCalculable
+// CalcGas implements Transaction
 func (tx *OracleExtendTx) CalcGas() (g *big.Int, err error) {
 	baseGas := new(big.Int)
 	baseGas.Add(baseGas, config.Client.BaseGas)
@@ -456,17 +456,17 @@ func (tx *OracleQueryTx) JSON() (string, error) {
 	return string(output), err
 }
 
-// SetFee implements TransactionFeeCalculable
+// SetFee implements Transaction
 func (tx *OracleQueryTx) SetFee(f *big.Int) {
 	tx.Fee = f
 }
 
-// GetFee implements TransactionFeeCalculable
+// GetFee implements Transaction
 func (tx *OracleQueryTx) GetFee() *big.Int {
 	return tx.Fee
 }
 
-// CalcGas implements TransactionFeeCalculable
+// CalcGas implements Transaction
 func (tx *OracleQueryTx) CalcGas() (g *big.Int, err error) {
 	baseGas := new(big.Int)
 	baseGas.Add(baseGas, config.Client.BaseGas)
@@ -608,17 +608,17 @@ func (tx *OracleRespondTx) JSON() (string, error) {
 
 }
 
-// SetFee implements TransactionFeeCalculable
+// SetFee implements Transaction
 func (tx *OracleRespondTx) SetFee(f *big.Int) {
 	tx.Fee = f
 }
 
-// GetFee implements TransactionFeeCalculable
+// GetFee implements Transaction
 func (tx *OracleRespondTx) GetFee() *big.Int {
 	return tx.Fee
 }
 
-// CalcGas implements TransactionFeeCalculable
+// CalcGas implements Transaction
 func (tx *OracleRespondTx) CalcGas() (g *big.Int, err error) {
 	baseGas := new(big.Int)
 	baseGas.Add(baseGas, config.Client.BaseGas)

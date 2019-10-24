@@ -375,7 +375,7 @@ func Test_readIDTag(t *testing.T) {
 }
 
 func Test_CalculateFee(t *testing.T) {
-	tests := []TransactionFeeCalculable{
+	tests := []Transaction{
 		&SpendTx{
 			SenderID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
 			RecipientID: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
