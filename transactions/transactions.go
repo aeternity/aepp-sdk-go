@@ -155,16 +155,11 @@ func buildContractID(sender string, senderNonce uint64) (ctID string, err error)
 }
 
 // Transaction is used to indicate a transaction of any type.
-type Transaction interface {
-	rlp.Encoder
-}
-
-// TransactionFeeCalculable is a set of methods that simplify calculating the tx
-// fee. In particular, SetFee and GetFee let the code increase the fee further
+// In particular, SetFee and GetFee let the code increase the fee further
 // in case the newer, calculated fee ends up increasing the size of the
 // transaction (and thus necessitates an even larger fee)
-type TransactionFeeCalculable interface {
-	Transaction
+type Transaction interface {
+	rlp.Encoder
 	SetFee(*big.Int)
 	GetFee() *big.Int
 	CalcGas() (g *big.Int, err error)
@@ -285,7 +280,7 @@ func normalGasComponent(tx Transaction, gasLimit *big.Int) (gas *big.Int, err er
 
 // CalculateFee calculates the required transaction fee, and increases the fee
 // further in case the newer fee ends up increasing the transaction size.
-func CalculateFee(tx TransactionFeeCalculable) (err error) {
+func CalculateFee(tx Transaction) (err error) {
 	var fee, gas, newFee *big.Int
 	for {
 		fee = tx.GetFee()
@@ -344,7 +339,7 @@ func GetTransactionType(rawRLP []byte) (tx Transaction, err error) {
 // SignedTx wraps around other Tx structs to hold the signature.
 type SignedTx struct {
 	Signatures [][]byte
-	Tx         rlp.Encoder
+	Tx         Transaction
 }
 
 // EncodeRLP implements rlp.Encoder
@@ -436,8 +431,23 @@ func (tx *SignedTx) DecodeRLP(s *rlp.Stream) (err error) {
 	return
 }
 
+// SetFee implements Transaction
+func (tx *SignedTx) SetFee(f *big.Int) {
+	tx.Tx.SetFee(f)
+}
+
+// GetFee implements Transaction
+func (tx *SignedTx) GetFee() *big.Int {
+	return tx.Tx.GetFee()
+}
+
+// CalcGas implements Transaction
+func (tx *SignedTx) CalcGas() (g *big.Int, err error) {
+	return tx.Tx.CalcGas()
+}
+
 // NewSignedTx ensures that all fields of SignedTx are filled out.
-func NewSignedTx(Signatures [][]byte, tx rlp.Encoder) (s *SignedTx) {
+func NewSignedTx(Signatures [][]byte, tx Transaction) (s *SignedTx) {
 	return &SignedTx{
 		Signatures: Signatures,
 		Tx:         tx,

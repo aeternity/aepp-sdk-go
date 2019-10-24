@@ -119,17 +119,17 @@ func (tx *SpendTx) JSON() (string, error) {
 	return string(output), err
 }
 
-// SetFee implements TransactionFeeCalculable
+// SetFee implements Transaction
 func (tx *SpendTx) SetFee(f *big.Int) {
 	tx.Fee = f
 }
 
-// GetFee implements TransactionFeeCalculable
+// GetFee implements Transaction
 func (tx *SpendTx) GetFee() *big.Int {
 	return tx.Fee
 }
 
-// CalcGas implements TransactionFeeCalculable
+// CalcGas implements Transaction
 func (tx *SpendTx) CalcGas() (g *big.Int, err error) {
 	baseGas := new(big.Int)
 	baseGas.Add(baseGas, config.Client.BaseGas)

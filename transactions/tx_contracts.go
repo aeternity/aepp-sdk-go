@@ -177,17 +177,17 @@ func (tx *ContractCreateTx) ContractID() (string, error) {
 	return buildContractID(tx.OwnerID, tx.AccountNonce)
 }
 
-// SetFee implements TransactionFeeCalculable
+// SetFee implements Transaction
 func (tx *ContractCreateTx) SetFee(f *big.Int) {
 	tx.Fee = f
 }
 
-// GetFee implements TransactionFeeCalculable
+// GetFee implements Transaction
 func (tx *ContractCreateTx) GetFee() *big.Int {
 	return tx.Fee
 }
 
-// CalcGas implements TransactionFeeCalculable
+// CalcGas implements Transaction
 func (tx *ContractCreateTx) CalcGas() (g *big.Int, err error) {
 	baseGas := new(big.Int)
 	baseGas.Mul(config.Client.BaseGas, big.NewInt(5))
@@ -353,17 +353,17 @@ func (tx *ContractCallTx) JSON() (string, error) {
 	return string(output), err
 }
 
-// SetFee implements TransactionFeeCalculable
+// SetFee implements Transaction
 func (tx *ContractCallTx) SetFee(f *big.Int) {
 	tx.Fee = f
 }
 
-// GetFee implements TransactionFeeCalculable
+// GetFee implements Transaction
 func (tx *ContractCallTx) GetFee() *big.Int {
 	return tx.Fee
 }
 
-// CalcGas implements TransactionFeeCalculable
+// CalcGas implements Transaction
 func (tx *ContractCallTx) CalcGas() (g *big.Int, err error) {
 	baseGas := new(big.Int)
 	baseGas.Mul(config.Client.BaseGas, big.NewInt(30))
