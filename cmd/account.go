@@ -239,23 +239,42 @@ func vanityFunc(cmd *cobra.Command, args []string) {
 	}
 	fmt.Println("The search for your account matching", searchString, "has begun")
 
+	foundAccounts := make(chan *account.Account, 5)
 	var wg sync.WaitGroup
 	wg.Add(runtime.NumCPU())
 	for i := 0; i < runtime.NumCPU(); i++ {
 		go func() {
 			for {
 				a, _ := account.New()
-
 				if r.MatchString(a.Address[3:]) {
-					fmt.Println("FOUND!")
-					fmt.Println("Secret: ", a.SigningKeyToHexString())
-					fmt.Println("Address", a.Address)
+					foundAccounts <- a
 				}
 			}
 		}()
 	}
-	wg.Wait()
+	for a := range foundAccounts {
+		fmt.Printf("Found account! %s \n", a.Address)
+		filename := fmt.Sprintf("account.%s.json", a.Address)
+		yes := AskYes(fmt.Sprintf("Save it to %s?", filename), false)
+		if yes {
+			pw, err := AskPassword("To encrypt the keystore, please provide a password")
+			if err != nil {
+				fmt.Println(err)
+			}
 
+			path, err := account.StoreToKeyStoreFile(a, pw, filename)
+			if err != nil {
+				fmt.Println(err)
+			}
+			fmt.Println("Account saved in", path)
+
+			continueSearch := AskYes("Would you like to continue searching?", false)
+			if !continueSearch {
+				return
+			}
+		}
+	}
+	wg.Wait()
 }
 
 func init() {

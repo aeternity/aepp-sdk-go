@@ -29,15 +29,14 @@ func DefaultIfEmptyStr(s *string, defaultS string) {
 
 // AskYes prompt a yes/no question to the prompt
 func AskYes(question string, defaultYes bool) (isYes bool) {
-	fmt.Print(question)
-	if defaultYes {
-		fmt.Print(" [yes]: ")
-	} else {
-		fmt.Print(" [no]: ")
+	defaultStrVal := "yes"
+	if !defaultYes {
+		defaultStrVal = "no"
 	}
+	fmt.Print(question, " [", defaultStrVal, "]: ")
 	reader := bufio.NewReader(os.Stdin)
 	reply, _ := reader.ReadString('\n')
-	DefaultIfEmptyStr(&reply, "yes")
+	DefaultIfEmptyStr(&reply, defaultStrVal)
 	if IsEqStr(reply, "yes") {
 		return true
 	}
