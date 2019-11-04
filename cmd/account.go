@@ -253,20 +253,25 @@ func vanityFunc(cmd *cobra.Command, args []string) {
 		}()
 	}
 	for a := range foundAccounts {
-		q := fmt.Sprintf("Would you like to save the account %s", a.Address)
-		yes := AskYes(q, false)
+		fmt.Printf("Found account! %s \n", a.Address)
+		filename := fmt.Sprintf("account.%s.json", a.Address)
+		yes := AskYes(fmt.Sprintf("Save it to %s?", filename), false)
 		if yes {
 			pw, err := AskPassword("To encrypt the keystore, please provide a password")
 			if err != nil {
 				fmt.Println(err)
 			}
 
-			path, err := account.StoreToKeyStoreFile(a, pw, "vanityaccount.json")
+			path, err := account.StoreToKeyStoreFile(a, pw, filename)
 			if err != nil {
 				fmt.Println(err)
 			}
-			fmt.Println("Account stored in", path)
-			return
+			fmt.Println("Account saved in", path)
+
+			continueSearch := AskYes("Would you like to continue searching?", false)
+			if !continueSearch {
+				return
+			}
 		}
 	}
 	wg.Wait()
