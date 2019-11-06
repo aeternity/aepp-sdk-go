@@ -8,31 +8,34 @@ import (
 )
 
 func TestDerivePathFromSeedAeAccount(t *testing.T) {
+	type args struct {
+		accountIndex uint32
+		addressIndex uint32
+	}
 	tests := []struct {
 		name        string
 		seed        string
-		path        string
+		args        args
 		wantAddress string
 		wantErr     bool
 	}{
 		{
-			name:        "Standard Seed, m/0'",
-			seed:        "60812c7c93d6f9cb346bbcf799957b6ec776aea84b01bdd9f9b7916522cc52c6ea5d07960b68668cd37b0a77f6c4fe283f146bd916153c426df126a8b8707b39",
-			path:        "m/0'",
-			wantAddress: "ak_2o3zmfG3hMFu4oveTs4VcsmdimnsUBX7sEp3LwXhj9kutRm8mN",
-			wantErr:     false,
-		},
-		{
-			name:        "Standard Seed, m/44'/457'/0'/0'/0'",
-			seed:        "60812c7c93d6f9cb346bbcf799957b6ec776aea84b01bdd9f9b7916522cc52c6ea5d07960b68668cd37b0a77f6c4fe283f146bd916153c426df126a8b8707b39",
-			path:        "m/44'/457'/0'/0'/0'",
+			name: "Standard Seed, m/44'/457'/0'/0'/0'",
+			seed: "60812c7c93d6f9cb346bbcf799957b6ec776aea84b01bdd9f9b7916522cc52c6ea5d07960b68668cd37b0a77f6c4fe283f146bd916153c426df126a8b8707b39",
+			args: args{
+				accountIndex: 0,
+				addressIndex: 0,
+			},
 			wantAddress: "ak_2Z74Jhbo3xqF47k2h6NoUpr5gTfc9EQFX7wPH2Vf7Q5PCVcZSW",
 			wantErr:     false,
 		},
 		{
-			name:        "Standard Seed, m/44'/457'/0'/0'/3'",
-			seed:        "60812c7c93d6f9cb346bbcf799957b6ec776aea84b01bdd9f9b7916522cc52c6ea5d07960b68668cd37b0a77f6c4fe283f146bd916153c426df126a8b8707b39",
-			path:        "m/44'/457'/0'/0'/3'",
+			name: "Standard Seed, m/44'/457'/0'/0'/3'",
+			seed: "60812c7c93d6f9cb346bbcf799957b6ec776aea84b01bdd9f9b7916522cc52c6ea5d07960b68668cd37b0a77f6c4fe283f146bd916153c426df126a8b8707b39",
+			args: args{
+				accountIndex: 0,
+				addressIndex: 3,
+			},
 			wantAddress: "ak_2wPpjbxDhdn8PURqLPsunqBTWYSbe9iac1gjfJcQVzY4aZYEzq",
 			wantErr:     false,
 		},
@@ -42,7 +45,7 @@ func TestDerivePathFromSeedAeAccount(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		key, err := DerivePathFromSeed(seedBytes, tt.path)
+		key, err := DerivePathFromSeed(seedBytes, tt.args.accountIndex, tt.args.addressIndex)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -57,7 +60,7 @@ func TestDerivePathFromSeedAeAccount(t *testing.T) {
 	}
 }
 
-func TestDerivePathFromSeed_SLIP0010_TestVectors(t *testing.T) {
+func TestDerivePath_SLIP0010_TestVectors(t *testing.T) {
 	// BIP32 adds an extra 0 byte of padding in the beginning of the public key.
 	// We do not use the padded public key. Instead we just feed the private key
 	// into the official ed25519 scheme and use its public key. Nevertheless it
@@ -185,7 +188,11 @@ func TestDerivePathFromSeed_SLIP0010_TestVectors(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		key, err := DerivePathFromSeed(seedBytes, tt.path)
+		masterKey, err := NewMasterKey(seedBytes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		key, err := derivePath(masterKey, tt.path)
 		if err != nil {
 			t.Fatal(err)
 		}
