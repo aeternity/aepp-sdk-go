@@ -29,6 +29,11 @@ build-dist: $(GOFILES)
 	cp -r README.md LICENSE $(OUTPUTFOLDER)
 	@echo done
 
+build-lib: $(GOFILES)
+	@echo build library to $(OUTPUTFOLDER)
+	go build -ldflags "-X main.Version=$(GIT_DESCR)" -o $(OUTPUTFOLDER)/$(APP).so --buildmode=c-shared .
+	@echo done
+
 build-release:
 	@echo build binary to $(OUTPUTFOLDER)
 	$(eval OS=darwin)
