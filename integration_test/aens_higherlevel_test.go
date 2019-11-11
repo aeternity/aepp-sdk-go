@@ -3,8 +3,8 @@ package integrationtest
 import (
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/v6/aeternity"
-	"github.com/aeternity/aepp-sdk-go/v6/transactions"
+	"github.com/aeternity/aepp-sdk-go/v7/aeternity"
+	"github.com/aeternity/aepp-sdk-go/v7/transactions"
 )
 
 func TestRegisterName(t *testing.T) {

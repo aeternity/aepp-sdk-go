@@ -3,7 +3,7 @@ package cmd
 import (
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/v6/naet"
+	"github.com/aeternity/aepp-sdk-go/v7/naet"
 )
 
 func Test_printNameEntry(t *testing.T) {

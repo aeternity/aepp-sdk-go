@@ -13,7 +13,7 @@ import (
 
 	strfmt "github.com/go-openapi/strfmt"
 
-	models "github.com/aeternity/aepp-sdk-go/v6/swagguard/node/models"
+	models "github.com/aeternity/aepp-sdk-go/v7/swagguard/node/models"
 )
 
 // GetContractReader is a Reader for the GetContract structure.
