@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/v6/aeternity"
-	"github.com/aeternity/aepp-sdk-go/v6/config"
-	"github.com/aeternity/aepp-sdk-go/v6/transactions"
+	"github.com/aeternity/aepp-sdk-go/v7/aeternity"
+	"github.com/aeternity/aepp-sdk-go/v7/config"
+	"github.com/aeternity/aepp-sdk-go/v7/transactions"
 	"gotest.tools/golden"
 )
 

@@ -5,10 +5,10 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/aeternity/aepp-sdk-go/v6/account"
-	"github.com/aeternity/aepp-sdk-go/v6/config"
-	"github.com/aeternity/aepp-sdk-go/v6/naet"
-	"github.com/aeternity/aepp-sdk-go/v6/transactions"
+	"github.com/aeternity/aepp-sdk-go/v7/account"
+	"github.com/aeternity/aepp-sdk-go/v7/config"
+	"github.com/aeternity/aepp-sdk-go/v7/naet"
+	"github.com/aeternity/aepp-sdk-go/v7/transactions"
 )
 
 // GetAnythingByNameFunc describes a function that returns lookup results for a

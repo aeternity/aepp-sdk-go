@@ -1,4 +1,4 @@
-module github.com/aeternity/aepp-sdk-go/v6
+module github.com/aeternity/aepp-sdk-go/v7
 
 go 1.12
 

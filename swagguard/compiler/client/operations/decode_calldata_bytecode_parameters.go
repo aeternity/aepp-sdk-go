@@ -16,7 +16,7 @@ import (
 
 	strfmt "github.com/go-openapi/strfmt"
 
-	models "github.com/aeternity/aepp-sdk-go/v6/swagguard/compiler/models"
+	models "github.com/aeternity/aepp-sdk-go/v7/swagguard/compiler/models"
 )
 
 // NewDecodeCalldataBytecodeParams creates a new DecodeCalldataBytecodeParams object

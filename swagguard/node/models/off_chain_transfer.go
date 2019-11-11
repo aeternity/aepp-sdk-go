@@ -15,7 +15,7 @@ import (
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 
-	utils "github.com/aeternity/aepp-sdk-go/v6/utils"
+	utils "github.com/aeternity/aepp-sdk-go/v7/utils"
 )
 
 // OffChainTransfer off chain transfer
