@@ -266,3 +266,24 @@ func TestParseMnemonic(t *testing.T) {
 		})
 	}
 }
+
+func Example() {
+	mnemonic := "ring defense obey exhaust boat popular surround supreme front lemon monster number"
+	seed, err := ParseMnemonic(mnemonic)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// Derive the subaccount m/44'/457'/3'/0'/1'
+	key, err := DerivePathFromSeed(seed, 3, 1)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// Deriving the aeternity Account from a BIP32 Key is a destructive process
+	alice, err := BIP32KeyToAeKey(key)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(alice.Address)
+}
