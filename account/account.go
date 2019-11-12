@@ -100,7 +100,7 @@ func StoreToKeyStoreFile(account *Account, password, walletName string) (filePat
 // LoadFromKeyStoreFile loads an encrypted Account from a JSON file
 func LoadFromKeyStoreFile(keyFile, password string) (account *Account, err error) {
 	// find out the real path of the wallet
-	filePath, err := GetWalletPath(keyFile)
+	filePath, err := CheckWalletExists(keyFile)
 	if err != nil {
 		return
 	}
@@ -114,8 +114,8 @@ func LoadFromKeyStoreFile(keyFile, password string) (account *Account, err error
 	return
 }
 
-// GetWalletPath checks if a file exists at the specified path.
-func GetWalletPath(path string) (walletPath string, err error) {
+// CheckWalletExists checks if a file exists at the specified path.
+func CheckWalletExists(path string) (walletPath string, err error) {
 	// if file exists then load the file
 	if _, err = os.Stat(path); !os.IsNotExist(err) {
 		walletPath = path
