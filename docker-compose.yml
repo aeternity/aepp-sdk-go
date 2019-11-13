@@ -16,20 +16,22 @@ services:
   node:
     image: aeternity/aeternity:${TAG}
     hostname: node
-    expose: [3013, 3113]
+    ports: 
+      - "3013:3013"
+      - "3113:3113"
     environment:
-      EPOCH_CONFIG: /home/aeternity/aeternity.yaml
+      AETERNITY_CONFIG: /home/aeternity/aeternity.yaml
     command: bin/aeternity console -noinput -aecore expected_mine_rate ${AETERNITY_MINE_RATE:-15000}
     volumes:
       - ${PWD}/build/docker/aeternity_node_mean16.yaml:/home/aeternity/aeternity.yaml
       - ${PWD}/build/docker/accounts.json:/home/aeternity/node/data/aecore/.genesis/accounts_test.json
       - ${PWD}/build/docker/keys/node:/home/aeternity/node/keys
       - node_db:/home/aeternity/node/data/mnesia
-      - node_keys:/home/aeternity/node/keys
   compiler:
     image: aeternity/aesophia_http:${COMPILER_TAG}
     hostname: compiler
-    expose: [3080]
+    ports:
+      - "3080:3080"
 volumes:
   node_db:
   node_keys:
