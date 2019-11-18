@@ -366,7 +366,11 @@ func (tx *ContractCallTx) GetFee() *big.Int {
 // CalcGas implements Transaction
 func (tx *ContractCallTx) CalcGas() (g *big.Int, err error) {
 	baseGas := new(big.Int)
-	baseGas.Mul(config.Client.BaseGas, big.NewInt(30))
+	if tx.AbiVersion == 3 {
+		baseGas.Mul(config.Client.BaseGas, big.NewInt(12))
+	} else {
+		baseGas.Mul(config.Client.BaseGas, big.NewInt(30))
+	}
 	gasComponent, err := normalGasComponent(tx, tx.GasLimit)
 	if err != nil {
 		return
