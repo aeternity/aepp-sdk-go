@@ -34,12 +34,15 @@ build-release:
 	$(eval OS=darwin)
 	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build -ldflags "-X main.Version=$(GIT_DESCR)" -o $(OUTPUTFOLDER)/$(OS)/$(APP) .
 	cp -r README.md LICENSE CHANGELOG.md $(OUTPUTFOLDER)/$(OS)
+	zip -r $(OUTPUTFOLDER)/$(OS).zip $(OUTPUTFOLDER)/$(OS)
 	$(eval OS=windows)
 	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build -ldflags "-X main.Version=$(GIT_DESCR)" -o $(OUTPUTFOLDER)/$(OS)/$(APP).exe .
 	cp -r README.md LICENSE CHANGELOG.md $(OUTPUTFOLDER)/$(OS)
+	zip -r $(OUTPUTFOLDER)/$(OS).zip $(OUTPUTFOLDER)/$(OS)
 	$(eval OS=linux)
 	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build -ldflags "-X main.Version=$(GIT_DESCR)" -o $(OUTPUTFOLDER)/$(OS)/$(APP) .
-	cp -r README.md LICENSE CHANGELOG.md $(OUTPUTFOLDER)/$(OS)	
+	cp -r README.md LICENSE CHANGELOG.md $(OUTPUTFOLDER)/$(OS)
+	zip -r $(OUTPUTFOLDER)/$(OS).zip $(OUTPUTFOLDER)/$(OS)
 	@echo done
 
 test: test-all
