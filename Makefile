@@ -33,12 +33,13 @@ build-release:
 	@echo build binary to $(OUTPUTFOLDER)
 	$(eval OS=darwin)
 	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build -ldflags "-X main.Version=$(GIT_DESCR)" -o $(OUTPUTFOLDER)/$(OS)/$(APP) .
+	cp -r README.md LICENSE CHANGELOG.md $(OUTPUTFOLDER)/$(OS)
 	$(eval OS=windows)
 	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build -ldflags "-X main.Version=$(GIT_DESCR)" -o $(OUTPUTFOLDER)/$(OS)/$(APP).exe .
+	cp -r README.md LICENSE CHANGELOG.md $(OUTPUTFOLDER)/$(OS)
 	$(eval OS=linux)
 	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build -ldflags "-X main.Version=$(GIT_DESCR)" -o $(OUTPUTFOLDER)/$(OS)/$(APP) .
-	@echo copy resources
-	cp -r README.md LICENSE CHANGELOG.md $(OUTPUTFOLDER)
+	cp -r README.md LICENSE CHANGELOG.md $(OUTPUTFOLDER)/$(OS)	
 	@echo done
 
 test: test-all
