@@ -29,7 +29,7 @@ build-dist: $(GOFILES)
 	cp -r README.md LICENSE $(OUTPUTFOLDER)
 	@echo done
 
-build-relase:
+build-release:
 	@echo build binary to $(OUTPUTFOLDER)
 	$(eval OS=darwin)
 	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build -ldflags "-X main.Version=$(GIT_DESCR)" -o $(OUTPUTFOLDER)/$(OS)/$(APP) .
