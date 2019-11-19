@@ -1,5 +1,6 @@
 name: Go
-on: [push]
+on:
+  push: [tags]
 jobs:
 
   build:
@@ -22,15 +23,48 @@ jobs:
         if [ -f Gopkg.toml ]; then
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep ensure
+
         fi
 
     - name: Build
       run: make build-release
-    
-    - name: Upload artifact
-      uses: actions/upload-artifact@v1.0.0
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1.0.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        # Artifact name
-        name: binaries 
-        # Directory containing files to upload
-        path: dist
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: true
+        prerelease: false
+    - name: Upload Release Asset - Windows
+      id: upload-release-asset-win
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist/windows.zip
+        asset_name: windows.zip
+        asset_content_type: application/zip 
+    - name: Upload Release Asset - Mac
+      id: upload-release-asset-darwin
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist/darwin.zip
+        asset_name: darwin.zip
+        asset_content_type: application/zip 
+    - name: Upload Release Asset - Linux
+      id: upload-release-asset-linux
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist/linux.zip
+        asset_name: linux.zip
+        asset_content_type: application/zip 
