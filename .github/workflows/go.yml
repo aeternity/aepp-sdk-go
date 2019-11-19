@@ -1,7 +1,8 @@
 name: Go
 on:
-  push:
-    tags:
+  push: 
+    tags: 
+      - refs/tags/*
 jobs:
 
   build:
