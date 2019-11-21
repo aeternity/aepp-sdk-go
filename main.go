@@ -16,7 +16,26 @@ package main
 
 import (
 	"github.com/aeternity/aepp-sdk-go/v7/cmd"
+	"github.com/aeternity/aepp-sdk-go/v7/clib"
 )
+
+/*
+#include <gmp.h>
+struct Vertex {
+    int X;
+    int Y;
+};
+struct SpendTx {
+	char *SenderID;
+	char *RecipientID;
+	unsigned long long int Amount;
+	unsigned long long int Fee;
+	char *Payload;
+	unsigned long long int TTL;
+	unsigned long long int Nonce;
+};
+*/
+import "C"
 
 // Version hold the version of the program
 var Version = "0.0.0"
@@ -27,4 +46,15 @@ func main() {
 	// 	log.Fatal(err)
 	// }
 	cmd.Execute(Version)
+}
+
+//export getVertex
+func getVertex(X, Y C.int) C.struct_Vertex {
+    return C.struct_Vertex{X, Y}
+}
+
+//export getString
+func getString() *C.char {
+	clib.GetTx()
+	return C.CString("Hello World")
 }
