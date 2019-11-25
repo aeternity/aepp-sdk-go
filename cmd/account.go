@@ -174,7 +174,11 @@ func signFunc(cmd *cobra.Command, args []string) (err error) {
 		return err
 	}
 
-	txSignedBase64, txHash, signature, err := transactions.SignHashTx(account, tx, config.Node.NetworkID)
+	txSigned, txHash, signature, err := transactions.SignHashTx(account, tx, config.Node.NetworkID)
+	if err != nil {
+		return err
+	}
+	txSignedB64, err := transactions.SerializeTx(txSigned)
 	if err != nil {
 		return err
 	}
@@ -183,7 +187,7 @@ func signFunc(cmd *cobra.Command, args []string) (err error) {
 		"Signing account address", account.Address,
 		"Signature", signature,
 		"Unsigned", txUnsignedBase64,
-		"Signed", txSignedBase64,
+		"Signed", txSignedB64,
 		"Hash", txHash,
 	)
 	return nil
