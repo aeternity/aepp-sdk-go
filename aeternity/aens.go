@@ -12,11 +12,10 @@ import (
 // RegisterName allows one to easily register a name on AENS. It does the
 // preclaim, transaction sending, confirmation and claim for you.
 func RegisterName(n naet.NodeInterface, acc *account.Account, name string, nameFee *big.Int) (signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
-	status, err := n.GetStatus()
+	networkID, err := getNetworkID(n)
 	if err != nil {
 		return
 	}
-	networkID := *status.NetworkID
 	_, _, ttlnoncer := transactions.GenerateTTLNoncer(n)
 
 	preclaimTx, nameSalt, err := transactions.NewNamePreclaimTx(acc.Address, name, ttlnoncer)

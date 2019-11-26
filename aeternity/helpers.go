@@ -164,3 +164,12 @@ func SignBroadcastWaitTransaction(tx transactions.Transaction, signingAccount *a
 	blockHeight, blockHash, err = WaitForTransactionForXBlocks(n, hash, x)
 	return
 }
+
+func getNetworkID(n naet.NodeInterface) (networkID string, err error) {
+	status, err := n.GetStatus()
+	if err != nil {
+		return
+	}
+	networkID = *status.NetworkID
+	return
+}
