@@ -11,6 +11,10 @@ import (
 	rlp "github.com/randomshinichi/rlpae"
 )
 
+// ABIVersionFATE indicates that the bytecode payload is for the FATE VM. Only
+// used in Tx fee calculation
+const ABIVersionFATE = 3
+
 func encodeVMABI(VMVersion, ABIVersion uint16) []byte {
 	vmBytes := big.NewInt(int64(VMVersion)).Bytes()
 	abiBytes := big.NewInt(int64(ABIVersion)).Bytes()
@@ -366,7 +370,7 @@ func (tx *ContractCallTx) GetFee() *big.Int {
 // CalcGas implements Transaction
 func (tx *ContractCallTx) CalcGas() (g *big.Int, err error) {
 	baseGas := new(big.Int)
-	if tx.AbiVersion == 3 {
+	if tx.AbiVersion == ABIVersionFATE {
 		baseGas.Mul(config.Client.BaseGas, big.NewInt(12))
 	} else {
 		baseGas.Mul(config.Client.BaseGas, big.NewInt(30))
