@@ -29,11 +29,10 @@ type compileencoder interface {
 
 // CreateContract lets one deploy a contract with minimum fuss.
 func CreateContract(n naet.NodeInterface, c compileencoder, acc *account.Account, source, function string, args []string, backend string) (signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
-	status, err := n.GetStatus()
+	networkID, err := getNetworkID(n)
 	if err != nil {
 		return
 	}
-	networkID := *status.NetworkID
 
 	bytecode, err := c.CompileContract(source, backend)
 	if err != nil {
@@ -44,6 +43,10 @@ func CreateContract(n naet.NodeInterface, c compileencoder, acc *account.Account
 		return
 	}
 
+	status, err := n.GetStatus()
+	if err != nil {
+		return
+	}
 	VMVersion, ABIVersion, err := findVMABIVersion(*status.NodeVersion, backend)
 	if err != nil {
 		return

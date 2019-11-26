@@ -48,6 +48,7 @@ type NodeInterface interface {
 	GetHeighter
 	GetKeyBlockByHasher
 	GetOracleByPubkeyer
+	GetOracleQueriesByPubkeyer
 	GetGenerationByHeighter
 	GetTransactionByHasher
 	GetNameEntryByNamer
@@ -286,6 +287,12 @@ func (c *Node) GetOracleByPubkey(pubkey string) (oracle *models.RegisteredOracle
 	}
 	oracle = r.Payload
 	return
+}
+
+// GetOracleQueriesByPubkeyer guarantees that one can run a GetOracleByPubkey() method
+// on the mocked/real network connection
+type GetOracleQueriesByPubkeyer interface {
+	GetOracleQueriesByPubkey(pubkey string) (oracleQueries *models.OracleQueries, err error)
 }
 
 // GetOracleQueriesByPubkey get a list of queries made to a particular oracle
