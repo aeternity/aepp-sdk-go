@@ -1,6 +1,7 @@
 package transactions
 
 import (
+	gobinary "encoding/binary"
 	"io"
 	"math"
 	"math/big"
@@ -355,9 +356,9 @@ func (tx *OracleQueryTx) ID() (id string, err error) {
 	}
 	b = append(b, senderIDRaw...)
 
-	nonceRaw := new(big.Int)
-	nonceRaw.SetUint64(tx.AccountNonce)
-	nonceRawPadded := leftPadByteSlice(32, nonceRaw.Bytes())
+	nonceRaw2 := make([]byte, 8)
+	gobinary.BigEndian.PutUint64(nonceRaw2, tx.AccountNonce)
+	nonceRawPadded := leftPadByteSlice(32, nonceRaw2)
 	b = append(b, nonceRawPadded...)
 
 	oracleIDRaw, err := binary.Decode(tx.OracleID)
