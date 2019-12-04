@@ -2,7 +2,6 @@ package aeternity
 
 import (
 	"math/big"
-	"strings"
 	"time"
 
 	"github.com/aeternity/aepp-sdk-go/v7/account"
@@ -14,7 +13,6 @@ import (
 
 // CreateOracle registers a new oracle with the given queryspec and responsespec
 func CreateOracle(n naet.NodeInterface, oracleAccount *account.Account, queryspec, responsespec string, queryFee *big.Int, queryTTLType uint64, oracleTTL uint64) (oracleID string, err error) {
-	var oraclizer = strings.NewReplacer("ak_", "ok_")
 	networkID, err := getNetworkID(n)
 	if err != nil {
 		return
@@ -29,7 +27,7 @@ func CreateOracle(n naet.NodeInterface, oracleAccount *account.Account, queryspe
 	if err != nil {
 		return
 	}
-	return oraclizer.Replace(oracleAccount.Address), nil
+	return registerTx.ID(), nil
 }
 
 // ListenOracleQueries polls the node at a custom interval and returns queries

@@ -4,6 +4,7 @@ import (
 	"io"
 	"math"
 	"math/big"
+	"strings"
 
 	"github.com/aeternity/aepp-sdk-go/v7/binary"
 	"github.com/aeternity/aepp-sdk-go/v7/config"
@@ -29,6 +30,11 @@ type OracleRegisterTx struct {
 	AbiVersion     uint16
 	Fee            *big.Int
 	TTL            uint64
+}
+
+// ID returns the oracle ID, ok_..
+func (tx *OracleRegisterTx) ID() string {
+	return strings.Replace(tx.AccountID, "ak_", "ok_", 1)
 }
 
 // EncodeRLP implements rlp.Encoder
@@ -337,6 +343,34 @@ type OracleQueryTx struct {
 	ResponseTTLValue uint64
 	Fee              *big.Int
 	TTL              uint64
+}
+
+// ID returns the oracle query ID, oq_...
+func (tx *OracleQueryTx) ID() (id string, err error) {
+	b := []byte{}
+
+	senderIDRaw, err := binary.Decode(tx.SenderID)
+	if err != nil {
+		return
+	}
+	b = append(b, senderIDRaw...)
+
+	nonceRaw := new(big.Int)
+	nonceRaw.SetUint64(tx.AccountNonce)
+	nonceRawPadded := leftPadByteSlice(32, nonceRaw.Bytes())
+	b = append(b, nonceRawPadded...)
+
+	oracleIDRaw, err := binary.Decode(tx.OracleID)
+	if err != nil {
+		return
+	}
+	b = append(b, oracleIDRaw...)
+
+	bHashed, err := binary.Blake2bHash(b)
+	if err != nil {
+		return
+	}
+	return binary.Encode(binary.PrefixOracleQueryID, bHashed), nil
 }
 
 // EncodeRLP implements rlp.Encoder

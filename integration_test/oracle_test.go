@@ -3,7 +3,6 @@ package integrationtest
 import (
 	"fmt"
 	"math/big"
-	"strings"
 	"testing"
 
 	"github.com/aeternity/aepp-sdk-go/v7/account"
@@ -37,7 +36,7 @@ func TestOracleWorkflow(t *testing.T) {
 	}
 
 	// Confirm that the oracle exists
-	oraclePubKey := strings.Replace(testAccount.Address, "ak_", "ok_", 1)
+	oraclePubKey := register.ID()
 	var oracle *models.RegisteredOracle
 	getOracle := func() {
 		oracle, err = node.GetOracleByPubkey(oraclePubKey)
@@ -81,21 +80,13 @@ func TestOracleWorkflow(t *testing.T) {
 	}
 
 	// Find the Oracle Query ID to reply to
-	fmt.Println("Sleeping a bit before querying node for OracleID")
-
-	var oracleQueries *models.OracleQueries
-	getOracleQueries := func() {
-		oracleQueries, err = node.GetOracleQueriesByPubkey(oraclePubKey)
-		if err != nil {
-			t.Fatalf("APIGetOracleQueriesByPubkey: %s", err)
-		}
+	oqID, err := query.ID()
+	if err != nil {
+		t.Fatal(err)
 	}
-	delay(getOracleQueries)
-	oqID := oracleQueries.OracleQueries[0].ID
-	fmt.Println(oraclePubKey, *oqID)
 
 	// Respond
-	respond, err := transactions.NewOracleRespondTx(testAccount.Address, oraclePubKey, *oqID, "My day was fine thank you", config.OracleTTLTypeDelta, config.Client.Oracles.ResponseTTLValue, ttlnoncer)
+	respond, err := transactions.NewOracleRespondTx(testAccount.Address, oraclePubKey, oqID, "My day was fine thank you", config.OracleTTLTypeDelta, config.Client.Oracles.ResponseTTLValue, ttlnoncer)
 	if err != nil {
 		t.Fatal(err)
 	}

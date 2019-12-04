@@ -9,6 +9,50 @@ import (
 	"github.com/aeternity/aepp-sdk-go/v7/utils"
 )
 
+func TestOracleTx_ID(t *testing.T) {
+	tx := &OracleRegisterTx{
+		AccountID:      "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
+		AccountNonce:   uint64(0),
+		QuerySpec:      "query Specification",
+		ResponseSpec:   "response Specification",
+		QueryFee:       utils.NewIntFromUint64(0),
+		OracleTTLType:  uint64(0),
+		OracleTTLValue: uint64(100),
+		AbiVersion:     0,
+		Fee:            utils.NewIntFromUint64(0),
+		TTL:            500,
+	}
+	expectedOID := "ok_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v"
+	if tx.ID() != expectedOID {
+		t.Errorf("OracleRegisterTx should have oracle ID %s but got %s", expectedOID, tx.ID())
+	}
+}
+
+func TestOracleQueryTx_ID(t *testing.T) {
+	tx := &OracleQueryTx{
+		SenderID:         "ak_EmeDiDrLBijiWcKmgBMNQanjjJeDRHVs5iad8XEAqMQfv6Jer",
+		AccountNonce:     3,
+		OracleID:         "ok_EmeDiDrLBijiWcKmgBMNQanjjJeDRHVs5iad8XEAqMQfv6Jer",
+		Query:            "How was your day?",
+		QueryFee:         utils.NewIntFromUint64(0),
+		QueryTTLType:     0,
+		QueryTTLValue:    100,
+		ResponseTTLType:  0,
+		ResponseTTLValue: 100,
+		Fee:              utils.RequireIntFromString("17139000000000"),
+		TTL:              517,
+	}
+	oqID, err := tx.ID()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedOQID := "oq_gHKkg8aeo93yh9FpxCz2PMvd2FWBE62mvqCCBwSD6cjykLLPZ"
+	if oqID != expectedOQID {
+		t.Errorf("Oracle Query should have oracle query ID %s but got %s", expectedOQID, oqID)
+	}
+}
+
 func TestOracleTx(t *testing.T) {
 	tests := []struct {
 		name     string

@@ -193,7 +193,7 @@ func TestAPI(t *testing.T) {
 
 	// OracleExtendTx
 	fmt.Println("OracleExtendTx")
-	sentTxs.oracleID = strings.Replace(alice.Address, "ak_", "ok_", 1)
+	sentTxs.oracleID = register.ID()
 	extend, err := transactions.NewOracleExtendTx(alice.Address, sentTxs.oracleID, config.OracleTTLTypeDelta, config.Client.Oracles.QueryTTLValue, ttlnoncer)
 	if err != nil {
 		t.Fatal(err)
