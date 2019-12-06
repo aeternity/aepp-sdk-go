@@ -4,29 +4,26 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/aeternity/aepp-sdk-go/v7/account"
 	"github.com/aeternity/aepp-sdk-go/v7/config"
 	"github.com/aeternity/aepp-sdk-go/v7/naet"
 	"github.com/aeternity/aepp-sdk-go/v7/swagguard/node/models"
 	"github.com/aeternity/aepp-sdk-go/v7/transactions"
 )
 
+type generateTTLNoncerNodeInterface interface {
+	naet.GetAccounter
+	naet.GetHeighter
+}
+
 // CreateOracle registers a new oracle with the given queryspec and responsespec
-func CreateOracle(n nodeStatusHeightAccounterBroadcaster, oracleAccount *account.Account, queryspec, responsespec string, queryFee *big.Int, queryTTLType uint64, oracleTTL uint64) (oracleID string, err error) {
-	networkID, err := getNetworkID(n)
-	if err != nil {
-		return
-	}
+func CreateOracle(n generateTTLNoncerNodeInterface, b *Broadcaster, queryspec, responsespec string, queryFee *big.Int, queryTTLType uint64, oracleTTL uint64) (oracleID string, err error) {
 	_, _, ttlnoncer := transactions.GenerateTTLNoncer(n)
-	registerTx, err := transactions.NewOracleRegisterTx(oracleAccount.Address, queryspec, responsespec, queryFee, queryTTLType, oracleTTL, config.Client.Oracles.ABIVersion, ttlnoncer)
+	registerTx, err := transactions.NewOracleRegisterTx(b.Account.Address, queryspec, responsespec, queryFee, queryTTLType, oracleTTL, config.Client.Oracles.ABIVersion, ttlnoncer)
 	if err != nil {
 		return
 	}
 
-	_, _, _, _, _, err = SignBroadcastWaitTransaction(registerTx, oracleAccount, n, networkID, config.Client.WaitBlocks)
-	if err != nil {
-		return
-	}
+	b.SignBroadcastWait(registerTx, config.Client.WaitBlocks)
 	return registerTx.ID(), nil
 }
 

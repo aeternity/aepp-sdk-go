@@ -176,12 +176,13 @@ func getNetworkID(n naet.GetStatuser) (networkID string, err error) {
 
 type broadcasterNodeCapabilities interface {
 	naet.GetStatuser
+	naet.GetAccounter
 	broadcastWaitTransactionNodeCapabilities
 }
 type Broadcaster struct {
-	signingAcc *account.Account
-	networkID  string
-	node       broadcastWaitTransactionNodeCapabilities
+	Account   *account.Account
+	networkID string
+	node      broadcasterNodeCapabilities
 }
 
 func NewBroadcaster(signingAccount *account.Account, node broadcasterNodeCapabilities) (b *Broadcaster, err error) {
@@ -191,12 +192,12 @@ func NewBroadcaster(signingAccount *account.Account, node broadcasterNodeCapabil
 	}
 
 	return &Broadcaster{
-		signingAcc: signingAccount,
-		node:       node,
-		networkID:  networkID,
+		Account:   signingAccount,
+		node:      node,
+		networkID: networkID,
 	}, nil
 }
 
 func (b *Broadcaster) SignBroadcastWait(tx transactions.Transaction, blocks uint64) (signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
-	return SignBroadcastWaitTransaction(tx, b.signingAcc, b.node, b.networkID, blocks)
+	return SignBroadcastWaitTransaction(tx, b.Account, b.node, b.networkID, blocks)
 }
