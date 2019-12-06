@@ -28,7 +28,7 @@ type compileencoder interface {
 }
 
 // CreateContract lets one deploy a contract with minimum fuss.
-func CreateContract(n naet.NodeInterface, c compileencoder, acc *account.Account, source, function string, args []string, backend string) (signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
+func CreateContract(n nodeStatusHeightAccounterBroadcaster, c compileencoder, acc *account.Account, source, function string, args []string, backend string) (signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
 	networkID, err := getNetworkID(n)
 	if err != nil {
 		return
