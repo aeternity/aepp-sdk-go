@@ -165,7 +165,7 @@ func SignBroadcastWaitTransaction(tx transactions.Transaction, signingAccount *a
 	return
 }
 
-func getNetworkID(n naet.NodeInterface) (networkID string, err error) {
+func getNetworkID(n naet.GetStatuser) (networkID string, err error) {
 	status, err := n.GetStatus()
 	if err != nil {
 		return

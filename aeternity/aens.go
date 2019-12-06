@@ -9,9 +9,15 @@ import (
 	"github.com/aeternity/aepp-sdk-go/v7/transactions"
 )
 
+type nodeStatusHeightAccounterBroadcaster interface {
+	naet.GetStatuser
+	naet.GetAccounter
+	broadcastWaitTransactionNodeCapabilities
+}
+
 // RegisterName allows one to easily register a name on AENS. It does the
 // preclaim, transaction sending, confirmation and claim for you.
-func RegisterName(n naet.NodeInterface, acc *account.Account, name string, nameFee *big.Int) (signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
+func RegisterName(n nodeStatusHeightAccounterBroadcaster, acc *account.Account, name string, nameFee *big.Int) (signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
 	networkID, err := getNetworkID(n)
 	if err != nil {
 		return

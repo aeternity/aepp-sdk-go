@@ -12,7 +12,7 @@ import (
 )
 
 // CreateOracle registers a new oracle with the given queryspec and responsespec
-func CreateOracle(n naet.NodeInterface, oracleAccount *account.Account, queryspec, responsespec string, queryFee *big.Int, queryTTLType uint64, oracleTTL uint64) (oracleID string, err error) {
+func CreateOracle(n nodeStatusHeightAccounterBroadcaster, oracleAccount *account.Account, queryspec, responsespec string, queryFee *big.Int, queryTTLType uint64, oracleTTL uint64) (oracleID string, err error) {
 	networkID, err := getNetworkID(n)
 	if err != nil {
 		return

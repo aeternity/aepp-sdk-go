@@ -51,7 +51,7 @@ func Execute(v string) {
 // have to maintain a Node global variable (which needs the config vars to be
 // read immediately, with this helper function you can defer the reading of the
 // variables until the subcommand's execution)
-func newAeNode() naet.NodeInterface {
+func newAeNode() *naet.Node {
 	return naet.NewNode(config.Node.URL, debug)
 }
 
