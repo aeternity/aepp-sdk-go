@@ -173,3 +173,30 @@ func getNetworkID(n naet.GetStatuser) (networkID string, err error) {
 	networkID = *status.NetworkID
 	return
 }
+
+type broadcasterNodeCapabilities interface {
+	naet.GetStatuser
+	broadcastWaitTransactionNodeCapabilities
+}
+type Broadcaster struct {
+	signingAcc *account.Account
+	networkID  string
+	node       broadcastWaitTransactionNodeCapabilities
+}
+
+func NewBroadcaster(signingAccount *account.Account, node broadcasterNodeCapabilities) (b *Broadcaster, err error) {
+	networkID, err := getNetworkID(node)
+	if err != nil {
+		return
+	}
+
+	return &Broadcaster{
+		signingAcc: signingAccount,
+		node:       node,
+		networkID:  networkID,
+	}, nil
+}
+
+func (b *Broadcaster) SignBroadcastWait(tx transactions.Transaction, blocks uint64) (signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
+	return SignBroadcastWaitTransaction(tx, b.signingAcc, b.node, b.networkID, blocks)
+}
