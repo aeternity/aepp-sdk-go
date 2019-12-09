@@ -16,8 +16,8 @@ import (
 )
 
 var sender = "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"
-var senderPrivateKey = os.Getenv("INTEGRATION_TEST_SENDER_PRIVATE_KEY")
-var recipientPrivateKey = os.Getenv("INTEGRATION_TEST_RECEIVER_PRIVATE_KEY")
+var alicePrivateKey = os.Getenv("AETERNITY_ALICE_PRIVATE_KEY")
+var bobPrivateKey = os.Getenv("AETERNITY_BOB_PRIVATE_KEY")
 var privatenetURL = "http://localhost:3013"
 var testnetURL = "http://sdk-testnet.aepps.com"
 var networkID = "ae_docker"
@@ -30,12 +30,12 @@ func setupNetwork(t *testing.T, nodeURL string, debug bool) *naet.Node {
 }
 
 func setupAccounts(t *testing.T) (*account.Account, *account.Account) {
-	alice, err := account.FromHexString(senderPrivateKey)
+	alice, err := account.FromHexString(alicePrivateKey)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	bob, err := account.FromHexString(recipientPrivateKey)
+	bob, err := account.FromHexString(bobPrivateKey)
 	if err != nil {
 		t.Fatal(err)
 	}
