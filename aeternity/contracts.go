@@ -28,7 +28,7 @@ type compileencoder interface {
 }
 
 // CreateContract lets one deploy a contract with minimum fuss.
-func CreateContract(n nodeStatusHeightAccounterBroadcaster, c compileencoder, acc *account.Account, source, function string, args []string, backend string) (signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
+func CreateContract(n nodeStatusHeightAccounterBroadcaster, c compileencoder, acc *account.Account, source, function string, args []string, backend string) (ctID, signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
 	networkID, err := getNetworkID(n)
 	if err != nil {
 		return
@@ -65,5 +65,28 @@ func CreateContract(n nodeStatusHeightAccounterBroadcaster, c compileencoder, ac
 	if err != nil {
 		return
 	}
+	ctID, err = createTx.ContractID()
 	return
+}
+
+// CallContract calls a smart contract's function, automatically calling the
+// compiler to transform the arguments into bytecode.
+func CallContract(n nodeStatusHeightAccounterBroadcaster, c compileencoder, acc *account.Account, ctID, source, function string, args []string, backend string) (signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
+	networkID, err := getNetworkID(n)
+	if err != nil {
+		return
+	}
+	_, _, ttlnoncer := transactions.GenerateTTLNoncer(n)
+
+	callData, err := c.EncodeCalldata(source, function, args, backend)
+	if err != nil {
+		return
+	}
+
+	callTx, err := transactions.NewContractCallTx(acc.Address, ctID, config.Client.Contracts.Amount, config.Client.Contracts.GasLimit, config.Client.GasPrice, config.Client.Contracts.ABIVersion, callData, ttlnoncer)
+	if err != nil {
+		return
+	}
+
+	return SignBroadcastWaitTransaction(callTx, acc, n, networkID, config.Client.WaitBlocks)
 }
