@@ -39,7 +39,7 @@ func randomName(length int) string {
 func TestAENSWorkflow(t *testing.T) {
 	node := setupNetwork(t, privatenetURL, false)
 	alice, bob := setupAccounts(t)
-	ttler, noncer, ttlnoncer := transactions.GenerateTTLNoncer(node)
+	ttlnoncer := transactions.NewTTLNoncer(node)
 
 	name := randomName(int(config.Client.Names.NameAuctionMaxLength + 1))
 	// Preclaim the name
@@ -74,7 +74,7 @@ func TestAENSWorkflow(t *testing.T) {
 	delay(printNameEntry)
 
 	// Update the name, make it point to something
-	updateTx, err := transactions.NewNameUpdateTx(alice.Address, name, []string{alice.Address}, config.Client.Names.ClientTTL, ttler, noncer)
+	updateTx, err := transactions.NewNameUpdateTx(alice.Address, name, []string{alice.Address}, config.Client.Names.ClientTTL, ttlnoncer)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -102,7 +102,7 @@ func TestAENSWorkflow(t *testing.T) {
 	}
 
 	// Receiver updates the name, makes it point to himself
-	updateTx2, err := transactions.NewNameUpdateTx(bob.Address, name, []string{bob.Address}, config.Client.Names.ClientTTL, ttler, noncer)
+	updateTx2, err := transactions.NewNameUpdateTx(bob.Address, name, []string{bob.Address}, config.Client.Names.ClientTTL, ttlnoncer)
 	if err != nil {
 		t.Fatal(err)
 	}

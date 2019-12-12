@@ -110,7 +110,7 @@ func TestMain(m *testing.M) {
 func TestAPI(t *testing.T) {
 	privateNet := setupNetwork(t, privatenetURL, false)
 	testNet := setupNetwork(t, testnetURL, false)
-	ttler, noncer, ttlnoncer := transactions.GenerateTTLNoncer(privateNet)
+	ttlnoncer := transactions.NewTTLNoncer(privateNet)
 
 	alice, bob := setupAccounts(t)
 
@@ -143,7 +143,7 @@ func TestAPI(t *testing.T) {
 
 	// NameUpdateTx
 	fmt.Println("NameUpdateTx")
-	updateTx, err := transactions.NewNameUpdateTx(alice.Address, name, []string{alice.Address}, config.Client.Names.ClientTTL, ttler, noncer)
+	updateTx, err := transactions.NewNameUpdateTx(alice.Address, name, []string{alice.Address}, config.Client.Names.ClientTTL, ttlnoncer)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -25,7 +25,7 @@ func Test_txSpendFunc(t *testing.T) {
 		{
 			name: "Alice sends 10 to Bob",
 			args: args{
-				ttlFunc:   func(offset uint64) (ttl uint64, err error) { return 500, nil },
+				ttlFunc:   func(offset uint64) (ttl, height uint64, err error) { return 500, 0, nil },
 				nonceFunc: func(address string) (nonce uint64, err error) { return 2, nil },
 				args:      []string{alice, bob, "10"},
 			},
@@ -78,7 +78,7 @@ func Test_txContractCreateFunc(t *testing.T) {
 		{
 			name: "Deploy SimpleStorage with alice (unsigned)",
 			args: args{
-				ttlFunc:   func(offset uint64) (ttl uint64, err error) { return 500, nil },
+				ttlFunc:   func(offset uint64) (ttl, height uint64, err error) { return 500, 0, nil },
 				nonceFunc: func(address string) (nonce uint64, err error) { return 2, nil },
 				args:      []string{alice, contractSimpleStorageBytecode, contractSimpleStorageInit42},
 			},

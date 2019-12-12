@@ -146,7 +146,7 @@ func (tx *GAAttachTx) CalcGas() (g *big.Int, err error) {
 
 // NewGAAttachTx creates a GAAttachTx
 func NewGAAttachTx(ownerID string, code string, authFunc []byte, vmVersion uint16, abiVersion uint16, gasLimit *big.Int, gasPrice *big.Int, callData string, ttlnoncer TTLNoncer) (tx *GAAttachTx, err error) {
-	ttl, accountNonce, err := ttlnoncer(ownerID, config.Client.TTL)
+	ttl, _, accountNonce, err := ttlnoncer(ownerID, config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -296,8 +296,8 @@ func (tx *GAMetaTx) CalcGas() (g *big.Int, err error) {
 }
 
 // NewGAMetaTx creates a GAMetaTx
-func NewGAMetaTx(accountID string, authData string, abiVersion uint16, gasLimit *big.Int, gasPrice *big.Int, wrappedTx Transaction, ttler TTLer) (tx *GAMetaTx, err error) {
-	ttl, err := ttler(config.Client.TTL)
+func NewGAMetaTx(accountID string, authData string, abiVersion uint16, gasLimit *big.Int, gasPrice *big.Int, wrappedTx Transaction, ttlnoncer TTLNoncer) (tx *GAMetaTx, err error) {
+	ttl, _, _, err := ttlnoncer(accountID, config.Client.TTL)
 	if err != nil {
 		return
 	}

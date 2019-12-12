@@ -74,7 +74,7 @@ func Example() {
 	node := naet.NewNode("http://localhost:3013", false)
 
 	// create the closures that autofill the correct account nonce and transaction TTL
-	_, _, ttlnoncer := transactions.GenerateTTLNoncer(node)
+	ttlnoncer := transactions.NewTTLNoncer(node)
 
 	// create the SpendTransaction
 	msg := "Reason For Payment"

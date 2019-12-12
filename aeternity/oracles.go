@@ -17,7 +17,7 @@ type generateTTLNoncerNodeInterface interface {
 
 // CreateOracle registers a new oracle with the given queryspec and responsespec
 func CreateOracle(n generateTTLNoncerNodeInterface, b *Broadcaster, queryspec, responsespec string, queryFee *big.Int, queryTTLType uint64, oracleTTL uint64) (oracleID string, err error) {
-	_, _, ttlnoncer := transactions.GenerateTTLNoncer(n)
+	ttlnoncer := transactions.NewTTLNoncer(n)
 	registerTx, err := transactions.NewOracleRegisterTx(b.Account.Address, queryspec, responsespec, queryFee, queryTTLType, oracleTTL, config.Client.Oracles.ABIVersion, ttlnoncer)
 	if err != nil {
 		return

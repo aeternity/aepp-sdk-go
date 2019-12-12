@@ -144,7 +144,7 @@ func (tx *SpendTx) CalcGas() (g *big.Int, err error) {
 
 // NewSpendTx is a constructor for a SpendTx struct
 func NewSpendTx(senderID, recipientID string, amount *big.Int, payload []byte, ttlnoncer TTLNoncer) (tx *SpendTx, err error) {
-	ttl, nonce, err := ttlnoncer(senderID, config.Client.TTL)
+	ttl, _, nonce, err := ttlnoncer(senderID, config.Client.TTL)
 	if err != nil {
 		return
 	}
