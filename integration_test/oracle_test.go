@@ -15,7 +15,7 @@ import (
 func TestOracleWorkflow(t *testing.T) {
 	alice, _ := setupAccounts(t)
 	node := setupNetwork(t, privatenetURL, false)
-	_, _, ttlnoncer := transactions.GenerateTTLNoncer(node)
+	ttlnoncer := transactions.NewTTLNoncer(node)
 
 	// Setup temporary test account and fund it
 	testAccount, err := account.New()

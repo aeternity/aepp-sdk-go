@@ -51,7 +51,7 @@ func CreateContract(n nodeStatusHeightAccounterBroadcaster, c compileencoder, ac
 	if err != nil {
 		return
 	}
-	_, _, ttlnoncer := transactions.GenerateTTLNoncer(n)
+	ttlnoncer := transactions.NewTTLNoncer(n)
 
 	createTx, err := transactions.NewContractCreateTx(acc.Address, bytecode, VMVersion, ABIVersion, config.Client.Contracts.Deposit, config.Client.Contracts.Amount, config.Client.Contracts.GasLimit, config.Client.GasPrice, calldata, ttlnoncer)
 	if err != nil {
@@ -76,7 +76,7 @@ func CallContract(n nodeStatusHeightAccounterBroadcaster, c compileencoder, acc 
 	if err != nil {
 		return
 	}
-	_, _, ttlnoncer := transactions.GenerateTTLNoncer(n)
+	ttlnoncer := transactions.NewTTLNoncer(n)
 
 	callData, err := c.EncodeCalldata(source, function, args, backend)
 	if err != nil {

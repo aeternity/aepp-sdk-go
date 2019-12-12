@@ -17,7 +17,7 @@ type nodeStatusHeightAccounterBroadcaster interface {
 // RegisterName allows one to easily register a name on AENS. It does the
 // preclaim, transaction sending, confirmation and claim for you.
 func RegisterName(n nodeStatusHeightAccounterBroadcaster, b *Broadcaster, name string, nameFee *big.Int) (signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
-	_, _, ttlnoncer := transactions.GenerateTTLNoncer(n)
+	ttlnoncer := transactions.NewTTLNoncer(n)
 
 	preclaimTx, nameSalt, err := transactions.NewNamePreclaimTx(b.Account.Address, name, ttlnoncer)
 	if err != nil {

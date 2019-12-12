@@ -532,7 +532,7 @@ func VerifySignedTx(accountID string, txSigned string, networkID string) (valid 
 
 // TTLer defines a function that will return an appropriate TTL for a
 // transaction.
-type TTLer func(offset uint64) (ttl uint64, err error)
+type TTLer func(offset uint64) (ttl, height uint64, err error)
 
 // Noncer defines a function that will return an unused account nonce
 // for making a transaction.
@@ -540,7 +540,7 @@ type Noncer func(accountID string) (nonce uint64, err error)
 
 // TTLNoncer describes a function that combines the roles of TTLer
 // and Noncer
-type TTLNoncer func(address string, offset uint64) (ttl, nonce uint64, err error)
+type TTLNoncer func(address string, offset uint64) (ttl, height, nonce uint64, err error)
 
 type getHeightAccounter interface {
 	naet.GetHeighter
@@ -549,8 +549,8 @@ type getHeightAccounter interface {
 
 // CreateTTLer returns the chain height + offset
 func CreateTTLer(n naet.GetHeighter) TTLer {
-	return func(offset uint64) (ttl uint64, err error) {
-		height, err := n.GetHeight()
+	return func(offset uint64) (ttl, height uint64, err error) {
+		height, err = n.GetHeight()
 		if err != nil {
 			return
 		}
@@ -572,20 +572,19 @@ func CreateNoncer(n naet.GetAccounter) Noncer {
 	}
 }
 
-// GenerateTTLNoncer is a convenience wrapper to CreateTTLNoncer, but instead of
+// NewTTLNoncer is a convenience wrapper to CreateTTLNoncer, but instead of
 // taking TTLer and Noncer closures, it takes a connection to a node.
-func GenerateTTLNoncer(node getHeightAccounter) (ttler TTLer, noncer Noncer, ttlnoncer TTLNoncer) {
-	ttler = CreateTTLer(node)
-	noncer = CreateNoncer(node)
+func NewTTLNoncer(node getHeightAccounter) (ttlnoncer TTLNoncer) {
+	ttler := CreateTTLer(node)
+	noncer := CreateNoncer(node)
 
-	ttlnoncer = CreateTTLNoncer(ttler, noncer)
-	return
+	return CreateTTLNoncer(ttler, noncer)
 }
 
 // CreateTTLNoncer combines TTLer and Noncer closures.
 func CreateTTLNoncer(t TTLer, n Noncer) (ttlnoncer TTLNoncer) {
-	ttlnoncer = func(accountID string, offset uint64) (ttl, nonce uint64, err error) {
-		ttl, err = t(offset)
+	ttlnoncer = func(accountID string, offset uint64) (ttl, height, nonce uint64, err error) {
+		ttl, height, err = t(offset)
 		if err != nil {
 			return
 		}

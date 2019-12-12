@@ -13,7 +13,7 @@ import (
 func TestContracts(t *testing.T) {
 	alice, _ := setupAccounts(t)
 	node := setupNetwork(t, privatenetURL, false)
-	_, _, ttlnoncer := transactions.GenerateTTLNoncer(node)
+	ttlnoncer := transactions.NewTTLNoncer(node)
 
 	var ctID string
 

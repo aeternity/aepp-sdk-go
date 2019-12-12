@@ -30,7 +30,7 @@ func TestSpendTx(t *testing.T) {
 		expected.Add(&bS, amount)
 	}
 
-	_, _, ttlnoncer := transactions.GenerateTTLNoncer(node)
+	ttlnoncer := transactions.NewTTLNoncer(node)
 	tx, err := transactions.NewSpendTx(alice.Address, bob.Address, amount, []byte(msg), ttlnoncer)
 	if err != nil {
 		t.Error(err)

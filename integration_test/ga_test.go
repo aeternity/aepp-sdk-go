@@ -29,7 +29,7 @@ func TestGeneralizedAccounts(t *testing.T) {
 	alice, bob := setupAccounts(t)
 	node := setupNetwork(t, privatenetURL, false)
 	compiler := naet.NewCompiler(config.Client.Contracts.CompilerURL, false)
-	ttler, _, ttlnoncer := transactions.GenerateTTLNoncer(node)
+	ttlnoncer := transactions.NewTTLNoncer(node)
 
 	// Take note of Bob's balance, and after this test, we expect it to have this much more AE
 	amount := utils.NewIntFromUint64(5000)
@@ -99,12 +99,11 @@ func TestGeneralizedAccounts(t *testing.T) {
 	// included in GAMetaTx. The constructor NewGAMetaTx() does this for you.
 	// authData is authorize(3)
 	authData := "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACBGtXufEG2HuMYcRcNwsGAeqymslunKf692bHnvwI5K6wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAU3aKBNm"
-	zeroNoncer := func(accountID string) (nonce uint64, err error) {
-		return 0, nil
+	metaTxTTLNoncer := func(accountID string, offset uint64) (ttl, height, nonce uint64, err error) {
+		return 0, 0, 0, nil
 	}
-	metaTxTTLNoncer := transactions.CreateTTLNoncer(ttler, zeroNoncer)
 	spendTx, err := transactions.NewSpendTx(testAccount.Address, bob.Address, big.NewInt(5000), []byte{}, metaTxTTLNoncer)
-	gaMetaTx, err := transactions.NewGAMetaTx(testAccount.Address, authData, config.Client.Contracts.ABIVersion, config.Client.GasPrice, config.Client.GasPrice, spendTx, ttler)
+	gaMetaTx, err := transactions.NewGAMetaTx(testAccount.Address, authData, config.Client.Contracts.ABIVersion, config.Client.GasPrice, config.Client.GasPrice, spendTx, ttlnoncer)
 
 	gaMetaTxFinal, hash, _, err := transactions.SignHashTx(testAccount, gaMetaTx, config.Node.NetworkID)
 	if err != nil {

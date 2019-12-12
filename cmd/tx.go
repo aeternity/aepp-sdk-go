@@ -65,22 +65,19 @@ func txSpendFunc(ttlFunc transactions.TTLer, nonceFunc transactions.Noncer, args
 		return errors.New("Error, missing or invalid fee")
 	}
 
-	// If nonce was not specified as an argument, connect to the node to
-	// query it
+	// If nonce or TTL was specified, no need to query the node
 	if nonce > 0 {
 		nonceFunc = func(accountID string) (uint64, error) {
 			return nonce, nil
 		}
 	}
-	// If TTL was not specified as an argument, connect to the node to calculate
-	// it
 	if ttl > 0 {
-		ttlFunc = func(offset uint64) (uint64, error) {
-			return ttl, nil
+		ttlFunc = func(offset uint64) (uint64, uint64, error) {
+			return ttl, 0, nil
 		}
 	}
-	ttlnoncer := transactions.CreateTTLNoncer(ttlFunc, nonceFunc)
-	tx, err := transactions.NewSpendTx(sender, recipient, amount, []byte(spendTxPayload), ttlnoncer)
+
+	tx, err := transactions.NewSpendTx(sender, recipient, amount, []byte(spendTxPayload), transactions.CreateTTLNoncer(ttlFunc, nonceFunc))
 	if err != nil {
 		return err
 	}
@@ -157,8 +154,8 @@ func txContractCreateFunc(ttlFunc transactions.TTLer, nonceFunc transactions.Non
 	// If TTL was not specified as an argument, connect to the node to calculate
 	// it
 	if ttl > 0 {
-		ttlFunc = func(offset uint64) (uint64, error) {
-			return ttl, nil
+		ttlFunc = func(offset uint64) (uint64, uint64, error) {
+			return ttl, 0, nil
 		}
 	}
 	ttlnoncer := transactions.CreateTTLNoncer(ttlFunc, nonceFunc)

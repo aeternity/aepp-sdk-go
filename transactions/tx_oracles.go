@@ -186,7 +186,7 @@ func (tx *OracleRegisterTx) CalcGas() (g *big.Int, err error) {
 
 // NewOracleRegisterTx is a constructor for a OracleRegisterTx struct
 func NewOracleRegisterTx(accountID string, querySpec, responseSpec string, queryFee *big.Int, oracleTTLType, oracleTTLValue uint64, abiVersion uint16, ttlnoncer TTLNoncer) (tx *OracleRegisterTx, err error) {
-	ttl, accountNonce, err := ttlnoncer(accountID, config.Client.TTL)
+	ttl, _, accountNonce, err := ttlnoncer(accountID, config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -321,7 +321,7 @@ func (tx *OracleExtendTx) CalcGas() (g *big.Int, err error) {
 
 // NewOracleExtendTx is a constructor for a OracleExtendTx struct
 func NewOracleExtendTx(senderID, oracleID string, oracleTTLType, oracleTTLValue uint64, ttlnoncer TTLNoncer) (tx *OracleExtendTx, err error) {
-	ttl, accountNonce, err := ttlnoncer(senderID, config.Client.TTL)
+	ttl, _, accountNonce, err := ttlnoncer(senderID, config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -520,7 +520,7 @@ func (tx *OracleQueryTx) CalcGas() (g *big.Int, err error) {
 
 // NewOracleQueryTx is a constructor for a OracleQueryTx struct
 func NewOracleQueryTx(senderID string, oracleID, query string, queryFee *big.Int, queryTTLType, queryTTLValue, responseTTLType, responseTTLValue uint64, ttlnoncer TTLNoncer) (tx *OracleQueryTx, err error) {
-	ttl, accountNonce, err := ttlnoncer(senderID, config.Client.TTL)
+	ttl, _, accountNonce, err := ttlnoncer(senderID, config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -672,7 +672,7 @@ func (tx *OracleRespondTx) CalcGas() (g *big.Int, err error) {
 
 // NewOracleRespondTx is a constructor for a OracleRespondTx struct
 func NewOracleRespondTx(senderID, oracleID string, queryID string, response string, responseTTLType uint64, responseTTLValue uint64, ttlnoncer TTLNoncer) (tx *OracleRespondTx, err error) {
-	ttl, accountNonce, err := ttlnoncer(senderID, config.Client.TTL)
+	ttl, _, accountNonce, err := ttlnoncer(senderID, config.Client.TTL)
 	if err != nil {
 		return
 	}

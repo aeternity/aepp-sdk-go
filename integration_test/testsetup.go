@@ -79,7 +79,7 @@ func waitForTransaction(node *naet.Node, hash string) (height uint64, microblock
 }
 
 func fundAccount(t *testing.T, node *naet.Node, source, destination *account.Account, amount *big.Int) {
-	_, _, ttlnoncer := transactions.GenerateTTLNoncer(node)
+	ttlnoncer := transactions.NewTTLNoncer(node)
 	fmt.Println("Funding account", destination.Address)
 	tx, err := transactions.NewSpendTx(source.Address, destination.Address, amount, []byte{}, ttlnoncer)
 	if err != nil {

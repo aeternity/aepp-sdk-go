@@ -213,7 +213,7 @@ func (tx *NamePreclaimTx) CalcGas() (g *big.Int, err error) {
 
 // NewNamePreclaimTx is a constructor for a NamePreclaimTx struct
 func NewNamePreclaimTx(accountID, name string, ttlnoncer TTLNoncer) (tx *NamePreclaimTx, nameSalt *big.Int, err error) {
-	ttl, accountNonce, err := ttlnoncer(accountID, config.Client.TTL)
+	ttl, _, accountNonce, err := ttlnoncer(accountID, config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -359,7 +359,7 @@ func (tx *NameClaimTx) CalcGas() (g *big.Int, err error) {
 
 // NewNameClaimTx is a constructor for a NameClaimTx struct
 func NewNameClaimTx(accountID, name string, nameSalt, nameFee *big.Int, ttlnoncer TTLNoncer) (tx *NameClaimTx, err error) {
-	ttl, accountNonce, err := ttlnoncer(accountID, config.Client.TTL)
+	ttl, _, accountNonce, err := ttlnoncer(accountID, config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -601,20 +601,14 @@ func (tx *NameUpdateTx) CalcGas() (g *big.Int, err error) {
 }
 
 // NewNameUpdateTx is a constructor for a NameUpdateTx struct
-func NewNameUpdateTx(accountID, name string, pointers []string, clientTTL uint64, ttler TTLer, noncer Noncer) (tx *NameUpdateTx, err error) {
-	ttl, err := ttler(config.Client.TTL)
+func NewNameUpdateTx(accountID, name string, pointers []string, clientTTL uint64, ttlnoncer TTLNoncer) (tx *NameUpdateTx, err error) {
+	ttl, height, accountNonce, err := ttlnoncer(accountID, config.Client.TTL)
 	if err != nil {
 		return
 	}
-	accountNonce, err := noncer(accountID)
-	if err != nil {
-		return
-	}
+	nameTTL := height + config.Client.Names.NameTTL
+
 	nm, err := NameID(name)
-	if err != nil {
-		return
-	}
-	nameTTL, err := ttler(config.Client.Names.NameTTL)
 	if err != nil {
 		return
 	}
@@ -751,7 +745,7 @@ func (tx *NameRevokeTx) CalcGas() (g *big.Int, err error) {
 
 // NewNameRevokeTx is a constructor for a NameRevokeTx struct
 func NewNameRevokeTx(accountID, name string, ttlnoncer TTLNoncer) (tx *NameRevokeTx, err error) {
-	ttl, accountNonce, err := ttlnoncer(accountID, config.Client.TTL)
+	ttl, _, accountNonce, err := ttlnoncer(accountID, config.Client.TTL)
 	if err != nil {
 		return
 	}
@@ -906,7 +900,7 @@ func (tx *NameTransferTx) CalcGas() (g *big.Int, err error) {
 
 // NewNameTransferTx is a constructor for a NameTransferTx struct
 func NewNameTransferTx(accountID, name, recipientID string, ttlnoncer TTLNoncer) (tx *NameTransferTx, err error) {
-	ttl, accountNonce, err := ttlnoncer(accountID, config.Client.TTL)
+	ttl, _, accountNonce, err := ttlnoncer(accountID, config.Client.TTL)
 	if err != nil {
 		return
 	}
