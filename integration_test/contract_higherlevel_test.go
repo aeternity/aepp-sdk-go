@@ -20,7 +20,7 @@ contract SimpleStorage =
   function get() : int = state.data
   stateful function set(value : int) = put(state{data = value})`
 
-	_, _, _, _, _, _, err := aeternity.CreateContract(n, c, alice, simplestorage, "init", []string{"42"}, config.CompilerBackendFATE)
+	_, err := aeternity.CreateContract(n, c, alice, simplestorage, "init", []string{"42"}, config.CompilerBackendFATE)
 	if err != nil {
 		t.Error(err)
 	}
@@ -38,12 +38,12 @@ contract SimpleStorage =
   function get() : int = state.data
   stateful function set(value : int) = put(state{data = value})`
 
-	ctID, _, _, _, _, _, err := aeternity.CreateContract(n, c, alice, simplestorage, "init", []string{"42"}, config.CompilerBackendFATE)
+	ctID, _, err := aeternity.CreateContract(n, c, alice, simplestorage, "init", []string{"42"}, config.CompilerBackendFATE)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, _, _, _, _, err = aeternity.CallContract(n, c, alice, ctID, simplestorage, "get", []string{}, config.CompilerBackendFATE)
+	err = aeternity.CallContract(n, c, alice, ctID, simplestorage, "get", []string{}, config.CompilerBackendFATE)
 	if err != nil {
 		t.Error(err)
 	}

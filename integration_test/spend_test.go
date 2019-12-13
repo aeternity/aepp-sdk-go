@@ -35,7 +35,7 @@ func TestSpendTx(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	_, _, _, _, _, err = aeternity.SignBroadcastWaitTransaction(tx, alice, node, networkID, config.Client.WaitBlocks)
+	_, err = aeternity.SignBroadcastWaitTransaction(tx, alice, node, networkID, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}

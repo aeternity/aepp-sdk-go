@@ -156,12 +156,19 @@ type broadcastWaitTransactionNodeCapabilities interface {
 
 // SignBroadcastWaitTransaction is a convenience function that combines
 // SignBroadcastTransaction and WaitForTransactionForXBlocks.
-func SignBroadcastWaitTransaction(tx transactions.Transaction, signingAccount *account.Account, n broadcastWaitTransactionNodeCapabilities, networkID string, x uint64) (signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
-	signedTxStr, hash, signature, err = SignBroadcastTransaction(tx, signingAccount, n, networkID)
+func SignBroadcastWaitTransaction(tx transactions.Transaction, signingAccount *account.Account, n broadcastWaitTransactionNodeCapabilities, networkID string, x uint64) (txReceipt *TxReceipt, err error) {
+	signedTxStr, hash, signature, err := SignBroadcastTransaction(tx, signingAccount, n, networkID)
 	if err != nil {
 		return
 	}
-	blockHeight, blockHash, err = WaitForTransactionForXBlocks(n, hash, x)
+	blockHeight, blockHash, err := WaitForTransactionForXBlocks(n, hash, x)
+	txReceipt = &TxReceipt{
+		SignedTx:    signedTxStr,
+		Hash:        hash,
+		Signature:   signature,
+		BlockHeight: blockHeight,
+		BlockHash:   blockHash,
+	}
 	return
 }
 
@@ -192,6 +199,10 @@ type TxReceipt struct {
 	BlockHash   string
 }
 
+func (t *TxReceipt) String() string {
+	return fmt.Sprintf("Signed Tx: %s\nHash: %s\nSignature: %s\nBlockHeight: %d\nBlockHash: %s", t.SignedTx, t.Hash, t.Signature, t.BlockHeight, t.BlockHash)
+}
+
 type Context struct {
 	Account   *account.Account
 	NetworkID string
@@ -213,6 +224,6 @@ func NewContext(signingAccount *account.Account, node transactionSender) (b *Con
 	}, nil
 }
 
-func (c *Context) SignBroadcastWait(tx transactions.Transaction, blocks uint64) (signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
+func (c *Context) SignBroadcastWait(tx transactions.Transaction, blocks uint64) (txReceipt *TxReceipt, err error) {
 	return SignBroadcastWaitTransaction(tx, c.Account, c.TxSender, c.NetworkID, blocks)
 }

@@ -21,17 +21,17 @@ func findVMABIVersion(nodeVersion, compilerBackend string) (VMVersion, ABIVersio
 }
 
 // CreateContract lets one deploy a contract with minimum fuss.
-func (ctx *Context) CreateContract(source, function string, args []string, backend string) (ctID, signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
-	bytecode, err := ctx.compiler.CompileContract(source, backend)
+func (ctx *Context) CreateContract(source, function string, args []string, backend string) (ctID string, createTxReceipt *TxReceipt, err error) {
+	bytecode, err := ctx.Compiler.CompileContract(source, backend)
 	if err != nil {
 		return
 	}
-	calldata, err := ctx.compiler.EncodeCalldata(source, function, args, backend)
+	calldata, err := ctx.Compiler.EncodeCalldata(source, function, args, backend)
 	if err != nil {
 		return
 	}
 
-	status, err := ctx.node.GetStatus()
+	status, err := ctx.TxSender.GetStatus()
 	if err != nil {
 		return
 	}
@@ -40,7 +40,7 @@ func (ctx *Context) CreateContract(source, function string, args []string, backe
 		return
 	}
 
-	createTx, err := transactions.NewContractCreateTx(ctx.Account.Address, bytecode, VMVersion, ABIVersion, config.Client.Contracts.Deposit, config.Client.Contracts.Amount, config.Client.Contracts.GasLimit, config.Client.GasPrice, calldata, ctx.ttlnoncer)
+	createTx, err := transactions.NewContractCreateTx(ctx.Account.Address, bytecode, VMVersion, ABIVersion, config.Client.Contracts.Deposit, config.Client.Contracts.Amount, config.Client.Contracts.GasLimit, config.Client.GasPrice, calldata, ctx.TTLNoncer)
 	if err != nil {
 		return
 	}
@@ -48,7 +48,7 @@ func (ctx *Context) CreateContract(source, function string, args []string, backe
 	createTxStr, _ := transactions.SerializeTx(createTx)
 	fmt.Printf("%+v\n", createTx)
 	fmt.Println(createTxStr)
-	signedTxStr, hash, signature, blockHeight, blockHash, err = ctx.SignBroadcastWait(createTx, config.Client.WaitBlocks)
+	createTxReceipt, err = ctx.SignBroadcastWait(createTx, config.Client.WaitBlocks)
 	if err != nil {
 		return
 	}
@@ -58,13 +58,13 @@ func (ctx *Context) CreateContract(source, function string, args []string, backe
 
 // CallContract calls a smart contract's function, automatically calling the
 // compiler to transform the arguments into bytecode.
-func (ctx *Context) CallContract(ctID, source, function string, args []string, backend string) (signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
-	callData, err := ctx.compiler.EncodeCalldata(source, function, args, backend)
+func (ctx *Context) CallContract(ctID, source, function string, args []string, backend string) (txReceipt *TxReceipt, err error) {
+	callData, err := ctx.Compiler.EncodeCalldata(source, function, args, backend)
 	if err != nil {
 		return
 	}
 
-	callTx, err := transactions.NewContractCallTx(ctx.Account.Address, ctID, config.Client.Contracts.Amount, config.Client.Contracts.GasLimit, config.Client.GasPrice, config.Client.Contracts.ABIVersion, callData, ctx.ttlnoncer)
+	callTx, err := transactions.NewContractCallTx(ctx.Account.Address, ctID, config.Client.Contracts.Amount, config.Client.Contracts.GasLimit, config.Client.GasPrice, config.Client.Contracts.ABIVersion, callData, ctx.TTLNoncer)
 	if err != nil {
 		return
 	}
