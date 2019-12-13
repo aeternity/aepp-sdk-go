@@ -16,24 +16,22 @@ type nodeStatusHeightAccounterBroadcaster interface {
 
 // RegisterName allows one to easily register a name on AENS. It does the
 // preclaim, transaction sending, confirmation and claim for you.
-func RegisterName(n nodeStatusHeightAccounterBroadcaster, b *Broadcaster, name string, nameFee *big.Int) (signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
-	ttlnoncer := transactions.NewTTLNoncer(n)
-
-	preclaimTx, nameSalt, err := transactions.NewNamePreclaimTx(b.Account.Address, name, ttlnoncer)
+func (ctx *Context) RegisterName(name string, nameFee *big.Int) (signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
+	preclaimTx, nameSalt, err := transactions.NewNamePreclaimTx(ctx.Account.Address, name, ctx.ttlnoncer)
 	if err != nil {
 		return
 	}
-	_, _, _, _, _, err = b.SignBroadcastWait(preclaimTx, config.Client.WaitBlocks)
-	if err != nil {
-		return
-	}
-
-	claimTx, err := transactions.NewNameClaimTx(b.Account.Address, name, nameSalt, nameFee, ttlnoncer)
+	_, _, _, _, _, err = ctx.SignBroadcastWait(preclaimTx, config.Client.WaitBlocks)
 	if err != nil {
 		return
 	}
 
-	signedTxStr, hash, signature, blockHeight, blockHash, err = b.SignBroadcastWait(claimTx, config.Client.WaitBlocks)
+	claimTx, err := transactions.NewNameClaimTx(ctx.Account.Address, name, nameSalt, nameFee, ctx.ttlnoncer)
+	if err != nil {
+		return
+	}
+
+	signedTxStr, hash, signature, blockHeight, blockHash, err = ctx.SignBroadcastWait(claimTx, config.Client.WaitBlocks)
 	if err != nil {
 		return
 	}

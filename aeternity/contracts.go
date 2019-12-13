@@ -4,9 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/aeternity/aepp-sdk-go/v7/account"
 	"github.com/aeternity/aepp-sdk-go/v7/config"
-	"github.com/aeternity/aepp-sdk-go/v7/naet"
 	"github.com/aeternity/aepp-sdk-go/v7/transactions"
 )
 
@@ -22,28 +20,18 @@ func findVMABIVersion(nodeVersion, compilerBackend string) (VMVersion, ABIVersio
 	}
 }
 
-type compileencoder interface {
-	naet.CompileContracter
-	naet.EncodeCalldataer
-}
-
 // CreateContract lets one deploy a contract with minimum fuss.
-func CreateContract(n nodeStatusHeightAccounterBroadcaster, c compileencoder, acc *account.Account, source, function string, args []string, backend string) (ctID, signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
-	networkID, err := getNetworkID(n)
+func (ctx *Context) CreateContract(source, function string, args []string, backend string) (ctID, signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
+	bytecode, err := ctx.compiler.CompileContract(source, backend)
+	if err != nil {
+		return
+	}
+	calldata, err := ctx.compiler.EncodeCalldata(source, function, args, backend)
 	if err != nil {
 		return
 	}
 
-	bytecode, err := c.CompileContract(source, backend)
-	if err != nil {
-		return
-	}
-	calldata, err := c.EncodeCalldata(source, function, args, backend)
-	if err != nil {
-		return
-	}
-
-	status, err := n.GetStatus()
+	status, err := ctx.node.GetStatus()
 	if err != nil {
 		return
 	}
@@ -51,9 +39,8 @@ func CreateContract(n nodeStatusHeightAccounterBroadcaster, c compileencoder, ac
 	if err != nil {
 		return
 	}
-	ttlnoncer := transactions.NewTTLNoncer(n)
 
-	createTx, err := transactions.NewContractCreateTx(acc.Address, bytecode, VMVersion, ABIVersion, config.Client.Contracts.Deposit, config.Client.Contracts.Amount, config.Client.Contracts.GasLimit, config.Client.GasPrice, calldata, ttlnoncer)
+	createTx, err := transactions.NewContractCreateTx(ctx.Account.Address, bytecode, VMVersion, ABIVersion, config.Client.Contracts.Deposit, config.Client.Contracts.Amount, config.Client.Contracts.GasLimit, config.Client.GasPrice, calldata, ctx.ttlnoncer)
 	if err != nil {
 		return
 	}
@@ -61,7 +48,7 @@ func CreateContract(n nodeStatusHeightAccounterBroadcaster, c compileencoder, ac
 	createTxStr, _ := transactions.SerializeTx(createTx)
 	fmt.Printf("%+v\n", createTx)
 	fmt.Println(createTxStr)
-	signedTxStr, hash, signature, blockHeight, blockHash, err = SignBroadcastWaitTransaction(createTx, acc, n.(*naet.Node), networkID, config.Client.WaitBlocks)
+	signedTxStr, hash, signature, blockHeight, blockHash, err = ctx.SignBroadcastWait(createTx, config.Client.WaitBlocks)
 	if err != nil {
 		return
 	}
@@ -71,22 +58,16 @@ func CreateContract(n nodeStatusHeightAccounterBroadcaster, c compileencoder, ac
 
 // CallContract calls a smart contract's function, automatically calling the
 // compiler to transform the arguments into bytecode.
-func CallContract(n nodeStatusHeightAccounterBroadcaster, c compileencoder, acc *account.Account, ctID, source, function string, args []string, backend string) (signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
-	networkID, err := getNetworkID(n)
-	if err != nil {
-		return
-	}
-	ttlnoncer := transactions.NewTTLNoncer(n)
-
-	callData, err := c.EncodeCalldata(source, function, args, backend)
+func (ctx *Context) CallContract(ctID, source, function string, args []string, backend string) (signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
+	callData, err := ctx.compiler.EncodeCalldata(source, function, args, backend)
 	if err != nil {
 		return
 	}
 
-	callTx, err := transactions.NewContractCallTx(acc.Address, ctID, config.Client.Contracts.Amount, config.Client.Contracts.GasLimit, config.Client.GasPrice, config.Client.Contracts.ABIVersion, callData, ttlnoncer)
+	callTx, err := transactions.NewContractCallTx(ctx.Account.Address, ctID, config.Client.Contracts.Amount, config.Client.Contracts.GasLimit, config.Client.GasPrice, config.Client.Contracts.ABIVersion, callData, ctx.ttlnoncer)
 	if err != nil {
 		return
 	}
 
-	return SignBroadcastWaitTransaction(callTx, acc, n, networkID, config.Client.WaitBlocks)
+	return ctx.SignBroadcastWait(callTx, config.Client.WaitBlocks)
 }

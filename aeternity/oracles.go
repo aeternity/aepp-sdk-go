@@ -16,14 +16,13 @@ type generateTTLNoncerNodeInterface interface {
 }
 
 // CreateOracle registers a new oracle with the given queryspec and responsespec
-func CreateOracle(n generateTTLNoncerNodeInterface, b *Broadcaster, queryspec, responsespec string, queryFee *big.Int, queryTTLType uint64, oracleTTL uint64) (oracleID string, err error) {
-	ttlnoncer := transactions.NewTTLNoncer(n)
-	registerTx, err := transactions.NewOracleRegisterTx(b.Account.Address, queryspec, responsespec, queryFee, queryTTLType, oracleTTL, config.Client.Oracles.ABIVersion, ttlnoncer)
+func (ctx *Context) CreateOracle(queryspec, responsespec string, queryFee *big.Int, queryTTLType uint64, oracleTTL uint64) (oracleID string, err error) {
+	registerTx, err := transactions.NewOracleRegisterTx(ctx.Account.Address, queryspec, responsespec, queryFee, queryTTLType, oracleTTL, config.Client.Oracles.ABIVersion, ctx.ttlnoncer)
 	if err != nil {
 		return
 	}
 
-	b.SignBroadcastWait(registerTx, config.Client.WaitBlocks)
+	ctx.SignBroadcastWait(registerTx, config.Client.WaitBlocks)
 	return registerTx.ID(), nil
 }
 

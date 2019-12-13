@@ -174,30 +174,45 @@ func getNetworkID(n naet.GetStatuser) (networkID string, err error) {
 	return
 }
 
-type broadcasterNodeCapabilities interface {
+type transactionSender interface {
 	naet.GetStatuser
-	naet.GetAccounter
 	broadcastWaitTransactionNodeCapabilities
 }
-type Broadcaster struct {
-	Account   *account.Account
-	networkID string
-	node      broadcasterNodeCapabilities
+
+type compileencoder interface {
+	naet.CompileContracter
+	naet.EncodeCalldataer
 }
 
-func NewBroadcaster(signingAccount *account.Account, node broadcasterNodeCapabilities) (b *Broadcaster, err error) {
+type TxReceipt struct {
+	SignedTx    string
+	Hash        string
+	Signature   string
+	BlockHeight uint64
+	BlockHash   string
+}
+
+type Context struct {
+	Account   *account.Account
+	NetworkID string
+	TTLNoncer transactions.TTLNoncer
+	TxSender  transactionSender
+	Compiler  compileencoder
+}
+
+func NewContext(signingAccount *account.Account, node transactionSender) (b *Context, err error) {
 	networkID, err := getNetworkID(node)
 	if err != nil {
 		return
 	}
 
-	return &Broadcaster{
+	return &Context{
 		Account:   signingAccount,
-		node:      node,
-		networkID: networkID,
+		TxSender:  node,
+		NetworkID: networkID,
 	}, nil
 }
 
-func (b *Broadcaster) SignBroadcastWait(tx transactions.Transaction, blocks uint64) (signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
-	return SignBroadcastWaitTransaction(tx, b.Account, b.node, b.networkID, blocks)
+func (c *Context) SignBroadcastWait(tx transactions.Transaction, blocks uint64) (signedTxStr, hash, signature string, blockHeight uint64, blockHash string, err error) {
+	return SignBroadcastWaitTransaction(tx, c.Account, c.TxSender, c.NetworkID, blocks)
 }
