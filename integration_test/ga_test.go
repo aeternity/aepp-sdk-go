@@ -77,7 +77,7 @@ func TestGeneralizedAccounts(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, _, _, _, err = aeternity.SignBroadcastWaitTransaction(gaTx, testAccount, node, networkID, config.Client.WaitBlocks)
+	_, err = aeternity.SignBroadcastWaitTransaction(gaTx, testAccount, node, networkID, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}

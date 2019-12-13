@@ -59,14 +59,14 @@ var sentTxs txTypes
 var useTestNet bool
 
 func signBroadcastWaitKeepTrackOfTx(t *testing.T, tx transactions.Transaction, acc *account.Account, node *naet.Node) (height uint64, txHash string, mbHash string) {
-	_, txHash, _, height, mbHash, err := aeternity.SignBroadcastWaitTransaction(tx, acc, node, networkID, config.Client.WaitBlocks)
+	receipt, err := aeternity.SignBroadcastWaitTransaction(tx, acc, node, networkID, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}
 	info := txInfo{
-		height: height,
-		txHash: txHash,
-		mbHash: mbHash,
+		height: receipt.BlockHeight,
+		txHash: receipt.Hash,
+		mbHash: receipt.BlockHash,
 	}
 	rts := strings.Split(reflect.TypeOf(tx).String(), ".") // ['*aeternity', 'SpendTx']
 	switch txType := rts[1]; txType {

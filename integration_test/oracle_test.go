@@ -30,7 +30,7 @@ func TestOracleWorkflow(t *testing.T) {
 		t.Fatal(err)
 	}
 	fmt.Printf("Register %+v\n", register)
-	_, _, _, _, _, err = aeternity.SignBroadcastWaitTransaction(register, testAccount, node, networkID, config.Client.WaitBlocks)
+	_, err = aeternity.SignBroadcastWaitTransaction(register, testAccount, node, networkID, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -54,7 +54,7 @@ func TestOracleWorkflow(t *testing.T) {
 		t.Fatal(err)
 	}
 	fmt.Printf("Extend %+v\n", extend)
-	_, _, _, _, _, err = aeternity.SignBroadcastWaitTransaction(extend, testAccount, node, networkID, config.Client.WaitBlocks)
+	_, err = aeternity.SignBroadcastWaitTransaction(extend, testAccount, node, networkID, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -74,7 +74,7 @@ func TestOracleWorkflow(t *testing.T) {
 		t.Fatal(err)
 	}
 	fmt.Printf("Query %+v\n", query)
-	_, _, _, _, _, err = aeternity.SignBroadcastWaitTransaction(query, testAccount, node, networkID, config.Client.WaitBlocks)
+	_, err = aeternity.SignBroadcastWaitTransaction(query, testAccount, node, networkID, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -91,7 +91,7 @@ func TestOracleWorkflow(t *testing.T) {
 		t.Fatal(err)
 	}
 	fmt.Printf("Respond %+v\n", respond)
-	_, _, _, _, _, err = aeternity.SignBroadcastWaitTransaction(respond, testAccount, node, networkID, config.Client.WaitBlocks)
+	_, err = aeternity.SignBroadcastWaitTransaction(respond, testAccount, node, networkID, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}

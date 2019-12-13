@@ -85,7 +85,7 @@ func fundAccount(t *testing.T, node *naet.Node, source, destination *account.Acc
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, _, _, _, err = aeternity.SignBroadcastWaitTransaction(tx, source, node, networkID, config.Client.WaitBlocks)
+	_, err = aeternity.SignBroadcastWaitTransaction(tx, source, node, networkID, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}

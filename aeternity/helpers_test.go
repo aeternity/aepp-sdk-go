@@ -83,11 +83,11 @@ func Example() {
 		fmt.Println("Could not create the SpendTx:", err)
 	}
 
-	signedTxStr, hash, signature, foundAtBlockHeight, foundAtBlockHash, err := SignBroadcastWaitTransaction(tx, alice, node, config.Node.NetworkID, 10)
+	spendTxReceipt, err := SignBroadcastWaitTransaction(tx, alice, node, config.Node.NetworkID, 10)
 	if err != nil {
 		fmt.Println("SignBroadcastTransaction failed with:", err)
 	}
-	fmt.Println(signedTxStr, hash, signature, foundAtBlockHeight, foundAtBlockHash)
+	fmt.Println(spendTxReceipt)
 
 	// check the recipient's balance
 	time.Sleep(2 * time.Second)
