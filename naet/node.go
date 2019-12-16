@@ -28,15 +28,27 @@ func urlComponents(url string) (host string, schemas []string) {
 // NewNode instantiates a new swagger HTTP client to an aeternity node. No
 // network connection is actually performed, this only sets up the HTTP client
 // code.
-func NewNode(nodeURL string, debug bool) *Node {
+func NewNode(nodeURL string, debug bool) (aecli *Node) {
 	// create the transport
 	host, schemas := urlComponents(nodeURL)
 	transport := httptransport.New(host, "/v2", schemas)
 	transport.SetDebug(debug)
 	// create the API client, with the transport
 	openAPIClient := apiclient.New(transport, strfmt.Default)
-	aecli := &Node{
+	aecli = &Node{
 		Node: openAPIClient,
 	}
-	return aecli
+	return
+}
+
+type Infoer interface {
+	Info() (networkID string, version string)
+}
+
+func (n *Node) Info() (networkID string, version string) {
+	s, err := n.GetStatus()
+	if err != nil {
+		return
+	}
+	return *s.NetworkID, *s.NodeVersion
 }
