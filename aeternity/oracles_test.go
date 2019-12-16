@@ -20,17 +20,21 @@ func newMockOracleQueryNode() *mockOracleQueryNode {
 		},
 	}
 }
+func (m *mockOracleQueryNode) GetOracleByPubkey(pubkey string) (oracleQueries *models.RegisteredOracle, err error) {
+	return &models.RegisteredOracle{}, err
+}
+
 func (m *mockOracleQueryNode) GetOracleQueriesByPubkey(pubkey string) (oracleQueries *models.OracleQueries, err error) {
 	return m.oracleQueries, err
 }
-func newOracleQuery(i int) (q *models.OracleQuery, err error) {
-	q = new(models.OracleQuery)
-	qJSON := fmt.Sprintf(`{"fee":%d,"id":"oq_FAKEQUERY","oracle_id":"ok_FAKEID","query":"ov_FAKEQUERY=","response":"or_FAKERESPONSE","response_ttl":{"type":"delta","value":100},"sender_id":"ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi","sender_nonce":%d,"ttl":137}`, i, i)
-	err = q.UnmarshalBinary([]byte(qJSON))
-	return
-}
 
 func (m *mockOracleQueryNode) AddOracleQuery(n int) (err error) {
+	var newOracleQuery = func(i int) (q *models.OracleQuery, err error) {
+		q = new(models.OracleQuery)
+		qJSON := fmt.Sprintf(`{"fee":%d,"id":"oq_FAKEQUERY","oracle_id":"ok_FAKEID","query":"ov_FAKEQUERY=","response":"or_FAKERESPONSE","response_ttl":{"type":"delta","value":100},"sender_id":"ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi","sender_nonce":%d,"ttl":137}`, i, i)
+		err = q.UnmarshalBinary([]byte(qJSON))
+		return
+	}
 	// Create some fake OracleQuerys to add them to
 	// mockOracleQueryNode.OracleQueries. Keep track of how many we have
 	// created.
@@ -45,12 +49,12 @@ func (m *mockOracleQueryNode) AddOracleQuery(n int) (err error) {
 	return
 }
 
-func TestListenOracleQueries(t *testing.T) {
+func TestDefaultOracleListener(t *testing.T) {
 	n := newMockOracleQueryNode()
 
 	oQueries := make(chan *models.OracleQuery, 30)
 	errChan := make(chan error)
-	go ListenOracleQueries(n, "ok_FAKEID", oQueries, errChan, 20)
+	go DefaultOracleListener(n, "ok_FAKEID", oQueries, errChan, 20)
 	n.AddOracleQuery(3)
 	n.AddOracleQuery(5)
 	time.Sleep(20 * time.Millisecond)
@@ -62,7 +66,7 @@ func TestListenOracleQueries(t *testing.T) {
 	}
 }
 
-func TestManyPendingOracleQueries(t *testing.T) {
+func TestDefaultOracleListenerManyPendingQueries(t *testing.T) {
 	n := newMockOracleQueryNode()
 	readQueries := []*models.OracleQuery{}
 	oQueries := make(chan *models.OracleQuery, 5)
@@ -70,7 +74,7 @@ func TestManyPendingOracleQueries(t *testing.T) {
 
 	n.AddOracleQuery(100)
 
-	go ListenOracleQueries(n, "ok_FAKEID", oQueries, errChan, 20)
+	go DefaultOracleListener(n, "ok_FAKEID", oQueries, errChan, 20)
 
 	var q *models.OracleQuery
 	for i := 0; i < 100; i++ {
