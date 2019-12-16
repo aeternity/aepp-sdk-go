@@ -12,6 +12,12 @@ func TestCreateContract(t *testing.T) {
 	n := setupNetwork(t, privatenetURL, false)
 	c := naet.NewCompiler("http://localhost:3080", false)
 	alice, _ := setupAccounts(t)
+	ctx, err := aeternity.NewContext(alice, n)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx.SetCompiler(c)
+	contract := aeternity.NewContract(ctx)
 
 	simplestorage := `
 contract SimpleStorage =
@@ -20,9 +26,14 @@ contract SimpleStorage =
   function get() : int = state.data
   stateful function set(value : int) = put(state{data = value})`
 
-	_, err := aeternity.CreateContract(n, c, alice, simplestorage, "init", []string{"42"}, config.CompilerBackendFATE)
+	ctID, _, err := contract.Deploy(simplestorage, "init", []string{"42"}, config.CompilerBackendFATE)
 	if err != nil {
 		t.Error(err)
+	}
+
+	_, err = n.GetContractByID(ctID)
+	if err != nil {
+		t.Fatal(err)
 	}
 }
 
@@ -30,6 +41,12 @@ func TestCallContract(t *testing.T) {
 	n := setupNetwork(t, privatenetURL, false)
 	c := naet.NewCompiler("http://localhost:3080", false)
 	alice, _ := setupAccounts(t)
+	ctx, err := aeternity.NewContext(alice, n)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx.SetCompiler(c)
+	contract := aeternity.NewContract(ctx)
 
 	simplestorage := `
 contract SimpleStorage =
@@ -38,12 +55,12 @@ contract SimpleStorage =
   function get() : int = state.data
   stateful function set(value : int) = put(state{data = value})`
 
-	ctID, _, err := aeternity.CreateContract(n, c, alice, simplestorage, "init", []string{"42"}, config.CompilerBackendFATE)
+	ctID, _, err := contract.Deploy(simplestorage, "init", []string{"42"}, config.CompilerBackendFATE)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = aeternity.CallContract(n, c, alice, ctID, simplestorage, "get", []string{}, config.CompilerBackendFATE)
+	_, err = contract.Call(ctID, simplestorage, "get", []string{}, config.CompilerBackendFATE)
 	if err != nil {
 		t.Error(err)
 	}

@@ -1,46 +1,38 @@
 package aeternity
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/aeternity/aepp-sdk-go/v7/config"
 	"github.com/aeternity/aepp-sdk-go/v7/transactions"
 )
 
-func findVMABIVersion(nodeVersion, compilerBackend string) (VMVersion, ABIVersion uint16, err error) {
-	if nodeVersion[0] == '5' && compilerBackend == "fate" {
-		return 5, 3, nil
-	} else if nodeVersion[0] == '5' && compilerBackend == "aevm" {
-		return 6, 1, nil
-	} else if nodeVersion[0] == '4' {
-		return 4, 1, nil
-	} else {
-		return 0, 0, errors.New("Other node versions unsupported")
-	}
+type Contract struct {
+	ctx ContextInterface
 }
 
-// CreateContract lets one deploy a contract with minimum fuss.
-func (ctx *Context) CreateContract(source, function string, args []string, backend string) (ctID string, createTxReceipt *TxReceipt, err error) {
-	bytecode, err := ctx.Compiler.CompileContract(source, backend)
+func NewContract(ctx ContextInterface) *Contract {
+	return &Contract{ctx: ctx}
+}
+
+// Deploy lets one deploy a contract with minimum fuss.
+func (c *Contract) Deploy(source, function string, args []string, backend string) (ctID string, createTxReceipt *TxReceipt, err error) {
+	bytecode, err := c.ctx.Compiler().CompileContract(source, backend)
 	if err != nil {
 		return
 	}
-	calldata, err := ctx.Compiler.EncodeCalldata(source, function, args, backend)
+	calldata, err := c.ctx.Compiler().EncodeCalldata(source, function, args, backend)
 	if err != nil {
 		return
 	}
 
-	status, err := ctx.TxSender.GetStatus()
-	if err != nil {
-		return
-	}
-	VMVersion, ABIVersion, err := findVMABIVersion(*status.NodeVersion, backend)
+	_, version := c.ctx.NodeInfo()
+	VMVersion, ABIVersion, err := findVMABIVersion(version, backend)
 	if err != nil {
 		return
 	}
 
-	createTx, err := transactions.NewContractCreateTx(ctx.Account.Address, bytecode, VMVersion, ABIVersion, config.Client.Contracts.Deposit, config.Client.Contracts.Amount, config.Client.Contracts.GasLimit, config.Client.GasPrice, calldata, ctx.TTLNoncer)
+	createTx, err := transactions.NewContractCreateTx(c.ctx.SenderAccount(), bytecode, VMVersion, ABIVersion, config.Client.Contracts.Deposit, config.Client.Contracts.Amount, config.Client.Contracts.GasLimit, config.Client.GasPrice, calldata, c.ctx.TTLNoncer())
 	if err != nil {
 		return
 	}
@@ -48,7 +40,7 @@ func (ctx *Context) CreateContract(source, function string, args []string, backe
 	createTxStr, _ := transactions.SerializeTx(createTx)
 	fmt.Printf("%+v\n", createTx)
 	fmt.Println(createTxStr)
-	createTxReceipt, err = ctx.SignBroadcastWait(createTx, config.Client.WaitBlocks)
+	createTxReceipt, err = c.ctx.SignBroadcastWait(createTx, config.Client.WaitBlocks)
 	if err != nil {
 		return
 	}
@@ -56,18 +48,18 @@ func (ctx *Context) CreateContract(source, function string, args []string, backe
 	return
 }
 
-// CallContract calls a smart contract's function, automatically calling the
+// Call calls a smart contract's function, automatically calling the
 // compiler to transform the arguments into bytecode.
-func (ctx *Context) CallContract(ctID, source, function string, args []string, backend string) (txReceipt *TxReceipt, err error) {
-	callData, err := ctx.Compiler.EncodeCalldata(source, function, args, backend)
+func (c *Contract) Call(ctID, source, function string, args []string, backend string) (txReceipt *TxReceipt, err error) {
+	callData, err := c.ctx.Compiler().EncodeCalldata(source, function, args, backend)
 	if err != nil {
 		return
 	}
 
-	callTx, err := transactions.NewContractCallTx(ctx.Account.Address, ctID, config.Client.Contracts.Amount, config.Client.Contracts.GasLimit, config.Client.GasPrice, config.Client.Contracts.ABIVersion, callData, ctx.TTLNoncer)
+	callTx, err := transactions.NewContractCallTx(c.ctx.SenderAccount(), ctID, config.Client.Contracts.Amount, config.Client.Contracts.GasLimit, config.Client.GasPrice, config.Client.Contracts.ABIVersion, callData, c.ctx.TTLNoncer())
 	if err != nil {
 		return
 	}
 
-	return ctx.SignBroadcastWait(callTx, config.Client.WaitBlocks)
+	return c.ctx.SignBroadcastWait(callTx, config.Client.WaitBlocks)
 }
