@@ -1,6 +1,7 @@
 package aeternity
 
 import (
+	"errors"
 	"fmt"
 	"math/big"
 	"time"
@@ -172,25 +173,6 @@ func SignBroadcastWaitTransaction(tx transactions.Transaction, signingAccount *a
 	return
 }
 
-func getNetworkID(n naet.GetStatuser) (networkID string, err error) {
-	status, err := n.GetStatus()
-	if err != nil {
-		return
-	}
-	networkID = *status.NetworkID
-	return
-}
-
-type transactionSender interface {
-	naet.GetStatuser
-	broadcastWaitTransactionNodeCapabilities
-}
-
-type compileencoder interface {
-	naet.CompileContracter
-	naet.EncodeCalldataer
-}
-
 type TxReceipt struct {
 	SignedTx    string
 	Hash        string
@@ -203,27 +185,14 @@ func (t *TxReceipt) String() string {
 	return fmt.Sprintf("Signed Tx: %s\nHash: %s\nSignature: %s\nBlockHeight: %d\nBlockHash: %s", t.SignedTx, t.Hash, t.Signature, t.BlockHeight, t.BlockHash)
 }
 
-type Context struct {
-	Account   *account.Account
-	NetworkID string
-	TTLNoncer transactions.TTLNoncer
-	TxSender  transactionSender
-	Compiler  compileencoder
-}
-
-func NewContext(signingAccount *account.Account, node transactionSender) (b *Context, err error) {
-	networkID, err := getNetworkID(node)
-	if err != nil {
-		return
+func findVMABIVersion(nodeVersion, compilerBackend string) (VMVersion, ABIVersion uint16, err error) {
+	if nodeVersion[0] == '5' && compilerBackend == "fate" {
+		return 5, 3, nil
+	} else if nodeVersion[0] == '5' && compilerBackend == "aevm" {
+		return 6, 1, nil
+	} else if nodeVersion[0] == '4' {
+		return 4, 1, nil
+	} else {
+		return 0, 0, errors.New("Other node versions unsupported")
 	}
-
-	return &Context{
-		Account:   signingAccount,
-		TxSender:  node,
-		NetworkID: networkID,
-	}, nil
-}
-
-func (c *Context) SignBroadcastWait(tx transactions.Transaction, blocks uint64) (txReceipt *TxReceipt, err error) {
-	return SignBroadcastWaitTransaction(tx, c.Account, c.TxSender, c.NetworkID, blocks)
 }
