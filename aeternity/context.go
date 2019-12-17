@@ -12,18 +12,21 @@ type transactionSender interface {
 	broadcastWaitTransactionNodeCapabilities // basic transaction broadcasting capabilities
 }
 
-type compileencoder interface {
+type CompileEncoder interface {
 	naet.CompileContracter
 	naet.EncodeCalldataer
 }
 
+// ContextInterface describes the capabilities of Context, which provide
+// information solely related to transaction creation/broadcasting. It allows
+// for Context to be mocked out.
 type ContextInterface interface {
 	SenderAccount() string
 	TTLNoncer() transactions.TTLNoncer
-	Compiler() compileencoder
+	Compiler() CompileEncoder
 	NodeInfo() (networkID string, version string)
 	SignBroadcastWait(tx transactions.Transaction, blocks uint64) (*TxReceipt, error)
-	SetCompiler(c compileencoder)
+	SetCompiler(c CompileEncoder)
 }
 
 // Context holds information and node capabilities needed to create, sign and
@@ -32,7 +35,7 @@ type ContextInterface interface {
 type Context struct {
 	SigningAccount *account.Account
 	ttlNoncer      transactions.TTLNoncer
-	compiler       compileencoder
+	compiler       CompileEncoder
 	txSender       transactionSender
 }
 
@@ -58,7 +61,7 @@ func (c *Context) TTLNoncer() transactions.TTLNoncer {
 }
 
 // Compiler returns the compiler interface
-func (c *Context) Compiler() compileencoder {
+func (c *Context) Compiler() CompileEncoder {
 	return c.compiler
 }
 
@@ -75,6 +78,6 @@ func (c *Context) SignBroadcastWait(tx transactions.Transaction, blocks uint64) 
 }
 
 // SetCompiler changes the Context's compiler instance.
-func (c *Context) SetCompiler(compiler compileencoder) {
+func (c *Context) SetCompiler(compiler CompileEncoder) {
 	c.compiler = compiler
 }
