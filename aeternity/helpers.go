@@ -174,6 +174,7 @@ func SignBroadcastWaitTransaction(tx transactions.Transaction, signingAccount *a
 	return
 }
 
+// TxReceipt represents the status of a sent transaction
 type TxReceipt struct {
 	Tx          *transactions.Transaction
 	SignedTx    string
