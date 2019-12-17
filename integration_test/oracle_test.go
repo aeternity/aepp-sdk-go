@@ -12,6 +12,23 @@ import (
 	"github.com/aeternity/aepp-sdk-go/v7/transactions"
 )
 
+func myFunction(query string) (response string, err error) {
+	return "I don't care what you say, I am an oracle~!", nil
+}
+func TestOracleHLL(t *testing.T) {
+	alice, _ := setupAccounts(t)
+	node := setupNetwork(t, privatenetURL, false)
+	ctx, err := aeternity.NewContext(alice, node)
+	if err != nil {
+		t.Fatal(err)
+	}
+	oracle := aeternity.NewOracle(myFunction, node, ctx, "", "", config.Tuning.ChainPollInterval)
+	if err != nil {
+		t.Fatal(err)
+	}
+	oracle.Listen()
+}
+
 func TestOracleWorkflow(t *testing.T) {
 	alice, _ := setupAccounts(t)
 	node := setupNetwork(t, privatenetURL, false)
