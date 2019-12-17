@@ -164,6 +164,7 @@ func SignBroadcastWaitTransaction(tx transactions.Transaction, signingAccount *a
 	}
 	blockHeight, blockHash, err := WaitForTransactionForXBlocks(n, hash, x)
 	txReceipt = &TxReceipt{
+		Tx:          &tx,
 		SignedTx:    signedTxStr,
 		Hash:        hash,
 		Signature:   signature,
@@ -174,6 +175,7 @@ func SignBroadcastWaitTransaction(tx transactions.Transaction, signingAccount *a
 }
 
 type TxReceipt struct {
+	Tx          *transactions.Transaction
 	SignedTx    string
 	Hash        string
 	Signature   string
@@ -182,7 +184,7 @@ type TxReceipt struct {
 }
 
 func (t *TxReceipt) String() string {
-	return fmt.Sprintf("Signed Tx: %s\nHash: %s\nSignature: %s\nBlockHeight: %d\nBlockHash: %s", t.SignedTx, t.Hash, t.Signature, t.BlockHeight, t.BlockHash)
+	return fmt.Sprintf("Tx: %v\nSigned: %s\nHash: %s\nSignature: %s\nBlockHeight: %d\nBlockHash: %s", *t.Tx, t.SignedTx, t.Hash, t.Signature, t.BlockHeight, t.BlockHash)
 }
 
 func findVMABIVersion(nodeVersion, compilerBackend string) (VMVersion, ABIVersion uint16, err error) {
