@@ -124,6 +124,7 @@ func (o *Oracle) Listen() error {
 	if err != nil {
 		return err
 	}
+
 	queryChan := make(chan *models.OracleQuery)
 	errChan := make(chan error)
 	go o.Listener(o.node, o.ID, queryChan, errChan, o.ListenPollInterval)

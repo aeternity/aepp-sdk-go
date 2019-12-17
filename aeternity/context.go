@@ -46,27 +46,35 @@ func NewContext(signingAccount *account.Account, node transactionSender) (b *Con
 	}, nil
 }
 
+// SenderAccount returns the address of the signing account, which should also
+// be the sender address (for many transaction types)
 func (c *Context) SenderAccount() string {
 	return c.SigningAccount.Address
 }
 
+// TTLNoncer returns the TTLNoncer of Context.SigningAccount
 func (c *Context) TTLNoncer() transactions.TTLNoncer {
 	return c.ttlNoncer
 }
 
+// Compiler returns the compiler interface
 func (c *Context) Compiler() compileencoder {
 	return c.compiler
 }
 
+// NodeInfo returns the networkID and version of the currently connected node,
+// needed for contract Tx creation
 func (c *Context) NodeInfo() (networkID string, version string) {
 	return c.txSender.Info()
 }
 
+// SignBroadcastWait signs, sends and waits for the transaction to be mined.
 func (c *Context) SignBroadcastWait(tx transactions.Transaction, blocks uint64) (txReceipt *TxReceipt, err error) {
 	networkID, _ := c.txSender.Info()
 	return SignBroadcastWaitTransaction(tx, c.SigningAccount, c.txSender, networkID, blocks)
 }
 
+// SetCompiler changes the Context's compiler instance.
 func (c *Context) SetCompiler(compiler compileencoder) {
 	c.compiler = compiler
 }
