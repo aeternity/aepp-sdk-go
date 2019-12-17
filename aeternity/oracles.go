@@ -1,33 +1,35 @@
 package aeternity
 
 import (
+	"fmt"
 	"math/big"
+	"strings"
 	"time"
 
+	"github.com/aeternity/aepp-sdk-go/v7/binary"
 	"github.com/aeternity/aepp-sdk-go/v7/config"
 	"github.com/aeternity/aepp-sdk-go/v7/naet"
 	"github.com/aeternity/aepp-sdk-go/v7/swagguard/node/models"
 	"github.com/aeternity/aepp-sdk-go/v7/transactions"
 )
 
-type oracleQuery string
-type oracleResponse string
-type oracleResponder interface {
-	SendOracleResponse(ctx ContextInterface, resp oracleResponse)
-}
-
-type listener func(node oracleInfoer, oracleID string, queryChan chan *models.OracleQuery, errChan chan error, listenInterval time.Duration) (err error)
-type handler func(queryStr oracleQuery, respStr oracleResponder)
+type oracleListener func(node oracleInfoer, oracleID string, queryChan chan *models.OracleQuery, errChan chan error, listenInterval time.Duration) (err error)
+type oracleHandler func(query string) (response string, err error)
 
 type oracleInfoer interface {
 	naet.GetOracleByPubkeyer
 	naet.GetOracleQueriesByPubkeyer
 }
+
 type Oracle struct {
-	ID       string
-	node     oracleInfoer
-	ctx      ContextInterface
-	listener listener
+	ID                 string
+	QuerySpec          string
+	ResponseSpec       string
+	Handler            oracleHandler
+	Listener           oracleListener
+	ListenPollInterval time.Duration
+	node               oracleInfoer
+	ctx                ContextInterface
 }
 
 func DefaultOracleListener(node oracleInfoer, oracleID string, queryChan chan *models.OracleQuery, errChan chan error, listenInterval time.Duration) error {
@@ -46,22 +48,24 @@ func DefaultOracleListener(node oracleInfoer, oracleID string, queryChan chan *m
 				readUntilPosition++
 			}
 		}
-
-		time.Sleep(listenInterval * time.Millisecond)
+		time.Sleep(listenInterval)
 	}
 }
 
-func NewOracle(node oracleInfoer, ctx ContextInterface, ID string) *Oracle {
+func NewOracle(h oracleHandler, node oracleInfoer, ctx ContextInterface, QuerySpec, ResponseSpec string, pollInterval time.Duration) *Oracle {
 	return &Oracle{
-		ID:       ID,
-		ctx:      ctx,
-		node:     node,
-		listener: DefaultOracleListener,
+		ID:                 "",
+		QuerySpec:          QuerySpec,
+		ResponseSpec:       ResponseSpec,
+		Handler:            h,
+		ListenPollInterval: pollInterval,
+		ctx:                ctx,
+		node:               node,
+		Listener:           DefaultOracleListener,
 	}
 }
 
-// CreateOracle registers a new oracle with the given queryspec and responsespec
-func (o *Oracle) Register(queryspec, responsespec string, queryFee *big.Int, queryTTLType uint64, oracleTTL uint64) (oracleID string, err error) {
+func (o *Oracle) register(queryspec, responsespec string, queryFee *big.Int, queryTTLType uint64, oracleTTL uint64) (oracleID string, err error) {
 	registerTx, err := transactions.NewOracleRegisterTx(o.ctx.SenderAccount(), queryspec, responsespec, queryFee, queryTTLType, oracleTTL, config.Client.Oracles.ABIVersion, o.ctx.TTLNoncer())
 	if err != nil {
 		return
@@ -71,10 +75,59 @@ func (o *Oracle) Register(queryspec, responsespec string, queryFee *big.Int, que
 	return registerTx.ID(), nil
 }
 
+// RegisterIfNotExists checks if an oracle is already registered, using
+// Context.SenderAccount() to figure out the oracleID. If not, it sends a
+// OracleRegisterTx with default TTL values from config.
+func (o *Oracle) RegisterIfNotExists() error {
+	possibleOracleID := strings.Replace(o.ctx.SenderAccount(), "ak_", "ok_", 1)
+	r, err := o.node.GetOracleByPubkey(possibleOracleID)
+
+	if err != nil && strings.Contains(err.Error(), "Oracle not found") {
+		fmt.Println("Couldn't find the Oracle, registering it!")
+		oID, err := o.register(o.QuerySpec, o.ResponseSpec, config.Client.Oracles.QueryFee, config.Client.Oracles.QueryTTLType, config.Client.Oracles.OracleTTLValue)
+		if err != nil {
+			return err
+		}
+		o.ID = oID
+		fmt.Println("Registered an Oracle", oID)
+	}
+	fmt.Println(r)
+	return nil
+}
+
+func (o *Oracle) respondToQueries(queryChan chan *models.OracleQuery, errChan chan error) {
+	for {
+		q := <-queryChan
+		qBin, err := binary.Decode(*q.Query)
+		if err != nil {
+			fmt.Println("Error decoding OracleQuery", *q.ID)
+		}
+
+		qStr := string(qBin)
+		fmt.Println("Received query", *q.ID, qStr)
+		resp, err := o.Handler(qStr)
+		if err != nil {
+			fmt.Println("Error responding to OracleQuery - reason:", err)
+		}
+		respTx, err := transactions.NewOracleRespondTx(o.ctx.SenderAccount(), o.ID, *q.ID, resp, config.Client.Oracles.ResponseTTLType, config.Client.Oracles.ResponseTTLValue, o.ctx.TTLNoncer())
+		fmt.Println("respTx", respTx)
+		receipt, err := o.ctx.SignBroadcastWait(respTx, config.Client.WaitBlocks)
+		if err != nil {
+			fmt.Println("Error sending a response to OracleQuery, reason:", err)
+		}
+		fmt.Println(receipt)
+	}
+}
+
 func (o *Oracle) Listen() error {
-	_, err := o.node.GetOracleByPubkey(o.ID)
-	if err != nil { // How can we find out through the error that the oracle does not exist/404?
+	err := o.RegisterIfNotExists()
+	if err != nil {
 		return err
 	}
+	queryChan := make(chan *models.OracleQuery)
+	errChan := make(chan error)
+	go o.Listener(o.node, o.ID, queryChan, errChan, o.ListenPollInterval)
+
+	o.respondToQueries(queryChan, errChan)
 	return nil
 }
