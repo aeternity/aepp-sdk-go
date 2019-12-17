@@ -2,6 +2,7 @@ package config
 
 import (
 	"math/big"
+	"time"
 )
 
 // The main purpose of these constants is to relieve the user from having to
@@ -132,12 +133,12 @@ type ClientConfig struct {
 
 // TuningConfig fine tuning of parameters of the client
 type TuningConfig struct {
-	ChainPollInterval int64  `json:"chain_poll_interval" yaml:"chain_poll_interval" mapstructure:"chain_poll_interval"`
-	ChainTimeout      int64  `json:"chain_timeout" yaml:"chain_timeout" mapstructure:"chain_timeout"`
-	CryptoKdfMemlimit uint32 `json:"crypto_kdf_memlimit" yaml:"crypto_kdf_memlimit" mapstructure:"crypto_kdf_memlimit"`
-	CryptoKdfOpslimit uint32 `json:"crypto_kdf_opslimit" yaml:"crypto_kdf_opslimit" mapstructure:"crypto_kdf_opslimit"`
-	CryptoKdfThreads  uint8  `json:"crypto_kdf_threads" yaml:"crypto_kdf_threads" mapstructure:"crypto_kdf_threads"`
-	OutputFormatJSON  bool   `json:"-" yaml:"-" mapstructure:"-"`
+	ChainPollInterval time.Duration `json:"chain_poll_interval" yaml:"chain_poll_interval" mapstructure:"chain_poll_interval"`
+	ChainTimeout      int64         `json:"chain_timeout" yaml:"chain_timeout" mapstructure:"chain_timeout"`
+	CryptoKdfMemlimit uint32        `json:"crypto_kdf_memlimit" yaml:"crypto_kdf_memlimit" mapstructure:"crypto_kdf_memlimit"`
+	CryptoKdfOpslimit uint32        `json:"crypto_kdf_opslimit" yaml:"crypto_kdf_opslimit" mapstructure:"crypto_kdf_opslimit"`
+	CryptoKdfThreads  uint8         `json:"crypto_kdf_threads" yaml:"crypto_kdf_threads" mapstructure:"crypto_kdf_threads"`
+	OutputFormatJSON  bool          `json:"-" yaml:"-" mapstructure:"-"`
 }
 
 // ProfileConfig a configuration profile
@@ -201,7 +202,7 @@ var Client = ClientConfig{
 
 // Tuning holds default settings for TuningConfig
 var Tuning = TuningConfig{
-	ChainPollInterval: 100,
+	ChainPollInterval: 1 * time.Second,
 	ChainTimeout:      5000,
 	CryptoKdfMemlimit: 1024 * 32, // 32MB
 	CryptoKdfOpslimit: 3,
