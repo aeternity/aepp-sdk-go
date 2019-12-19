@@ -74,7 +74,14 @@ func (c *Context) NodeInfo() (networkID string, version string) {
 // SignBroadcastWait signs, sends and waits for the transaction to be mined.
 func (c *Context) SignBroadcastWait(tx transactions.Transaction, blocks uint64) (txReceipt *TxReceipt, err error) {
 	networkID, _ := c.txSender.Info()
-	return SignBroadcastWaitTransaction(tx, c.SigningAccount, c.txSender, networkID, blocks)
+	txReceipt, err := SignBroadcast(tx, c.SigningAccount, c.txSender, networkID)
+	if err != nil {
+		return
+	}
+	minedChan := make(chan bool)
+	go txReceipt.Watch(minedChan, blocks, c.txSender)
+	mined = <-minedChan
+	return mined, txReceipt
 }
 
 // SetCompiler changes the Context's compiler instance.

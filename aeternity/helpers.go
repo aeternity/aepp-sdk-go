@@ -121,7 +121,7 @@ func WaitForTransactionForXBlocks(c getTransactionByHashHeighter, txHash string,
 			bh := big.Int(tx.BlockHeight)
 			return bh.Uint64(), *tx.BlockHash, nil
 		}
-		time.Sleep(time.Millisecond * time.Duration(config.Tuning.ChainPollInterval))
+		time.Sleep(config.Tuning.ChainPollInterval)
 	}
 	wtError = ErrWaitTransaction{
 		NetworkErr:     false,
@@ -131,14 +131,14 @@ func WaitForTransactionForXBlocks(c getTransactionByHashHeighter, txHash string,
 	return
 }
 
-// SignBroadcastTransaction signs a transaction and broadcasts it to a node.
-func SignBroadcastTransaction(tx transactions.Transaction, signingAccount *account.Account, n naet.PostTransactioner, networkID string) (signedTxStr, hash, signature string, err error) {
+// SignBroadcast signs a transaction and broadcasts it to a node.
+func SignBroadcast(tx transactions.Transaction, signingAccount *account.Account, n naet.PostTransactioner, networkID string) (txReceipt *TxReceipt, err error) {
 	signedTx, hash, signature, err := transactions.SignHashTx(signingAccount, tx, networkID)
 	if err != nil {
 		return
 	}
 
-	signedTxStr, err = transactions.SerializeTx(signedTx)
+	signedTxStr, err := transactions.SerializeTx(signedTx)
 	if err != nil {
 		return
 	}
@@ -147,30 +147,8 @@ func SignBroadcastTransaction(tx transactions.Transaction, signingAccount *accou
 	if err != nil {
 		return
 	}
-	return
-}
 
-type broadcastWaitTransactionNodeCapabilities interface {
-	naet.PostTransactioner
-	getTransactionByHashHeighter
-}
-
-// SignBroadcastWaitTransaction is a convenience function that combines
-// SignBroadcastTransaction and WaitForTransactionForXBlocks.
-func SignBroadcastWaitTransaction(tx transactions.Transaction, signingAccount *account.Account, n broadcastWaitTransactionNodeCapabilities, networkID string, x uint64) (txReceipt *TxReceipt, err error) {
-	signedTxStr, hash, signature, err := SignBroadcastTransaction(tx, signingAccount, n, networkID)
-	if err != nil {
-		return
-	}
-	blockHeight, blockHash, err := WaitForTransactionForXBlocks(n, hash, x)
-	txReceipt = &TxReceipt{
-		Tx:          &tx,
-		SignedTx:    signedTxStr,
-		Hash:        hash,
-		Signature:   signature,
-		BlockHeight: blockHeight,
-		BlockHash:   blockHash,
-	}
+	txReceipt = NewTxReceipt(&tx, signedTxStr, hash, signature)
 	return
 }
 
@@ -182,10 +160,60 @@ type TxReceipt struct {
 	Signature   string
 	BlockHeight uint64
 	BlockHash   string
+	Mined       bool
+	Error       error
 }
 
 func (t *TxReceipt) String() string {
 	return fmt.Sprintf("Tx: %v\nSigned: %s\nHash: %s\nSignature: %s\nBlockHeight: %d\nBlockHash: %s", *t.Tx, t.SignedTx, t.Hash, t.Signature, t.BlockHeight, t.BlockHash)
+}
+
+func NewTxReceipt(tx *transactions.Transaction, signedTx, hash, signature string) (txReceipt *TxReceipt) {
+	txReceipt = &TxReceipt{
+		Tx:        tx,
+		SignedTx:  signedTx,
+		Hash:      hash,
+		Signature: signature,
+	}
+
+	return
+}
+
+// Watch polls until a transaction has been mined or X blocks have gone by,
+// after which it errors out via TxReceiptWatchResult. The node polling interval
+// can be configured with config.Tuning.ChainPollInterval, which accepts a
+// time.Duration.
+func (t *TxReceipt) Watch(mined chan bool, waitBlocks uint64, node getTransactionByHashHeighter) {
+	nodeHeight, err := node.GetHeight()
+	if err != nil {
+		t.Error = err
+		mined <- false
+	}
+	endHeight := nodeHeight + waitBlocks
+	for nodeHeight <= endHeight {
+		nodeHeight, err = node.GetHeight()
+		if err != nil {
+			t.Error = err
+			mined <- false
+		}
+		tx, err := node.GetTransactionByHash(t.Hash)
+		if err != nil {
+			t.Error = err
+			mined <- false
+		}
+
+		if tx.BlockHeight.LargerThanZero() {
+			bh := big.Int(tx.BlockHeight)
+			t.BlockHeight = bh.Uint64()
+			t.BlockHash = *tx.BlockHash
+			t.Mined = true
+			mined <- true
+		}
+		time.Sleep(config.Tuning.ChainPollInterval)
+	}
+
+	t.Error = fmt.Errorf("%v blocks have gone by and %v still isn't in a block", waitBlocks, t.Hash)
+	mined <- false
 }
 
 func findVMABIVersion(nodeVersion, compilerBackend string) (VMVersion, ABIVersion uint16, err error) {
