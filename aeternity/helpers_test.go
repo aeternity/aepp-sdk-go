@@ -3,7 +3,6 @@ package aeternity
 import (
 	"fmt"
 	"math/big"
-	"testing"
 	"time"
 
 	"github.com/aeternity/aepp-sdk-go/v7/account"
@@ -43,20 +42,6 @@ func (m *mockClient) GetTransactionByHash(hash string) (tx *models.GenericSigned
 	}
 	return tx, nil
 }
-func TestWaitForTransactionForXBlocks(t *testing.T) {
-	m := new(mockClient)
-	blockHeight, blockHash, err := WaitForTransactionForXBlocks(m, "th_transactionhash", 10)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if blockHeight != 9 {
-		t.Fatalf("Expected mock blockHeight 9, got %v", blockHeight)
-	}
-	if blockHash != "bh_someblockhash" {
-		t.Fatalf("Expected mock blockHash bh_someblockhash, got %s", blockHash)
-	}
-}
-
 func Example() {
 	// Set the Network ID. For this example, setting the config.Node.NetworkID
 	// is actually not needed - but if you have other code that also needs to
