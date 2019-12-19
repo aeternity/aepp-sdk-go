@@ -83,54 +83,6 @@ func (b ErrWaitTransaction) Error() string {
 	return fmt.Sprintf("%s: %s", errType, b.Err.Error())
 }
 
-// WaitForTransactionForXBlocks blocks until a transaction has been mined or X
-// blocks have gone by, after which it returns an error. The node polling
-// interval can be config.Configured with config.Tuning.ChainPollInterval.
-func WaitForTransactionForXBlocks(c getTransactionByHashHeighter, txHash string, x uint64) (blockHeight uint64, blockHash string, wtError error) {
-	nodeHeight, err := c.GetHeight()
-	if err != nil {
-		wtError = ErrWaitTransaction{
-			NetworkErr:     true,
-			TransactionErr: false,
-			Err:            err,
-		}
-		return
-	}
-	endHeight := nodeHeight + x
-	for nodeHeight <= endHeight {
-		nodeHeight, err = c.GetHeight()
-		if err != nil {
-			wtError = ErrWaitTransaction{
-				NetworkErr:     true,
-				TransactionErr: false,
-				Err:            err,
-			}
-			return
-		}
-		tx, err := c.GetTransactionByHash(txHash)
-		if err != nil {
-			wtError = ErrWaitTransaction{
-				NetworkErr:     false,
-				TransactionErr: true,
-				Err:            err,
-			}
-			return
-		}
-
-		if tx.BlockHeight.LargerThanZero() {
-			bh := big.Int(tx.BlockHeight)
-			return bh.Uint64(), *tx.BlockHash, nil
-		}
-		time.Sleep(config.Tuning.ChainPollInterval)
-	}
-	wtError = ErrWaitTransaction{
-		NetworkErr:     false,
-		TransactionErr: true,
-		Err:            fmt.Errorf("%v blocks have gone by and %v still isn't in a block", x, txHash),
-	}
-	return
-}
-
 // SignBroadcast signs a transaction and broadcasts it to a node.
 func SignBroadcast(tx transactions.Transaction, signingAccount *account.Account, n naet.PostTransactioner, networkID string) (txReceipt *TxReceipt, err error) {
 	signedTx, hash, signature, err := transactions.SignHashTx(signingAccount, tx, networkID)

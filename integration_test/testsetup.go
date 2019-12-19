@@ -68,16 +68,6 @@ func getHeight(node *naet.Node) (h uint64) {
 	return
 }
 
-func waitForTransaction(node *naet.Node, hash string) (height uint64, microblockHash string, err error) {
-	height, microblockHash, err = aeternity.WaitForTransactionForXBlocks(node, hash, 10)
-	if err != nil {
-		// Sometimes, the tests want the tx to fail. Return the err to let them know.
-		return 0, "", err
-	}
-	fmt.Println("Transaction was found at", height, "microblockHash", microblockHash, "err", err)
-	return height, microblockHash, err
-}
-
 func fundAccount(t *testing.T, node *naet.Node, source, destination *account.Account, amount *big.Int) {
 	ttlnoncer := transactions.NewTTLNoncer(node)
 	fmt.Println("Funding account", destination.Address)
