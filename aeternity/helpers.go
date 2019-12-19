@@ -152,6 +152,16 @@ func SignBroadcast(tx transactions.Transaction, signingAccount *account.Account,
 	return
 }
 
+// WaitSynchronous blocks until TxReceipt.Watch() reports that a transaction was
+// mined/not mined. It is intended as a convenience function since it makes an
+// asynchronous operation synchronous.
+func WaitSynchronous(txReceipt *TxReceipt, waitBlocks uint64, n getTransactionByHashHeighter) (mined bool, err error) {
+	minedChan := make(chan bool)
+	go txReceipt.Watch(minedChan, waitBlocks, n)
+	mined = <-minedChan
+	return mined, txReceipt.Error
+}
+
 // TxReceipt represents the status of a sent transaction
 type TxReceipt struct {
 	Tx          *transactions.Transaction
