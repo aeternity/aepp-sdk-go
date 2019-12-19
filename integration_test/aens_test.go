@@ -39,28 +39,31 @@ func randomName(length int) string {
 func TestAENSWorkflow(t *testing.T) {
 	node := setupNetwork(t, privatenetURL, false)
 	alice, bob := setupAccounts(t)
-	ttlnoncer := transactions.NewTTLNoncer(node)
+	ctx, err := aeternity.NewContext(alice, node)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	name := randomName(int(config.Client.Names.NameAuctionMaxLength + 1))
 	// Preclaim the name
-	preclaimTx, nameSalt, err := transactions.NewNamePreclaimTx(alice.Address, name, ttlnoncer)
+	preclaimTx, nameSalt, err := transactions.NewNamePreclaimTx(alice.Address, name, ctx.TTLNoncer())
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Printf("Preclaim %+v with name %s \n", preclaimTx, name)
-	_, err = aeternity.SignBroadcastWaitTransaction(preclaimTx, alice, node, networkID, config.Client.WaitBlocks)
+	_, err = ctx.SignBroadcastWait(preclaimTx, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Claim the name
 	nameFee := transactions.CalculateMinNameFee(name)
-	claimTx, err := transactions.NewNameClaimTx(alice.Address, name, nameSalt, nameFee, ttlnoncer)
+	claimTx, err := transactions.NewNameClaimTx(alice.Address, name, nameSalt, nameFee, ctx.TTLNoncer())
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Printf("Claim %+v\n", claimTx)
-	_, err = aeternity.SignBroadcastWaitTransaction(claimTx, alice, node, networkID, config.Client.WaitBlocks)
+	_, err = ctx.SignBroadcastWait(claimTx, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -74,12 +77,12 @@ func TestAENSWorkflow(t *testing.T) {
 	delay(printNameEntry)
 
 	// Update the name, make it point to something
-	updateTx, err := transactions.NewNameUpdateTx(alice.Address, name, []string{alice.Address}, config.Client.Names.ClientTTL, ttlnoncer)
+	updateTx, err := transactions.NewNameUpdateTx(alice.Address, name, []string{alice.Address}, config.Client.Names.ClientTTL, ctx.TTLNoncer())
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Printf("Update %+v\n", updateTx)
-	_, err = aeternity.SignBroadcastWaitTransaction(updateTx, alice, node, networkID, config.Client.WaitBlocks)
+	_, err = ctx.SignBroadcastWait(updateTx, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -91,34 +94,34 @@ func TestAENSWorkflow(t *testing.T) {
 	}
 
 	// Transfer the name to a recipient
-	transferTx, err := transactions.NewNameTransferTx(alice.Address, name, bob.Address, ttlnoncer)
+	transferTx, err := transactions.NewNameTransferTx(alice.Address, name, bob.Address, ctx.TTLNoncer())
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Printf("Transfer %+v\n", transferTx)
-	_, err = aeternity.SignBroadcastWaitTransaction(transferTx, alice, node, networkID, config.Client.WaitBlocks)
+	_, err = ctx.SignBroadcastWait(transferTx, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Receiver updates the name, makes it point to himself
-	updateTx2, err := transactions.NewNameUpdateTx(bob.Address, name, []string{bob.Address}, config.Client.Names.ClientTTL, ttlnoncer)
+	updateTx2, err := transactions.NewNameUpdateTx(bob.Address, name, []string{bob.Address}, config.Client.Names.ClientTTL, ctx.TTLNoncer())
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Printf("Update Signed By Recipient %+v\n", updateTx2)
-	_, err = aeternity.SignBroadcastWaitTransaction(updateTx2, bob, node, networkID, config.Client.WaitBlocks)
+	_, err = ctx.SignBroadcastWait(updateTx2, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Revoke the name - shouldn't work because it is signed by the sender, who no longer owns the address
-	revokeTx, err := transactions.NewNameRevokeTx(alice.Address, name, ttlnoncer)
+	revokeTx, err := transactions.NewNameRevokeTx(alice.Address, name, ctx.TTLNoncer())
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Printf("Revoke %+v\n", revokeTx)
-	_, revokeTxShouldHaveFailed := aeternity.SignBroadcastWaitTransaction(revokeTx, alice, node, networkID, config.Client.WaitBlocks)
+	_, revokeTxShouldHaveFailed := ctx.SignBroadcastWait(revokeTx, config.Client.WaitBlocks)
 	if revokeTxShouldHaveFailed == nil {
 		t.Fatal("After transferring the name to Recipient, the Sender should not have been able to revoke the name")
 	} else if revokeTxShouldHaveFailed.(aeternity.ErrWaitTransaction).NetworkErr == true {
@@ -128,12 +131,12 @@ func TestAENSWorkflow(t *testing.T) {
 	}
 
 	// Revoke the name - signed by the recipient
-	revokeTx2, err := transactions.NewNameRevokeTx(bob.Address, name, ttlnoncer)
+	revokeTx2, err := transactions.NewNameRevokeTx(bob.Address, name, ctx.TTLNoncer())
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Printf("Revoke Signed By Recipient %+v\n", revokeTx2)
-	_, err = aeternity.SignBroadcastWaitTransaction(revokeTx2, bob, node, networkID, config.Client.WaitBlocks)
+	_, err = ctx.SignBroadcastWait(revokeTx2, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}

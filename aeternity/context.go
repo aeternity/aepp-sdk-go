@@ -30,7 +30,7 @@ type ContextInterface interface {
 	TTLNoncer() transactions.TTLNoncer
 	Compiler() CompileEncoder
 	NodeInfo() (networkID string, version string)
-	SignBroadcastWait(tx transactions.Transaction, blocks uint64) (*TxReceipt, error)
+	SignBroadcastWait(tx transactions.Transaction, blocks uint64) (r *TxReceipt, err error)
 	SetCompiler(c CompileEncoder)
 }
 
@@ -77,15 +77,15 @@ func (c *Context) NodeInfo() (networkID string, version string) {
 }
 
 // SignBroadcastWait signs, sends and waits for the transaction to be mined.
-func (c *Context) SignBroadcastWait(tx transactions.Transaction, blocks uint64) (mined bool, txReceipt *TxReceipt, err error) {
+func (c *Context) SignBroadcastWait(tx transactions.Transaction, blocks uint64) (txReceipt *TxReceipt, err error) {
 	networkID, _ := c.txSender.Info()
 	txReceipt, err = SignBroadcast(tx, c.SigningAccount, c.txSender, networkID)
 	if err != nil {
 		return
 	}
 
-	mined, err = Wait(txReceipt, blocks, c.txSender)
-	return mined, txReceipt, err
+	err = WaitSynchronous(txReceipt, blocks, c.txSender)
+	return txReceipt, err
 }
 
 // SetCompiler changes the Context's compiler instance.

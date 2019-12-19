@@ -83,11 +83,15 @@ func Example() {
 		fmt.Println("Could not create the SpendTx:", err)
 	}
 
-	spendTxReceipt, err := SignBroadcastWaitTransaction(tx, alice, node, config.Node.NetworkID, 10)
+	spendTxReceipt, err := SignBroadcast(tx, alice, node, config.Node.NetworkID)
 	if err != nil {
-		fmt.Println("SignBroadcastTransaction failed with:", err)
+		fmt.Println("could not send transaction:", err)
 	}
-	fmt.Println(spendTxReceipt)
+	err = WaitSynchronous(spendTxReceipt, 10, node)
+	if err != nil {
+		fmt.Println("transaction was not accepted by the blockchain:", err)
+	}
+	fmt.Printf("%#v\n", spendTxReceipt)
 
 	// check the recipient's balance
 	time.Sleep(2 * time.Second)

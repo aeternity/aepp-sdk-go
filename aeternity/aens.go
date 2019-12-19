@@ -17,12 +17,12 @@ func NewAENS(ctx ContextInterface) *AENS {
 
 // RegisterName allows one to easily register a name on AENS. It does the
 // preclaim, transaction sending, confirmation and claim for you.
-func (aens *AENS) RegisterName(name string, nameFee *big.Int) (claimTxReceipt *TxReceipt, err error) {
+func (aens *AENS) RegisterName(name string, nameFee *big.Int) (txReceipt *TxReceipt, err error) {
 	preclaimTx, nameSalt, err := transactions.NewNamePreclaimTx(aens.ctx.SenderAccount(), name, aens.ctx.TTLNoncer())
 	if err != nil {
 		return
 	}
-	_, err = aens.ctx.SignBroadcastWait(preclaimTx, config.Client.WaitBlocks)
+	txReceipt, err = aens.ctx.SignBroadcastWait(preclaimTx, config.Client.WaitBlocks)
 	if err != nil {
 		return
 	}
@@ -32,7 +32,7 @@ func (aens *AENS) RegisterName(name string, nameFee *big.Int) (claimTxReceipt *T
 		return
 	}
 
-	claimTxReceipt, err = aens.ctx.SignBroadcastWait(claimTx, config.Client.WaitBlocks)
+	txReceipt, err = aens.ctx.SignBroadcastWait(claimTx, config.Client.WaitBlocks)
 	if err != nil {
 		return
 	}

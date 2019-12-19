@@ -29,7 +29,11 @@ func TestGeneralizedAccounts(t *testing.T) {
 	alice, bob := setupAccounts(t)
 	node := setupNetwork(t, privatenetURL, false)
 	compiler := naet.NewCompiler(config.Client.Contracts.CompilerURL, false)
-	ttlnoncer := transactions.NewTTLNoncer(node)
+	ctx, err := aeternity.NewContext(alice, node)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx.SetCompiler(compiler)
 
 	// Take note of Bob's balance, and after this test, we expect it to have this much more AE
 	amount := utils.NewIntFromUint64(5000)
@@ -73,11 +77,11 @@ func TestGeneralizedAccounts(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	gaTx, err := transactions.NewGAAttachTx(testAccount.Address, authBytecode, auth.TypeInfo[0].FuncHash, config.Client.Contracts.VMVersion, config.Client.Contracts.ABIVersion, config.Client.Contracts.GasLimit, config.Client.GasPrice, authInitCalldata, ttlnoncer)
+	gaTx, err := transactions.NewGAAttachTx(testAccount.Address, authBytecode, auth.TypeInfo[0].FuncHash, config.Client.Contracts.VMVersion, config.Client.Contracts.ABIVersion, config.Client.Contracts.GasLimit, config.Client.GasPrice, authInitCalldata, ctx.TTLNoncer())
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = aeternity.SignBroadcastWaitTransaction(gaTx, testAccount, node, networkID, config.Client.WaitBlocks)
+	_, err = ctx.SignBroadcastWait(gaTx, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -103,7 +107,7 @@ func TestGeneralizedAccounts(t *testing.T) {
 		return 0, 0, 0, nil
 	}
 	spendTx, err := transactions.NewSpendTx(testAccount.Address, bob.Address, big.NewInt(5000), []byte{}, metaTxTTLNoncer)
-	gaMetaTx, err := transactions.NewGAMetaTx(testAccount.Address, authData, config.Client.Contracts.ABIVersion, config.Client.GasPrice, config.Client.GasPrice, spendTx, ttlnoncer)
+	gaMetaTx, err := transactions.NewGAMetaTx(testAccount.Address, authData, config.Client.Contracts.ABIVersion, config.Client.GasPrice, config.Client.GasPrice, spendTx, ctx.TTLNoncer())
 
 	gaMetaTxFinal, hash, _, err := transactions.SignHashTx(testAccount, gaMetaTx, config.Node.NetworkID)
 	if err != nil {
