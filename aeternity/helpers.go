@@ -130,7 +130,7 @@ type TxReceipt struct {
 }
 
 func (t *TxReceipt) String() string {
-	return fmt.Sprintf("Tx: %v\nSigned: %s\nHash: %s\nSignature: %s\nBlockHeight: %d\nBlockHash: %s", *t.Tx, t.SignedTx, t.Hash, t.Signature, t.BlockHeight, t.BlockHash)
+	return fmt.Sprintf("Mined: %v\nTx: %+v\nSigned: %s\nHash: %s\nSignature: %s\nBlockHeight: %d\nBlockHash: %s", t.Mined, *t.Tx, t.SignedTx, t.Hash, t.Signature, t.BlockHeight, t.BlockHash)
 }
 
 func NewTxReceipt(tx *transactions.Transaction, signedTx, hash, signature string) (txReceipt *TxReceipt) {
