@@ -12,6 +12,11 @@ type transactionSender interface {
 	broadcastWaitTransactionNodeCapabilities // basic transaction broadcasting capabilities
 }
 
+type broadcastWaitTransactionNodeCapabilities interface {
+	naet.PostTransactioner
+	getTransactionByHashHeighter
+}
+
 type CompileEncoder interface {
 	naet.CompileContracter
 	naet.EncodeCalldataer
