@@ -32,7 +32,10 @@ func TestOracleHLL(t *testing.T) {
 func TestOracleWorkflow(t *testing.T) {
 	alice, _ := setupAccounts(t)
 	node := setupNetwork(t, privatenetURL, false)
-	ttlnoncer := transactions.NewTTLNoncer(node)
+	ctx, err := aeternity.NewContext(alice, node)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	// Setup temporary test account and fund it
 	testAccount, err := account.New()
@@ -42,12 +45,12 @@ func TestOracleWorkflow(t *testing.T) {
 	fundAccount(t, node, alice, testAccount, big.NewInt(1000000000000000000))
 
 	// Register
-	register, err := transactions.NewOracleRegisterTx(testAccount.Address, "hello", "helloback", config.Client.Oracles.QueryFee, config.OracleTTLTypeDelta, config.Client.Oracles.OracleTTLValue, config.Client.Oracles.ABIVersion, ttlnoncer)
+	register, err := transactions.NewOracleRegisterTx(testAccount.Address, "hello", "helloback", config.Client.Oracles.QueryFee, config.OracleTTLTypeDelta, config.Client.Oracles.OracleTTLValue, config.Client.Oracles.ABIVersion, ctx.TTLNoncer())
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Printf("Register %+v\n", register)
-	_, err = aeternity.SignBroadcastWaitTransaction(register, testAccount, node, networkID, config.Client.WaitBlocks)
+	_, err = ctx.SignBroadcastWait(register, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -66,12 +69,12 @@ func TestOracleWorkflow(t *testing.T) {
 	// Extend
 	// save the oracle's initial TTL so we can compare it with after OracleExtendTx
 	oracleTTL := oracle.TTL
-	extend, err := transactions.NewOracleExtendTx(testAccount.Address, oraclePubKey, config.OracleTTLTypeDelta, config.Client.Oracles.OracleTTLValue, ttlnoncer)
+	extend, err := transactions.NewOracleExtendTx(testAccount.Address, oraclePubKey, config.OracleTTLTypeDelta, config.Client.Oracles.OracleTTLValue, ctx.TTLNoncer())
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Printf("Extend %+v\n", extend)
-	_, err = aeternity.SignBroadcastWaitTransaction(extend, testAccount, node, networkID, config.Client.WaitBlocks)
+	_, err = ctx.SignBroadcastWait(extend, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -86,12 +89,12 @@ func TestOracleWorkflow(t *testing.T) {
 	}
 
 	// Query
-	query, err := transactions.NewOracleQueryTx(testAccount.Address, oraclePubKey, "How was your day?", config.Client.Oracles.QueryFee, 0, 100, 0, 100, ttlnoncer)
+	query, err := transactions.NewOracleQueryTx(testAccount.Address, oraclePubKey, "How was your day?", config.Client.Oracles.QueryFee, 0, 100, 0, 100, ctx.TTLNoncer())
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Printf("Query %+v\n", query)
-	_, err = aeternity.SignBroadcastWaitTransaction(query, testAccount, node, networkID, config.Client.WaitBlocks)
+	_, err = ctx.SignBroadcastWait(query, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -103,12 +106,12 @@ func TestOracleWorkflow(t *testing.T) {
 	}
 
 	// Respond
-	respond, err := transactions.NewOracleRespondTx(testAccount.Address, oraclePubKey, oqID, "My day was fine thank you", config.OracleTTLTypeDelta, config.Client.Oracles.ResponseTTLValue, ttlnoncer)
+	respond, err := transactions.NewOracleRespondTx(testAccount.Address, oraclePubKey, oqID, "My day was fine thank you", config.OracleTTLTypeDelta, config.Client.Oracles.ResponseTTLValue, ctx.TTLNoncer())
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Printf("Respond %+v\n", respond)
-	_, err = aeternity.SignBroadcastWaitTransaction(respond, testAccount, node, networkID, config.Client.WaitBlocks)
+	_, err = ctx.SignBroadcastWait(respond, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}

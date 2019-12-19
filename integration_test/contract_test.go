@@ -13,18 +13,21 @@ import (
 func TestContracts(t *testing.T) {
 	alice, _ := setupAccounts(t)
 	node := setupNetwork(t, privatenetURL, false)
-	ttlnoncer := transactions.NewTTLNoncer(node)
+	ctx, err := aeternity.NewContext(alice, node)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	var ctID string
 
 	identityBytecode := string(golden.Get(t, "identity_bytecode.txt"))
 	identityInitCalldata := string(golden.Get(t, "identity_initcalldata.txt"))
-	create, err := transactions.NewContractCreateTx(alice.Address, identityBytecode, config.Client.Contracts.VMVersion, config.Client.Contracts.ABIVersion, config.Client.Contracts.Deposit, config.Client.Contracts.Amount, config.Client.Contracts.GasLimit, config.Client.GasPrice, identityInitCalldata, ttlnoncer)
+	create, err := transactions.NewContractCreateTx(alice.Address, identityBytecode, config.Client.Contracts.VMVersion, config.Client.Contracts.ABIVersion, config.Client.Contracts.Deposit, config.Client.Contracts.Amount, config.Client.Contracts.GasLimit, config.Client.GasPrice, identityInitCalldata, ctx.TTLNoncer())
 	if err != nil {
 		t.Fatal(err)
 	}
 	ctID, _ = create.ContractID()
-	createTxReceipt, err := aeternity.SignBroadcastWaitTransaction(create, alice, node, networkID, config.Client.WaitBlocks)
+	createTxReceipt, err := ctx.SignBroadcastWait(create, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -40,11 +43,11 @@ func TestContracts(t *testing.T) {
 	delay(getContract)
 
 	identityMain42Calldata := string(golden.Get(t, "identity_main42.txt"))
-	callTx, err := transactions.NewContractCallTx(alice.Address, ctID, config.Client.Contracts.Amount, config.Client.Contracts.GasLimit, config.Client.GasPrice, config.Client.Contracts.ABIVersion, identityMain42Calldata, ttlnoncer)
+	callTx, err := transactions.NewContractCallTx(alice.Address, ctID, config.Client.Contracts.Amount, config.Client.Contracts.GasLimit, config.Client.GasPrice, config.Client.Contracts.ABIVersion, identityMain42Calldata, ctx.TTLNoncer())
 	if err != nil {
 		t.Fatal(err)
 	}
-	callTxReceipt, err := aeternity.SignBroadcastWaitTransaction(callTx, alice, node, networkID, config.Client.WaitBlocks)
+	callTxReceipt, err := ctx.SignBroadcastWait(callTx, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
 	}
