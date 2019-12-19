@@ -26,7 +26,10 @@ func (c *Contract) Deploy(source, function string, args []string, backend string
 		return
 	}
 
-	_, version := c.ctx.NodeInfo()
+	_, version, err := c.ctx.NodeInfo()
+	if err != nil {
+		return
+	}
 	VMVersion, ABIVersion, err := findVMABIVersion(version, backend)
 	if err != nil {
 		return

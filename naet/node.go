@@ -40,15 +40,3 @@ func NewNode(nodeURL string, debug bool) (aecli *Node) {
 	}
 	return
 }
-
-type Infoer interface {
-	Info() (networkID string, version string)
-}
-
-func (n *Node) Info() (networkID string, version string) {
-	s, err := n.GetStatus()
-	if err != nil {
-		return
-	}
-	return *s.NetworkID, *s.NodeVersion
-}

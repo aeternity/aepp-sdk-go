@@ -7,7 +7,7 @@ import (
 )
 
 type transactionSender interface {
-	naet.Infoer                              // quickly get node version, networkID for VM/ABI
+	naet.GetStatuser                         // quickly get node version, networkID for VM/ABI
 	naet.GetAccounter                        // for transactions.NewTTLNoncer()
 	broadcastWaitTransactionNodeCapabilities // basic transaction broadcasting capabilities
 }
@@ -29,7 +29,7 @@ type ContextInterface interface {
 	SenderAccount() string
 	TTLNoncer() transactions.TTLNoncer
 	Compiler() CompileEncoder
-	NodeInfo() (networkID string, version string)
+	NodeInfo() (networkID string, version string, err error)
 	SignBroadcastWait(tx transactions.Transaction, blocks uint64) (r *TxReceipt, err error)
 	SetCompiler(c CompileEncoder)
 }
@@ -72,13 +72,20 @@ func (c *Context) Compiler() CompileEncoder {
 
 // NodeInfo returns the networkID and version of the currently connected node,
 // needed for contract Tx creation
-func (c *Context) NodeInfo() (networkID string, version string) {
-	return c.txSender.Info()
+func (c *Context) NodeInfo() (networkID string, version string, err error) {
+	s, err := c.txSender.GetStatus()
+	if err != nil {
+		return
+	}
+	return *s.NetworkID, *s.NodeVersion, err
 }
 
 // SignBroadcastWait signs, sends and waits for the transaction to be mined.
 func (c *Context) SignBroadcastWait(tx transactions.Transaction, blocks uint64) (txReceipt *TxReceipt, err error) {
-	networkID, _ := c.txSender.Info()
+	networkID, _, err := c.NodeInfo()
+	if err != nil {
+		return
+	}
 	txReceipt, err = SignBroadcast(tx, c.SigningAccount, c.txSender, networkID)
 	if err != nil {
 		return
