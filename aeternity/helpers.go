@@ -64,25 +64,6 @@ type getTransactionByHashHeighter interface {
 	naet.GetHeighter
 }
 
-// ErrWaitTransaction is returned by WaitForTransactionForXBlocks() to let
-// callers distinguish between network errors and transaction acceptance errors.
-type ErrWaitTransaction struct {
-	NetworkErr     bool
-	TransactionErr bool
-	Err            error
-}
-
-func (b ErrWaitTransaction) Error() string {
-	var errType string
-	if b.TransactionErr {
-		errType = "TransactionErr"
-	} else {
-		errType = "NetworkErr"
-	}
-
-	return fmt.Sprintf("%s: %s", errType, b.Err.Error())
-}
-
 // SignBroadcast signs a transaction and broadcasts it to a node.
 func SignBroadcast(tx transactions.Transaction, signingAccount *account.Account, n naet.PostTransactioner, networkID string) (txReceipt *TxReceipt, err error) {
 	signedTx, hash, signature, err := transactions.SignHashTx(signingAccount, tx, networkID)
@@ -133,7 +114,7 @@ func (t *TxReceipt) String() string {
 	return fmt.Sprintf("Mined: %v\nTx: %+v\nSigned: %s\nHash: %s\nSignature: %s\nBlockHeight: %d\nBlockHash: %s", t.Mined, *t.Tx, t.SignedTx, t.Hash, t.Signature, t.BlockHeight, t.BlockHash)
 }
 
-func NewTxReceipt(tx *transactions.Transaction, signedTx, hash, signature string) (txReceipt *TxReceipt) {
+func NewTxReceipt(tx transactions.Transaction, signedTx, hash, signature string) (txReceipt *TxReceipt) {
 	txReceipt = &TxReceipt{
 		Tx:        tx,
 		SignedTx:  signedTx,
