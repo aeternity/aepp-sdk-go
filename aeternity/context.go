@@ -80,19 +80,26 @@ func (c *Context) NodeInfo() (networkID string, version string, err error) {
 	return *s.NetworkID, *s.NodeVersion, err
 }
 
-// SignBroadcastWait signs, sends and waits for the transaction to be mined.
-func (c *Context) SignBroadcastWait(tx transactions.Transaction, blocks uint64) (txReceipt *TxReceipt, err error) {
+// SignBroadcast signs, sends and returns immediately, just like
+// aeternity.SignBroadcast. The difference is that the account used to sign the
+// transaction and broadcasting node and network ID don't have to be provided
+// every time.
+func (c *Context) SignBroadcast(tx transactions.Transaction, blocks uint64) (txReceipt *TxReceipt, err error) {
 	networkID, _, err := c.NodeInfo()
 	if err != nil {
 		return
 	}
-	txReceipt, err = SignBroadcast(tx, c.SigningAccount, c.txSender, networkID)
-	if err != nil {
-		return
-	}
+	return SignBroadcast(tx, c.SigningAccount, c.txSender, networkID)
 
+}
+
+// SignBroadcastWait is just like SignBroadcast but integrates
+// aeternity.WaitSynchronous afterwards, to block until the transaction is
+// mined.
+func (c *Context) SignBroadcastWait(tx transactions.Transaction, blocks uint64) (txReceipt *TxReceipt, err error) {
+	txReceipt, err = c.SignBroadcast(tx, blocks)
 	err = WaitSynchronous(txReceipt, blocks, c.txSender)
-	return txReceipt, err
+	return
 }
 
 // SetCompiler changes the Context's compiler instance.
