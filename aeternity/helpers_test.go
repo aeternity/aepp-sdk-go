@@ -14,17 +14,17 @@ import (
 	"github.com/aeternity/aepp-sdk-go/v7/utils"
 )
 
-type mockNode struct {
+type mockNodeForTxReceipt_Watch struct {
 	i uint64
 }
 
-func (m *mockNode) GetHeight() (uint64, error) {
+func (m *mockNodeForTxReceipt_Watch) GetHeight() (uint64, error) {
 	m.i++
 	return m.i, nil
 }
 
 // GetTransactionByHash pretends that the transaction was not mined until block 9, and this is only visible when the mockClient is at height 10.
-func (m *mockNode) GetTransactionByHash(hash string) (tx *models.GenericSignedTx, err error) {
+func (m *mockNodeForTxReceipt_Watch) GetTransactionByHash(hash string) (tx *models.GenericSignedTx, err error) {
 	unminedHeight, _ := utils.NewIntFromString("-1")
 	minedHeight, _ := utils.NewIntFromString("9")
 
@@ -61,7 +61,7 @@ func TestTxReceipt_Watch(t *testing.T) {
 			args: args{
 				mined:      make(chan bool),
 				waitBlocks: 10,
-				node:       &mockNode{},
+				node:       &mockNodeForTxReceipt_Watch{},
 			},
 			wantErr: false,
 		},
@@ -70,7 +70,7 @@ func TestTxReceipt_Watch(t *testing.T) {
 			args: args{
 				mined:      make(chan bool),
 				waitBlocks: 10,
-				node:       &mockNode{i: 20},
+				node:       &mockNodeForTxReceipt_Watch{i: 20},
 			},
 			wantErr: true,
 		},
@@ -133,4 +133,153 @@ func Example() {
 	}
 
 	fmt.Println(bobState.Balance)
+}
+
+type mockNodeForSignBroadcast struct {
+	shouldAcceptTx bool
+}
+
+func (m *mockNodeForSignBroadcast) PostTransaction(string, string) error {
+	if m.shouldAcceptTx {
+		return nil
+	} else {
+		return fmt.Errorf("Dummy PostTransaction error")
+	}
+}
+func TestSignBroadcast(t *testing.T) {
+	dummyAcc, err := account.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+	type args struct {
+		tx             transactions.Transaction
+		signingAccount *account.Account
+		n              naet.PostTransactioner
+		networkID      string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Everything okay, transaction was accepted",
+			args: args{
+				tx: &transactions.SpendTx{
+					SenderID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+					RecipientID: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
+					Amount:      &big.Int{},
+					Fee:         &big.Int{},
+					Payload:     nil,
+					TTL:         0,
+					Nonce:       0,
+				},
+				signingAccount: dummyAcc,
+				n:              &mockNodeForSignBroadcast{shouldAcceptTx: true},
+				networkID:      "dummy_network_id",
+			},
+			wantErr: false,
+		},
+		{
+			name: "Error, transaction not accepted",
+			args: args{
+				tx: &transactions.SpendTx{
+					SenderID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
+					RecipientID: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
+					Amount:      &big.Int{},
+					Fee:         &big.Int{},
+					Payload:     nil,
+					TTL:         0,
+					Nonce:       0,
+				},
+				signingAccount: dummyAcc,
+				n:              &mockNodeForSignBroadcast{shouldAcceptTx: false},
+				networkID:      "dummy_network_id",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := SignBroadcast(tt.args.tx, tt.args.signingAccount, tt.args.n, tt.args.networkID)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("SignBroadcast() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+		})
+	}
+}
+
+func Test_findVMABIVersion(t *testing.T) {
+	type args struct {
+		nodeVersion     string
+		compilerBackend string
+	}
+	tests := []struct {
+		name           string
+		args           args
+		wantVMVersion  uint16
+		wantABIVersion uint16
+		wantErr        bool
+	}{
+		{
+			name: "node version 5, FATE backend",
+			args: args{
+				nodeVersion:     "5",
+				compilerBackend: "fate",
+			},
+			wantVMVersion:  5,
+			wantABIVersion: 3,
+		},
+		{
+			name: "node version 5, AEVM backend",
+			args: args{
+				nodeVersion:     "5",
+				compilerBackend: "aevm",
+			},
+			wantVMVersion:  6,
+			wantABIVersion: 1,
+		},
+		{
+			name: "node version 4, AEVM backend",
+			args: args{
+				nodeVersion:     "4",
+				compilerBackend: "aevm",
+			},
+			wantVMVersion:  4,
+			wantABIVersion: 1,
+		},
+		{
+			name: "node version 4, does not actually support FATE, so it should return answer for AEVM anyway",
+			args: args{
+				nodeVersion:     "4",
+				compilerBackend: "fate",
+			},
+			wantVMVersion:  4,
+			wantABIVersion: 1,
+		},
+		{
+			name: "Other versions of the node are not supported",
+			args: args{
+				nodeVersion:     "3",
+				compilerBackend: "aevm",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotVMVersion, gotABIVersion, err := findVMABIVersion(tt.args.nodeVersion, tt.args.compilerBackend)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("findVMABIVersion() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if gotVMVersion != tt.wantVMVersion {
+				t.Errorf("findVMABIVersion() gotVMVersion = %v, want %v", gotVMVersion, tt.wantVMVersion)
+			}
+			if gotABIVersion != tt.wantABIVersion {
+				t.Errorf("findVMABIVersion() gotABIVersion = %v, want %v", gotABIVersion, tt.wantABIVersion)
+			}
+		})
+	}
 }
