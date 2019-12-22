@@ -56,10 +56,9 @@ func GetChannelsByName(n GetAnythingByNameFunc, name string) (channels []string,
 	return n(name, "channel")
 }
 
-// getTransactionByHashHeighter is used by WaitForTransactionForXBlocks to
-// specify that the node/mock node passed in should support
-// GetTransactionByHash() and GetHeight()
-type getTransactionByHashHeighter interface {
+// transactionWaiter is used to poll the node until a given tx is mined, or
+// until a certain height is reached.
+type transactionWaiter interface {
 	naet.GetTransactionByHasher
 	naet.GetHeighter
 }
@@ -81,14 +80,14 @@ func SignBroadcast(tx transactions.Transaction, signingAccount *account.Account,
 		return
 	}
 
-	txReceipt = NewTxReceipt(&tx, signedTxStr, hash, signature)
+	txReceipt = NewTxReceipt(tx, signedTxStr, hash, signature)
 	return
 }
 
 // WaitSynchronous blocks until TxReceipt.Watch() reports that a transaction was
 // mined/not mined. It is intended as a convenience function since it makes an
 // asynchronous operation synchronous.
-func WaitSynchronous(txReceipt *TxReceipt, waitBlocks uint64, n getTransactionByHashHeighter) (err error) {
+func WaitSynchronous(txReceipt *TxReceipt, waitBlocks uint64, n transactionWaiter) (err error) {
 	minedChan := make(chan bool)
 	go txReceipt.Watch(minedChan, waitBlocks, n)
 	mined := <-minedChan
@@ -129,7 +128,7 @@ func NewTxReceipt(tx transactions.Transaction, signedTx, hash, signature string)
 // after which it errors out via TxReceiptWatchResult. The node polling interval
 // can be configured with config.Tuning.ChainPollInterval, which accepts a
 // time.Duration.
-func (t *TxReceipt) Watch(mined chan bool, waitBlocks uint64, node getTransactionByHashHeighter) {
+func (t *TxReceipt) Watch(mined chan bool, waitBlocks uint64, node transactionWaiter) {
 	nodeHeight, err := node.GetHeight()
 	if err != nil {
 		t.Error = err

@@ -14,7 +14,7 @@ type transactionSender interface {
 
 type broadcastWaitTransactionNodeCapabilities interface {
 	naet.PostTransactioner
-	getTransactionByHashHeighter
+	transactionWaiter
 }
 
 type CompileEncoder interface {
