@@ -13,10 +13,7 @@ import (
 func TestContracts(t *testing.T) {
 	alice, _ := setupAccounts(t)
 	node := setupNetwork(t, privatenetURL, false)
-	ctx, err := aeternity.NewContext(alice, node)
-	if err != nil {
-		t.Fatal(err)
-	}
+	ctx := aeternity.NewContext(alice, node)
 
 	var ctID string
 

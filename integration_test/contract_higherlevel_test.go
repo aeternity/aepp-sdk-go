@@ -12,10 +12,7 @@ func TestCreateContract(t *testing.T) {
 	n := setupNetwork(t, privatenetURL, false)
 	c := naet.NewCompiler("http://localhost:3080", false)
 	alice, _ := setupAccounts(t)
-	ctx, err := aeternity.NewContext(alice, n)
-	if err != nil {
-		t.Fatal(err)
-	}
+	ctx := aeternity.NewContext(alice, n)
 	ctx.SetCompiler(c)
 	contract := aeternity.NewContract(ctx)
 
@@ -41,10 +38,7 @@ func TestCallContract(t *testing.T) {
 	n := setupNetwork(t, privatenetURL, false)
 	c := naet.NewCompiler("http://localhost:3080", false)
 	alice, _ := setupAccounts(t)
-	ctx, err := aeternity.NewContext(alice, n)
-	if err != nil {
-		t.Fatal(err)
-	}
+	ctx := aeternity.NewContext(alice, n)
 	ctx.SetCompiler(c)
 	contract := aeternity.NewContract(ctx)
 
