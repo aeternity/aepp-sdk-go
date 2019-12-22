@@ -3,6 +3,7 @@ package aeternity
 import (
 	"fmt"
 	"math/big"
+	"testing"
 	"time"
 
 	"github.com/aeternity/aepp-sdk-go/v7/account"
@@ -13,17 +14,17 @@ import (
 	"github.com/aeternity/aepp-sdk-go/v7/utils"
 )
 
-type mockClient struct {
+type mockNode struct {
 	i uint64
 }
 
-func (m *mockClient) GetHeight() (uint64, error) {
+func (m *mockNode) GetHeight() (uint64, error) {
 	m.i++
 	return m.i, nil
 }
 
 // GetTransactionByHash pretends that the transaction was not mined until block 9, and this is only visible when the mockClient is at height 10.
-func (m *mockClient) GetTransactionByHash(hash string) (tx *models.GenericSignedTx, err error) {
+func (m *mockNode) GetTransactionByHash(hash string) (tx *models.GenericSignedTx, err error) {
 	unminedHeight, _ := utils.NewIntFromString("-1")
 	minedHeight, _ := utils.NewIntFromString("9")
 
@@ -42,6 +43,52 @@ func (m *mockClient) GetTransactionByHash(hash string) (tx *models.GenericSigned
 	}
 	return tx, nil
 }
+
+func TestTxReceipt_Watch(t *testing.T) {
+	config.Tuning.ChainPollInterval = 1 * time.Microsecond
+	type args struct {
+		mined      chan bool
+		waitBlocks uint64
+		node       transactionWaiter
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Tx was mined successfully",
+			args: args{
+				mined:      make(chan bool),
+				waitBlocks: 10,
+				node:       &mockNode{},
+			},
+			wantErr: false,
+		},
+		{
+			name: "Tx did not get mined",
+			args: args{
+				mined:      make(chan bool),
+				waitBlocks: 10,
+				node:       &mockNode{i: 20},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tx := &transactions.SpendTx{}
+			txReceipt := NewTxReceipt(tx, "tx_signed", "th_somehash", "sg_somesignature")
+
+			go txReceipt.Watch(tt.args.mined, tt.args.waitBlocks, tt.args.node)
+			result := <-tt.args.mined
+			if result && tt.wantErr {
+				t.Fatal(txReceipt.Error)
+			}
+		})
+	}
+}
+
 func Example() {
 	// Set the Network ID. For this example, setting the config.Node.NetworkID
 	// is actually not needed - but if you have other code that also needs to
