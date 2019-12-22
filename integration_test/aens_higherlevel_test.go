@@ -11,15 +11,12 @@ func TestRegisterName(t *testing.T) {
 	n := setupNetwork(t, privatenetURL, false)
 	alice, _ := setupAccounts(t)
 
-	ctx, err := aeternity.NewContext(alice, n)
-	if err != nil {
-		t.Fatal(err)
-	}
+	ctx := aeternity.NewContext(alice, n)
 	name := "somelongnamefdsafdffsa.chain"
 	nameFee := transactions.CalculateMinNameFee(name)
 
 	aens := aeternity.NewAENS(ctx)
-	_, err = aens.RegisterName(name, nameFee)
+	_, err := aens.RegisterName(name, nameFee)
 	if err != nil {
 		t.Error(err)
 	}

@@ -18,24 +18,15 @@ func myFunction(query string) (response string, err error) {
 func TestOracleHLL(t *testing.T) {
 	alice, _ := setupAccounts(t)
 	node := setupNetwork(t, privatenetURL, false)
-	ctx, err := aeternity.NewContext(alice, node)
-	if err != nil {
-		t.Fatal(err)
-	}
+	ctx := aeternity.NewContext(alice, node)
 	oracle := aeternity.NewOracle(myFunction, node, ctx, "", "", config.Tuning.ChainPollInterval)
-	if err != nil {
-		t.Fatal(err)
-	}
 	oracle.Listen()
 }
 
 func TestOracleWorkflow(t *testing.T) {
 	alice, _ := setupAccounts(t)
 	node := setupNetwork(t, privatenetURL, false)
-	ctx, err := aeternity.NewContext(alice, node)
-	if err != nil {
-		t.Fatal(err)
-	}
+	ctx := aeternity.NewContext(alice, node)
 
 	// Setup temporary test account and fund it
 	testAccount, err := account.New()

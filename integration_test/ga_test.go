@@ -29,10 +29,7 @@ func TestGeneralizedAccounts(t *testing.T) {
 	alice, bob := setupAccounts(t)
 	node := setupNetwork(t, privatenetURL, false)
 	compiler := naet.NewCompiler(config.Client.Contracts.CompilerURL, false)
-	ctx, err := aeternity.NewContext(alice, node)
-	if err != nil {
-		t.Fatal(err)
-	}
+	ctx := aeternity.NewContext(alice, node)
 	ctx.SetCompiler(compiler)
 
 	// Take note of Bob's balance, and after this test, we expect it to have this much more AE

@@ -39,14 +39,8 @@ func randomName(length int) string {
 func TestAENSWorkflow(t *testing.T) {
 	node := setupNetwork(t, privatenetURL, false)
 	alice, bob := setupAccounts(t)
-	ctxAlice, err := aeternity.NewContext(alice, node)
-	if err != nil {
-		t.Fatal(err)
-	}
-	ctxBob, err := aeternity.NewContext(bob, node)
-	if err != nil {
-		t.Fatal(err)
-	}
+	ctxAlice := aeternity.NewContext(alice, node)
+	ctxBob := aeternity.NewContext(bob, node)
 
 	name := randomName(int(config.Client.Names.NameAuctionMaxLength + 1))
 	// Preclaim the name
