@@ -46,12 +46,12 @@ type Context struct {
 
 // NewContext creates a new Context, but does not force one to provide a
 // compiler (which can be set via SetCompiler)
-func NewContext(signingAccount *account.Account, node transactionSender) (b *Context, err error) {
+func NewContext(signingAccount *account.Account, node transactionSender) (b *Context) {
 	return &Context{
 		SigningAccount: signingAccount,
 		ttlNoncer:      transactions.NewTTLNoncer(node),
 		txSender:       node,
-	}, nil
+	}
 }
 
 // SenderAccount returns the address of the signing account, which should also
