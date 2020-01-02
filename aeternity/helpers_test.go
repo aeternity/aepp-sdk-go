@@ -14,17 +14,17 @@ import (
 	"github.com/aeternity/aepp-sdk-go/v7/utils"
 )
 
-type mockNodeForTxReceipt_Watch struct {
+type mockNodeForTxReceiptWatch struct {
 	i uint64
 }
 
-func (m *mockNodeForTxReceipt_Watch) GetHeight() (uint64, error) {
+func (m *mockNodeForTxReceiptWatch) GetHeight() (uint64, error) {
 	m.i++
 	return m.i, nil
 }
 
 // GetTransactionByHash pretends that the transaction was not mined until block 9, and this is only visible when the mockClient is at height 10.
-func (m *mockNodeForTxReceipt_Watch) GetTransactionByHash(hash string) (tx *models.GenericSignedTx, err error) {
+func (m *mockNodeForTxReceiptWatch) GetTransactionByHash(hash string) (tx *models.GenericSignedTx, err error) {
 	unminedHeight, _ := utils.NewIntFromString("-1")
 	minedHeight, _ := utils.NewIntFromString("9")
 
@@ -61,7 +61,7 @@ func TestTxReceipt_Watch(t *testing.T) {
 			args: args{
 				mined:      make(chan bool),
 				waitBlocks: 10,
-				node:       &mockNodeForTxReceipt_Watch{},
+				node:       &mockNodeForTxReceiptWatch{},
 			},
 			wantErr: false,
 		},
@@ -70,7 +70,7 @@ func TestTxReceipt_Watch(t *testing.T) {
 			args: args{
 				mined:      make(chan bool),
 				waitBlocks: 10,
-				node:       &mockNodeForTxReceipt_Watch{i: 20},
+				node:       &mockNodeForTxReceiptWatch{i: 20},
 			},
 			wantErr: true,
 		},
@@ -142,9 +142,8 @@ type mockNodeForSignBroadcast struct {
 func (m *mockNodeForSignBroadcast) PostTransaction(string, string) error {
 	if m.shouldAcceptTx {
 		return nil
-	} else {
-		return fmt.Errorf("Dummy PostTransaction error")
 	}
+	return fmt.Errorf("Dummy PostTransaction error")
 }
 func TestSignBroadcast(t *testing.T) {
 	dummyAcc, err := account.New()
