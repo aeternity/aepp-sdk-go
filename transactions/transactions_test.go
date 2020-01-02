@@ -404,7 +404,7 @@ func Test_CalculateFee(t *testing.T) {
 			AccountID: "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
 			NameID:    "nm_ie148R2qZYBfo1Ek3sZpfTLwBhkkqCRKi2Ce8JJ7yyWVRw2Sb", // fdsa.test
 			Pointers: []*NamePointer{
-				&NamePointer{Key: "account_pubkey", ID: "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"},
+				&NamePointer{Key: "account_pubkey", Pointer: "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"},
 			},
 			NameTTL:      uint64(0),
 			ClientTTL:    uint64(6),

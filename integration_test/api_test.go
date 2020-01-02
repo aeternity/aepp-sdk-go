@@ -148,7 +148,11 @@ func TestAPI(t *testing.T) {
 
 	// NameUpdateTx
 	fmt.Println("NameUpdateTx")
-	updateTx, err := transactions.NewNameUpdateTx(alice.Address, name, []string{alice.Address}, config.Client.Names.ClientTTL, ttlnoncer)
+	np, err := transactions.NewNamePointer("account_pubkey", alice.Address)
+	if err != nil {
+		t.Fatal(err)
+	}
+	updateTx, err := transactions.NewNameUpdateTx(alice.Address, name, []*transactions.NamePointer{np}, config.Client.Names.ClientTTL, ttlnoncer)
 	if err != nil {
 		t.Fatal(err)
 	}

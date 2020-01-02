@@ -77,7 +77,11 @@ func TestAENSWorkflow(t *testing.T) {
 	delay(printNameEntry)
 
 	// Update the name, make it point to something
-	updateTx, err := transactions.NewNameUpdateTx(alice.Address, name, []string{alice.Address}, config.Client.Names.ClientTTL, ctxAlice.TTLNoncer())
+	alicesAddress, err := transactions.NewNamePointer("account_pubkey", alice.Address)
+	if err != nil {
+		t.Fatal(err)
+	}
+	updateTx, err := transactions.NewNameUpdateTx(alice.Address, name, []*transactions.NamePointer{alicesAddress}, config.Client.Names.ClientTTL, ctxAlice.TTLNoncer())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -107,7 +111,11 @@ func TestAENSWorkflow(t *testing.T) {
 	fmt.Println(r)
 
 	// Receiver updates the name, makes it point to himself
-	updateTx2, err := transactions.NewNameUpdateTx(bob.Address, name, []string{bob.Address}, config.Client.Names.ClientTTL, ctxBob.TTLNoncer())
+	bobsAddress, err := transactions.NewNamePointer("account_pubkey", alice.Address)
+	if err != nil {
+		t.Fatal(err)
+	}
+	updateTx2, err := transactions.NewNameUpdateTx(bob.Address, name, []*transactions.NamePointer{bobsAddress}, config.Client.Names.ClientTTL, ctxBob.TTLNoncer())
 	if err != nil {
 		t.Fatal(err)
 	}

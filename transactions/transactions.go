@@ -230,32 +230,6 @@ func ttlTypeIntToStr(i uint64) string {
 	return oracleTTLTypeStr
 }
 
-func buildPointers(pointers []string) (ptrs []*NamePointer, err error) {
-	// TODO: handle errors
-	ptrs = make([]*NamePointer, len(pointers))
-	for i, p := range pointers {
-		switch binary.GetHashPrefix(p) {
-		case binary.PrefixAccountPubkey:
-			// pID, err := buildIDTag(IDTagAccount, p)
-			key := "account_pubkey"
-			ptrs[i] = NewNamePointer(key, p)
-			if err != nil {
-				break
-			}
-		case binary.PrefixOraclePubkey:
-			// pID, err := buildIDTag(IDTagOracle, p)
-			key := "oracle_pubkey"
-			ptrs[i] = NewNamePointer(key, p)
-			if err != nil {
-				break
-			}
-		default:
-			err = fmt.Errorf("Invalid ID %v for pointers", p)
-		}
-	}
-	return
-}
-
 func calcRlpLen(o interface{}) (size int64, err error) {
 	rlpEncoded, err := rlp.EncodeToBytes(o)
 	if err != nil {

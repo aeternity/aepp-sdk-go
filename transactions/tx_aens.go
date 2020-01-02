@@ -383,26 +383,43 @@ func CalculateMinNameFee(name string) (minNameFee *big.Int) {
 // NamePointer is a go-native representation of swagger generated
 // models.NamePointer.
 type NamePointer struct {
-	Key string
-	ID  string
+	Key     string
+	Pointer string
 }
 
 // Swagger generates the go-swagger representation of this model
 func (np *NamePointer) Swagger() *models.NamePointer {
 	return &models.NamePointer{
 		Key: &np.Key,
-		ID:  &np.ID,
+		ID:  &np.Pointer,
 	}
 }
 
 // EncodeRLP implements rlp.Encoder interface.
 func (np *NamePointer) EncodeRLP(w io.Writer) (err error) {
-	accountID, err := buildIDTag(IDTagAccount, np.ID)
+	var idTag uint8
+	// figure out ID tag for RLP serialization from NamePointer.Key
+	switch np.Key {
+	case "account_pubkey":
+		idTag = IDTagAccount
+	case "oracle_pubkey":
+		idTag = IDTagOracle
+	case "contract_pubkey":
+		idTag = IDTagContract
+	case "channel":
+		idTag = IDTagChannel
+	// if NamePointer.Key is custom, encode it as a channel for now until AENS
+	// supports generic byte blobs
+	default:
+		idTag = IDTagChannel
+	}
+
+	ID, err := buildIDTag(idTag, np.Pointer)
 	if err != nil {
 		return
 	}
 
-	err = rlp.Encode(w, []interface{}{np.Key, accountID})
+	err = rlp.Encode(w, []interface{}{np.Key, ID})
 	if err != nil {
 		return
 	}
@@ -410,8 +427,8 @@ func (np *NamePointer) EncodeRLP(w io.Writer) (err error) {
 }
 
 type namePointerRLP struct {
-	Key       string
-	AccountID []uint8
+	Key     string
+	Pointer []uint8
 }
 
 // DecodeRLP implements rlp.Decoder interface.
@@ -425,22 +442,73 @@ func (np *NamePointer) DecodeRLP(s *rlp.Stream) (err error) {
 	if err = rlp.DecodeBytes(blob, npRLP); err != nil {
 		return
 	}
-	_, aID, err := readIDTag(npRLP.AccountID)
+	_, ID, err := readIDTag(npRLP.Pointer)
 	if err != nil {
 		return
 	}
 
 	np.Key = npRLP.Key
-	np.ID = aID
+	np.Pointer = ID
 	return err
 }
 
-// NewNamePointer is a constructor for NamePointer struct.
-func NewNamePointer(key string, id string) *NamePointer {
-	return &NamePointer{
-		Key: key,
-		ID:  id,
+// Validate checks that the pointer's type matches its declared type in the Key,
+// and that its length is <32 bytes.
+func (np *NamePointer) Validate() (err error) {
+	var typeValidation error
+	switch np.Key {
+	case "account_pubkey":
+		typeValidation = np.validateAccountPubkey()
+	case "oracle_pubkey":
+		typeValidation = np.validateOraclePubkey()
+	case "contract_pubkey":
+		typeValidation = np.validateContractPubkey()
+	case "channel":
+		typeValidation = np.validateChannel()
+	default:
+		typeValidation = nil
 	}
+	return typeValidation
+}
+
+func (np *NamePointer) validateAccountPubkey() error {
+	if !strings.HasPrefix(np.Pointer, string(binary.PrefixAccountPubkey)) {
+		return fmt.Errorf("If the Key is \"account_pubkey\", the Pointer must start with %s", binary.PrefixAccountPubkey)
+	}
+	return nil
+}
+func (np *NamePointer) validateOraclePubkey() error {
+	if !strings.HasPrefix(np.Pointer, string(binary.PrefixOraclePubkey)) {
+		return fmt.Errorf("If the Key is \"oracle_pubkey\", the Pointer must start with %s", binary.PrefixOraclePubkey)
+	}
+	return nil
+}
+
+func (np *NamePointer) validateContractPubkey() error {
+	if !strings.HasPrefix(np.Pointer, string(binary.PrefixContractPubkey)) {
+		return fmt.Errorf("If the Key is \"contract_pubkey\", the Pointer must start with %s", binary.PrefixContractPubkey)
+	}
+	return nil
+}
+
+func (np *NamePointer) validateChannel() error {
+	if !strings.HasPrefix(np.Pointer, string(binary.PrefixChannel)) {
+		return fmt.Errorf("If the Key is \"channel\", the Pointer must start with %s", binary.PrefixChannel)
+	}
+	return nil
+}
+
+// NewNamePointer is a constructor for NamePointer struct.
+func NewNamePointer(key string, pointer string) (n *NamePointer, err error) {
+	n = &NamePointer{
+		Key:     key,
+		Pointer: pointer,
+	}
+	err = n.Validate()
+	if err != nil {
+		return nil, err
+	}
+	return
 }
 
 // NameUpdateTx represents a transaction where one extends the lifetime of a reserved name on AENS
@@ -601,7 +669,7 @@ func (tx *NameUpdateTx) CalcGas() (g *big.Int, err error) {
 }
 
 // NewNameUpdateTx is a constructor for a NameUpdateTx struct
-func NewNameUpdateTx(accountID, name string, pointers []string, clientTTL uint64, ttlnoncer TTLNoncer) (tx *NameUpdateTx, err error) {
+func NewNameUpdateTx(accountID, name string, pointers []*NamePointer, clientTTL uint64, ttlnoncer TTLNoncer) (tx *NameUpdateTx, err error) {
 	ttl, height, accountNonce, err := ttlnoncer(accountID, config.Client.TTL)
 	if err != nil {
 		return
@@ -612,12 +680,8 @@ func NewNameUpdateTx(accountID, name string, pointers []string, clientTTL uint64
 	if err != nil {
 		return
 	}
-	parsedPointers, err := buildPointers(pointers)
-	if err != nil {
-		panic(err)
-	}
 
-	tx = &NameUpdateTx{accountID, nm, parsedPointers, nameTTL, clientTTL, config.Client.Fee, ttl, accountNonce}
+	tx = &NameUpdateTx{accountID, nm, pointers, nameTTL, clientTTL, config.Client.Fee, ttl, accountNonce}
 	CalculateFee(tx)
 	return
 }
