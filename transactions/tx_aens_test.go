@@ -21,8 +21,8 @@ func TestNamePointer(t *testing.T) {
 		{
 			name: "1 pointer to a normal ak_ account",
 			namepointer: NamePointer{
-				Key: "account_pubkey",
-				ID:  "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
+				Key:     "account_pubkey",
+				Pointer: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
 			},
 			// the reference value of rlpBytes is taken from a correct serialization of NameUpdateTx.
 			// Unfortunately there is no way to get the node to serialize just the NamePointer.
@@ -98,7 +98,7 @@ func TestAENSTx(t *testing.T) {
 				AccountID: "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
 				NameID:    "nm_ie148R2qZYBfo1Ek3sZpfTLwBhkkqCRKi2Ce8JJ7yyWVRw2Sb", // fdsa.test
 				Pointers: []*NamePointer{
-					&NamePointer{Key: "account_pubkey", ID: "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"},
+					&NamePointer{Key: "account_pubkey", Pointer: "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"},
 				},
 				NameTTL:      uint64(0),
 				ClientTTL:    uint64(6),
@@ -116,9 +116,9 @@ func TestAENSTx(t *testing.T) {
 				AccountID: "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
 				NameID:    "nm_ie148R2qZYBfo1Ek3sZpfTLwBhkkqCRKi2Ce8JJ7yyWVRw2Sb", // fdsa.test
 				Pointers: []*NamePointer{
-					&NamePointer{Key: "account_pubkey", ID: "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"},
-					&NamePointer{Key: "account_pubkey", ID: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v"},
-					&NamePointer{Key: "account_pubkey", ID: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt"},
+					&NamePointer{Key: "account_pubkey", Pointer: "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"},
+					&NamePointer{Key: "account_pubkey", Pointer: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v"},
+					&NamePointer{Key: "account_pubkey", Pointer: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt"},
 				},
 				NameTTL:      uint64(0),
 				ClientTTL:    uint64(6),
@@ -136,10 +136,10 @@ func TestAENSTx(t *testing.T) {
 				AccountID: "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
 				NameID:    "nm_ie148R2qZYBfo1Ek3sZpfTLwBhkkqCRKi2Ce8JJ7yyWVRw2Sb", // fdsa.test
 				Pointers: []*NamePointer{
-					&NamePointer{Key: "account_pubkey", ID: "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"},
-					&NamePointer{Key: "account_pubkey", ID: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v"},
-					&NamePointer{Key: "account_pubkey", ID: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt"},
-					&NamePointer{Key: "account_pubkey", ID: "ak_rHQAmJsLKC2u7Tr1htTGYxy2ga71AESM611tjGGfyUJmLbDYP"},
+					&NamePointer{Key: "account_pubkey", Pointer: "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"},
+					&NamePointer{Key: "account_pubkey", Pointer: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v"},
+					&NamePointer{Key: "account_pubkey", Pointer: "ak_542o93BKHiANzqNaFj6UurrJuDuxU61zCGr9LJCwtTUg34kWt"},
+					&NamePointer{Key: "account_pubkey", Pointer: "ak_rHQAmJsLKC2u7Tr1htTGYxy2ga71AESM611tjGGfyUJmLbDYP"},
 				},
 				NameTTL:      uint64(0),
 				ClientTTL:    uint64(6),
