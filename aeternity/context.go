@@ -17,6 +17,8 @@ type broadcastWaitTransactionNodeCapabilities interface {
 	transactionWaiter
 }
 
+// CompileEncoder represents the basic capabilities required of a Compiler to be
+// used by ContextInterface. Basically, a Compiler should be able to Compile and Encode Calldata.
 type CompileEncoder interface {
 	naet.CompileContracter
 	naet.EncodeCalldataer

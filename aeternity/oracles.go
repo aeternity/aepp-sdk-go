@@ -21,6 +21,7 @@ type oracleInfoer interface {
 	naet.GetOracleQueriesByPubkeyer
 }
 
+// Oracle is a higher level interface to oracle functionalities.
 type Oracle struct {
 	ID                 string
 	QuerySpec          string
@@ -32,6 +33,9 @@ type Oracle struct {
 	ctx                ContextInterface
 }
 
+// DefaultOracleListener uses a oracleInfoer to get all OracleQueries for a
+// given oracleID, but keeps track of how many it read last time to that it only
+// pushes new OracleQueries into the queryChan channel.
 func DefaultOracleListener(node oracleInfoer, oracleID string, queryChan chan *models.OracleQuery, errChan chan error, listenInterval time.Duration) error {
 	// Node always returns all queries, but keeping track of until where we read
 	// last iteration ensures we only report newly arriving queries. This means
@@ -52,6 +56,7 @@ func DefaultOracleListener(node oracleInfoer, oracleID string, queryChan chan *m
 	}
 }
 
+// NewOracle creates a new Oracle higher level interface object
 func NewOracle(h oracleHandler, node oracleInfoer, ctx ContextInterface, QuerySpec, ResponseSpec string, pollInterval time.Duration) *Oracle {
 	return &Oracle{
 		ID:                 "",
@@ -119,6 +124,8 @@ func (o *Oracle) respondToQueries(queryChan chan *models.OracleQuery, errChan ch
 	}
 }
 
+// Listen starts polling for OracleQueries in a goroutine, passes new queries to
+// Handler, and sends out a OracleResponseTx that contains Handler's return value.
 func (o *Oracle) Listen() error {
 	err := o.RegisterIfNotExists()
 	if err != nil {

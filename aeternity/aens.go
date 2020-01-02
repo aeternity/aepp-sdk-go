@@ -7,10 +7,12 @@ import (
 	"github.com/aeternity/aepp-sdk-go/v7/transactions"
 )
 
+// AENS is a higher level interface to AENS functionalities.
 type AENS struct {
 	ctx ContextInterface
 }
 
+// NewAENS creates a new AENS higher level interface object
 func NewAENS(ctx ContextInterface) *AENS {
 	return &AENS{ctx: ctx}
 }
