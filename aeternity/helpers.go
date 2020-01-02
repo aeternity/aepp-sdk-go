@@ -113,6 +113,8 @@ func (t *TxReceipt) String() string {
 	return fmt.Sprintf("Mined: %v\nTx: %+v\nSigned: %s\nHash: %s\nSignature: %s\nBlockHeight: %d\nBlockHash: %s", t.Mined, t.Tx, t.SignedTx, t.Hash, t.Signature, t.BlockHeight, t.BlockHash)
 }
 
+// NewTxReceipt ensures that the essential fields of a TxReceipt are filled upon
+// creation
 func NewTxReceipt(tx transactions.Transaction, signedTx, hash, signature string) (txReceipt *TxReceipt) {
 	txReceipt = &TxReceipt{
 		Tx:        tx,

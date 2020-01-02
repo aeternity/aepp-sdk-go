@@ -7,10 +7,12 @@ import (
 	"github.com/aeternity/aepp-sdk-go/v7/transactions"
 )
 
+// Contract is a higher level interface to smart contract functionalities.
 type Contract struct {
 	ctx ContextInterface
 }
 
+// NewContract creates a new Contract higher level interface object
 func NewContract(ctx ContextInterface) *Contract {
 	return &Contract{ctx: ctx}
 }
