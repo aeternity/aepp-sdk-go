@@ -3,8 +3,8 @@ package aeternity
 import (
 	"math/big"
 
-	"github.com/aeternity/aepp-sdk-go/v7/config"
-	"github.com/aeternity/aepp-sdk-go/v7/transactions"
+	"github.com/aeternity/aepp-sdk-go/v8/config"
+	"github.com/aeternity/aepp-sdk-go/v8/transactions"
 )
 
 // AENS is a higher level interface to AENS functionalities.

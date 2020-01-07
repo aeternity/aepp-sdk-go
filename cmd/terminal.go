@@ -8,8 +8,8 @@ import (
 
 	"time"
 
-	"github.com/aeternity/aepp-sdk-go/v7/config"
-	"github.com/aeternity/aepp-sdk-go/v7/naet"
+	"github.com/aeternity/aepp-sdk-go/v8/config"
+	"github.com/aeternity/aepp-sdk-go/v8/naet"
 )
 
 func times(str string, n int) (out string) {

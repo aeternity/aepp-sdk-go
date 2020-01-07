@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/aeternity/aepp-sdk-go/v7/binary"
+	"github.com/aeternity/aepp-sdk-go/v8/binary"
 	rlp "github.com/randomshinichi/rlpae"
 )
 

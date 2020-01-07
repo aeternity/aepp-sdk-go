@@ -4,8 +4,8 @@ import (
 	"io"
 	"math/big"
 
-	"github.com/aeternity/aepp-sdk-go/v7/binary"
-	"github.com/aeternity/aepp-sdk-go/v7/config"
+	"github.com/aeternity/aepp-sdk-go/v8/binary"
+	"github.com/aeternity/aepp-sdk-go/v8/config"
 	rlp "github.com/randomshinichi/rlpae"
 )
 

@@ -2487,7 +2487,7 @@
       "minimum": 0,
       "x-go-type": {
         "import": {
-          "package": "github.com/aeternity/aepp-sdk-go/v7/utils"
+          "package": "github.com/aeternity/aepp-sdk-go/v8/utils"
         },
         "type": "BigInt"
       },

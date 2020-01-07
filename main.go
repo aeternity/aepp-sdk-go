@@ -15,7 +15,7 @@
 package main
 
 import (
-	"github.com/aeternity/aepp-sdk-go/v7/cmd"
+	"github.com/aeternity/aepp-sdk-go/v8/cmd"
 )
 
 // Version hold the version of the program
