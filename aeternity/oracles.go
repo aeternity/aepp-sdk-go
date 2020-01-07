@@ -13,7 +13,7 @@ import (
 	"github.com/aeternity/aepp-sdk-go/v7/transactions"
 )
 
-type oracleListener func(node oracleInfoer, oracleID string, queryChan chan *models.OracleQuery, errChan chan error, listenInterval time.Duration) (err error)
+type oracleListener func(node oracleInfoer, oracleID string, queryChan chan *models.OracleQuery, errChan chan error, listenInterval time.Duration)
 type oracleHandler func(query string) (response string, err error)
 
 type oracleInfoer interface {
@@ -36,7 +36,7 @@ type Oracle struct {
 // DefaultOracleListener uses a oracleInfoer to get all OracleQueries for a
 // given oracleID, but keeps track of how many it read last time to that it only
 // pushes new OracleQueries into the queryChan channel.
-func DefaultOracleListener(node oracleInfoer, oracleID string, queryChan chan *models.OracleQuery, errChan chan error, listenInterval time.Duration) error {
+func DefaultOracleListener(node oracleInfoer, oracleID string, queryChan chan *models.OracleQuery, errChan chan error, listenInterval time.Duration) {
 	// Node always returns all queries, but keeping track of until where we read
 	// last iteration ensures we only report newly arriving queries. This means
 	// the first time this loop runs, it will always return all the queries to
