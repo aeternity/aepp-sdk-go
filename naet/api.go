@@ -271,6 +271,24 @@ func (c *Node) GetTransactionByHash(txHash string) (tx *models.GenericSignedTx, 
 	return
 }
 
+// GetTransactionInfoByHasher guarantees that one can run a GetTransactionByHash()
+// method on the mocked/real network connection
+type GetTransactionInfoByHasher interface {
+	GetTransactionInfoByHash(string) (*models.TxInfoObject, error)
+}
+
+// GetTransactionInfoByHash get a transaction by it's hash
+func (c *Node) GetTransactionInfoByHash(txHash string) (tx *models.TxInfoObject, err error) {
+	p := external.NewGetTransactionInfoByHashParams().WithHash(txHash)
+	r, err := c.External.GetTransactionInfoByHash(p)
+	if err != nil {
+		err = fmt.Errorf("Error: %v", getErrorReason(err))
+		return
+	}
+	tx = r.Payload
+	return
+}
+
 // GetOracleByPubkeyer guarantees that one can run a GetOracleByPubkey() method
 // on the mocked/real network connection
 type GetOracleByPubkeyer interface {
