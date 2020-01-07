@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/v7/binary"
-	"github.com/aeternity/aepp-sdk-go/v7/utils"
+	"github.com/aeternity/aepp-sdk-go/v8/binary"
+	"github.com/aeternity/aepp-sdk-go/v8/utils"
 	rlp "github.com/randomshinichi/rlpae"
 )
 

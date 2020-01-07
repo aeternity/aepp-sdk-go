@@ -8,11 +8,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/aeternity/aepp-sdk-go/v7/account"
-	"github.com/aeternity/aepp-sdk-go/v7/aeternity"
-	"github.com/aeternity/aepp-sdk-go/v7/config"
-	"github.com/aeternity/aepp-sdk-go/v7/naet"
-	"github.com/aeternity/aepp-sdk-go/v7/transactions"
+	"github.com/aeternity/aepp-sdk-go/v8/account"
+	"github.com/aeternity/aepp-sdk-go/v8/aeternity"
+	"github.com/aeternity/aepp-sdk-go/v8/config"
+	"github.com/aeternity/aepp-sdk-go/v8/naet"
+	"github.com/aeternity/aepp-sdk-go/v8/transactions"
 )
 
 var sender = "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"

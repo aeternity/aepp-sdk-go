@@ -1,9 +1,9 @@
 package aeternity
 
 import (
-	"github.com/aeternity/aepp-sdk-go/v7/account"
-	"github.com/aeternity/aepp-sdk-go/v7/naet"
-	"github.com/aeternity/aepp-sdk-go/v7/transactions"
+	"github.com/aeternity/aepp-sdk-go/v8/account"
+	"github.com/aeternity/aepp-sdk-go/v8/naet"
+	"github.com/aeternity/aepp-sdk-go/v8/transactions"
 )
 
 type transactionSender interface {

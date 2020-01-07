@@ -6,11 +6,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/aeternity/aepp-sdk-go/v7/binary"
-	"github.com/aeternity/aepp-sdk-go/v7/config"
-	"github.com/aeternity/aepp-sdk-go/v7/naet"
-	"github.com/aeternity/aepp-sdk-go/v7/swagguard/node/models"
-	"github.com/aeternity/aepp-sdk-go/v7/transactions"
+	"github.com/aeternity/aepp-sdk-go/v8/binary"
+	"github.com/aeternity/aepp-sdk-go/v8/config"
+	"github.com/aeternity/aepp-sdk-go/v8/naet"
+	"github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v8/transactions"
 )
 
 type oracleListener func(node oracleInfoer, oracleID string, queryChan chan *models.OracleQuery, errChan chan error, listenInterval time.Duration)

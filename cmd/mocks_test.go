@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	compilermodels "github.com/aeternity/aepp-sdk-go/v7/swagguard/compiler/models"
-	models "github.com/aeternity/aepp-sdk-go/v7/swagguard/node/models"
+	compilermodels "github.com/aeternity/aepp-sdk-go/v8/swagguard/compiler/models"
+	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
 )
 
 type mockGetHeighter struct {

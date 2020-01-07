@@ -13,7 +13,7 @@ import (
 
 	strfmt "github.com/go-openapi/strfmt"
 
-	models "github.com/aeternity/aepp-sdk-go/v7/swagguard/node/models"
+	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
 )
 
 // GetKeyBlockByHashReader is a Reader for the GetKeyBlockByHash structure.
