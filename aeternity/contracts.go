@@ -1,11 +1,18 @@
 package aeternity
 
 import (
-	"fmt"
+	"time"
 
 	"github.com/aeternity/aepp-sdk-go/v7/config"
+	"github.com/aeternity/aepp-sdk-go/v7/naet"
+	"github.com/aeternity/aepp-sdk-go/v7/swagguard/node/models"
 	"github.com/aeternity/aepp-sdk-go/v7/transactions"
 )
+
+type callResultListener interface {
+	naet.GetHeighter
+	naet.GetTransactionInfoByHasher
+}
 
 // Contract is a higher level interface to smart contract functionalities.
 type Contract struct {
@@ -15,6 +22,25 @@ type Contract struct {
 // NewContract creates a new Contract higher level interface object
 func NewContract(ctx ContextInterface) *Contract {
 	return &Contract{ctx: ctx}
+}
+
+// DefaultCallResultListener polls the node for the result of a particular
+// transaction until /transaction/txhash/info is filled out with the pertinent
+// data (only for ContractCallTxs). Then it will push the CallInfo to a channel.
+// This function is intended to be run as a goroutine.
+func DefaultCallResultListener(node callResultListener, txHash string, callResultChan chan *models.ContractCallObject, errChan chan error, listenInterval time.Duration) {
+	for {
+		txInfo, err := node.GetTransactionInfoByHash(txHash)
+		if err != nil {
+			errChan <- err
+		}
+		if *txInfo.CallInfo.GasUsed != 0 {
+			callResultChan <- txInfo.CallInfo
+			errChan <- nil
+			break
+		}
+		time.Sleep(listenInterval)
+	}
 }
 
 // Deploy lets one deploy a contract with minimum fuss.
@@ -42,9 +68,6 @@ func (c *Contract) Deploy(source, function string, args []string, backend string
 		return
 	}
 
-	createTxStr, _ := transactions.SerializeTx(createTx)
-	fmt.Printf("%+v\n", createTx)
-	fmt.Println(createTxStr)
 	createTxReceipt, err = c.ctx.SignBroadcastWait(createTx, config.Client.WaitBlocks)
 	if err != nil {
 		return
