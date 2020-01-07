@@ -6,6 +6,7 @@ import (
 	"github.com/aeternity/aepp-sdk-go/v7/aeternity"
 	"github.com/aeternity/aepp-sdk-go/v7/config"
 	"github.com/aeternity/aepp-sdk-go/v7/naet"
+	"github.com/aeternity/aepp-sdk-go/v7/swagguard/node/models"
 )
 
 func TestCreateContract(t *testing.T) {
@@ -54,8 +55,17 @@ contract SimpleStorage =
 		t.Fatal(err)
 	}
 
-	_, err = contract.Call(ctID, simplestorage, "get", []string{}, config.CompilerBackendFATE)
+	callReceipt, err := contract.Call(ctID, simplestorage, "get", []string{}, config.CompilerBackendFATE)
 	if err != nil {
 		t.Error(err)
+	}
+
+	callInfoChan := make(chan *models.ContractCallObject)
+	errChan := make(chan error)
+	go aeternity.DefaultCallResultListener(n, callReceipt.Hash, callInfoChan, errChan, config.Tuning.ChainPollInterval)
+	_ = <-callInfoChan
+	err = <-errChan
+	if err != nil {
+		t.Fatal(err)
 	}
 }
