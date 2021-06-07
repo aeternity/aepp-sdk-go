@@ -56,7 +56,6 @@ type txTypes struct {
 }
 
 var sentTxs txTypes
-var useTestNet bool
 
 func signBroadcastWaitKeepTrackOfTx(t *testing.T, tx transactions.Transaction, acc *account.Account, node *naet.Node) (height uint64, txHash string, mbHash string) {
 	receipt, err := aeternity.SignBroadcast(tx, acc, node, networkID)
@@ -107,14 +106,12 @@ func signBroadcastWaitKeepTrackOfTx(t *testing.T, tx transactions.Transaction, a
 }
 
 func TestMain(m *testing.M) {
-	flag.BoolVar(&useTestNet, "testnet", false, "Run tests that need an internet connection to testnet")
 	flag.Parse()
 	os.Exit(m.Run())
 }
 
 func TestAPI(t *testing.T) {
 	privateNet := setupNetwork(t, privatenetURL, false)
-	testNet := setupNetwork(t, testnetURL, false)
 	ttlnoncer := transactions.NewTTLNoncer(privateNet)
 
 	alice, bob := setupAccounts(t)
@@ -327,17 +324,6 @@ func TestAPI(t *testing.T) {
 		}
 	})
 
-	t.Run("GetKeyBlockByHash", func(t *testing.T) {
-		if !useTestNet {
-			t.Skip("-testnet not specified: skipping test")
-		}
-		_, err := testNet.GetKeyBlockByHash("kh_2ZPK9GGvXKJ8vfwapBLztd2F8DSr9QdphZRHSdJH8MR298Guao")
-		// t.Logf("%+v\n", gotKeyBlockByHash)
-		if err != nil {
-			t.Errorf("Client.GetKeyBlockByHash() error = %v", err)
-			return
-		}
-	})
 	t.Run("GetMicroBlockTransactionsByHash", func(t *testing.T) {
 		_, err := privateNet.GetMicroBlockTransactionsByHash(sentTxs.SpendTx.mbHash)
 		// t.Logf("%+v\n", gotMicroBlockTransactionsByHash)
