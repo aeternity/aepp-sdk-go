@@ -12,7 +12,7 @@ func TestRegisterName(t *testing.T) {
 	alice, _ := setupAccounts(t)
 
 	ctx := aeternity.NewContext(alice, n)
-	name := "somelongnamefdsafdffsa.chain"
+	name := randomName(22)
 	nameFee := transactions.CalculateMinNameFee(name)
 
 	aens := aeternity.NewAENS(ctx)
