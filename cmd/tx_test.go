@@ -9,7 +9,7 @@ import (
 )
 
 var alice = "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi"
-var bob = "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v"
+var bob = "ak_wJ3iKZcqvgdnQ6YVz8pY2xPjtVTNNEL61qF4AYQdksZfXZLks"
 
 func Test_txSpendFunc(t *testing.T) {
 	type args struct {
