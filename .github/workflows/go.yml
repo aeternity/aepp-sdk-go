@@ -12,7 +12,7 @@ jobs:
 
     - name: Lint
       run: |
-        go get -u golang.org/x/lint/golint
+        go get honnef.co/go/tools/cmd/staticcheck@v0.2.0
         make lint
 
     - run: make test-unit
