@@ -49,6 +49,9 @@ func TestSpendTx_EncodeRLP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			txJSON, err := tt.tx.JSON()
+			if err != nil {
+				t.Error(err)
+			}
 			fmt.Println(txJSON)
 
 			fmt.Println(rlp.EncodeToBytes(tt.tx))

@@ -168,4 +168,5 @@ func init() {
 	contractCmd.AddCommand(encodeCalldataCmd)
 	contractCmd.AddCommand(decodeCalldataBytecodeCmd)
 	contractCmd.AddCommand(decodeCalldataSourceCmd)
+	contractCmd.AddCommand(generateAciCmd)
 }

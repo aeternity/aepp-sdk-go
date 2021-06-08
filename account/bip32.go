@@ -10,7 +10,7 @@ import (
 
 // ErrHardenedChildPublicKey is returned when trying to create a hardened child
 // from a public key.
-var ErrHardenedChildPublicKey = errors.New("Can't create hardened child from public key")
+var ErrHardenedChildPublicKey = errors.New("can't create hardened child from public key")
 
 // ErrHardenedOnly is returned when a node in the path is not hardened.
 var ErrHardenedOnly = errors.New("ed25519 only works with hardened children")

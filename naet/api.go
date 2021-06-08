@@ -1,6 +1,7 @@
 package naet
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 
@@ -89,7 +90,7 @@ func (c *Node) PostTransaction(signedEncodedTx, signedEncodedTxHash string) (err
 		return
 	}
 	if *r.Payload.TxHash != signedEncodedTxHash {
-		err = fmt.Errorf("Transaction hash mismatch, expected %s got %s", signedEncodedTxHash, *r.Payload.TxHash)
+		err = fmt.Errorf("transaction hash mismatch, expected %s got %s", signedEncodedTxHash, *r.Payload.TxHash)
 	}
 	return
 }
@@ -134,7 +135,7 @@ func (c *Node) GetHeight() (height uint64, err error) {
 func (c *Node) GetCurrentKeyBlock() (kb *models.KeyBlock, err error) {
 	r, err := c.External.GetCurrentKeyBlock(nil)
 	if err != nil {
-		err = fmt.Errorf("Error: %v", getErrorReason(err))
+		err = errors.New(getErrorReason(err))
 		return
 	}
 	kb = r.Payload
@@ -153,7 +154,7 @@ func (c *Node) GetAccount(accountID string) (account *models.Account, err error)
 	p := external.NewGetAccountByPubkeyParams().WithPubkey(accountID)
 	r, err := c.External.GetAccountByPubkey(p)
 	if err != nil {
-		err = fmt.Errorf("Error: %v", getErrorReason(err))
+		err = errors.New(getErrorReason(err))
 		return
 	}
 	account = r.Payload
@@ -172,7 +173,7 @@ func (c *Node) GetNameEntryByName(name string) (nameEntry *models.NameEntry, err
 	r, err := c.External.GetNameEntryByName(p)
 
 	if err != nil {
-		err = fmt.Errorf("Error: %v", getErrorReason(err))
+		err = errors.New(getErrorReason(err))
 		return
 	}
 
@@ -191,7 +192,7 @@ func (c *Node) GetGenerationByHeight(height uint64) (g *models.Generation, err e
 	p := external.NewGetGenerationByHeightParams().WithHeight(height)
 	r, err := c.External.GetGenerationByHeight(p)
 	if err != nil {
-		err = fmt.Errorf("Error: %v", getErrorReason(err))
+		err = errors.New(getErrorReason(err))
 		return
 	}
 	g = r.Payload
@@ -210,7 +211,7 @@ func (c *Node) GetMicroBlockTransactionsByHash(microBlockID string) (txs *models
 	p := external.NewGetMicroBlockTransactionsByHashParams().WithHash(microBlockID)
 	r, err := c.External.GetMicroBlockTransactionsByHash(p)
 	if err != nil {
-		err = fmt.Errorf("Error: %v", getErrorReason(err))
+		err = errors.New(getErrorReason(err))
 		return
 	}
 	txs = r.Payload
@@ -228,7 +229,7 @@ func (c *Node) GetMicroBlockHeaderByHash(microBlockID string) (txs *models.Micro
 	p := external.NewGetMicroBlockHeaderByHashParams().WithHash(microBlockID)
 	r, err := c.External.GetMicroBlockHeaderByHash(p)
 	if err != nil {
-		err = fmt.Errorf("Error: %v", getErrorReason(err))
+		err = errors.New(getErrorReason(err))
 		return
 	}
 	txs = r.Payload
@@ -246,7 +247,7 @@ func (c *Node) GetKeyBlockByHash(keyBlockID string) (txs *models.KeyBlock, err e
 	p := external.NewGetKeyBlockByHashParams().WithHash(keyBlockID)
 	r, err := c.External.GetKeyBlockByHash(p)
 	if err != nil {
-		err = fmt.Errorf("Error: %v", getErrorReason(err))
+		err = errors.New(getErrorReason(err))
 		return
 	}
 	txs = r.Payload
@@ -264,7 +265,7 @@ func (c *Node) GetTransactionByHash(txHash string) (tx *models.GenericSignedTx, 
 	p := external.NewGetTransactionByHashParams().WithHash(txHash)
 	r, err := c.External.GetTransactionByHash(p)
 	if err != nil {
-		err = fmt.Errorf("Error: %v", getErrorReason(err))
+		err = errors.New(getErrorReason(err))
 		return
 	}
 	tx = r.Payload
@@ -282,7 +283,7 @@ func (c *Node) GetTransactionInfoByHash(txHash string) (tx *models.TxInfoObject,
 	p := external.NewGetTransactionInfoByHashParams().WithHash(txHash)
 	r, err := c.External.GetTransactionInfoByHash(p)
 	if err != nil {
-		err = fmt.Errorf("Error: %v", getErrorReason(err))
+		err = errors.New(getErrorReason(err))
 		return
 	}
 	tx = r.Payload
@@ -300,7 +301,7 @@ func (c *Node) GetOracleByPubkey(pubkey string) (oracle *models.RegisteredOracle
 	p := external.NewGetOracleByPubkeyParams().WithPubkey(pubkey)
 	r, err := c.External.GetOracleByPubkey(p)
 	if err != nil {
-		err = fmt.Errorf("Error: %v", getErrorReason(err))
+		err = errors.New(getErrorReason(err))
 		return
 	}
 	oracle = r.Payload
@@ -318,7 +319,7 @@ func (c *Node) GetOracleQueriesByPubkey(pubkey string) (oracleQueries *models.Or
 	p := external.NewGetOracleQueriesByPubkeyParams().WithPubkey(pubkey)
 	r, err := c.External.GetOracleQueriesByPubkey(p)
 	if err != nil {
-		err = fmt.Errorf("Error: %v", getErrorReason(err))
+		err = errors.New(getErrorReason(err))
 		return
 	}
 	oracleQueries = r.Payload
@@ -330,7 +331,7 @@ func (c *Node) GetContractByID(ctID string) (contract *models.ContractObject, er
 	p := external.NewGetContractParams().WithPubkey(ctID)
 	r, err := c.External.GetContract(p)
 	if err != nil {
-		err = fmt.Errorf("Error: %v", getErrorReason(err))
+		err = errors.New(getErrorReason(err))
 		return
 	}
 	contract = r.Payload

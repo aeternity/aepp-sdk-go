@@ -68,7 +68,7 @@ func computeCommitmentID(name string, salt []byte) (ch string, err error) {
 		// includes an extra byte at the start and end of the string, messing up
 		// the hashing process.
 		if !isPrintable(name) {
-			return "", fmt.Errorf("The name %s must contain only printable characters", name)
+			return "", fmt.Errorf("the name %s must contain only printable characters", name)
 		}
 
 		nh = append([]byte(name), salt...)
@@ -206,7 +206,6 @@ func (tx *NamePreclaimTx) CalcGas() (g *big.Int, err error) {
 	if err != nil {
 		return
 	}
-	g = new(big.Int)
 	g = baseGas.Add(baseGas, gasComponent)
 	return
 }
@@ -352,7 +351,6 @@ func (tx *NameClaimTx) CalcGas() (g *big.Int, err error) {
 	if err != nil {
 		return
 	}
-	g = new(big.Int)
 	g = baseGas.Add(baseGas, gasComponent)
 	return
 }
@@ -473,27 +471,27 @@ func (np *NamePointer) Validate() (err error) {
 
 func (np *NamePointer) validateAccountPubkey() error {
 	if !strings.HasPrefix(np.Pointer, string(binary.PrefixAccountPubkey)) {
-		return fmt.Errorf("If the Key is \"account_pubkey\", the Pointer must start with %s", binary.PrefixAccountPubkey)
+		return fmt.Errorf("if the Key is \"account_pubkey\", the Pointer must start with %s", binary.PrefixAccountPubkey)
 	}
 	return nil
 }
 func (np *NamePointer) validateOraclePubkey() error {
 	if !strings.HasPrefix(np.Pointer, string(binary.PrefixOraclePubkey)) {
-		return fmt.Errorf("If the Key is \"oracle_pubkey\", the Pointer must start with %s", binary.PrefixOraclePubkey)
+		return fmt.Errorf("if the Key is \"oracle_pubkey\", the Pointer must start with %s", binary.PrefixOraclePubkey)
 	}
 	return nil
 }
 
 func (np *NamePointer) validateContractPubkey() error {
 	if !strings.HasPrefix(np.Pointer, string(binary.PrefixContractPubkey)) {
-		return fmt.Errorf("If the Key is \"contract_pubkey\", the Pointer must start with %s", binary.PrefixContractPubkey)
+		return fmt.Errorf("if the Key is \"contract_pubkey\", the Pointer must start with %s", binary.PrefixContractPubkey)
 	}
 	return nil
 }
 
 func (np *NamePointer) validateChannel() error {
 	if !strings.HasPrefix(np.Pointer, string(binary.PrefixChannel)) {
-		return fmt.Errorf("If the Key is \"channel\", the Pointer must start with %s", binary.PrefixChannel)
+		return fmt.Errorf("if the Key is \"channel\", the Pointer must start with %s", binary.PrefixChannel)
 	}
 	return nil
 }
@@ -663,7 +661,6 @@ func (tx *NameUpdateTx) CalcGas() (g *big.Int, err error) {
 	if err != nil {
 		return
 	}
-	g = new(big.Int)
 	g = baseGas.Add(baseGas, gasComponent)
 	return
 }
@@ -802,7 +799,6 @@ func (tx *NameRevokeTx) CalcGas() (g *big.Int, err error) {
 	if err != nil {
 		return
 	}
-	g = new(big.Int)
 	g = baseGas.Add(baseGas, gasComponent)
 	return
 }
@@ -957,7 +953,6 @@ func (tx *NameTransferTx) CalcGas() (g *big.Int, err error) {
 	if err != nil {
 		return
 	}
-	g = new(big.Int)
 	g = baseGas.Add(baseGas, gasComponent)
 	return
 }

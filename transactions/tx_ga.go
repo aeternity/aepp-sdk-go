@@ -139,7 +139,6 @@ func (tx *GAAttachTx) CalcGas() (g *big.Int, err error) {
 	if err != nil {
 		return
 	}
-	g = new(big.Int)
 	g = baseGas.Add(baseGas, gasComponent)
 	return
 }
@@ -290,7 +289,6 @@ func (tx *GAMetaTx) CalcGas() (g *big.Int, err error) {
 	if err != nil {
 		return
 	}
-	g = new(big.Int)
 	g = baseGas.Add(baseGas, gasComponent)
 	return
 }

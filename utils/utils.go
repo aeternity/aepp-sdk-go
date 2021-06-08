@@ -32,20 +32,13 @@ func (b *BigInt) Validate(formats strfmt.Registry) error {
 func (b *BigInt) LargerThanZero() bool {
 	zero := new(BigInt)
 
-	if b.Cmp(zero) != 1 {
-		return false
-	}
-	return true
+	return b.Cmp(zero) == 1
 }
 
 // LargerOrEqualToZero checks that the number is >=0
 func (b *BigInt) LargerOrEqualToZero() bool {
 	zero := new(BigInt)
-
-	if b.Cmp(zero) == -1 {
-		return false
-	}
-	return true
+	return b.Cmp(zero) != -1
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
@@ -85,8 +78,8 @@ func (b *BigInt) Cmp(i *BigInt) int {
 func NewIntFromString(number string) (i *big.Int, err error) {
 	i = new(big.Int)
 	_, success := i.SetString(number, 10)
-	if success == false {
-		return nil, errors.New("Could not parse string as a number")
+	if !success {
+		return nil, errors.New("could not parse string as a number")
 	}
 	return i, nil
 }

@@ -23,12 +23,6 @@ var (
 	defaultIndentSize = 50
 )
 
-// Left left-pads the string with pad up to len runes
-// len may be exceeded if
-func left(str string, length int, pad string) string {
-	return times(pad, length-len(str)) + str
-}
-
 // Right right-pads the string with pad up to len runes
 func right(str string, length int, pad string) string {
 	return str + times(pad, length-len(str))
