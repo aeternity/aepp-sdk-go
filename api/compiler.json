@@ -4,12 +4,16 @@
     "ACI": {
       "example": {
         "encoded_aci": "{}",
+        "external_encoded_aci": "",
         "interface": "interface"
       },
       "properties": {
         "encoded_aci": {
           "properties": {},
           "type": "object"
+        },
+        "external_encoded_aci": {
+          "type": "array"
         },
         "interface": {
           "type": "string"
@@ -47,6 +51,21 @@
       "properties": {
         "bytecode": {
           "$ref": "#/definitions/EncodedByteArray"
+        }
+      },
+      "required": [
+        "bytecode"
+      ],
+      "type": "object"
+    },
+    "ByteCodeInput": {
+      "example": {
+        "bytecode": {}
+      },
+      "properties": {
+        "bytecode": {
+          "$ref": "#/definitions/EncodedByteArray",
+          "description": "Compiled contract"
         }
       },
       "required": [
@@ -347,6 +366,21 @@
       ],
       "type": "object"
     },
+    "FateAssembler": {
+      "example": {
+        "fate-assembler": "fate-assembler"
+      },
+      "properties": {
+        "fate-assembler": {
+          "description": "Fate assembler code",
+          "type": "string"
+        }
+      },
+      "required": [
+        "fate-assembler"
+      ],
+      "type": "object"
+    },
     "FunctionCallInput": {
       "example": {
         "arguments": [
@@ -463,6 +497,36 @@
         "data"
       ],
       "type": "object"
+    },
+    "ValidateByteCodeInput": {
+      "example": {
+        "bytecode": {},
+        "options": {
+          "backend": "fate",
+          "file_system": "{}",
+          "src_file": "src_file"
+        },
+        "source": "source"
+      },
+      "properties": {
+        "bytecode": {
+          "$ref": "#/definitions/EncodedByteArray",
+          "description": "Compiled contract"
+        },
+        "options": {
+          "$ref": "#/definitions/CompileOpts"
+        },
+        "source": {
+          "description": "Sophia contract source code",
+          "type": "string"
+        }
+      },
+      "required": [
+        "bytecode",
+        "options",
+        "source"
+      ],
+      "type": "object"
     }
   },
   "info": {
@@ -472,7 +536,7 @@
     "description": "This is the [Aeternity](https://www.aeternity.com/) compiler API.",
     "termsOfService": "https://www.aeternity.com/terms/",
     "title": "Aeternity node",
-    "version": "4.0.0-rc5"
+    "version": "4.3.2"
   },
   "paths": {
     "/aci": {
@@ -592,6 +656,43 @@
             "description": "Invalid contract",
             "schema": {
               "$ref": "#/definitions/CompilerErrors"
+            }
+          }
+        }
+      }
+    },
+    "/compiler-version": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "description": "Extract compiler version from bytecode",
+        "operationId": "GetCompilerVersion",
+        "parameters": [
+          {
+            "description": "contract byte array",
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ByteCodeInput"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "The compiler version",
+            "schema": {
+              "$ref": "#/definitions/CompilerVersion"
+            }
+          },
+          "400": {
+            "description": "Invalid data",
+            "schema": {
+              "$ref": "#/definitions/Error"
             }
           }
         }
@@ -809,6 +910,77 @@
             "schema": {
               "$ref": "#/definitions/Calldata"
             }
+          },
+          "400": {
+            "description": "Invalid contract",
+            "schema": {
+              "$ref": "#/definitions/CompilerErrors"
+            }
+          }
+        }
+      }
+    },
+    "/fate-assembler": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "description": "Get FATE assembler code from bytecode",
+        "operationId": "GetFateAssemblerCode",
+        "parameters": [
+          {
+            "description": "contract byte array",
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ByteCodeInput"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "The FATE assembler",
+            "schema": {
+              "$ref": "#/definitions/FateAssembler"
+            }
+          },
+          "400": {
+            "description": "Invalid data",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/validate-byte-code": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "description": "Verify that an encoded byte array is the result of compiling a given contract",
+        "operationId": "ValidateByteCode",
+        "parameters": [
+          {
+            "description": "contract byte array and source code",
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ValidateByteCodeInput"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Validation successful"
           },
           "400": {
             "description": "Invalid contract",
