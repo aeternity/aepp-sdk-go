@@ -14,8 +14,9 @@ jobs:
         go get -u golang.org/x/lint/golint
         make lint
 
+    - run: make test-unit
     - run: docker-compose up -d
-    - run: make test
+    - run: make test-integration
 
     - name: Build
       if: true != startsWith(github.ref, 'refs/tags/')
