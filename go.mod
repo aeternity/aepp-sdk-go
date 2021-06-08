@@ -1,6 +1,6 @@
 module github.com/aeternity/aepp-sdk-go/v8
 
-go 1.12
+go 1.16
 
 require (
 	github.com/aeternity/rlp-go v0.0.0-20190813143754-207301e28aeb
