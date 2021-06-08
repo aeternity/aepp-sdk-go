@@ -18,7 +18,6 @@ jobs:
             dep ensure
         fi
 
-    - run: go get github.com/tebeka/go2xunit
     - run: go get -u golang.org/x/lint/golint
     - run: go mod download
     - run: docker-compose up -d
