@@ -539,6 +539,10 @@ func CreateNoncer(n naet.GetAccounter) Noncer {
 	return func(accountID string) (nextNonce uint64, err error) {
 		a, err := n.GetAccount(accountID)
 		if err != nil {
+			if err.Error() == "Error: Account not found" {
+				nextNonce = 0
+				err = nil
+			}
 			return
 		}
 		nextNonce = *a.Nonce + 1
