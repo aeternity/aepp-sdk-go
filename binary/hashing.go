@@ -5,8 +5,8 @@ import (
 	"encoding/base64"
 	"fmt"
 
+	rlp "github.com/aeternity/rlp-go"
 	"github.com/btcsuite/btcutil/base58"
-	rlp "github.com/randomshinichi/rlpae"
 	"golang.org/x/crypto/blake2b"
 )
 

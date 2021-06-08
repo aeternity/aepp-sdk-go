@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/aeternity/aepp-sdk-go/v8/utils"
-	rlp "github.com/randomshinichi/rlpae"
+	rlp "github.com/aeternity/rlp-go"
 )
 
 func TestSpendTx_EncodeRLP(t *testing.T) {

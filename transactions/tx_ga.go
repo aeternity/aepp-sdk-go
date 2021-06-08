@@ -6,7 +6,7 @@ import (
 
 	"github.com/aeternity/aepp-sdk-go/v8/binary"
 	"github.com/aeternity/aepp-sdk-go/v8/config"
-	rlp "github.com/randomshinichi/rlpae"
+	rlp "github.com/aeternity/rlp-go"
 )
 
 // GAAttachTx is a transaction that converts a plain old account (POA) into a

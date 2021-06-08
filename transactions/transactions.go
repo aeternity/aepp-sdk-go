@@ -12,7 +12,7 @@ import (
 
 	"github.com/aeternity/aepp-sdk-go/v8/account"
 	"github.com/aeternity/aepp-sdk-go/v8/utils"
-	rlp "github.com/randomshinichi/rlpae"
+	rlp "github.com/aeternity/rlp-go"
 )
 
 // TransactionTypes is a map between the ObjectTags defined above and the
