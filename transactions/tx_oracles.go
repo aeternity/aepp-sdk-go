@@ -119,7 +119,7 @@ func (tx *OracleRegisterTx) DecodeRLP(s *rlp.Stream) (err error) {
 }
 
 // JSON representation of a Tx is useful for querying the node's debug endpoint
-// BUG: Account Nonce won't be represented in JSON output if nonce is 0, thanks to swagger.json
+// BUG: Account Nonce won't be represented in JSON output if nonce is 0, thanks to node.json
 func (tx *OracleRegisterTx) JSON() (string, error) {
 	// # Oracles
 	// ORACLE_TTL_TYPE_DELTA = 'delta'
