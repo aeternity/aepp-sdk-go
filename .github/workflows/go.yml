@@ -10,12 +10,18 @@ jobs:
 
     - uses: actions/checkout@v2
 
-    - run: |
+    - name: Lint
+      run: |
         go get -u golang.org/x/lint/golint
         make lint
 
     - run: make test-unit
     - run: docker-compose up -d
+    - name: Ensure that node is running
+      run: |
+        while [[ `curl -s -o /dev/null -w %{http_code} localhost:3013/api` != 200 ]]; do
+          sleep 0.2;
+        done
     - run: make test-integration
 
     - name: Build
