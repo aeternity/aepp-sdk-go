@@ -13,7 +13,11 @@
           "type": "object"
         },
         "external_encoded_aci": {
-          "type": "array"
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {}
+          }
         },
         "interface": {
           "type": "string"
