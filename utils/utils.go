@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"math/big"
@@ -26,6 +27,11 @@ func (b *BigInt) Validate(formats strfmt.Registry) error {
 		return fmt.Errorf("%v was not >=0", b.String())
 	}
 	return nil
+}
+
+// ContextValidate does the same as Validate
+func (b *BigInt) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return b.Validate(formats)
 }
 
 // LargerThanZero returns true if it is >0
