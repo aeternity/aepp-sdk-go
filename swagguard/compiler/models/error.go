@@ -69,3 +69,8 @@ func (m *Error) UnmarshalBinary(b []byte) error {
 	*m = res
 	return nil
 }
+
+// TODO: This is not auto generated, it should be avoided
+func (m *Error) String() string {
+	return *m.Reason
+}

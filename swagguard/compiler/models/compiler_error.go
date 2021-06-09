@@ -7,6 +7,7 @@ package models
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
@@ -137,4 +138,9 @@ func (m *CompilerError) UnmarshalBinary(b []byte) error {
 	}
 	*m = res
 	return nil
+}
+
+// TODO: This is not auto generated, it should be avoided
+func (m *CompilerError) String() string {
+	return fmt.Sprintf("%s, %s, %s", *m.Type, *m.Message, m.Context)
 }
