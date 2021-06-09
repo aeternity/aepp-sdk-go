@@ -6,14 +6,16 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
 
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 )
 
 // SophiaJSONData sophia Json data
+// Example: {"data":"{}"}
+//
 // swagger:model SophiaJsonData
 type SophiaJSONData struct {
 
@@ -38,10 +40,15 @@ func (m *SophiaJSONData) Validate(formats strfmt.Registry) error {
 
 func (m *SophiaJSONData) validateData(formats strfmt.Registry) error {
 
-	if err := validate.Required("data", "body", m.Data); err != nil {
-		return err
+	if m.Data == nil {
+		return errors.Required("data", "body", nil)
 	}
 
+	return nil
+}
+
+// ContextValidate validates this sophia Json data based on context it is used
+func (m *SophiaJSONData) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

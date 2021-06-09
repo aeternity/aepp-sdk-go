@@ -6,14 +6,17 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
 
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // DecodedCallresult decoded callresult
+// Example: {"function":"function","result":"{}"}
+//
 // swagger:model DecodedCallresult
 type DecodedCallresult struct {
 
@@ -55,10 +58,15 @@ func (m *DecodedCallresult) validateFunction(formats strfmt.Registry) error {
 
 func (m *DecodedCallresult) validateResult(formats strfmt.Registry) error {
 
-	if err := validate.Required("result", "body", m.Result); err != nil {
-		return err
+	if m.Result == nil {
+		return errors.Required("result", "body", nil)
 	}
 
+	return nil
+}
+
+// ContextValidate validates this decoded callresult based on context it is used
+func (m *DecodedCallresult) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

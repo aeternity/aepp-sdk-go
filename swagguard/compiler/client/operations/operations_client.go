@@ -6,13 +6,14 @@ package operations
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"github.com/go-openapi/runtime"
+	"fmt"
 
-	strfmt "github.com/go-openapi/strfmt"
+	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 )
 
 // New creates a new operations API client.
-func New(transport runtime.ClientTransport, formats strfmt.Registry) *Client {
+func New(transport runtime.ClientTransport, formats strfmt.Registry) ClientService {
 	return &Client{transport: transport, formats: formats}
 }
 
@@ -24,72 +25,121 @@ type Client struct {
 	formats   strfmt.Registry
 }
 
+// ClientOption is the option for Client methods
+type ClientOption func(*runtime.ClientOperation)
+
+// ClientService is the interface for Client methods
+type ClientService interface {
+	APIVersion(params *APIVersionParams, opts ...ClientOption) (*APIVersionOK, error)
+
+	API(params *APIParams, opts ...ClientOption) (*APIOK, error)
+
+	CompileContract(params *CompileContractParams, opts ...ClientOption) (*CompileContractOK, error)
+
+	DecodeCallResult(params *DecodeCallResultParams, opts ...ClientOption) (*DecodeCallResultOK, error)
+
+	DecodeCallResultBytecode(params *DecodeCallResultBytecodeParams, opts ...ClientOption) (*DecodeCallResultBytecodeOK, error)
+
+	DecodeCalldataBytecode(params *DecodeCalldataBytecodeParams, opts ...ClientOption) (*DecodeCalldataBytecodeOK, error)
+
+	DecodeCalldataSource(params *DecodeCalldataSourceParams, opts ...ClientOption) (*DecodeCalldataSourceOK, error)
+
+	DecodeData(params *DecodeDataParams, opts ...ClientOption) (*DecodeDataOK, error)
+
+	EncodeCalldata(params *EncodeCalldataParams, opts ...ClientOption) (*EncodeCalldataOK, error)
+
+	GenerateACI(params *GenerateACIParams, opts ...ClientOption) (*GenerateACIOK, error)
+
+	Version(params *VersionParams, opts ...ClientOption) (*VersionOK, error)
+
+	SetTransport(transport runtime.ClientTransport)
+}
+
 /*
-APIVersion Get the version of the API
+  APIVersion Get the version of the API
 */
-func (a *Client) APIVersion(params *APIVersionParams) (*APIVersionOK, error) {
+func (a *Client) APIVersion(params *APIVersionParams, opts ...ClientOption) (*APIVersionOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewAPIVersionParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "APIVersion",
 		Method:             "GET",
 		PathPattern:        "/api-version",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &APIVersionReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*APIVersionOK), nil
-
+	success, ok := result.(*APIVersionOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for APIVersion: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-API Get the Api description
+  API Get the Api description
 */
-func (a *Client) API(params *APIParams) (*APIOK, error) {
+func (a *Client) API(params *APIParams, opts ...ClientOption) (*APIOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewAPIParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "Api",
 		Method:             "GET",
 		PathPattern:        "/api",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &APIReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*APIOK), nil
-
+	success, ok := result.(*APIOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for Api: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-CompileContract Compile a sophia contract from source and return byte code
+  CompileContract Compile a sophia contract from source and return byte code
 */
-func (a *Client) CompileContract(params *CompileContractParams) (*CompileContractOK, error) {
+func (a *Client) CompileContract(params *CompileContractParams, opts ...ClientOption) (*CompileContractOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewCompileContractParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "CompileContract",
 		Method:             "POST",
 		PathPattern:        "/compile",
@@ -100,24 +150,34 @@ func (a *Client) CompileContract(params *CompileContractParams) (*CompileContrac
 		Reader:             &CompileContractReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*CompileContractOK), nil
-
+	success, ok := result.(*CompileContractOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for CompileContract: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-DecodeCallResult Decode the result of contract call
+  DecodeCallResult Decode the result of contract call
 */
-func (a *Client) DecodeCallResult(params *DecodeCallResultParams) (*DecodeCallResultOK, error) {
+func (a *Client) DecodeCallResult(params *DecodeCallResultParams, opts ...ClientOption) (*DecodeCallResultOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewDecodeCallResultParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "DecodeCallResult",
 		Method:             "POST",
 		PathPattern:        "/decode-call-result",
@@ -128,24 +188,34 @@ func (a *Client) DecodeCallResult(params *DecodeCallResultParams) (*DecodeCallRe
 		Reader:             &DecodeCallResultReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*DecodeCallResultOK), nil
-
+	success, ok := result.(*DecodeCallResultOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for DecodeCallResult: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-DecodeCallResultBytecode Decode the result of contract call from Bytecode
+  DecodeCallResultBytecode Decode the result of contract call from Bytecode
 */
-func (a *Client) DecodeCallResultBytecode(params *DecodeCallResultBytecodeParams) (*DecodeCallResultBytecodeOK, error) {
+func (a *Client) DecodeCallResultBytecode(params *DecodeCallResultBytecodeParams, opts ...ClientOption) (*DecodeCallResultBytecodeOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewDecodeCallResultBytecodeParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "DecodeCallResultBytecode",
 		Method:             "POST",
 		PathPattern:        "/decode-call-result/bytecode",
@@ -156,24 +226,34 @@ func (a *Client) DecodeCallResultBytecode(params *DecodeCallResultBytecodeParams
 		Reader:             &DecodeCallResultBytecodeReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*DecodeCallResultBytecodeOK), nil
-
+	success, ok := result.(*DecodeCallResultBytecodeOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for DecodeCallResultBytecode: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-DecodeCalldataBytecode Identify function name and arguments in Calldata for a compiled contract
+  DecodeCalldataBytecode Identify function name and arguments in Calldata for a compiled contract
 */
-func (a *Client) DecodeCalldataBytecode(params *DecodeCalldataBytecodeParams) (*DecodeCalldataBytecodeOK, error) {
+func (a *Client) DecodeCalldataBytecode(params *DecodeCalldataBytecodeParams, opts ...ClientOption) (*DecodeCalldataBytecodeOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewDecodeCalldataBytecodeParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "DecodeCalldataBytecode",
 		Method:             "POST",
 		PathPattern:        "/decode-calldata/bytecode",
@@ -184,24 +264,34 @@ func (a *Client) DecodeCalldataBytecode(params *DecodeCalldataBytecodeParams) (*
 		Reader:             &DecodeCalldataBytecodeReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*DecodeCalldataBytecodeOK), nil
-
+	success, ok := result.(*DecodeCalldataBytecodeOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for DecodeCalldataBytecode: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-DecodeCalldataSource Identify function name and arguments in Calldata for a (partial) contract
+  DecodeCalldataSource Identify function name and arguments in Calldata for a (partial) contract
 */
-func (a *Client) DecodeCalldataSource(params *DecodeCalldataSourceParams) (*DecodeCalldataSourceOK, error) {
+func (a *Client) DecodeCalldataSource(params *DecodeCalldataSourceParams, opts ...ClientOption) (*DecodeCalldataSourceOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewDecodeCalldataSourceParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "DecodeCalldataSource",
 		Method:             "POST",
 		PathPattern:        "/decode-calldata/source",
@@ -212,24 +302,34 @@ func (a *Client) DecodeCalldataSource(params *DecodeCalldataSourceParams) (*Deco
 		Reader:             &DecodeCalldataSourceReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*DecodeCalldataSourceOK), nil
-
+	success, ok := result.(*DecodeCalldataSourceOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for DecodeCalldataSource: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-DecodeData Decode data as retuned by a contract call. - Legacy decoding
+  DecodeData Decode data as retuned by a contract call. - Legacy decoding
 */
-func (a *Client) DecodeData(params *DecodeDataParams) (*DecodeDataOK, error) {
+func (a *Client) DecodeData(params *DecodeDataParams, opts ...ClientOption) (*DecodeDataOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewDecodeDataParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "DecodeData",
 		Method:             "POST",
 		PathPattern:        "/decode-data",
@@ -240,24 +340,34 @@ func (a *Client) DecodeData(params *DecodeDataParams) (*DecodeDataOK, error) {
 		Reader:             &DecodeDataReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*DecodeDataOK), nil
-
+	success, ok := result.(*DecodeDataOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for DecodeData: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-EncodeCalldata Encode Sophia function call according to sophia ABI.
+  EncodeCalldata Encode Sophia function call according to sophia ABI.
 */
-func (a *Client) EncodeCalldata(params *EncodeCalldataParams) (*EncodeCalldataOK, error) {
+func (a *Client) EncodeCalldata(params *EncodeCalldataParams, opts ...ClientOption) (*EncodeCalldataOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewEncodeCalldataParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "EncodeCalldata",
 		Method:             "POST",
 		PathPattern:        "/encode-calldata",
@@ -268,24 +378,34 @@ func (a *Client) EncodeCalldata(params *EncodeCalldataParams) (*EncodeCalldataOK
 		Reader:             &EncodeCalldataReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*EncodeCalldataOK), nil
-
+	success, ok := result.(*EncodeCalldataOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for EncodeCalldata: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-GenerateACI Generate an Aeternity Contract Interface (ACI) for contract
+  GenerateACI Generate an Aeternity Contract Interface (ACI) for contract
 */
-func (a *Client) GenerateACI(params *GenerateACIParams) (*GenerateACIOK, error) {
+func (a *Client) GenerateACI(params *GenerateACIParams, opts ...ClientOption) (*GenerateACIOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGenerateACIParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GenerateACI",
 		Method:             "POST",
 		PathPattern:        "/aci",
@@ -296,40 +416,61 @@ func (a *Client) GenerateACI(params *GenerateACIParams) (*GenerateACIOK, error) 
 		Reader:             &GenerateACIReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GenerateACIOK), nil
-
+	success, ok := result.(*GenerateACIOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GenerateACI: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-Version Get the version of the underlying Sophia compiler version
+  Version Get the version of the underlying Sophia compiler version
 */
-func (a *Client) Version(params *VersionParams) (*VersionOK, error) {
+func (a *Client) Version(params *VersionParams, opts ...ClientOption) (*VersionOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewVersionParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "Version",
 		Method:             "GET",
 		PathPattern:        "/version",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &VersionReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*VersionOK), nil
-
+	success, ok := result.(*VersionOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for Version: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 // SetTransport changes the transport on the client

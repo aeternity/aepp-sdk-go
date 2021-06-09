@@ -10,10 +10,9 @@ import (
 	"io"
 
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 
-	strfmt "github.com/go-openapi/strfmt"
-
-	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/compiler/models"
+	"github.com/aeternity/aepp-sdk-go/v8/swagguard/compiler/models"
 )
 
 // GenerateACIReader is a Reader for the GenerateACI structure.
@@ -24,23 +23,20 @@ type GenerateACIReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *GenerateACIReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewGenerateACIOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 400:
 		result := NewGenerateACIBadRequest()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -49,7 +45,7 @@ func NewGenerateACIOK() *GenerateACIOK {
 	return &GenerateACIOK{}
 }
 
-/*GenerateACIOK handles this case with default header values.
+/* GenerateACIOK describes a response with status code 200, with default header values.
 
 ACI for contract
 */
@@ -59,6 +55,9 @@ type GenerateACIOK struct {
 
 func (o *GenerateACIOK) Error() string {
 	return fmt.Sprintf("[POST /aci][%d] generateACIOK  %+v", 200, o.Payload)
+}
+func (o *GenerateACIOK) GetPayload() *models.ACI {
+	return o.Payload
 }
 
 func (o *GenerateACIOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -78,7 +77,7 @@ func NewGenerateACIBadRequest() *GenerateACIBadRequest {
 	return &GenerateACIBadRequest{}
 }
 
-/*GenerateACIBadRequest handles this case with default header values.
+/* GenerateACIBadRequest describes a response with status code 400, with default header values.
 
 Compiler errors
 */
@@ -88,6 +87,9 @@ type GenerateACIBadRequest struct {
 
 func (o *GenerateACIBadRequest) Error() string {
 	return fmt.Sprintf("[POST /aci][%d] generateACIBadRequest  %+v", 400, o.Payload)
+}
+func (o *GenerateACIBadRequest) GetPayload() models.CompilerErrors {
+	return o.Payload
 }
 
 func (o *GenerateACIBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

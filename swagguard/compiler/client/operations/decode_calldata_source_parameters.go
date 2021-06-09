@@ -13,65 +13,78 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
+	"github.com/go-openapi/strfmt"
 
-	strfmt "github.com/go-openapi/strfmt"
-
-	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/compiler/models"
+	"github.com/aeternity/aepp-sdk-go/v8/swagguard/compiler/models"
 )
 
-// NewDecodeCalldataSourceParams creates a new DecodeCalldataSourceParams object
-// with the default values initialized.
+// NewDecodeCalldataSourceParams creates a new DecodeCalldataSourceParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewDecodeCalldataSourceParams() *DecodeCalldataSourceParams {
-	var ()
 	return &DecodeCalldataSourceParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewDecodeCalldataSourceParamsWithTimeout creates a new DecodeCalldataSourceParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewDecodeCalldataSourceParamsWithTimeout(timeout time.Duration) *DecodeCalldataSourceParams {
-	var ()
 	return &DecodeCalldataSourceParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewDecodeCalldataSourceParamsWithContext creates a new DecodeCalldataSourceParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewDecodeCalldataSourceParamsWithContext(ctx context.Context) *DecodeCalldataSourceParams {
-	var ()
 	return &DecodeCalldataSourceParams{
-
 		Context: ctx,
 	}
 }
 
 // NewDecodeCalldataSourceParamsWithHTTPClient creates a new DecodeCalldataSourceParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewDecodeCalldataSourceParamsWithHTTPClient(client *http.Client) *DecodeCalldataSourceParams {
-	var ()
 	return &DecodeCalldataSourceParams{
 		HTTPClient: client,
 	}
 }
 
-/*DecodeCalldataSourceParams contains all the parameters to send to the API endpoint
-for the decode calldata source operation typically these are written to a http.Request
+/* DecodeCalldataSourceParams contains all the parameters to send to the API endpoint
+   for the decode calldata source operation.
+
+   Typically these are written to a http.Request.
 */
 type DecodeCalldataSourceParams struct {
 
-	/*Body
-	  Calldata + contract (stub) code
+	/* Body.
 
+	   Calldata + contract (stub) code
 	*/
 	Body *models.DecodeCalldataSource
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the decode calldata source params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *DecodeCalldataSourceParams) WithDefaults() *DecodeCalldataSourceParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the decode calldata source params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *DecodeCalldataSourceParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the decode calldata source params
@@ -125,7 +138,6 @@ func (o *DecodeCalldataSourceParams) WriteToRequest(r runtime.ClientRequest, reg
 		return err
 	}
 	var res []error
-
 	if o.Body != nil {
 		if err := r.SetBodyParam(o.Body); err != nil {
 			return err

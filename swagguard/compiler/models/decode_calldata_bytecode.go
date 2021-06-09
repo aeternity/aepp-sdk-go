@@ -6,16 +6,18 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"encoding/json"
 
-	strfmt "github.com/go-openapi/strfmt"
-
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // DecodeCalldataBytecode decode calldata bytecode
+// Example: {"backend":"fate","bytecode":null,"calldata":{}}
+//
 // swagger:model DecodeCalldataBytecode
 type DecodeCalldataBytecode struct {
 
@@ -25,11 +27,11 @@ type DecodeCalldataBytecode struct {
 
 	// Compiled contract
 	// Required: true
-	Bytecode EncodedByteArray `json:"bytecode"`
+	Bytecode *EncodedByteArray `json:"bytecode"`
 
 	// Calldata to dissect
 	// Required: true
-	Calldata EncodedByteArray `json:"calldata"`
+	Calldata *EncodedByteArray `json:"calldata"`
 }
 
 // Validate validates this decode calldata bytecode
@@ -77,14 +79,13 @@ const (
 
 // prop value enum
 func (m *DecodeCalldataBytecode) validateBackendEnum(path, location string, value string) error {
-	if err := validate.Enum(path, location, value, decodeCalldataBytecodeTypeBackendPropEnum); err != nil {
+	if err := validate.EnumCase(path, location, value, decodeCalldataBytecodeTypeBackendPropEnum, true); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (m *DecodeCalldataBytecode) validateBackend(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Backend) { // not required
 		return nil
 	}
@@ -99,11 +100,21 @@ func (m *DecodeCalldataBytecode) validateBackend(formats strfmt.Registry) error 
 
 func (m *DecodeCalldataBytecode) validateBytecode(formats strfmt.Registry) error {
 
-	if err := m.Bytecode.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("bytecode")
-		}
+	if err := validate.Required("bytecode", "body", m.Bytecode); err != nil {
 		return err
+	}
+
+	if err := validate.Required("bytecode", "body", m.Bytecode); err != nil {
+		return err
+	}
+
+	if m.Bytecode != nil {
+		if err := m.Bytecode.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("bytecode")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -111,11 +122,67 @@ func (m *DecodeCalldataBytecode) validateBytecode(formats strfmt.Registry) error
 
 func (m *DecodeCalldataBytecode) validateCalldata(formats strfmt.Registry) error {
 
-	if err := m.Calldata.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("calldata")
-		}
+	if err := validate.Required("calldata", "body", m.Calldata); err != nil {
 		return err
+	}
+
+	if err := validate.Required("calldata", "body", m.Calldata); err != nil {
+		return err
+	}
+
+	if m.Calldata != nil {
+		if err := m.Calldata.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("calldata")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this decode calldata bytecode based on the context it is used
+func (m *DecodeCalldataBytecode) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateBytecode(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateCalldata(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *DecodeCalldataBytecode) contextValidateBytecode(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Bytecode != nil {
+		if err := m.Bytecode.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("bytecode")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *DecodeCalldataBytecode) contextValidateCalldata(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Calldata != nil {
+		if err := m.Calldata.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("calldata")
+			}
+			return err
+		}
 	}
 
 	return nil

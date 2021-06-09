@@ -6,16 +6,16 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"fmt"
-
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
 
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // ErrorPos error pos
+//
 // swagger:model ErrorPos
 type ErrorPos struct {
 
@@ -67,6 +67,11 @@ func (m *ErrorPos) validateLine(formats strfmt.Registry) error {
 	return nil
 }
 
+// ContextValidate validates this error pos based on context it is used
+func (m *ErrorPos) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
 // MarshalBinary interface implementation
 func (m *ErrorPos) MarshalBinary() ([]byte, error) {
 	if m == nil {
@@ -83,8 +88,4 @@ func (m *ErrorPos) UnmarshalBinary(b []byte) error {
 	}
 	*m = res
 	return nil
-}
-
-func (m *ErrorPos) String() string {
-	return fmt.Sprintf("%s:line %v, col %v", m.File, *m.Line, *m.Col)
 }

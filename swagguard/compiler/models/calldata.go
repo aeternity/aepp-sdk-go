@@ -6,19 +6,23 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
 
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // Calldata calldata
+// Example: {"calldata":{}}
+//
 // swagger:model Calldata
 type Calldata struct {
 
 	// calldata
 	// Required: true
-	Calldata EncodedByteArray `json:"calldata"`
+	Calldata *EncodedByteArray `json:"calldata"`
 }
 
 // Validate validates this calldata
@@ -37,11 +41,49 @@ func (m *Calldata) Validate(formats strfmt.Registry) error {
 
 func (m *Calldata) validateCalldata(formats strfmt.Registry) error {
 
-	if err := m.Calldata.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("calldata")
-		}
+	if err := validate.Required("calldata", "body", m.Calldata); err != nil {
 		return err
+	}
+
+	if err := validate.Required("calldata", "body", m.Calldata); err != nil {
+		return err
+	}
+
+	if m.Calldata != nil {
+		if err := m.Calldata.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("calldata")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this calldata based on the context it is used
+func (m *Calldata) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateCalldata(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *Calldata) contextValidateCalldata(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Calldata != nil {
+		if err := m.Calldata.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("calldata")
+			}
+			return err
+		}
 	}
 
 	return nil

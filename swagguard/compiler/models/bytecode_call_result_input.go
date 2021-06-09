@@ -6,16 +6,18 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"encoding/json"
 
-	strfmt "github.com/go-openapi/strfmt"
-
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // BytecodeCallResultInput bytecode call result input
+// Example: {"backend":"fate","bytecode":{},"call-result":"call-result","call-value":"call-value","function":"function"}
+//
 // swagger:model BytecodeCallResultInput
 type BytecodeCallResultInput struct {
 
@@ -25,7 +27,7 @@ type BytecodeCallResultInput struct {
 
 	// Compiled contract
 	// Required: true
-	Bytecode EncodedByteArray `json:"bytecode"`
+	Bytecode *EncodedByteArray `json:"bytecode"`
 
 	// Call result type (ok | revert | error)
 	// Required: true
@@ -93,14 +95,13 @@ const (
 
 // prop value enum
 func (m *BytecodeCallResultInput) validateBackendEnum(path, location string, value string) error {
-	if err := validate.Enum(path, location, value, bytecodeCallResultInputTypeBackendPropEnum); err != nil {
+	if err := validate.EnumCase(path, location, value, bytecodeCallResultInputTypeBackendPropEnum, true); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (m *BytecodeCallResultInput) validateBackend(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Backend) { // not required
 		return nil
 	}
@@ -115,11 +116,21 @@ func (m *BytecodeCallResultInput) validateBackend(formats strfmt.Registry) error
 
 func (m *BytecodeCallResultInput) validateBytecode(formats strfmt.Registry) error {
 
-	if err := m.Bytecode.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("bytecode")
-		}
+	if err := validate.Required("bytecode", "body", m.Bytecode); err != nil {
 		return err
+	}
+
+	if err := validate.Required("bytecode", "body", m.Bytecode); err != nil {
+		return err
+	}
+
+	if m.Bytecode != nil {
+		if err := m.Bytecode.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("bytecode")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -147,6 +158,34 @@ func (m *BytecodeCallResultInput) validateFunction(formats strfmt.Registry) erro
 
 	if err := validate.Required("function", "body", m.Function); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this bytecode call result input based on the context it is used
+func (m *BytecodeCallResultInput) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateBytecode(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *BytecodeCallResultInput) contextValidateBytecode(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Bytecode != nil {
+		if err := m.Bytecode.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("bytecode")
+			}
+			return err
+		}
 	}
 
 	return nil

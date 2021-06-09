@@ -13,65 +13,78 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
+	"github.com/go-openapi/strfmt"
 
-	strfmt "github.com/go-openapi/strfmt"
-
-	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/compiler/models"
+	"github.com/aeternity/aepp-sdk-go/v8/swagguard/compiler/models"
 )
 
-// NewDecodeCallResultParams creates a new DecodeCallResultParams object
-// with the default values initialized.
+// NewDecodeCallResultParams creates a new DecodeCallResultParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewDecodeCallResultParams() *DecodeCallResultParams {
-	var ()
 	return &DecodeCallResultParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewDecodeCallResultParamsWithTimeout creates a new DecodeCallResultParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewDecodeCallResultParamsWithTimeout(timeout time.Duration) *DecodeCallResultParams {
-	var ()
 	return &DecodeCallResultParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewDecodeCallResultParamsWithContext creates a new DecodeCallResultParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewDecodeCallResultParamsWithContext(ctx context.Context) *DecodeCallResultParams {
-	var ()
 	return &DecodeCallResultParams{
-
 		Context: ctx,
 	}
 }
 
 // NewDecodeCallResultParamsWithHTTPClient creates a new DecodeCallResultParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewDecodeCallResultParamsWithHTTPClient(client *http.Client) *DecodeCallResultParams {
-	var ()
 	return &DecodeCallResultParams{
 		HTTPClient: client,
 	}
 }
 
-/*DecodeCallResultParams contains all the parameters to send to the API endpoint
-for the decode call result operation typically these are written to a http.Request
+/* DecodeCallResultParams contains all the parameters to send to the API endpoint
+   for the decode call result operation.
+
+   Typically these are written to a http.Request.
 */
 type DecodeCallResultParams struct {
 
-	/*Body
-	  Binary data in Sophia ABI format
+	/* Body.
 
+	   Binary data in Sophia ABI format
 	*/
 	Body *models.SophiaCallResultInput
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the decode call result params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *DecodeCallResultParams) WithDefaults() *DecodeCallResultParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the decode call result params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *DecodeCallResultParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the decode call result params
@@ -125,7 +138,6 @@ func (o *DecodeCallResultParams) WriteToRequest(r runtime.ClientRequest, reg str
 		return err
 	}
 	var res []error
-
 	if o.Body != nil {
 		if err := r.SetBodyParam(o.Body); err != nil {
 			return err
