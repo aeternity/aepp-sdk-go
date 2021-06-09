@@ -281,6 +281,7 @@
             "description": "The height",
             "required": true,
             "type": "integer",
+            "minimum": 0,
             "format": "uint64"
           }
         ],
@@ -447,7 +448,8 @@
             "description": "The index of the transaction in a block",
             "required": true,
             "type": "integer",
-            "minimum": 1
+            "minimum": 1,
+            "format": "uint64"
           }
         ],
         "responses": {
@@ -609,6 +611,7 @@
             "description": "The height",
             "required": true,
             "type": "integer",
+            "minimum": 0,
             "format": "uint64"
           }
         ],
@@ -695,6 +698,7 @@
             "description": "The height",
             "required": true,
             "type": "integer",
+            "minimum": 0,
             "format": "uint64"
           }
         ],
@@ -1172,7 +1176,7 @@
             "required": false,
             "type": "integer",
             "minimum": 1,
-            "maximum": 1000
+            "format": "uint64"
           },
           {
             "in": "query",
@@ -2295,8 +2299,8 @@
             "description": "Salt",
             "required": true,
             "type": "integer",
-            "format": "uint64",
-            "minimum": 0
+            "minimum": 0,
+            "format": "uint64"
           }
         ],
         "responses": {
@@ -2461,6 +2465,7 @@
             "description": "The height",
             "required": true,
             "type": "integer",
+            "minimum": 0,
             "format": "uint64"
           }
         ],
@@ -2490,32 +2495,26 @@
           "package": "github.com/aeternity/aepp-sdk-go/v8/utils"
         },
         "type": "BigInt"
-      },
-      "format": "uint64"
+      }
     },
     "UInt16": {
       "type": "integer",
       "minimum": 0,
-      "maximum": 65535,
       "format": "uint64"
     },
     "UInt32": {
       "type": "integer",
       "minimum": 0,
-      "maximum": 4294967295,
       "format": "uint64"
     },
     "UInt64": {
       "type": "integer",
       "minimum": 0,
-      "maximum": 18446744073709551615,
       "format": "uint64"
     },
     "TxBlockHeight": {
       "type": "integer",
-      "minimum": -1,
-      "maximum": 18446744073709551615,
-      "format": "uint64"
+      "minimum": -1
     },
     "EncodedHash": {
       "description": "Base58Check encoded tagged hash",
@@ -3751,8 +3750,8 @@
         "sync_progress": {
           "type": "number",
           "format": "float",
-          "minimum": 0,
-          "maximum": 100
+          "minimum": 0.0,
+          "maximum": 100.0
         },
         "listening": {
           "type": "boolean"
