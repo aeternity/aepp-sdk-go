@@ -65,7 +65,7 @@ func (c *Compiler) CompileContract(source string, backend string) (bytecode stri
 	if err != nil {
 		return "", err
 	}
-	bytecode = string(result.Payload.Bytecode)
+	bytecode = string(*result.Payload.Bytecode)
 	return
 }
 
@@ -108,9 +108,11 @@ type DecodeCalldataBytecoder interface {
 // DecodeCalldataBytecode abstracts away the swagger specifics of posting to
 // /decode-calldata/bytecode
 func (c *Compiler) DecodeCalldataBytecode(bytecode string, calldata string, backend string) (decodedCallData *models.DecodedCalldata, err error) {
+	bytecodeEba := models.EncodedByteArray(bytecode)
+	calldataEba := models.EncodedByteArray(calldata)
 	decodeCalldataBytecode := &models.DecodeCalldataBytecode{
-		Bytecode: models.EncodedByteArray(bytecode),
-		Calldata: models.EncodedByteArray(calldata),
+		Bytecode: &bytecodeEba,
+		Calldata: &calldataEba,
 		Backend:  backend,
 	}
 	params := operations.NewDecodeCalldataBytecodeParams().WithBody(decodeCalldataBytecode)
@@ -131,8 +133,9 @@ type DecodeCalldataSourcer interface {
 // DecodeCalldataSource abstracts away the swagger specifics of posting to
 // /decode-calldata/source
 func (c *Compiler) DecodeCalldataSource(source string, function string, callData string, backend string) (decodedCallData *models.DecodedCalldata, err error) {
+	callDataEba := models.EncodedByteArray(callData)
 	p := &models.DecodeCalldataSource{
-		Calldata: models.EncodedByteArray(callData),
+		Calldata: &callDataEba,
 		Function: &function,
 		Options: &models.CompileOpts{
 			Backend:    backend,
@@ -196,7 +199,7 @@ func (c *Compiler) EncodeCalldata(source string, function string, args []string,
 		return
 	}
 
-	s := string(result.Payload.Calldata)
+	s := string(*result.Payload.Calldata)
 	return s, err
 }
 

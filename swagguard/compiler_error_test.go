@@ -14,7 +14,7 @@ func TestCompilerErrorModelDereferencing(t *testing.T) {
 	internalServerErr := operations.APIVersionInternalServerError{}
 	err := models.Error{Reason: &reason}
 	internalServerErr.Payload = &err
-	printedError := fmt.Sprintf("BadRequest %s", internalServerErr)
+	printedError := fmt.Sprintf("BadRequest %v", internalServerErr)
 	if !strings.Contains(printedError, reason) {
 		t.Errorf("Expected to find %s when printing out the models.Error: got %s instead", reason, printedError)
 	}
@@ -29,7 +29,7 @@ func TestCompilerCompilationErrorsModelDereferencing(t *testing.T) {
 	compileContractErr := operations.CompileContractBadRequest{
 		Payload: []*models.CompilerError{err1, err2},
 	}
-	printedError := fmt.Sprintf("%s", compileContractErr)
+	printedError := fmt.Sprintf("%v", compileContractErr)
 	lookForError1 := "Unbound variable ae_addres"
 	lookForError2 := "Also I don't like your face"
 
