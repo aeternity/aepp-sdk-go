@@ -15,7 +15,7 @@ import (
 )
 
 // ACI a c i
-// Example: {"encoded_aci":"{}","interface":"interface"}
+// Example: {"encoded_aci":"{}","external_encoded_aci":"","interface":"interface"}
 //
 // swagger:model ACI
 type ACI struct {
@@ -23,6 +23,9 @@ type ACI struct {
 	// encoded aci
 	// Required: true
 	EncodedAci interface{} `json:"encoded_aci"`
+
+	// external encoded aci
+	ExternalEncodedAci []interface{} `json:"external_encoded_aci"`
 
 	// interface
 	// Required: true

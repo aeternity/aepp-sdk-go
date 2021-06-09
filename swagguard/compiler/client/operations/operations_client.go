@@ -50,6 +50,12 @@ type ClientService interface {
 
 	GenerateACI(params *GenerateACIParams, opts ...ClientOption) (*GenerateACIOK, error)
 
+	GetCompilerVersion(params *GetCompilerVersionParams, opts ...ClientOption) (*GetCompilerVersionOK, error)
+
+	GetFateAssemblerCode(params *GetFateAssemblerCodeParams, opts ...ClientOption) (*GetFateAssemblerCodeOK, error)
+
+	ValidateByteCode(params *ValidateByteCodeParams, opts ...ClientOption) (*ValidateByteCodeOK, error)
+
 	Version(params *VersionParams, opts ...ClientOption) (*VersionOK, error)
 
 	SetTransport(transport runtime.ClientTransport)
@@ -432,6 +438,120 @@ func (a *Client) GenerateACI(params *GenerateACIParams, opts ...ClientOption) (*
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for GenerateACI: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+  GetCompilerVersion Extract compiler version from bytecode
+*/
+func (a *Client) GetCompilerVersion(params *GetCompilerVersionParams, opts ...ClientOption) (*GetCompilerVersionOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetCompilerVersionParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "GetCompilerVersion",
+		Method:             "POST",
+		PathPattern:        "/compiler-version",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetCompilerVersionReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetCompilerVersionOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetCompilerVersion: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+  GetFateAssemblerCode Get FATE assembler code from bytecode
+*/
+func (a *Client) GetFateAssemblerCode(params *GetFateAssemblerCodeParams, opts ...ClientOption) (*GetFateAssemblerCodeOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetFateAssemblerCodeParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "GetFateAssemblerCode",
+		Method:             "POST",
+		PathPattern:        "/fate-assembler",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetFateAssemblerCodeReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetFateAssemblerCodeOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetFateAssemblerCode: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+  ValidateByteCode Verify that an encoded byte array is the result of compiling a given contract
+*/
+func (a *Client) ValidateByteCode(params *ValidateByteCodeParams, opts ...ClientOption) (*ValidateByteCodeOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewValidateByteCodeParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "ValidateByteCode",
+		Method:             "POST",
+		PathPattern:        "/validate-byte-code",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &ValidateByteCodeReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*ValidateByteCodeOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for ValidateByteCode: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
