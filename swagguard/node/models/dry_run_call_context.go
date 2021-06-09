@@ -20,6 +20,9 @@ type DryRunCallContext struct {
 	// This call will have effects on the next call in this dry-run (or not)
 	Stateful bool `json:"stateful,omitempty"`
 
+	// tx
+	Tx string `json:"tx,omitempty"`
+
 	// tx hash
 	TxHash string `json:"tx_hash,omitempty"`
 }

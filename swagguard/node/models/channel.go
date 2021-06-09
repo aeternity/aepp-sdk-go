@@ -28,10 +28,6 @@ type Channel struct {
 	// Required: true
 	ChannelReserve *utils.BigInt `json:"channel_reserve"`
 
-	// delegate ids
-	// Required: true
-	DelegateIds []string `json:"delegate_ids"`
-
 	// id
 	// Required: true
 	ID *string `json:"id"`
@@ -82,10 +78,6 @@ func (m *Channel) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateChannelReserve(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateDelegateIds(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -174,15 +166,6 @@ func (m *Channel) validateChannelReserve(formats strfmt.Registry) error {
 			}
 			return err
 		}
-	}
-
-	return nil
-}
-
-func (m *Channel) validateDelegateIds(formats strfmt.Registry) error {
-
-	if err := validate.Required("delegate_ids", "body", m.DelegateIds); err != nil {
-		return err
 	}
 
 	return nil

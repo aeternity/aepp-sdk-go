@@ -19,11 +19,11 @@ import (
 // swagger:model Protocol
 type Protocol struct {
 
-	// effective at height
+	// Height at which protocol becomes active
 	// Required: true
 	EffectiveAtHeight *uint64 `json:"effective_at_height"`
 
-	// version
+	// Protocol version (can include protocol activated by miner signalling)
 	// Required: true
 	Version *uint32 `json:"version"`
 }

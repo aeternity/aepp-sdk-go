@@ -23,6 +23,9 @@ type DryRunResults struct {
 	// results
 	// Required: true
 	Results []*DryRunResult `json:"results"`
+
+	// on-chain tx events
+	TxEvents []TxEvent `json:"tx_events"`
 }
 
 // Validate validates this dry run results

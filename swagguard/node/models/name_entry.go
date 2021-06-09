@@ -24,6 +24,9 @@ type NameEntry struct {
 	// Required: true
 	ID *string `json:"id"`
 
+	// owner
+	Owner string `json:"owner,omitempty"`
+
 	// pointers
 	// Required: true
 	Pointers []*NamePointer `json:"pointers"`

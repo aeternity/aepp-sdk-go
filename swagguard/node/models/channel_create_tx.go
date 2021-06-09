@@ -24,9 +24,6 @@ type ChannelCreateTx struct {
 	// Required: true
 	ChannelReserve *utils.BigInt `json:"channel_reserve"`
 
-	// delegate ids
-	DelegateIds []string `json:"delegate_ids"`
-
 	// fee
 	// Required: true
 	Fee *utils.BigInt `json:"fee"`

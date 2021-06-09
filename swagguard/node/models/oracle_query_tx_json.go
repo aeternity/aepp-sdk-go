@@ -27,7 +27,7 @@ type OracleQueryTxJSON struct {
 
 // Type gets the type of this subtype
 func (m *OracleQueryTxJSON) Type() string {
-	return "OracleQueryTx"
+	return "OracleQueryTxJSON"
 }
 
 // SetType sets the type of this subtype

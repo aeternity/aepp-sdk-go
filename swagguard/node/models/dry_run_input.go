@@ -26,6 +26,9 @@ type DryRunInput struct {
 	// top
 	Top string `json:"top,omitempty"`
 
+	// Collect and return on-chain tx events that would result from the call
+	TxEvents *bool `json:"tx_events,omitempty"`
+
 	// Txs
 	// Required: true
 	Txs []*DryRunInputItem `json:"txs"`

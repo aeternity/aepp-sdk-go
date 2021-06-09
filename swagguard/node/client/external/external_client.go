@@ -36,6 +36,8 @@ type ClientService interface {
 
 	GetAccountByPubkeyAndHeight(params *GetAccountByPubkeyAndHeightParams, opts ...ClientOption) (*GetAccountByPubkeyAndHeightOK, error)
 
+	GetChainEnds(params *GetChainEndsParams, opts ...ClientOption) (*GetChainEndsOK, error)
+
 	GetChannelByPubkey(params *GetChannelByPubkeyParams, opts ...ClientOption) (*GetChannelByPubkeyOK, error)
 
 	GetContract(params *GetContractParams, opts ...ClientOption) (*GetContractOK, error)
@@ -43,8 +45,6 @@ type ClientService interface {
 	GetContractCode(params *GetContractCodeParams, opts ...ClientOption) (*GetContractCodeOK, error)
 
 	GetContractPoI(params *GetContractPoIParams, opts ...ClientOption) (*GetContractPoIOK, error)
-
-	GetContractStore(params *GetContractStoreParams, opts ...ClientOption) (*GetContractStoreOK, error)
 
 	GetCurrentGeneration(params *GetCurrentGenerationParams, opts ...ClientOption) (*GetCurrentGenerationOK, error)
 
@@ -212,6 +212,44 @@ func (a *Client) GetAccountByPubkeyAndHeight(params *GetAccountByPubkeyAndHeight
 }
 
 /*
+  GetChainEnds Get oldest keyblock hashes counting from genesis including orphans
+*/
+func (a *Client) GetChainEnds(params *GetChainEndsParams, opts ...ClientOption) (*GetChainEndsOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetChainEndsParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "GetChainEnds",
+		Method:             "GET",
+		PathPattern:        "/status/chain-ends",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetChainEndsReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetChainEndsOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetChainEnds: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
   GetChannelByPubkey Get channel by public key
 */
 func (a *Client) GetChannelByPubkey(params *GetChannelByPubkeyParams, opts ...ClientOption) (*GetChannelByPubkeyOK, error) {
@@ -360,44 +398,6 @@ func (a *Client) GetContractPoI(params *GetContractPoIParams, opts ...ClientOpti
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for GetContractPoI: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
-}
-
-/*
-  GetContractStore Get contract store by pubkey
-*/
-func (a *Client) GetContractStore(params *GetContractStoreParams, opts ...ClientOption) (*GetContractStoreOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetContractStoreParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "GetContractStore",
-		Method:             "GET",
-		PathPattern:        "/contracts/{pubkey}/store",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetContractStoreReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*GetContractStoreOK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for GetContractStore: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
