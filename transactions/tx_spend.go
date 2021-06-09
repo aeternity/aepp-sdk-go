@@ -106,9 +106,11 @@ func (tx *SpendTx) DecodeRLP(s *rlp.Stream) (err error) {
 // JSON representation of a Tx is useful for querying the node's debug endpoint
 func (tx *SpendTx) JSON() (string, error) {
 	baseEncodedPayload := binary.Encode(binary.PrefixByteArray, tx.Payload)
+	amount := utils.BigInt(*tx.Amount)
+	fee := utils.BigInt(*tx.Fee)
 	swaggerT := models.SpendTx{
-		Amount:      utils.BigInt(*tx.Amount),
-		Fee:         utils.BigInt(*tx.Fee),
+		Amount:      &amount,
+		Fee:         &fee,
 		Nonce:       tx.Nonce,
 		Payload:     &baseEncodedPayload,
 		RecipientID: &tx.RecipientID,
