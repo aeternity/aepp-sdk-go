@@ -27,7 +27,7 @@ type ContractCallTxJSON struct {
 
 // Type gets the type of this subtype
 func (m *ContractCallTxJSON) Type() string {
-	return "ContractCallTxJSON"
+	return "ContractCallTx"
 }
 
 // SetType sets the type of this subtype

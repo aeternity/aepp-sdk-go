@@ -27,7 +27,7 @@ type GAMetaTxJSON struct {
 
 // Type gets the type of this subtype
 func (m *GAMetaTxJSON) Type() string {
-	return "GAMetaTxJSON"
+	return "GAMetaTx"
 }
 
 // SetType sets the type of this subtype
