@@ -6,16 +6,17 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"strconv"
 
-	strfmt "github.com/go-openapi/strfmt"
-
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // OracleQueries oracle queries
+//
 // swagger:model OracleQueries
 type OracleQueries struct {
 
@@ -51,6 +52,38 @@ func (m *OracleQueries) validateOracleQueries(formats strfmt.Registry) error {
 
 		if m.OracleQueries[i] != nil {
 			if err := m.OracleQueries[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("oracle_queries" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// ContextValidate validate this oracle queries based on the context it is used
+func (m *OracleQueries) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateOracleQueries(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *OracleQueries) contextValidateOracleQueries(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.OracleQueries); i++ {
+
+		if m.OracleQueries[i] != nil {
+			if err := m.OracleQueries[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("oracle_queries" + "." + strconv.Itoa(i))
 				}

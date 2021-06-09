@@ -6,13 +6,15 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
 
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
 
 // KeyBlockOrMicroBlockHeader key block or micro block header
+//
 // swagger:model KeyBlockOrMicroBlockHeader
 type KeyBlockOrMicroBlockHeader struct {
 
@@ -42,7 +44,6 @@ func (m *KeyBlockOrMicroBlockHeader) Validate(formats strfmt.Registry) error {
 }
 
 func (m *KeyBlockOrMicroBlockHeader) validateKeyBlock(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.KeyBlock) { // not required
 		return nil
 	}
@@ -60,13 +61,58 @@ func (m *KeyBlockOrMicroBlockHeader) validateKeyBlock(formats strfmt.Registry) e
 }
 
 func (m *KeyBlockOrMicroBlockHeader) validateMicroBlock(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.MicroBlock) { // not required
 		return nil
 	}
 
 	if m.MicroBlock != nil {
 		if err := m.MicroBlock.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("micro_block")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this key block or micro block header based on the context it is used
+func (m *KeyBlockOrMicroBlockHeader) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateKeyBlock(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateMicroBlock(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *KeyBlockOrMicroBlockHeader) contextValidateKeyBlock(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.KeyBlock != nil {
+		if err := m.KeyBlock.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("key_block")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *KeyBlockOrMicroBlockHeader) contextValidateMicroBlock(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.MicroBlock != nil {
+		if err := m.MicroBlock.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("micro_block")
 			}

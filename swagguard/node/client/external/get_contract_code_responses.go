@@ -10,10 +10,9 @@ import (
 	"io"
 
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 
-	strfmt "github.com/go-openapi/strfmt"
-
-	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
 )
 
 // GetContractCodeReader is a Reader for the GetContractCode structure.
@@ -24,30 +23,26 @@ type GetContractCodeReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *GetContractCodeReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewGetContractCodeOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 400:
 		result := NewGetContractCodeBadRequest()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 404:
 		result := NewGetContractCodeNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -56,7 +51,7 @@ func NewGetContractCodeOK() *GetContractCodeOK {
 	return &GetContractCodeOK{}
 }
 
-/*GetContractCodeOK handles this case with default header values.
+/* GetContractCodeOK describes a response with status code 200, with default header values.
 
 Contract code
 */
@@ -66,6 +61,9 @@ type GetContractCodeOK struct {
 
 func (o *GetContractCodeOK) Error() string {
 	return fmt.Sprintf("[GET /contracts/{pubkey}/code][%d] getContractCodeOK  %+v", 200, o.Payload)
+}
+func (o *GetContractCodeOK) GetPayload() *models.ByteCode {
+	return o.Payload
 }
 
 func (o *GetContractCodeOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -85,7 +83,7 @@ func NewGetContractCodeBadRequest() *GetContractCodeBadRequest {
 	return &GetContractCodeBadRequest{}
 }
 
-/*GetContractCodeBadRequest handles this case with default header values.
+/* GetContractCodeBadRequest describes a response with status code 400, with default header values.
 
 Invalid pubkey
 */
@@ -95,6 +93,9 @@ type GetContractCodeBadRequest struct {
 
 func (o *GetContractCodeBadRequest) Error() string {
 	return fmt.Sprintf("[GET /contracts/{pubkey}/code][%d] getContractCodeBadRequest  %+v", 400, o.Payload)
+}
+func (o *GetContractCodeBadRequest) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *GetContractCodeBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -114,7 +115,7 @@ func NewGetContractCodeNotFound() *GetContractCodeNotFound {
 	return &GetContractCodeNotFound{}
 }
 
-/*GetContractCodeNotFound handles this case with default header values.
+/* GetContractCodeNotFound describes a response with status code 404, with default header values.
 
 Contract not found
 */
@@ -124,6 +125,9 @@ type GetContractCodeNotFound struct {
 
 func (o *GetContractCodeNotFound) Error() string {
 	return fmt.Sprintf("[GET /contracts/{pubkey}/code][%d] getContractCodeNotFound  %+v", 404, o.Payload)
+}
+func (o *GetContractCodeNotFound) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *GetContractCodeNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

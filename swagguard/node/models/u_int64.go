@@ -13,16 +13,16 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// TxBlockHeight tx block height
+// UInt64 u int64
 //
-// swagger:model TxBlockHeight
-type TxBlockHeight int64
+// swagger:model UInt64
+type UInt64 uint64
 
-// Validate validates this tx block height
-func (m TxBlockHeight) Validate(formats strfmt.Registry) error {
+// Validate validates this u int64
+func (m UInt64) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := validate.MinimumInt("", "body", int64(m), -1, false); err != nil {
+	if err := validate.MinimumUint("", "body", uint64(m), 0, false); err != nil {
 		return err
 	}
 
@@ -32,7 +32,7 @@ func (m TxBlockHeight) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validates this tx block height based on context it is used
-func (m TxBlockHeight) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+// ContextValidate validates this u int64 based on context it is used
+func (m UInt64) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }

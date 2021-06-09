@@ -7,16 +7,17 @@ package models
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 
-	strfmt "github.com/go-openapi/strfmt"
-
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // OracleQueryTxJSON oracle query tx JSON
+//
 // swagger:model OracleQueryTxJSON
 type OracleQueryTxJSON struct {
 	versionField *uint32
@@ -26,12 +27,11 @@ type OracleQueryTxJSON struct {
 
 // Type gets the type of this subtype
 func (m *OracleQueryTxJSON) Type() string {
-	return "OracleQueryTx"
+	return "OracleQueryTxJSON"
 }
 
 // SetType sets the type of this subtype
 func (m *OracleQueryTxJSON) SetType(val string) {
-
 }
 
 // Version gets the version of this subtype
@@ -78,7 +78,6 @@ func (m *OracleQueryTxJSON) UnmarshalJSON(raw []byte) error {
 		/* Not the type we're looking for. */
 		return errors.New(422, "invalid type value: %q", base.Type)
 	}
-
 	result.versionField = base.Version
 
 	result.OracleQueryTx = data.OracleQueryTx
@@ -97,8 +96,7 @@ func (m OracleQueryTxJSON) MarshalJSON() ([]byte, error) {
 	}{
 
 		OracleQueryTx: m.OracleQueryTx,
-	},
-	)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -111,8 +109,7 @@ func (m OracleQueryTxJSON) MarshalJSON() ([]byte, error) {
 		Type: m.Type(),
 
 		Version: m.Version(),
-	},
-	)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -145,6 +142,21 @@ func (m *OracleQueryTxJSON) validateVersion(formats strfmt.Registry) error {
 		return err
 	}
 
+	return nil
+}
+
+// ContextValidate validate this oracle query tx JSON based on the context it is used
+func (m *OracleQueryTxJSON) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	// validation for a type composition with OracleQueryTx
+	if err := m.OracleQueryTx.ContextValidate(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
 	return nil
 }
 

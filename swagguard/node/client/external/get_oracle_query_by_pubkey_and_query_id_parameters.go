@@ -13,68 +13,82 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
-
-	strfmt "github.com/go-openapi/strfmt"
+	"github.com/go-openapi/strfmt"
 )
 
-// NewGetOracleQueryByPubkeyAndQueryIDParams creates a new GetOracleQueryByPubkeyAndQueryIDParams object
-// with the default values initialized.
+// NewGetOracleQueryByPubkeyAndQueryIDParams creates a new GetOracleQueryByPubkeyAndQueryIDParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewGetOracleQueryByPubkeyAndQueryIDParams() *GetOracleQueryByPubkeyAndQueryIDParams {
-	var ()
 	return &GetOracleQueryByPubkeyAndQueryIDParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewGetOracleQueryByPubkeyAndQueryIDParamsWithTimeout creates a new GetOracleQueryByPubkeyAndQueryIDParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewGetOracleQueryByPubkeyAndQueryIDParamsWithTimeout(timeout time.Duration) *GetOracleQueryByPubkeyAndQueryIDParams {
-	var ()
 	return &GetOracleQueryByPubkeyAndQueryIDParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewGetOracleQueryByPubkeyAndQueryIDParamsWithContext creates a new GetOracleQueryByPubkeyAndQueryIDParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewGetOracleQueryByPubkeyAndQueryIDParamsWithContext(ctx context.Context) *GetOracleQueryByPubkeyAndQueryIDParams {
-	var ()
 	return &GetOracleQueryByPubkeyAndQueryIDParams{
-
 		Context: ctx,
 	}
 }
 
 // NewGetOracleQueryByPubkeyAndQueryIDParamsWithHTTPClient creates a new GetOracleQueryByPubkeyAndQueryIDParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewGetOracleQueryByPubkeyAndQueryIDParamsWithHTTPClient(client *http.Client) *GetOracleQueryByPubkeyAndQueryIDParams {
-	var ()
 	return &GetOracleQueryByPubkeyAndQueryIDParams{
 		HTTPClient: client,
 	}
 }
 
-/*GetOracleQueryByPubkeyAndQueryIDParams contains all the parameters to send to the API endpoint
-for the get oracle query by pubkey and query Id operation typically these are written to a http.Request
+/* GetOracleQueryByPubkeyAndQueryIDParams contains all the parameters to send to the API endpoint
+   for the get oracle query by pubkey and query Id operation.
+
+   Typically these are written to a http.Request.
 */
 type GetOracleQueryByPubkeyAndQueryIDParams struct {
 
-	/*Pubkey
-	  The public key of the oracle
+	/* Pubkey.
 
+	   The public key of the oracle
 	*/
 	Pubkey string
-	/*QueryID
-	  The ID of the query
 
+	/* QueryID.
+
+	   The ID of the query
 	*/
 	QueryID string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the get oracle query by pubkey and query Id params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetOracleQueryByPubkeyAndQueryIDParams) WithDefaults() *GetOracleQueryByPubkeyAndQueryIDParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the get oracle query by pubkey and query Id params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetOracleQueryByPubkeyAndQueryIDParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the get oracle query by pubkey and query Id params

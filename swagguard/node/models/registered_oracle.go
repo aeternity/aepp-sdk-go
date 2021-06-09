@@ -6,16 +6,17 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
 
+	"github.com/aeternity/aepp-sdk-go/v8/utils"
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
-
-	utils "github.com/aeternity/aepp-sdk-go/v8/utils"
 )
 
 // RegisteredOracle registered oracle
+//
 // swagger:model RegisteredOracle
 type RegisteredOracle struct {
 
@@ -29,7 +30,7 @@ type RegisteredOracle struct {
 
 	// query fee
 	// Required: true
-	QueryFee utils.BigInt `json:"query_fee"`
+	QueryFee *utils.BigInt `json:"query_fee"`
 
 	// query format
 	// Required: true
@@ -98,11 +99,21 @@ func (m *RegisteredOracle) validateID(formats strfmt.Registry) error {
 
 func (m *RegisteredOracle) validateQueryFee(formats strfmt.Registry) error {
 
-	if err := m.QueryFee.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("query_fee")
-		}
+	if err := validate.Required("query_fee", "body", m.QueryFee); err != nil {
 		return err
+	}
+
+	if err := validate.Required("query_fee", "body", m.QueryFee); err != nil {
+		return err
+	}
+
+	if m.QueryFee != nil {
+		if err := m.QueryFee.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("query_fee")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -130,6 +141,34 @@ func (m *RegisteredOracle) validateTTL(formats strfmt.Registry) error {
 
 	if err := validate.Required("ttl", "body", m.TTL); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this registered oracle based on the context it is used
+func (m *RegisteredOracle) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateQueryFee(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *RegisteredOracle) contextValidateQueryFee(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.QueryFee != nil {
+		if err := m.QueryFee.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("query_fee")
+			}
+			return err
+		}
 	}
 
 	return nil

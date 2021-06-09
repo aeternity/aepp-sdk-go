@@ -7,16 +7,17 @@ package models
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 
-	strfmt "github.com/go-openapi/strfmt"
-
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // NameRevokeTxJSON name revoke tx JSON
+//
 // swagger:model NameRevokeTxJSON
 type NameRevokeTxJSON struct {
 	versionField *uint32
@@ -26,12 +27,11 @@ type NameRevokeTxJSON struct {
 
 // Type gets the type of this subtype
 func (m *NameRevokeTxJSON) Type() string {
-	return "NameRevokeTx"
+	return "NameRevokeTxJSON"
 }
 
 // SetType sets the type of this subtype
 func (m *NameRevokeTxJSON) SetType(val string) {
-
 }
 
 // Version gets the version of this subtype
@@ -78,7 +78,6 @@ func (m *NameRevokeTxJSON) UnmarshalJSON(raw []byte) error {
 		/* Not the type we're looking for. */
 		return errors.New(422, "invalid type value: %q", base.Type)
 	}
-
 	result.versionField = base.Version
 
 	result.NameRevokeTx = data.NameRevokeTx
@@ -97,8 +96,7 @@ func (m NameRevokeTxJSON) MarshalJSON() ([]byte, error) {
 	}{
 
 		NameRevokeTx: m.NameRevokeTx,
-	},
-	)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -111,8 +109,7 @@ func (m NameRevokeTxJSON) MarshalJSON() ([]byte, error) {
 		Type: m.Type(),
 
 		Version: m.Version(),
-	},
-	)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -145,6 +142,21 @@ func (m *NameRevokeTxJSON) validateVersion(formats strfmt.Registry) error {
 		return err
 	}
 
+	return nil
+}
+
+// ContextValidate validate this name revoke tx JSON based on the context it is used
+func (m *NameRevokeTxJSON) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	// validation for a type composition with NameRevokeTx
+	if err := m.NameRevokeTx.ContextValidate(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
 	return nil
 }
 

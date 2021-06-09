@@ -7,24 +7,24 @@ package models
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 
-	strfmt "github.com/go-openapi/strfmt"
-
+	"github.com/aeternity/aepp-sdk-go/v8/utils"
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
-
-	utils "github.com/aeternity/aepp-sdk-go/v8/utils"
 )
 
 // OffChainDeposit off chain deposit
+//
 // swagger:model OffChainDeposit
 type OffChainDeposit struct {
 
 	// amount
 	// Required: true
-	Amount utils.BigInt `json:"amount"`
+	Amount *utils.BigInt `json:"amount"`
 
 	// Depositor of tokens
 	// Required: true
@@ -38,12 +38,7 @@ func (m *OffChainDeposit) Op() string {
 
 // SetOp sets the op of this subtype
 func (m *OffChainDeposit) SetOp(val string) {
-
 }
-
-// Amount gets the amount of this subtype
-
-// From gets the from of this subtype
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
 func (m *OffChainDeposit) UnmarshalJSON(raw []byte) error {
@@ -51,7 +46,7 @@ func (m *OffChainDeposit) UnmarshalJSON(raw []byte) error {
 
 		// amount
 		// Required: true
-		Amount utils.BigInt `json:"amount"`
+		Amount *utils.BigInt `json:"amount"`
 
 		// Depositor of tokens
 		// Required: true
@@ -86,7 +81,6 @@ func (m *OffChainDeposit) UnmarshalJSON(raw []byte) error {
 	}
 
 	result.Amount = data.Amount
-
 	result.From = data.From
 
 	*m = result
@@ -102,7 +96,7 @@ func (m OffChainDeposit) MarshalJSON() ([]byte, error) {
 
 		// amount
 		// Required: true
-		Amount utils.BigInt `json:"amount"`
+		Amount *utils.BigInt `json:"amount"`
 
 		// Depositor of tokens
 		// Required: true
@@ -112,8 +106,7 @@ func (m OffChainDeposit) MarshalJSON() ([]byte, error) {
 		Amount: m.Amount,
 
 		From: m.From,
-	},
-	)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -122,8 +115,7 @@ func (m OffChainDeposit) MarshalJSON() ([]byte, error) {
 	}{
 
 		Op: m.Op(),
-	},
-	)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -151,11 +143,21 @@ func (m *OffChainDeposit) Validate(formats strfmt.Registry) error {
 
 func (m *OffChainDeposit) validateAmount(formats strfmt.Registry) error {
 
-	if err := m.Amount.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("amount")
-		}
+	if err := validate.Required("amount", "body", m.Amount); err != nil {
 		return err
+	}
+
+	if err := validate.Required("amount", "body", m.Amount); err != nil {
+		return err
+	}
+
+	if m.Amount != nil {
+		if err := m.Amount.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("amount")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -165,6 +167,34 @@ func (m *OffChainDeposit) validateFrom(formats strfmt.Registry) error {
 
 	if err := validate.Required("from", "body", m.From); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this off chain deposit based on the context it is used
+func (m *OffChainDeposit) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateAmount(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *OffChainDeposit) contextValidateAmount(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Amount != nil {
+		if err := m.Amount.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("amount")
+			}
+			return err
+		}
 	}
 
 	return nil

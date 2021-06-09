@@ -6,15 +6,16 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
 
+	"github.com/aeternity/aepp-sdk-go/v8/utils"
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-
-	utils "github.com/aeternity/aepp-sdk-go/v8/utils"
 )
 
 // TokenSupply token supply
+//
 // swagger:model TokenSupply
 type TokenSupply struct {
 
@@ -86,7 +87,6 @@ func (m *TokenSupply) Validate(formats strfmt.Registry) error {
 }
 
 func (m *TokenSupply) validateAccounts(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Accounts) { // not required
 		return nil
 	}
@@ -102,7 +102,6 @@ func (m *TokenSupply) validateAccounts(formats strfmt.Registry) error {
 }
 
 func (m *TokenSupply) validateContractOracles(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.ContractOracles) { // not required
 		return nil
 	}
@@ -118,7 +117,6 @@ func (m *TokenSupply) validateContractOracles(formats strfmt.Registry) error {
 }
 
 func (m *TokenSupply) validateContracts(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Contracts) { // not required
 		return nil
 	}
@@ -134,7 +132,6 @@ func (m *TokenSupply) validateContracts(formats strfmt.Registry) error {
 }
 
 func (m *TokenSupply) validateLocked(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Locked) { // not required
 		return nil
 	}
@@ -150,7 +147,6 @@ func (m *TokenSupply) validateLocked(formats strfmt.Registry) error {
 }
 
 func (m *TokenSupply) validateOracleQueries(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.OracleQueries) { // not required
 		return nil
 	}
@@ -166,7 +162,6 @@ func (m *TokenSupply) validateOracleQueries(formats strfmt.Registry) error {
 }
 
 func (m *TokenSupply) validateOracles(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Oracles) { // not required
 		return nil
 	}
@@ -182,7 +177,6 @@ func (m *TokenSupply) validateOracles(formats strfmt.Registry) error {
 }
 
 func (m *TokenSupply) validatePendingRewards(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.PendingRewards) { // not required
 		return nil
 	}
@@ -198,12 +192,149 @@ func (m *TokenSupply) validatePendingRewards(formats strfmt.Registry) error {
 }
 
 func (m *TokenSupply) validateTotal(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Total) { // not required
 		return nil
 	}
 
 	if err := m.Total.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("total")
+		}
+		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this token supply based on the context it is used
+func (m *TokenSupply) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateAccounts(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateContractOracles(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateContracts(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateLocked(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateOracleQueries(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateOracles(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidatePendingRewards(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateTotal(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *TokenSupply) contextValidateAccounts(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.Accounts.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("accounts")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *TokenSupply) contextValidateContractOracles(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.ContractOracles.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("contract_oracles")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *TokenSupply) contextValidateContracts(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.Contracts.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("contracts")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *TokenSupply) contextValidateLocked(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.Locked.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("locked")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *TokenSupply) contextValidateOracleQueries(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.OracleQueries.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("oracle_queries")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *TokenSupply) contextValidateOracles(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.Oracles.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("oracles")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *TokenSupply) contextValidatePendingRewards(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.PendingRewards.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("pending_rewards")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *TokenSupply) contextValidateTotal(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.Total.ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("total")
 		}

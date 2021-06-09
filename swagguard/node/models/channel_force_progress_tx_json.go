@@ -7,16 +7,17 @@ package models
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 
-	strfmt "github.com/go-openapi/strfmt"
-
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // ChannelForceProgressTxJSON channel force progress tx JSON
+//
 // swagger:model ChannelForceProgressTxJSON
 type ChannelForceProgressTxJSON struct {
 	versionField *uint32
@@ -26,12 +27,11 @@ type ChannelForceProgressTxJSON struct {
 
 // Type gets the type of this subtype
 func (m *ChannelForceProgressTxJSON) Type() string {
-	return "ChannelForceProgressTx"
+	return "ChannelForceProgressTxJSON"
 }
 
 // SetType sets the type of this subtype
 func (m *ChannelForceProgressTxJSON) SetType(val string) {
-
 }
 
 // Version gets the version of this subtype
@@ -78,7 +78,6 @@ func (m *ChannelForceProgressTxJSON) UnmarshalJSON(raw []byte) error {
 		/* Not the type we're looking for. */
 		return errors.New(422, "invalid type value: %q", base.Type)
 	}
-
 	result.versionField = base.Version
 
 	result.ChannelForceProgressTx = data.ChannelForceProgressTx
@@ -97,8 +96,7 @@ func (m ChannelForceProgressTxJSON) MarshalJSON() ([]byte, error) {
 	}{
 
 		ChannelForceProgressTx: m.ChannelForceProgressTx,
-	},
-	)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -111,8 +109,7 @@ func (m ChannelForceProgressTxJSON) MarshalJSON() ([]byte, error) {
 		Type: m.Type(),
 
 		Version: m.Version(),
-	},
-	)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -145,6 +142,21 @@ func (m *ChannelForceProgressTxJSON) validateVersion(formats strfmt.Registry) er
 		return err
 	}
 
+	return nil
+}
+
+// ContextValidate validate this channel force progress tx JSON based on the context it is used
+func (m *ChannelForceProgressTxJSON) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	// validation for a type composition with ChannelForceProgressTx
+	if err := m.ChannelForceProgressTx.ContextValidate(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
 	return nil
 }
 

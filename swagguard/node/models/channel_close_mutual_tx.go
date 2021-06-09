@@ -6,16 +6,17 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
 
+	"github.com/aeternity/aepp-sdk-go/v8/utils"
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
-
-	utils "github.com/aeternity/aepp-sdk-go/v8/utils"
 )
 
 // ChannelCloseMutualTx channel close mutual tx
+//
 // swagger:model ChannelCloseMutualTx
 type ChannelCloseMutualTx struct {
 
@@ -33,7 +34,7 @@ type ChannelCloseMutualTx struct {
 
 	// initiator amount final
 	// Required: true
-	InitiatorAmountFinal utils.BigInt `json:"initiator_amount_final"`
+	InitiatorAmountFinal *utils.BigInt `json:"initiator_amount_final"`
 
 	// nonce
 	// Required: true
@@ -41,7 +42,7 @@ type ChannelCloseMutualTx struct {
 
 	// responder amount final
 	// Required: true
-	ResponderAmountFinal utils.BigInt `json:"responder_amount_final"`
+	ResponderAmountFinal *utils.BigInt `json:"responder_amount_final"`
 
 	// ttl
 	TTL uint64 `json:"ttl,omitempty"`
@@ -110,11 +111,21 @@ func (m *ChannelCloseMutualTx) validateFromID(formats strfmt.Registry) error {
 
 func (m *ChannelCloseMutualTx) validateInitiatorAmountFinal(formats strfmt.Registry) error {
 
-	if err := m.InitiatorAmountFinal.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("initiator_amount_final")
-		}
+	if err := validate.Required("initiator_amount_final", "body", m.InitiatorAmountFinal); err != nil {
 		return err
+	}
+
+	if err := validate.Required("initiator_amount_final", "body", m.InitiatorAmountFinal); err != nil {
+		return err
+	}
+
+	if m.InitiatorAmountFinal != nil {
+		if err := m.InitiatorAmountFinal.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("initiator_amount_final")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -131,11 +142,67 @@ func (m *ChannelCloseMutualTx) validateNonce(formats strfmt.Registry) error {
 
 func (m *ChannelCloseMutualTx) validateResponderAmountFinal(formats strfmt.Registry) error {
 
-	if err := m.ResponderAmountFinal.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("responder_amount_final")
-		}
+	if err := validate.Required("responder_amount_final", "body", m.ResponderAmountFinal); err != nil {
 		return err
+	}
+
+	if err := validate.Required("responder_amount_final", "body", m.ResponderAmountFinal); err != nil {
+		return err
+	}
+
+	if m.ResponderAmountFinal != nil {
+		if err := m.ResponderAmountFinal.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("responder_amount_final")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this channel close mutual tx based on the context it is used
+func (m *ChannelCloseMutualTx) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateInitiatorAmountFinal(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateResponderAmountFinal(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *ChannelCloseMutualTx) contextValidateInitiatorAmountFinal(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.InitiatorAmountFinal != nil {
+		if err := m.InitiatorAmountFinal.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("initiator_amount_final")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *ChannelCloseMutualTx) contextValidateResponderAmountFinal(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.ResponderAmountFinal != nil {
+		if err := m.ResponderAmountFinal.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("responder_amount_final")
+			}
+			return err
+		}
 	}
 
 	return nil

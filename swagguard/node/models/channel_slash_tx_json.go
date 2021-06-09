@@ -7,47 +7,47 @@ package models
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 
-	strfmt "github.com/go-openapi/strfmt"
-
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
-// ChannelSLASHTxJSON channel slash tx JSON
+// ChannelSlashTxJSON channel slash tx JSON
+//
 // swagger:model ChannelSlashTxJSON
-type ChannelSLASHTxJSON struct {
+type ChannelSlashTxJSON struct {
 	versionField *uint32
 
-	ChannelSLASHTx
+	ChannelSlashTx
 }
 
 // Type gets the type of this subtype
-func (m *ChannelSLASHTxJSON) Type() string {
-	return "ChannelSlashTx"
+func (m *ChannelSlashTxJSON) Type() string {
+	return "ChannelSlashTxJSON"
 }
 
 // SetType sets the type of this subtype
-func (m *ChannelSLASHTxJSON) SetType(val string) {
-
+func (m *ChannelSlashTxJSON) SetType(val string) {
 }
 
 // Version gets the version of this subtype
-func (m *ChannelSLASHTxJSON) Version() *uint32 {
+func (m *ChannelSlashTxJSON) Version() *uint32 {
 	return m.versionField
 }
 
 // SetVersion sets the version of this subtype
-func (m *ChannelSLASHTxJSON) SetVersion(val *uint32) {
+func (m *ChannelSlashTxJSON) SetVersion(val *uint32) {
 	m.versionField = val
 }
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
-func (m *ChannelSLASHTxJSON) UnmarshalJSON(raw []byte) error {
+func (m *ChannelSlashTxJSON) UnmarshalJSON(raw []byte) error {
 	var data struct {
-		ChannelSLASHTx
+		ChannelSlashTx
 	}
 	buf := bytes.NewBuffer(raw)
 	dec := json.NewDecoder(buf)
@@ -72,16 +72,15 @@ func (m *ChannelSLASHTxJSON) UnmarshalJSON(raw []byte) error {
 		return err
 	}
 
-	var result ChannelSLASHTxJSON
+	var result ChannelSlashTxJSON
 
 	if base.Type != result.Type() {
 		/* Not the type we're looking for. */
 		return errors.New(422, "invalid type value: %q", base.Type)
 	}
-
 	result.versionField = base.Version
 
-	result.ChannelSLASHTx = data.ChannelSLASHTx
+	result.ChannelSlashTx = data.ChannelSlashTx
 
 	*m = result
 
@@ -89,16 +88,15 @@ func (m *ChannelSLASHTxJSON) UnmarshalJSON(raw []byte) error {
 }
 
 // MarshalJSON marshals this object with a polymorphic type to a JSON structure
-func (m ChannelSLASHTxJSON) MarshalJSON() ([]byte, error) {
+func (m ChannelSlashTxJSON) MarshalJSON() ([]byte, error) {
 	var b1, b2, b3 []byte
 	var err error
 	b1, err = json.Marshal(struct {
-		ChannelSLASHTx
+		ChannelSlashTx
 	}{
 
-		ChannelSLASHTx: m.ChannelSLASHTx,
-	},
-	)
+		ChannelSlashTx: m.ChannelSlashTx,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -111,8 +109,7 @@ func (m ChannelSLASHTxJSON) MarshalJSON() ([]byte, error) {
 		Type: m.Type(),
 
 		Version: m.Version(),
-	},
-	)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -121,15 +118,15 @@ func (m ChannelSLASHTxJSON) MarshalJSON() ([]byte, error) {
 }
 
 // Validate validates this channel slash tx JSON
-func (m *ChannelSLASHTxJSON) Validate(formats strfmt.Registry) error {
+func (m *ChannelSlashTxJSON) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateVersion(formats); err != nil {
 		res = append(res, err)
 	}
 
-	// validation for a type composition with ChannelSLASHTx
-	if err := m.ChannelSLASHTx.Validate(formats); err != nil {
+	// validation for a type composition with ChannelSlashTx
+	if err := m.ChannelSlashTx.Validate(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -139,7 +136,7 @@ func (m *ChannelSLASHTxJSON) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ChannelSLASHTxJSON) validateVersion(formats strfmt.Registry) error {
+func (m *ChannelSlashTxJSON) validateVersion(formats strfmt.Registry) error {
 
 	if err := validate.Required("version", "body", m.Version()); err != nil {
 		return err
@@ -148,8 +145,23 @@ func (m *ChannelSLASHTxJSON) validateVersion(formats strfmt.Registry) error {
 	return nil
 }
 
+// ContextValidate validate this channel slash tx JSON based on the context it is used
+func (m *ChannelSlashTxJSON) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	// validation for a type composition with ChannelSlashTx
+	if err := m.ChannelSlashTx.ContextValidate(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
 // MarshalBinary interface implementation
-func (m *ChannelSLASHTxJSON) MarshalBinary() ([]byte, error) {
+func (m *ChannelSlashTxJSON) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -157,8 +169,8 @@ func (m *ChannelSLASHTxJSON) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *ChannelSLASHTxJSON) UnmarshalBinary(b []byte) error {
-	var res ChannelSLASHTxJSON
+func (m *ChannelSlashTxJSON) UnmarshalBinary(b []byte) error {
+	var res ChannelSlashTxJSON
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

@@ -7,16 +7,17 @@ package models
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 
-	strfmt "github.com/go-openapi/strfmt"
-
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // GAMetaTxJSON g a meta tx JSON
+//
 // swagger:model GAMetaTxJSON
 type GAMetaTxJSON struct {
 	versionField *uint32
@@ -26,12 +27,11 @@ type GAMetaTxJSON struct {
 
 // Type gets the type of this subtype
 func (m *GAMetaTxJSON) Type() string {
-	return "GAMetaTx"
+	return "GAMetaTxJSON"
 }
 
 // SetType sets the type of this subtype
 func (m *GAMetaTxJSON) SetType(val string) {
-
 }
 
 // Version gets the version of this subtype
@@ -78,7 +78,6 @@ func (m *GAMetaTxJSON) UnmarshalJSON(raw []byte) error {
 		/* Not the type we're looking for. */
 		return errors.New(422, "invalid type value: %q", base.Type)
 	}
-
 	result.versionField = base.Version
 
 	result.GAMetaTx = data.GAMetaTx
@@ -97,8 +96,7 @@ func (m GAMetaTxJSON) MarshalJSON() ([]byte, error) {
 	}{
 
 		GAMetaTx: m.GAMetaTx,
-	},
-	)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -111,8 +109,7 @@ func (m GAMetaTxJSON) MarshalJSON() ([]byte, error) {
 		Type: m.Type(),
 
 		Version: m.Version(),
-	},
-	)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -145,6 +142,21 @@ func (m *GAMetaTxJSON) validateVersion(formats strfmt.Registry) error {
 		return err
 	}
 
+	return nil
+}
+
+// ContextValidate validate this g a meta tx JSON based on the context it is used
+func (m *GAMetaTxJSON) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	// validation for a type composition with GAMetaTx
+	if err := m.GAMetaTx.ContextValidate(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
 	return nil
 }
 

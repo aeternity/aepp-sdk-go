@@ -6,16 +6,17 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
 
+	"github.com/aeternity/aepp-sdk-go/v8/utils"
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
-
-	utils "github.com/aeternity/aepp-sdk-go/v8/utils"
 )
 
 // ContractCreateTx contract create tx
+//
 // swagger:model ContractCreateTx
 type ContractCreateTx struct {
 
@@ -25,7 +26,7 @@ type ContractCreateTx struct {
 
 	// amount
 	// Required: true
-	Amount utils.BigInt `json:"amount"`
+	Amount *utils.BigInt `json:"amount"`
 
 	// Contract call data
 	// Required: true
@@ -37,11 +38,11 @@ type ContractCreateTx struct {
 
 	// deposit
 	// Required: true
-	Deposit utils.BigInt `json:"deposit"`
+	Deposit *utils.BigInt `json:"deposit"`
 
 	// fee
 	// Required: true
-	Fee utils.BigInt `json:"fee"`
+	Fee *utils.BigInt `json:"fee"`
 
 	// gas
 	// Required: true
@@ -49,7 +50,7 @@ type ContractCreateTx struct {
 
 	// gas price
 	// Required: true
-	GasPrice utils.BigInt `json:"gas_price"`
+	GasPrice *utils.BigInt `json:"gas_price"`
 
 	// Owner's nonce
 	Nonce uint64 `json:"nonce,omitempty"`
@@ -127,11 +128,21 @@ func (m *ContractCreateTx) validateAbiVersion(formats strfmt.Registry) error {
 
 func (m *ContractCreateTx) validateAmount(formats strfmt.Registry) error {
 
-	if err := m.Amount.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("amount")
-		}
+	if err := validate.Required("amount", "body", m.Amount); err != nil {
 		return err
+	}
+
+	if err := validate.Required("amount", "body", m.Amount); err != nil {
+		return err
+	}
+
+	if m.Amount != nil {
+		if err := m.Amount.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("amount")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -157,11 +168,21 @@ func (m *ContractCreateTx) validateCode(formats strfmt.Registry) error {
 
 func (m *ContractCreateTx) validateDeposit(formats strfmt.Registry) error {
 
-	if err := m.Deposit.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("deposit")
-		}
+	if err := validate.Required("deposit", "body", m.Deposit); err != nil {
 		return err
+	}
+
+	if err := validate.Required("deposit", "body", m.Deposit); err != nil {
+		return err
+	}
+
+	if m.Deposit != nil {
+		if err := m.Deposit.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("deposit")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -169,11 +190,21 @@ func (m *ContractCreateTx) validateDeposit(formats strfmt.Registry) error {
 
 func (m *ContractCreateTx) validateFee(formats strfmt.Registry) error {
 
-	if err := m.Fee.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("fee")
-		}
+	if err := validate.Required("fee", "body", m.Fee); err != nil {
 		return err
+	}
+
+	if err := validate.Required("fee", "body", m.Fee); err != nil {
+		return err
+	}
+
+	if m.Fee != nil {
+		if err := m.Fee.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("fee")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -190,11 +221,21 @@ func (m *ContractCreateTx) validateGas(formats strfmt.Registry) error {
 
 func (m *ContractCreateTx) validateGasPrice(formats strfmt.Registry) error {
 
-	if err := m.GasPrice.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("gas_price")
-		}
+	if err := validate.Required("gas_price", "body", m.GasPrice); err != nil {
 		return err
+	}
+
+	if err := validate.Required("gas_price", "body", m.GasPrice); err != nil {
+		return err
+	}
+
+	if m.GasPrice != nil {
+		if err := m.GasPrice.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("gas_price")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -213,6 +254,88 @@ func (m *ContractCreateTx) validateVMVersion(formats strfmt.Registry) error {
 
 	if err := validate.Required("vm_version", "body", m.VMVersion); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this contract create tx based on the context it is used
+func (m *ContractCreateTx) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateAmount(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateDeposit(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateFee(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateGasPrice(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *ContractCreateTx) contextValidateAmount(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Amount != nil {
+		if err := m.Amount.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("amount")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *ContractCreateTx) contextValidateDeposit(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Deposit != nil {
+		if err := m.Deposit.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("deposit")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *ContractCreateTx) contextValidateFee(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Fee != nil {
+		if err := m.Fee.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("fee")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *ContractCreateTx) contextValidateGasPrice(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.GasPrice != nil {
+		if err := m.GasPrice.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("gas_price")
+			}
+			return err
+		}
 	}
 
 	return nil

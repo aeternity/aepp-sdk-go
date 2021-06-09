@@ -7,20 +7,20 @@ package models
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io"
 
-	strfmt "github.com/go-openapi/strfmt"
-
+	"github.com/aeternity/aepp-sdk-go/v8/utils"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
-
-	utils "github.com/aeternity/aepp-sdk-go/v8/utils"
 )
 
 // GenericSignedTx generic signed tx
+//
 // swagger:model GenericSignedTx
 type GenericSignedTx struct {
 
@@ -30,7 +30,7 @@ type GenericSignedTx struct {
 
 	// block height
 	// Required: true
-	BlockHeight utils.BigInt `json:"block_height"`
+	BlockHeight *utils.BigInt `json:"block_height"`
 
 	// hash
 	// Required: true
@@ -57,7 +57,7 @@ func (m *GenericSignedTx) UnmarshalJSON(raw []byte) error {
 	var data struct {
 		BlockHash *string `json:"block_hash"`
 
-		BlockHeight utils.BigInt `json:"block_height"`
+		BlockHeight *utils.BigInt `json:"block_height"`
 
 		Hash *string `json:"hash"`
 
@@ -107,7 +107,7 @@ func (m GenericSignedTx) MarshalJSON() ([]byte, error) {
 	b1, err = json.Marshal(struct {
 		BlockHash *string `json:"block_hash"`
 
-		BlockHeight utils.BigInt `json:"block_height"`
+		BlockHeight *utils.BigInt `json:"block_height"`
 
 		Hash *string `json:"hash"`
 
@@ -121,8 +121,7 @@ func (m GenericSignedTx) MarshalJSON() ([]byte, error) {
 		Hash: m.Hash,
 
 		Signatures: m.Signatures,
-	},
-	)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -131,8 +130,7 @@ func (m GenericSignedTx) MarshalJSON() ([]byte, error) {
 	}{
 
 		Tx: m.txField,
-	},
-	)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -177,11 +175,21 @@ func (m *GenericSignedTx) validateBlockHash(formats strfmt.Registry) error {
 
 func (m *GenericSignedTx) validateBlockHeight(formats strfmt.Registry) error {
 
-	if err := m.BlockHeight.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("block_height")
-		}
+	if err := validate.Required("block_height", "body", m.BlockHeight); err != nil {
 		return err
+	}
+
+	if err := validate.Required("block_height", "body", m.BlockHeight); err != nil {
+		return err
+	}
+
+	if m.BlockHeight != nil {
+		if err := m.BlockHeight.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("block_height")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -198,7 +206,55 @@ func (m *GenericSignedTx) validateHash(formats strfmt.Registry) error {
 
 func (m *GenericSignedTx) validateTx(formats strfmt.Registry) error {
 
+	if err := validate.Required("tx", "body", m.Tx()); err != nil {
+		return err
+	}
+
 	if err := m.Tx().Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("tx")
+		}
+		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this generic signed tx based on the context it is used
+func (m *GenericSignedTx) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateBlockHeight(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateTx(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *GenericSignedTx) contextValidateBlockHeight(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.BlockHeight != nil {
+		if err := m.BlockHeight.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("block_height")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *GenericSignedTx) contextValidateTx(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.Tx().ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("tx")
 		}

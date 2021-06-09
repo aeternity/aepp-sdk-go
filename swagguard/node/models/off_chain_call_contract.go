@@ -7,18 +7,18 @@ package models
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 
-	strfmt "github.com/go-openapi/strfmt"
-
+	"github.com/aeternity/aepp-sdk-go/v8/utils"
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
-
-	utils "github.com/aeternity/aepp-sdk-go/v8/utils"
 )
 
 // OffChainCallContract off chain call contract
+//
 // swagger:model OffChainCallContract
 type OffChainCallContract struct {
 
@@ -28,7 +28,7 @@ type OffChainCallContract struct {
 
 	// amount
 	// Required: true
-	Amount utils.BigInt `json:"amount"`
+	Amount *utils.BigInt `json:"amount"`
 
 	// Contract call data
 	// Required: true
@@ -48,7 +48,7 @@ type OffChainCallContract struct {
 
 	// gas price
 	// Required: true
-	GasPrice utils.BigInt `json:"gas_price"`
+	GasPrice *utils.BigInt `json:"gas_price"`
 }
 
 // Op gets the op of this subtype
@@ -58,22 +58,7 @@ func (m *OffChainCallContract) Op() string {
 
 // SetOp sets the op of this subtype
 func (m *OffChainCallContract) SetOp(val string) {
-
 }
-
-// AbiVersion gets the abi version of this subtype
-
-// Amount gets the amount of this subtype
-
-// CallData gets the call data of this subtype
-
-// Caller gets the caller of this subtype
-
-// Contract gets the contract of this subtype
-
-// Gas gets the gas of this subtype
-
-// GasPrice gets the gas price of this subtype
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
 func (m *OffChainCallContract) UnmarshalJSON(raw []byte) error {
@@ -85,7 +70,7 @@ func (m *OffChainCallContract) UnmarshalJSON(raw []byte) error {
 
 		// amount
 		// Required: true
-		Amount utils.BigInt `json:"amount"`
+		Amount *utils.BigInt `json:"amount"`
 
 		// Contract call data
 		// Required: true
@@ -105,7 +90,7 @@ func (m *OffChainCallContract) UnmarshalJSON(raw []byte) error {
 
 		// gas price
 		// Required: true
-		GasPrice utils.BigInt `json:"gas_price"`
+		GasPrice *utils.BigInt `json:"gas_price"`
 	}
 	buf := bytes.NewBuffer(raw)
 	dec := json.NewDecoder(buf)
@@ -136,17 +121,11 @@ func (m *OffChainCallContract) UnmarshalJSON(raw []byte) error {
 	}
 
 	result.AbiVersion = data.AbiVersion
-
 	result.Amount = data.Amount
-
 	result.CallData = data.CallData
-
 	result.Caller = data.Caller
-
 	result.Contract = data.Contract
-
 	result.Gas = data.Gas
-
 	result.GasPrice = data.GasPrice
 
 	*m = result
@@ -166,7 +145,7 @@ func (m OffChainCallContract) MarshalJSON() ([]byte, error) {
 
 		// amount
 		// Required: true
-		Amount utils.BigInt `json:"amount"`
+		Amount *utils.BigInt `json:"amount"`
 
 		// Contract call data
 		// Required: true
@@ -186,7 +165,7 @@ func (m OffChainCallContract) MarshalJSON() ([]byte, error) {
 
 		// gas price
 		// Required: true
-		GasPrice utils.BigInt `json:"gas_price"`
+		GasPrice *utils.BigInt `json:"gas_price"`
 	}{
 
 		AbiVersion: m.AbiVersion,
@@ -202,8 +181,7 @@ func (m OffChainCallContract) MarshalJSON() ([]byte, error) {
 		Gas: m.Gas,
 
 		GasPrice: m.GasPrice,
-	},
-	)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -212,8 +190,7 @@ func (m OffChainCallContract) MarshalJSON() ([]byte, error) {
 	}{
 
 		Op: m.Op(),
-	},
-	)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -270,11 +247,21 @@ func (m *OffChainCallContract) validateAbiVersion(formats strfmt.Registry) error
 
 func (m *OffChainCallContract) validateAmount(formats strfmt.Registry) error {
 
-	if err := m.Amount.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("amount")
-		}
+	if err := validate.Required("amount", "body", m.Amount); err != nil {
 		return err
+	}
+
+	if err := validate.Required("amount", "body", m.Amount); err != nil {
+		return err
+	}
+
+	if m.Amount != nil {
+		if err := m.Amount.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("amount")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -318,11 +305,67 @@ func (m *OffChainCallContract) validateGas(formats strfmt.Registry) error {
 
 func (m *OffChainCallContract) validateGasPrice(formats strfmt.Registry) error {
 
-	if err := m.GasPrice.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("gas_price")
-		}
+	if err := validate.Required("gas_price", "body", m.GasPrice); err != nil {
 		return err
+	}
+
+	if err := validate.Required("gas_price", "body", m.GasPrice); err != nil {
+		return err
+	}
+
+	if m.GasPrice != nil {
+		if err := m.GasPrice.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("gas_price")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this off chain call contract based on the context it is used
+func (m *OffChainCallContract) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateAmount(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateGasPrice(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *OffChainCallContract) contextValidateAmount(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Amount != nil {
+		if err := m.Amount.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("amount")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *OffChainCallContract) contextValidateGasPrice(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.GasPrice != nil {
+		if err := m.GasPrice.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("gas_price")
+			}
+			return err
+		}
 	}
 
 	return nil

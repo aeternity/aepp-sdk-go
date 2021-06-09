@@ -13,63 +13,76 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
-
-	strfmt "github.com/go-openapi/strfmt"
+	"github.com/go-openapi/strfmt"
 )
 
-// NewGetKeyBlockByHashParams creates a new GetKeyBlockByHashParams object
-// with the default values initialized.
+// NewGetKeyBlockByHashParams creates a new GetKeyBlockByHashParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewGetKeyBlockByHashParams() *GetKeyBlockByHashParams {
-	var ()
 	return &GetKeyBlockByHashParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewGetKeyBlockByHashParamsWithTimeout creates a new GetKeyBlockByHashParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewGetKeyBlockByHashParamsWithTimeout(timeout time.Duration) *GetKeyBlockByHashParams {
-	var ()
 	return &GetKeyBlockByHashParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewGetKeyBlockByHashParamsWithContext creates a new GetKeyBlockByHashParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewGetKeyBlockByHashParamsWithContext(ctx context.Context) *GetKeyBlockByHashParams {
-	var ()
 	return &GetKeyBlockByHashParams{
-
 		Context: ctx,
 	}
 }
 
 // NewGetKeyBlockByHashParamsWithHTTPClient creates a new GetKeyBlockByHashParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewGetKeyBlockByHashParamsWithHTTPClient(client *http.Client) *GetKeyBlockByHashParams {
-	var ()
 	return &GetKeyBlockByHashParams{
 		HTTPClient: client,
 	}
 }
 
-/*GetKeyBlockByHashParams contains all the parameters to send to the API endpoint
-for the get key block by hash operation typically these are written to a http.Request
+/* GetKeyBlockByHashParams contains all the parameters to send to the API endpoint
+   for the get key block by hash operation.
+
+   Typically these are written to a http.Request.
 */
 type GetKeyBlockByHashParams struct {
 
-	/*Hash
-	  The hash of the block
+	/* Hash.
 
+	   The hash of the block
 	*/
 	Hash string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the get key block by hash params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetKeyBlockByHashParams) WithDefaults() *GetKeyBlockByHashParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the get key block by hash params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetKeyBlockByHashParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the get key block by hash params

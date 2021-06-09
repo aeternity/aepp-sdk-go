@@ -6,15 +6,15 @@ package external
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"fmt"
 	"io"
 
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
-	strfmt "github.com/go-openapi/strfmt"
-
-	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
 )
 
 // GetMicroBlockTransactionsCountByHashReader is a Reader for the GetMicroBlockTransactionsCountByHash structure.
@@ -25,30 +25,26 @@ type GetMicroBlockTransactionsCountByHashReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *GetMicroBlockTransactionsCountByHashReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewGetMicroBlockTransactionsCountByHashOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 400:
 		result := NewGetMicroBlockTransactionsCountByHashBadRequest()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 404:
 		result := NewGetMicroBlockTransactionsCountByHashNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -57,7 +53,7 @@ func NewGetMicroBlockTransactionsCountByHashOK() *GetMicroBlockTransactionsCount
 	return &GetMicroBlockTransactionsCountByHashOK{}
 }
 
-/*GetMicroBlockTransactionsCountByHashOK handles this case with default header values.
+/* GetMicroBlockTransactionsCountByHashOK describes a response with status code 200, with default header values.
 
 Successful operation
 */
@@ -67,6 +63,9 @@ type GetMicroBlockTransactionsCountByHashOK struct {
 
 func (o *GetMicroBlockTransactionsCountByHashOK) Error() string {
 	return fmt.Sprintf("[GET /micro-blocks/hash/{hash}/transactions/count][%d] getMicroBlockTransactionsCountByHashOK  %+v", 200, o.Payload)
+}
+func (o *GetMicroBlockTransactionsCountByHashOK) GetPayload() *GetMicroBlockTransactionsCountByHashOKBody {
+	return o.Payload
 }
 
 func (o *GetMicroBlockTransactionsCountByHashOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -86,7 +85,7 @@ func NewGetMicroBlockTransactionsCountByHashBadRequest() *GetMicroBlockTransacti
 	return &GetMicroBlockTransactionsCountByHashBadRequest{}
 }
 
-/*GetMicroBlockTransactionsCountByHashBadRequest handles this case with default header values.
+/* GetMicroBlockTransactionsCountByHashBadRequest describes a response with status code 400, with default header values.
 
 Invalid hash
 */
@@ -96,6 +95,9 @@ type GetMicroBlockTransactionsCountByHashBadRequest struct {
 
 func (o *GetMicroBlockTransactionsCountByHashBadRequest) Error() string {
 	return fmt.Sprintf("[GET /micro-blocks/hash/{hash}/transactions/count][%d] getMicroBlockTransactionsCountByHashBadRequest  %+v", 400, o.Payload)
+}
+func (o *GetMicroBlockTransactionsCountByHashBadRequest) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *GetMicroBlockTransactionsCountByHashBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -115,7 +117,7 @@ func NewGetMicroBlockTransactionsCountByHashNotFound() *GetMicroBlockTransaction
 	return &GetMicroBlockTransactionsCountByHashNotFound{}
 }
 
-/*GetMicroBlockTransactionsCountByHashNotFound handles this case with default header values.
+/* GetMicroBlockTransactionsCountByHashNotFound describes a response with status code 404, with default header values.
 
 Block not found
 */
@@ -125,6 +127,9 @@ type GetMicroBlockTransactionsCountByHashNotFound struct {
 
 func (o *GetMicroBlockTransactionsCountByHashNotFound) Error() string {
 	return fmt.Sprintf("[GET /micro-blocks/hash/{hash}/transactions/count][%d] getMicroBlockTransactionsCountByHashNotFound  %+v", 404, o.Payload)
+}
+func (o *GetMicroBlockTransactionsCountByHashNotFound) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *GetMicroBlockTransactionsCountByHashNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -150,6 +155,11 @@ type GetMicroBlockTransactionsCountByHashOKBody struct {
 
 // Validate validates this get micro block transactions count by hash o k body
 func (o *GetMicroBlockTransactionsCountByHashOKBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this get micro block transactions count by hash o k body based on context it is used
+func (o *GetMicroBlockTransactionsCountByHashOKBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

@@ -6,16 +6,17 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"strconv"
 
-	strfmt "github.com/go-openapi/strfmt"
-
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // ContractStore contract store
+//
 // swagger:model ContractStore
 type ContractStore struct {
 
@@ -63,6 +64,38 @@ func (m *ContractStore) validateStore(formats strfmt.Registry) error {
 	return nil
 }
 
+// ContextValidate validate this contract store based on the context it is used
+func (m *ContractStore) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateStore(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *ContractStore) contextValidateStore(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.Store); i++ {
+
+		if m.Store[i] != nil {
+			if err := m.Store[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("store" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
 // MarshalBinary interface implementation
 func (m *ContractStore) MarshalBinary() ([]byte, error) {
 	if m == nil {
@@ -82,6 +115,7 @@ func (m *ContractStore) UnmarshalBinary(b []byte) error {
 }
 
 // ContractStoreStoreItems0 contract store store items0
+//
 // swagger:model ContractStoreStoreItems0
 type ContractStoreStoreItems0 struct {
 
@@ -94,6 +128,11 @@ type ContractStoreStoreItems0 struct {
 
 // Validate validates this contract store store items0
 func (m *ContractStoreStoreItems0) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this contract store store items0 based on context it is used
+func (m *ContractStoreStoreItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

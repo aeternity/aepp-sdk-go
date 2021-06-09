@@ -7,16 +7,17 @@ package models
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 
-	strfmt "github.com/go-openapi/strfmt"
-
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // ContractCallTxJSON contract call tx JSON
+//
 // swagger:model ContractCallTxJSON
 type ContractCallTxJSON struct {
 	versionField *uint32
@@ -26,12 +27,11 @@ type ContractCallTxJSON struct {
 
 // Type gets the type of this subtype
 func (m *ContractCallTxJSON) Type() string {
-	return "ContractCallTx"
+	return "ContractCallTxJSON"
 }
 
 // SetType sets the type of this subtype
 func (m *ContractCallTxJSON) SetType(val string) {
-
 }
 
 // Version gets the version of this subtype
@@ -78,7 +78,6 @@ func (m *ContractCallTxJSON) UnmarshalJSON(raw []byte) error {
 		/* Not the type we're looking for. */
 		return errors.New(422, "invalid type value: %q", base.Type)
 	}
-
 	result.versionField = base.Version
 
 	result.ContractCallTx = data.ContractCallTx
@@ -97,8 +96,7 @@ func (m ContractCallTxJSON) MarshalJSON() ([]byte, error) {
 	}{
 
 		ContractCallTx: m.ContractCallTx,
-	},
-	)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -111,8 +109,7 @@ func (m ContractCallTxJSON) MarshalJSON() ([]byte, error) {
 		Type: m.Type(),
 
 		Version: m.Version(),
-	},
-	)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -145,6 +142,21 @@ func (m *ContractCallTxJSON) validateVersion(formats strfmt.Registry) error {
 		return err
 	}
 
+	return nil
+}
+
+// ContextValidate validate this contract call tx JSON based on the context it is used
+func (m *ContractCallTxJSON) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	// validation for a type composition with ContractCallTx
+	if err := m.ContractCallTx.ContextValidate(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
 	return nil
 }
 

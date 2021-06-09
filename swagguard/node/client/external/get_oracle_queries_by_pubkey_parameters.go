@@ -13,79 +13,97 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-
-	strfmt "github.com/go-openapi/strfmt"
 )
 
-// NewGetOracleQueriesByPubkeyParams creates a new GetOracleQueriesByPubkeyParams object
-// with the default values initialized.
+// NewGetOracleQueriesByPubkeyParams creates a new GetOracleQueriesByPubkeyParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewGetOracleQueriesByPubkeyParams() *GetOracleQueriesByPubkeyParams {
-	var ()
 	return &GetOracleQueriesByPubkeyParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewGetOracleQueriesByPubkeyParamsWithTimeout creates a new GetOracleQueriesByPubkeyParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewGetOracleQueriesByPubkeyParamsWithTimeout(timeout time.Duration) *GetOracleQueriesByPubkeyParams {
-	var ()
 	return &GetOracleQueriesByPubkeyParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewGetOracleQueriesByPubkeyParamsWithContext creates a new GetOracleQueriesByPubkeyParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewGetOracleQueriesByPubkeyParamsWithContext(ctx context.Context) *GetOracleQueriesByPubkeyParams {
-	var ()
 	return &GetOracleQueriesByPubkeyParams{
-
 		Context: ctx,
 	}
 }
 
 // NewGetOracleQueriesByPubkeyParamsWithHTTPClient creates a new GetOracleQueriesByPubkeyParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewGetOracleQueriesByPubkeyParamsWithHTTPClient(client *http.Client) *GetOracleQueriesByPubkeyParams {
-	var ()
 	return &GetOracleQueriesByPubkeyParams{
 		HTTPClient: client,
 	}
 }
 
-/*GetOracleQueriesByPubkeyParams contains all the parameters to send to the API endpoint
-for the get oracle queries by pubkey operation typically these are written to a http.Request
+/* GetOracleQueriesByPubkeyParams contains all the parameters to send to the API endpoint
+   for the get oracle queries by pubkey operation.
+
+   Typically these are written to a http.Request.
 */
 type GetOracleQueriesByPubkeyParams struct {
 
-	/*From
-	  Last query id in previous page
+	/* From.
 
+	   Last query id in previous page
 	*/
 	From *string
-	/*Limit
-	  Max number of oracle queries
 
+	/* Limit.
+
+	   Max number of oracle queries
+
+	   Format: uint64
 	*/
-	Limit *int64
-	/*Pubkey
-	  The public key of the oracle
+	Limit *uint64
 
+	/* Pubkey.
+
+	   The public key of the oracle
 	*/
 	Pubkey string
-	/*Type
-	  The type of a query: open, closed or all
 
+	/* Type.
+
+	   The type of a query: open, closed or all
 	*/
 	Type *string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the get oracle queries by pubkey params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetOracleQueriesByPubkeyParams) WithDefaults() *GetOracleQueriesByPubkeyParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the get oracle queries by pubkey params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetOracleQueriesByPubkeyParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the get oracle queries by pubkey params
@@ -133,13 +151,13 @@ func (o *GetOracleQueriesByPubkeyParams) SetFrom(from *string) {
 }
 
 // WithLimit adds the limit to the get oracle queries by pubkey params
-func (o *GetOracleQueriesByPubkeyParams) WithLimit(limit *int64) *GetOracleQueriesByPubkeyParams {
+func (o *GetOracleQueriesByPubkeyParams) WithLimit(limit *uint64) *GetOracleQueriesByPubkeyParams {
 	o.SetLimit(limit)
 	return o
 }
 
 // SetLimit adds the limit to the get oracle queries by pubkey params
-func (o *GetOracleQueriesByPubkeyParams) SetLimit(limit *int64) {
+func (o *GetOracleQueriesByPubkeyParams) SetLimit(limit *uint64) {
 	o.Limit = limit
 }
 
@@ -177,32 +195,34 @@ func (o *GetOracleQueriesByPubkeyParams) WriteToRequest(r runtime.ClientRequest,
 
 		// query param from
 		var qrFrom string
+
 		if o.From != nil {
 			qrFrom = *o.From
 		}
 		qFrom := qrFrom
 		if qFrom != "" {
+
 			if err := r.SetQueryParam("from", qFrom); err != nil {
 				return err
 			}
 		}
-
 	}
 
 	if o.Limit != nil {
 
 		// query param limit
-		var qrLimit int64
+		var qrLimit uint64
+
 		if o.Limit != nil {
 			qrLimit = *o.Limit
 		}
-		qLimit := swag.FormatInt64(qrLimit)
+		qLimit := swag.FormatUint64(qrLimit)
 		if qLimit != "" {
+
 			if err := r.SetQueryParam("limit", qLimit); err != nil {
 				return err
 			}
 		}
-
 	}
 
 	// path param pubkey
@@ -214,16 +234,17 @@ func (o *GetOracleQueriesByPubkeyParams) WriteToRequest(r runtime.ClientRequest,
 
 		// query param type
 		var qrType string
+
 		if o.Type != nil {
 			qrType = *o.Type
 		}
 		qType := qrType
 		if qType != "" {
+
 			if err := r.SetQueryParam("type", qType); err != nil {
 				return err
 			}
 		}
-
 	}
 
 	if len(res) > 0 {

@@ -7,16 +7,17 @@ package models
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 
-	strfmt "github.com/go-openapi/strfmt"
-
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // ChannelCreateTxJSON channel create tx JSON
+//
 // swagger:model ChannelCreateTxJSON
 type ChannelCreateTxJSON struct {
 	versionField *uint32
@@ -26,12 +27,11 @@ type ChannelCreateTxJSON struct {
 
 // Type gets the type of this subtype
 func (m *ChannelCreateTxJSON) Type() string {
-	return "ChannelCreateTx"
+	return "ChannelCreateTxJSON"
 }
 
 // SetType sets the type of this subtype
 func (m *ChannelCreateTxJSON) SetType(val string) {
-
 }
 
 // Version gets the version of this subtype
@@ -78,7 +78,6 @@ func (m *ChannelCreateTxJSON) UnmarshalJSON(raw []byte) error {
 		/* Not the type we're looking for. */
 		return errors.New(422, "invalid type value: %q", base.Type)
 	}
-
 	result.versionField = base.Version
 
 	result.ChannelCreateTx = data.ChannelCreateTx
@@ -97,8 +96,7 @@ func (m ChannelCreateTxJSON) MarshalJSON() ([]byte, error) {
 	}{
 
 		ChannelCreateTx: m.ChannelCreateTx,
-	},
-	)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -111,8 +109,7 @@ func (m ChannelCreateTxJSON) MarshalJSON() ([]byte, error) {
 		Type: m.Type(),
 
 		Version: m.Version(),
-	},
-	)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -145,6 +142,21 @@ func (m *ChannelCreateTxJSON) validateVersion(formats strfmt.Registry) error {
 		return err
 	}
 
+	return nil
+}
+
+// ContextValidate validate this channel create tx JSON based on the context it is used
+func (m *ChannelCreateTxJSON) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	// validation for a type composition with ChannelCreateTx
+	if err := m.ChannelCreateTx.ContextValidate(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
 	return nil
 }
 

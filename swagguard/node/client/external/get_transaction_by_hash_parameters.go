@@ -13,63 +13,76 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
-
-	strfmt "github.com/go-openapi/strfmt"
+	"github.com/go-openapi/strfmt"
 )
 
-// NewGetTransactionByHashParams creates a new GetTransactionByHashParams object
-// with the default values initialized.
+// NewGetTransactionByHashParams creates a new GetTransactionByHashParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewGetTransactionByHashParams() *GetTransactionByHashParams {
-	var ()
 	return &GetTransactionByHashParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewGetTransactionByHashParamsWithTimeout creates a new GetTransactionByHashParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewGetTransactionByHashParamsWithTimeout(timeout time.Duration) *GetTransactionByHashParams {
-	var ()
 	return &GetTransactionByHashParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewGetTransactionByHashParamsWithContext creates a new GetTransactionByHashParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewGetTransactionByHashParamsWithContext(ctx context.Context) *GetTransactionByHashParams {
-	var ()
 	return &GetTransactionByHashParams{
-
 		Context: ctx,
 	}
 }
 
 // NewGetTransactionByHashParamsWithHTTPClient creates a new GetTransactionByHashParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewGetTransactionByHashParamsWithHTTPClient(client *http.Client) *GetTransactionByHashParams {
-	var ()
 	return &GetTransactionByHashParams{
 		HTTPClient: client,
 	}
 }
 
-/*GetTransactionByHashParams contains all the parameters to send to the API endpoint
-for the get transaction by hash operation typically these are written to a http.Request
+/* GetTransactionByHashParams contains all the parameters to send to the API endpoint
+   for the get transaction by hash operation.
+
+   Typically these are written to a http.Request.
 */
 type GetTransactionByHashParams struct {
 
-	/*Hash
-	  The hash of the transaction
+	/* Hash.
 
+	   The hash of the transaction
 	*/
 	Hash string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the get transaction by hash params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetTransactionByHashParams) WithDefaults() *GetTransactionByHashParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the get transaction by hash params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetTransactionByHashParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the get transaction by hash params

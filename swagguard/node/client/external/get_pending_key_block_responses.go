@@ -10,10 +10,9 @@ import (
 	"io"
 
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 
-	strfmt "github.com/go-openapi/strfmt"
-
-	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
 )
 
 // GetPendingKeyBlockReader is a Reader for the GetPendingKeyBlock structure.
@@ -24,30 +23,26 @@ type GetPendingKeyBlockReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *GetPendingKeyBlockReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewGetPendingKeyBlockOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 400:
 		result := NewGetPendingKeyBlockBadRequest()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 404:
 		result := NewGetPendingKeyBlockNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -56,7 +51,7 @@ func NewGetPendingKeyBlockOK() *GetPendingKeyBlockOK {
 	return &GetPendingKeyBlockOK{}
 }
 
-/*GetPendingKeyBlockOK handles this case with default header values.
+/* GetPendingKeyBlockOK describes a response with status code 200, with default header values.
 
 Successful operation
 */
@@ -66,6 +61,9 @@ type GetPendingKeyBlockOK struct {
 
 func (o *GetPendingKeyBlockOK) Error() string {
 	return fmt.Sprintf("[GET /key-blocks/pending][%d] getPendingKeyBlockOK  %+v", 200, o.Payload)
+}
+func (o *GetPendingKeyBlockOK) GetPayload() *models.KeyBlock {
+	return o.Payload
 }
 
 func (o *GetPendingKeyBlockOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -85,7 +83,7 @@ func NewGetPendingKeyBlockBadRequest() *GetPendingKeyBlockBadRequest {
 	return &GetPendingKeyBlockBadRequest{}
 }
 
-/*GetPendingKeyBlockBadRequest handles this case with default header values.
+/* GetPendingKeyBlockBadRequest describes a response with status code 400, with default header values.
 
 Beneficiary not configured
 */
@@ -95,6 +93,9 @@ type GetPendingKeyBlockBadRequest struct {
 
 func (o *GetPendingKeyBlockBadRequest) Error() string {
 	return fmt.Sprintf("[GET /key-blocks/pending][%d] getPendingKeyBlockBadRequest  %+v", 400, o.Payload)
+}
+func (o *GetPendingKeyBlockBadRequest) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *GetPendingKeyBlockBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -114,7 +115,7 @@ func NewGetPendingKeyBlockNotFound() *GetPendingKeyBlockNotFound {
 	return &GetPendingKeyBlockNotFound{}
 }
 
-/*GetPendingKeyBlockNotFound handles this case with default header values.
+/* GetPendingKeyBlockNotFound describes a response with status code 404, with default header values.
 
 Block not found
 */
@@ -124,6 +125,9 @@ type GetPendingKeyBlockNotFound struct {
 
 func (o *GetPendingKeyBlockNotFound) Error() string {
 	return fmt.Sprintf("[GET /key-blocks/pending][%d] getPendingKeyBlockNotFound  %+v", 404, o.Payload)
+}
+func (o *GetPendingKeyBlockNotFound) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *GetPendingKeyBlockNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
