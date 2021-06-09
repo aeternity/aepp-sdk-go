@@ -3434,9 +3434,6 @@
         "channel_reserve": {
           "$ref": "#/definitions/UInt"
         },
-        "delegate_ids": {
-          "$ref": "#/definitions/Delegates"
-        },
         "state_hash": {
           "$ref": "#/definitions/EncodedHash"
         },
@@ -3461,7 +3458,6 @@
         "initiator_amount",
         "responder_amount",
         "channel_reserve",
-        "delegate_ids",
         "state_hash",
         "round",
         "solo_round",
@@ -3502,9 +3498,6 @@
         "state_hash": {
           "description": "Root hash of the channel's internal state tree",
           "$ref": "#/definitions/EncodedHash"
-        },
-        "delegate_ids": {
-          "$ref": "#/definitions/Delegates"
         }
       },
       "required": [
@@ -3512,7 +3505,6 @@
         "initiator_amount",
         "responder_id",
         "responder_amount",
-        "push_amount",
         "channel_reserve",
         "lock_period",
         "fee",
@@ -3821,12 +3813,6 @@
         "from_id": {
           "$ref": "#/definitions/EncodedPubkey"
         },
-        "initiator_delegate_ids": {
-          "$ref": "#/definitions/Delegates"
-        },
-        "responder_delegate_ids": {
-          "$ref": "#/definitions/Delegates"
-        },
         "state_hash": {
           "$ref": "#/definitions/EncodedHash"
         },
@@ -3849,8 +3835,6 @@
       "required": [
         "channel_id",
         "from_id",
-        "initiator_delegate_ids",
-        "responder_delegate_ids",
         "state_hash",
         "round",
         "payload",
@@ -5246,16 +5230,6 @@
           "$ref": "#/definitions/DelegatesList"
         }
       }
-    },
-    "Delegates": {
-      "oneOf": [
-        {
-          "$ref": "#/definitions/DelegatesList"
-        },
-        {
-          "$ref": "#/definitions/DelegatesObject"
-        }
-      ]
     }
   },
   "externalDocs": {
