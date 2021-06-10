@@ -43,10 +43,6 @@ type ChannelCreateTx struct {
 	// nonce
 	Nonce uint64 `json:"nonce,omitempty"`
 
-	// push amount
-	// Required: true
-	PushAmount *utils.BigInt `json:"push_amount"`
-
 	// responder amount
 	// Required: true
 	ResponderAmount *utils.BigInt `json:"responder_amount"`
@@ -84,10 +80,6 @@ func (m *ChannelCreateTx) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateLockPeriod(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validatePushAmount(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -193,28 +185,6 @@ func (m *ChannelCreateTx) validateLockPeriod(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ChannelCreateTx) validatePushAmount(formats strfmt.Registry) error {
-
-	if err := validate.Required("push_amount", "body", m.PushAmount); err != nil {
-		return err
-	}
-
-	if err := validate.Required("push_amount", "body", m.PushAmount); err != nil {
-		return err
-	}
-
-	if m.PushAmount != nil {
-		if err := m.PushAmount.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("push_amount")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
 func (m *ChannelCreateTx) validateResponderAmount(formats strfmt.Registry) error {
 
 	if err := validate.Required("responder_amount", "body", m.ResponderAmount); err != nil {
@@ -271,10 +241,6 @@ func (m *ChannelCreateTx) ContextValidate(ctx context.Context, formats strfmt.Re
 		res = append(res, err)
 	}
 
-	if err := m.contextValidatePushAmount(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.contextValidateResponderAmount(ctx, formats); err != nil {
 		res = append(res, err)
 	}
@@ -319,20 +285,6 @@ func (m *ChannelCreateTx) contextValidateInitiatorAmount(ctx context.Context, fo
 		if err := m.InitiatorAmount.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("initiator_amount")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (m *ChannelCreateTx) contextValidatePushAmount(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.PushAmount != nil {
-		if err := m.PushAmount.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("push_amount")
 			}
 			return err
 		}

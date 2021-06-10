@@ -16,38 +16,38 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// ContractCallTxJSON contract call tx JSON
+// PayingForTxJSON paying for tx JSON
 //
-// swagger:model ContractCallTxJSON
-type ContractCallTxJSON struct {
+// swagger:model PayingForTxJSON
+type PayingForTxJSON struct {
 	versionField *uint32
 
-	ContractCallTx
+	PayingForTx
 }
 
 // Type gets the type of this subtype
-func (m *ContractCallTxJSON) Type() string {
-	return "ContractCallTxJSON"
+func (m *PayingForTxJSON) Type() string {
+	return "PayingForTxJSON"
 }
 
 // SetType sets the type of this subtype
-func (m *ContractCallTxJSON) SetType(val string) {
+func (m *PayingForTxJSON) SetType(val string) {
 }
 
 // Version gets the version of this subtype
-func (m *ContractCallTxJSON) Version() *uint32 {
+func (m *PayingForTxJSON) Version() *uint32 {
 	return m.versionField
 }
 
 // SetVersion sets the version of this subtype
-func (m *ContractCallTxJSON) SetVersion(val *uint32) {
+func (m *PayingForTxJSON) SetVersion(val *uint32) {
 	m.versionField = val
 }
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
-func (m *ContractCallTxJSON) UnmarshalJSON(raw []byte) error {
+func (m *PayingForTxJSON) UnmarshalJSON(raw []byte) error {
 	var data struct {
-		ContractCallTx
+		PayingForTx
 	}
 	buf := bytes.NewBuffer(raw)
 	dec := json.NewDecoder(buf)
@@ -72,7 +72,7 @@ func (m *ContractCallTxJSON) UnmarshalJSON(raw []byte) error {
 		return err
 	}
 
-	var result ContractCallTxJSON
+	var result PayingForTxJSON
 
 	if base.Type != result.Type() {
 		/* Not the type we're looking for. */
@@ -80,7 +80,7 @@ func (m *ContractCallTxJSON) UnmarshalJSON(raw []byte) error {
 	}
 	result.versionField = base.Version
 
-	result.ContractCallTx = data.ContractCallTx
+	result.PayingForTx = data.PayingForTx
 
 	*m = result
 
@@ -88,14 +88,14 @@ func (m *ContractCallTxJSON) UnmarshalJSON(raw []byte) error {
 }
 
 // MarshalJSON marshals this object with a polymorphic type to a JSON structure
-func (m ContractCallTxJSON) MarshalJSON() ([]byte, error) {
+func (m PayingForTxJSON) MarshalJSON() ([]byte, error) {
 	var b1, b2, b3 []byte
 	var err error
 	b1, err = json.Marshal(struct {
-		ContractCallTx
+		PayingForTx
 	}{
 
-		ContractCallTx: m.ContractCallTx,
+		PayingForTx: m.PayingForTx,
 	})
 	if err != nil {
 		return nil, err
@@ -117,16 +117,16 @@ func (m ContractCallTxJSON) MarshalJSON() ([]byte, error) {
 	return swag.ConcatJSON(b1, b2, b3), nil
 }
 
-// Validate validates this contract call tx JSON
-func (m *ContractCallTxJSON) Validate(formats strfmt.Registry) error {
+// Validate validates this paying for tx JSON
+func (m *PayingForTxJSON) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateVersion(formats); err != nil {
 		res = append(res, err)
 	}
 
-	// validation for a type composition with ContractCallTx
-	if err := m.ContractCallTx.Validate(formats); err != nil {
+	// validation for a type composition with PayingForTx
+	if err := m.PayingForTx.Validate(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -136,7 +136,7 @@ func (m *ContractCallTxJSON) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ContractCallTxJSON) validateVersion(formats strfmt.Registry) error {
+func (m *PayingForTxJSON) validateVersion(formats strfmt.Registry) error {
 
 	if err := validate.Required("version", "body", m.Version()); err != nil {
 		return err
@@ -145,12 +145,12 @@ func (m *ContractCallTxJSON) validateVersion(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validate this contract call tx JSON based on the context it is used
-func (m *ContractCallTxJSON) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+// ContextValidate validate this paying for tx JSON based on the context it is used
+func (m *PayingForTxJSON) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
-	// validation for a type composition with ContractCallTx
-	if err := m.ContractCallTx.ContextValidate(ctx, formats); err != nil {
+	// validation for a type composition with PayingForTx
+	if err := m.PayingForTx.ContextValidate(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -161,7 +161,7 @@ func (m *ContractCallTxJSON) ContextValidate(ctx context.Context, formats strfmt
 }
 
 // MarshalBinary interface implementation
-func (m *ContractCallTxJSON) MarshalBinary() ([]byte, error) {
+func (m *PayingForTxJSON) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -169,8 +169,8 @@ func (m *ContractCallTxJSON) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *ContractCallTxJSON) UnmarshalBinary(b []byte) error {
-	var res ContractCallTxJSON
+func (m *PayingForTxJSON) UnmarshalBinary(b []byte) error {
+	var res PayingForTxJSON
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

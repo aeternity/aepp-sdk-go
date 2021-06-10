@@ -71,6 +71,7 @@ type GetOracleQueriesByPubkeyParams struct {
 	   Max number of oracle queries
 
 	   Format: uint64
+	   Default: 20
 	*/
 	Limit *uint64
 
@@ -83,6 +84,8 @@ type GetOracleQueriesByPubkeyParams struct {
 	/* Type.
 
 	   The type of a query: open, closed or all
+
+	   Default: "all"
 	*/
 	Type *string
 
@@ -103,7 +106,21 @@ func (o *GetOracleQueriesByPubkeyParams) WithDefaults() *GetOracleQueriesByPubke
 //
 // All values with no default are reset to their zero value.
 func (o *GetOracleQueriesByPubkeyParams) SetDefaults() {
-	// no default values defined for this parameter
+	var (
+		limitDefault = uint64(20)
+
+		typeVarDefault = string("all")
+	)
+
+	val := GetOracleQueriesByPubkeyParams{
+		Limit: &limitDefault,
+		Type:  &typeVarDefault,
+	}
+
+	val.timeout = o.timeout
+	val.Context = o.Context
+	val.HTTPClient = o.HTTPClient
+	*o = val
 }
 
 // WithTimeout adds the timeout to the get oracle queries by pubkey params
