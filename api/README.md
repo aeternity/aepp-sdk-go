@@ -29,3 +29,12 @@ TODO: investigate why Python SDK have no problem with this
 ```
 rm -rf ../swagguard/compiler/* && swagger generate client -f compiler.json -A compiler --with-flatten=minimal --target ../swagguard/compiler
 ```
+
+
+# go-swagger
+The last time was used:
+```
+$ swagger version
+version: v0.27.0
+commit: 43c2774170504d87b104e3e4d68626aac2cd447d
+```
