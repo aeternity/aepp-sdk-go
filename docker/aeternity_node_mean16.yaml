@@ -21,7 +21,7 @@ chain:
   persist: false
   hard_forks:
     "1": 0
-    "4": 1
+    "5": 1
 
 mining:
   autostart: true

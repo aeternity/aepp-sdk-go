@@ -164,8 +164,8 @@ func (t *TxReceipt) Watch(mined chan bool, waitBlocks uint64, node transactionWa
 }
 
 func findVMABIVersion(nodeVersion string) (VMVersion, ABIVersion uint16, err error) {
-	if nodeVersion[0] == '5' {
-		return 5, 3, nil
+	if nodeVersion[0] == '6' {
+		return 7, 3, nil
 	}
 	return 0, 0, errors.New("node is unsupported")
 }

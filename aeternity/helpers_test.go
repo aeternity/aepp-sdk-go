@@ -221,11 +221,11 @@ func Test_findVMABIVersion(t *testing.T) {
 		wantErr        bool
 	}{
 		{
-			name: "node version 5, FATE backend",
+			name: "node version 6, FATE backend",
 			args: args{
-				nodeVersion:     "5",
+				nodeVersion:     "6",
 			},
-			wantVMVersion:  5,
+			wantVMVersion:  7,
 			wantABIVersion: 3,
 		},
 		{

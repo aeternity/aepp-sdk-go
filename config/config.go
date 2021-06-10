@@ -174,7 +174,7 @@ var Client = ClientConfig{
 		GasLimit:    big.NewInt(1e6),
 		Amount:      new(big.Int),
 		Deposit:     new(big.Int),
-		VMVersion:   5,
+		VMVersion:   7,
 		ABIVersion:  3,
 	},
 	Oracles: OracleConfig{
