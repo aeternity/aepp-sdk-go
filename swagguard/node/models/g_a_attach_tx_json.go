@@ -27,7 +27,7 @@ type GAAttachTxJSON struct {
 
 // Type gets the type of this subtype
 func (m *GAAttachTxJSON) Type() string {
-	return "GAAttachTxJSON"
+	return "GAAttachTx"
 }
 
 // SetType sets the type of this subtype
