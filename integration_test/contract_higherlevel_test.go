@@ -24,7 +24,7 @@ contract SimpleStorage =
   function get() : int = state.data
   stateful function set(value : int) = put(state{data = value})`
 
-	ctID, _, err := contract.Deploy(simplestorage, "init", []string{"42"}, config.CompilerBackendFATE)
+	ctID, _, err := contract.Deploy(simplestorage, "init", []string{"42"})
 	if err != nil {
 		t.Error(err)
 	}
@@ -50,12 +50,12 @@ contract SimpleStorage =
   function get() : int = state.data
   stateful function set(value : int) = put(state{data = value})`
 
-	ctID, _, err := contract.Deploy(simplestorage, "init", []string{"42"}, config.CompilerBackendFATE)
+	ctID, _, err := contract.Deploy(simplestorage, "init", []string{"42"})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	callReceipt, err := contract.Call(ctID, simplestorage, "get", []string{}, config.CompilerBackendFATE)
+	callReceipt, err := contract.Call(ctID, simplestorage, "get", []string{})
 	if err != nil {
 		t.Error(err)
 	}

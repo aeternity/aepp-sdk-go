@@ -17,12 +17,6 @@ const (
 	NetworkIDTestnet = "ae_uat"
 	// URLTestnet is the URL to an aeternity Foundation maintained node
 	URLTestnet = "https://testnet.aeternity.io"
-	// CompilerBackendFATE indicates that the compiler should use the FATE VM
-	// for contract bytecode execution
-	CompilerBackendFATE = "fate"
-	// CompilerBackendAEVM indicates that the compiler should use the AEVM for
-	// contract bytecode execution
-	CompilerBackendAEVM = "aevm"
 	// OracleTTLTypeDelta indicates that the accompanying TTL value (in blocks)
 	// should be interpreted as currentHeight + TTLValue
 	OracleTTLTypeDelta = 0
@@ -45,7 +39,6 @@ type NodeConfig struct {
 // CompilerConfig configuration for the compiler
 type CompilerConfig struct {
 	URL     string `json:"url" yaml:"url" mapstructure:"url"`
-	Backend string `json:"backend" yaml:"backend" mapstructure:"backend"`
 }
 
 // AensConfig contains default parameters for AENS
@@ -161,7 +154,6 @@ var Node = NodeConfig{
 // Compiler holds default settings for CompilerConfig
 var Compiler = CompilerConfig{
 	URL:     "http://localhost:3080",
-	Backend: CompilerBackendFATE,
 }
 
 // Client holds default settings for ClientConfig
