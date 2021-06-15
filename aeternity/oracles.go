@@ -112,13 +112,16 @@ func (o *Oracle) respondToQueries(queryChan chan *models.OracleQuery, errChan ch
 		fmt.Println("Received query", *q.ID, qStr)
 		resp, err := o.Handler(qStr)
 		if err != nil {
-			fmt.Println("Error responding to OracleQuery - reason:", err)
+			fmt.Println("Error responding to OracleQuery", err)
 		}
 		respTx, err := transactions.NewOracleRespondTx(o.ctx.SenderAccount(), o.ID, *q.ID, resp, config.Client.Oracles.ResponseTTLType, config.Client.Oracles.ResponseTTLValue, o.ctx.TTLNoncer())
+		if err != nil {
+			fmt.Println("Error generating OracleRespondTx", err)
+		}
 		fmt.Println("respTx", respTx)
 		receipt, err := o.ctx.SignBroadcastWait(respTx, config.Client.WaitBlocks)
 		if err != nil {
-			fmt.Println("Error sending a response to OracleQuery, reason:", err)
+			fmt.Println("Error sending a response to OracleQuery", err)
 		}
 		fmt.Println(receipt)
 	}

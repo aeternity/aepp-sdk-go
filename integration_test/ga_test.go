@@ -12,7 +12,7 @@ import (
 	"github.com/aeternity/aepp-sdk-go/v8/naet"
 	"github.com/aeternity/aepp-sdk-go/v8/transactions"
 	"github.com/aeternity/aepp-sdk-go/v8/utils"
-	rlp "github.com/randomshinichi/rlpae"
+	rlp "github.com/aeternity/rlp-go"
 	"gotest.tools/golden"
 )
 

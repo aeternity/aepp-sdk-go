@@ -2,7 +2,7 @@ package models
 
 import (
 	"github.com/aeternity/aepp-sdk-go/v8/binary"
-	rlp "github.com/randomshinichi/rlpae"
+	rlp "github.com/aeternity/rlp-go"
 )
 
 // ContractFunction struct represents the type information for a single function

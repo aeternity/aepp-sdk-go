@@ -8,7 +8,7 @@ import (
 	"github.com/aeternity/aepp-sdk-go/v8/config"
 	"github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
 	"github.com/aeternity/aepp-sdk-go/v8/utils"
-	rlp "github.com/randomshinichi/rlpae"
+	rlp "github.com/aeternity/rlp-go"
 )
 
 // ABIVersionFATE indicates that the bytecode payload is for the FATE VM. Only
@@ -199,7 +199,6 @@ func (tx *ContractCreateTx) CalcGas() (g *big.Int, err error) {
 	if err != nil {
 		return
 	}
-	g = new(big.Int)
 	g = baseGas.Add(baseGas, gasComponent)
 	return
 }
@@ -379,7 +378,6 @@ func (tx *ContractCallTx) CalcGas() (g *big.Int, err error) {
 	if err != nil {
 		return
 	}
-	g = new(big.Int)
 	g = baseGas.Add(baseGas, gasComponent)
 	return
 }

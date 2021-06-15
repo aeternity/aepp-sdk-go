@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/aeternity/aepp-sdk-go/v8/utils"
-	rlp "github.com/randomshinichi/rlpae"
+	rlp "github.com/aeternity/rlp-go"
 )
 
 func TestSpendTx_EncodeRLP(t *testing.T) {
@@ -49,6 +49,9 @@ func TestSpendTx_EncodeRLP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			txJSON, err := tt.tx.JSON()
+			if err != nil {
+				t.Error(err)
+			}
 			fmt.Println(txJSON)
 
 			fmt.Println(rlp.EncodeToBytes(tt.tx))

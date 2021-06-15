@@ -12,7 +12,7 @@ import (
 
 	"github.com/aeternity/aepp-sdk-go/v8/account"
 	"github.com/aeternity/aepp-sdk-go/v8/utils"
-	rlp "github.com/randomshinichi/rlpae"
+	rlp "github.com/aeternity/rlp-go"
 )
 
 // TransactionTypes is a map between the ObjectTags defined above and the
@@ -539,7 +539,7 @@ func CreateNoncer(n naet.GetAccounter) Noncer {
 	return func(accountID string) (nextNonce uint64, err error) {
 		a, err := n.GetAccount(accountID)
 		if err != nil {
-			if err.Error() == "Error: Account not found" {
+			if err.Error() == "Account not found" {
 				nextNonce = 0
 				err = nil
 			}

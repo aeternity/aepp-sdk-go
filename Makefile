@@ -1,30 +1,15 @@
 GOFILES = $(shell find . -name '*.go' -not -path './vendor/*')
-GOPACKAGES = $(shell go list ./...  | grep -v /vendor/)
-GIT_DESCR = $(shell git describe --tags --always) 
+GOPACKAGES_UNIT = $(shell go list ./...  | grep -v /vendor/ | grep -v integration_test)
+GIT_DESCR = $(shell git describe --tags --always)
 APP=aecli
-# build output folder
 OUTPUTFOLDER = dist
-# docker image
-DOCKER_IMAGE = aeternity/aepps-sdk-go
-DOCKER_TAG = $(shell git describe --tags --always)
-# build paramters
-OS = linux
 ARCH = amd64
-
-.PHONY: list
-list:
-	@$(MAKE) -pRrq -f $(lastword $(MAKEFILE_LIST)) : 2>/dev/null | awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | sort | egrep -v -e '^[^[:alnum:]]' -e '^$@$$' | xargs
 
 default: build
 
-workdir:
-	mkdir -p dist
-
-build: build-dist
-
-build-dist: $(GOFILES)
+build: $(GOFILES)
 	@echo build binary to $(OUTPUTFOLDER)
-	GOOS=$(OS) GOARCH=$(ARCH) CGO_ENABLED=0 go build -ldflags "-X main.Version=$(GIT_DESCR)" -o $(OUTPUTFOLDER)/$(APP) .
+	CGO_ENABLED=0 go build -ldflags "-X main.Version=$(GIT_DESCR)" -o $(OUTPUTFOLDER)/$(APP) .
 	@echo copy resources
 	cp -r README.md LICENSE $(OUTPUTFOLDER)
 	@echo done
@@ -45,47 +30,25 @@ build-release:
 	zip -r $(OUTPUTFOLDER)/$(OS).zip $(OUTPUTFOLDER)/$(OS)
 	@echo done
 
-test: test-all
+test: test-unit test-integration
 
-test-all:
-	@go test -v $(GOPACKAGES) -coverprofile .testCoverage.txt
+test-unit:
+	go test -v $(GOPACKAGES_UNIT)
 
-bench: bench-all
+test-integration:
+	go test -v ./integration_test
 
-bench-all:
-	@go test -bench -v $(GOPACKAGES)
+bench:
+	go test -bench -v ./...
 
-lint: lint-all
+lint:
+	staticcheck ./...
 
-lint-all:
-	@golint -set_exit_status $(GOPACKAGES)
-
-install: build-dist
-	@cp dist/aecli $(GOPATH)/bin
+install: build
+	@cp $(OUTPUTFOLDER)/$(APP) $(GOPATH)/bin
 	@echo copied to GOPATH/bin
 
 clean:
 	@echo remove $(OUTPUTFOLDER) folder
-	@rm -rf dist
+	@rm -rf $(OUTPUTFOLDER)
 	@echo done
-
-docker: docker-build
-
-docker-build: build-dist
-	@echo copy resources
-	@cp config/settings.docker.yaml $(OUTPUTFOLDER)/settings.yaml
-	@echo build image
-	docker build -t $(DOCKER_IMAGE):$(DOCKER_TAG) -f ./build/docker/Dockerfile .
-	@echo done
-
-docker-push: docker-build
-	@echo push image
-	docker tag $(DOCKER_IMAGE):$(DOCKER_TAG) $(DOCKER_IMAGE):latest
-	docker push $(DOCKER_IMAGE)
-	@echo done
-
-docker-run: 
-	@docker run -p 1804:1804 $(DOCKER_IMAGE) 
-
-debug-start:
-	@go run main.go -c config/settings.sample.yaml --debug start

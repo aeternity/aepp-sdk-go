@@ -63,7 +63,7 @@ contract SimpleStorage =
 	callInfoChan := make(chan *models.ContractCallObject)
 	errChan := make(chan error)
 	go aeternity.DefaultCallResultListener(n, callReceipt.Hash, callInfoChan, errChan, config.Tuning.ChainPollInterval)
-	_ = <-callInfoChan
+	<-callInfoChan
 	err = <-errChan
 	if err != nil {
 		t.Fatal(err)

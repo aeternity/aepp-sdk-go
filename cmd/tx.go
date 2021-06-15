@@ -7,7 +7,6 @@ import (
 
 	"github.com/aeternity/aepp-sdk-go/v8/binary"
 	"github.com/aeternity/aepp-sdk-go/v8/config"
-	"github.com/aeternity/aepp-sdk-go/v8/naet"
 	"github.com/aeternity/aepp-sdk-go/v8/transactions"
 	"github.com/aeternity/aepp-sdk-go/v8/utils"
 
@@ -49,20 +48,23 @@ func txSpendFunc(ttlFunc transactions.TTLer, nonceFunc transactions.Noncer, args
 	sender = args[0]
 	recipient = args[1]
 	amount, err = utils.NewIntFromString(args[2])
+	if err != nil {
+		return
+	}
 	feeBigInt, _ = utils.NewIntFromString(fee)
 
 	// Validate arguments
 	if !IsAddress(sender) {
-		return errors.New("Error, missing or invalid sender address")
+		return errors.New("missing or invalid sender address")
 	}
 	if !IsAddress(recipient) {
-		return errors.New("Error, missing or invalid recipient address")
+		return errors.New("missing or invalid recipient address")
 	}
 	if amount.Cmp(big.NewInt(0)) == -1 {
-		return errors.New("Error, missing or invalid amount")
+		return errors.New("missing or invalid amount")
 	}
 	if feeBigInt.Cmp(big.NewInt(0)) == -1 {
-		return errors.New("Error, missing or invalid fee")
+		return errors.New("missing or invalid fee")
 	}
 
 	// If nonce or TTL was specified, no need to query the node
@@ -118,11 +120,6 @@ var txContractCreateCmd = &cobra.Command{
 	},
 }
 
-type getHeightAccounter interface {
-	naet.GetHeighter
-	naet.GetAccounter
-}
-
 func txContractCreateFunc(ttlFunc transactions.TTLer, nonceFunc transactions.Noncer, args []string) (err error) {
 	var (
 		owner    string
@@ -133,15 +130,15 @@ func txContractCreateFunc(ttlFunc transactions.TTLer, nonceFunc transactions.Non
 	// Load variables from arguments and validate them
 	owner = args[0]
 	if !IsAddress(owner) {
-		return errors.New("Error, missing or invalid owner address")
+		return errors.New("missing or invalid owner address")
 	}
 	contract = args[1]
 	if !IsBytecode(contract) {
-		return errors.New("Error, missing or invalid contract bytecode")
+		return errors.New("missing or invalid contract bytecode")
 	}
 	calldata = args[2]
 	if !IsBytecode(calldata) {
-		return errors.New("Error, missing or invalid init calldata bytecode")
+		return errors.New("missing or invalid init calldata bytecode")
 	}
 
 	// If nonce was not specified as an argument, connect to the node to
@@ -206,10 +203,10 @@ func txVerifyFunc(cmd *cobra.Command, args []string) (err error) {
 	txSignedBase64 := args[1]
 
 	if !IsAddress(sender) {
-		return errors.New("Error, missing or invalid sender address")
+		return errors.New("missing or invalid sender address")
 	}
 	if !IsTransaction(txSignedBase64) {
-		return errors.New("Error, missing or invalid base64 encoded transaction")
+		return errors.New("missing or invalid base64 encoded transaction")
 	}
 	valid, err := transactions.VerifySignedTx(sender, txSignedBase64, config.Node.NetworkID)
 	if err != nil {
@@ -239,7 +236,7 @@ var txDumpRawCmd = &cobra.Command{
 func txDumpRawFunc(cmd *cobra.Command, args []string) (err error) {
 	tx := args[0]
 	if !IsTransaction(tx) {
-		return errors.New("Error, missing or invalid base64 encoded transaction")
+		return errors.New("missing or invalid base64 encoded transaction")
 	}
 	txRaw, err := binary.Decode(tx)
 	if err != nil {
@@ -260,6 +257,6 @@ func init() {
 	// tx spend command
 	txSpendCmd.Flags().StringVar(&fee, "fee", config.Client.Fee.String(), fmt.Sprintf("Set the transaction fee (default=%s)", config.Client.Fee.String()))
 	txSpendCmd.Flags().Uint64Var(&ttl, "ttl", 0, fmt.Sprintf("Set the TTL in keyblocks (default=%d)", 0))
-	txSpendCmd.Flags().Uint64Var(&nonce, "nonce", 0, fmt.Sprint("Set the sender account nonce, if not the chain will be queried for its value"))
-	txSpendCmd.Flags().StringVar(&spendTxPayload, "payload", "", fmt.Sprint("Optional text payload for Spend Transactions, which will be turned into a bytearray"))
+	txSpendCmd.Flags().Uint64Var(&nonce, "nonce", 0, "Set the sender account nonce, if not the chain will be queried for its value")
+	txSpendCmd.Flags().StringVar(&spendTxPayload, "payload", "", "Optional text payload for Spend Transactions, which will be turned into a bytearray")
 }

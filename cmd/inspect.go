@@ -141,9 +141,13 @@ func printOracleByPubkey(conn naet.GetOracleByPubkeyer, oracleID string) (err er
 }
 
 func inspectFunc(conn nodeGetters, args []string) (err error) {
+	numberRegexp, err := regexp.Compile(`^\d+$`)
+	if err != nil {
+		return
+	}
 	for _, object := range args {
 		// height
-		if matched, _ := regexp.MatchString(`^\d+$`, object); matched {
+		if numberRegexp.MatchString(object) {
 			height, _ := strconv.ParseUint(object, 10, 64)
 			PrintGenerationByHeight(conn, height)
 			continue
@@ -166,7 +170,7 @@ func inspectFunc(conn nodeGetters, args []string) (err error) {
 		case binary.PrefixOraclePubkey:
 			printOracleByPubkey(conn, object)
 		default:
-			return fmt.Errorf("Object %v not yet supported", object)
+			return fmt.Errorf("object %v not yet supported", object)
 		}
 	}
 	return nil

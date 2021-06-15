@@ -7,12 +7,12 @@ import (
 	"strings"
 	"syscall"
 
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 // IsEqStr tells if two strings a and b are equals after trimming spaces and lowercasing
 func IsEqStr(a, b string) bool {
-	return strings.ToLower(strings.TrimSpace(a)) == strings.ToLower(strings.TrimSpace(b))
+	return strings.EqualFold(strings.TrimSpace(a), strings.TrimSpace(b))
 }
 
 // IsEmptyStr tells if a string is empty or not
@@ -46,7 +46,7 @@ func AskYes(question string, defaultYes bool) (isYes bool) {
 // AskPassword ask a password
 func AskPassword(question string) (password string, err error) {
 	fmt.Println(question)
-	bytePassword, err := terminal.ReadPassword(int(syscall.Stdin))
+	bytePassword, err := term.ReadPassword(int(syscall.Stdin))
 	if err != nil {
 		return
 	}

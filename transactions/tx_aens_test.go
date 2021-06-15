@@ -8,7 +8,7 @@ import (
 
 	"github.com/aeternity/aepp-sdk-go/v8/binary"
 	"github.com/aeternity/aepp-sdk-go/v8/utils"
-	rlp "github.com/randomshinichi/rlpae"
+	rlp "github.com/aeternity/rlp-go"
 )
 
 func TestNamePointer(t *testing.T) {

@@ -21,7 +21,7 @@ type Account struct {
 func loadFromPrivateKeyRaw(privb []byte) (account *Account, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = fmt.Errorf("Invalid private key")
+			err = fmt.Errorf("invalid private key")
 		}
 	}()
 	account = loadFromPrivateKey(ed25519.PrivateKey(privb))

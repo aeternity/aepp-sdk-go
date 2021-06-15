@@ -6,7 +6,7 @@ import (
 
 	"github.com/aeternity/aepp-sdk-go/v8/binary"
 	"github.com/aeternity/aepp-sdk-go/v8/config"
-	rlp "github.com/randomshinichi/rlpae"
+	rlp "github.com/aeternity/rlp-go"
 )
 
 // GAAttachTx is a transaction that converts a plain old account (POA) into a
@@ -139,7 +139,6 @@ func (tx *GAAttachTx) CalcGas() (g *big.Int, err error) {
 	if err != nil {
 		return
 	}
-	g = new(big.Int)
 	g = baseGas.Add(baseGas, gasComponent)
 	return
 }
@@ -290,7 +289,6 @@ func (tx *GAMetaTx) CalcGas() (g *big.Int, err error) {
 	if err != nil {
 		return
 	}
-	g = new(big.Int)
 	g = baseGas.Add(baseGas, gasComponent)
 	return
 }

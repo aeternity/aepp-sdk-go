@@ -171,6 +171,6 @@ func findVMABIVersion(nodeVersion, compilerBackend string) (VMVersion, ABIVersio
 	} else if nodeVersion[0] == '4' {
 		return 4, 1, nil
 	} else {
-		return 0, 0, errors.New("Other node versions unsupported")
+		return 0, 0, errors.New("other node versions unsupported")
 	}
 }

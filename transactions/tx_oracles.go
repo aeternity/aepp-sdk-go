@@ -11,7 +11,7 @@ import (
 	"github.com/aeternity/aepp-sdk-go/v8/config"
 	"github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
 	"github.com/aeternity/aepp-sdk-go/v8/utils"
-	rlp "github.com/randomshinichi/rlpae"
+	rlp "github.com/aeternity/rlp-go"
 )
 
 func timeGas(ttl uint64) (timeGasComponent uint64) {
