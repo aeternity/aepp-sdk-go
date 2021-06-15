@@ -12,11 +12,11 @@ const (
 	// NetworkIDMainnet is the network ID for aeternity mainnet
 	NetworkIDMainnet = "ae_mainnet"
 	// URLMainnet is the URL to an aeternity Foundation maintained node
-	URLMainnet = "https://sdk-mainnet.aepps.com"
+	URLMainnet = "https://mainnet.aeternity.io"
 	// NetworkIDTestnet is the network ID for aeternity testnet
 	NetworkIDTestnet = "ae_uat"
 	// URLTestnet is the URL to an aeternity Foundation maintained node
-	URLTestnet = "https://sdk-testnet.aepps.com"
+	URLTestnet = "https://testnet.aeternity.io"
 	// CompilerBackendFATE indicates that the compiler should use the FATE VM
 	// for contract bytecode execution
 	CompilerBackendFATE = "fate"
@@ -152,9 +152,9 @@ type ProfileConfig struct {
 
 // Node holds default settings for NodeConfig
 var Node = NodeConfig{
-	URL:         "https://sdk-mainnet.aepps.com",
-	URLInternal: "https://sdk-mainnet.aepps.com",
-	URLChannels: "https://sdk-mainnet.aepps.com",
+	URL:         "https://mainnet.aeternity.io",
+	URLInternal: "https://mainnet.aeternity.io",
+	URLChannels: "https://mainnet.aeternity.io",
 	NetworkID:   "ae_mainnet",
 }
 

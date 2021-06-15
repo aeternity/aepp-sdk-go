@@ -20,20 +20,18 @@ func TestOracleHLL(t *testing.T) {
 	node := setupNetwork(t, privatenetURL, false)
 	ctx := aeternity.NewContext(alice, node)
 	oracle := aeternity.NewOracle(myFunction, node, ctx, "", "", config.Tuning.ChainPollInterval)
-	oracle.Listen()
+	go oracle.Listen()
 }
 
 func TestOracleWorkflow(t *testing.T) {
 	alice, _ := setupAccounts(t)
 	node := setupNetwork(t, privatenetURL, false)
-	ctx := aeternity.NewContext(alice, node)
-
-	// Setup temporary test account and fund it
 	testAccount, err := account.New()
 	if err != nil {
 		t.Fatal(err)
 	}
 	fundAccount(t, node, alice, testAccount, big.NewInt(1000000000000000000))
+	ctx := aeternity.NewContext(testAccount, node)
 
 	// Register
 	register, err := transactions.NewOracleRegisterTx(testAccount.Address, "hello", "helloback", config.Client.Oracles.QueryFee, config.OracleTTLTypeDelta, config.Client.Oracles.OracleTTLValue, config.Client.Oracles.ABIVersion, ctx.TTLNoncer())
@@ -80,10 +78,11 @@ func TestOracleWorkflow(t *testing.T) {
 	}
 
 	// Query
-	query, err := transactions.NewOracleQueryTx(testAccount.Address, oraclePubKey, "How was your day?", config.Client.Oracles.QueryFee, 0, 100, 0, 100, ctx.TTLNoncer())
+	query, err := transactions.NewOracleQueryTx(alice.Address, oraclePubKey, "How was your day?", config.Client.Oracles.QueryFee, 0, 100, 0, 100, ctx.TTLNoncer())
 	if err != nil {
 		t.Fatal(err)
 	}
+	ctx.SigningAccount = alice
 	fmt.Printf("Query %+v\n", query)
 	_, err = ctx.SignBroadcastWait(query, config.Client.WaitBlocks)
 	if err != nil {
@@ -97,6 +96,7 @@ func TestOracleWorkflow(t *testing.T) {
 	}
 
 	// Respond
+	ctx.SigningAccount = testAccount
 	respond, err := transactions.NewOracleRespondTx(testAccount.Address, oraclePubKey, oqID, "My day was fine thank you", config.OracleTTLTypeDelta, config.Client.Oracles.ResponseTTLValue, ctx.TTLNoncer())
 	if err != nil {
 		t.Fatal(err)

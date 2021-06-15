@@ -100,7 +100,7 @@ func Example() {
 		fmt.Println("Could not create alice's Account:", err)
 	}
 
-	bobAddress := "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v"
+	bobAddress := "ak_wJ3iKZcqvgdnQ6YVz8pY2xPjtVTNNEL61qF4AYQdksZfXZLks"
 
 	// create a connection to a node, represented by *Node
 	node := naet.NewNode("http://localhost:3013", false)
@@ -166,7 +166,7 @@ func TestSignBroadcast(t *testing.T) {
 			args: args{
 				tx: &transactions.SpendTx{
 					SenderID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
-					RecipientID: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
+					RecipientID: "ak_wJ3iKZcqvgdnQ6YVz8pY2xPjtVTNNEL61qF4AYQdksZfXZLks",
 					Amount:      &big.Int{},
 					Fee:         &big.Int{},
 					Payload:     nil,
@@ -184,7 +184,7 @@ func TestSignBroadcast(t *testing.T) {
 			args: args{
 				tx: &transactions.SpendTx{
 					SenderID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
-					RecipientID: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
+					RecipientID: "ak_wJ3iKZcqvgdnQ6YVz8pY2xPjtVTNNEL61qF4AYQdksZfXZLks",
 					Amount:      &big.Int{},
 					Fee:         &big.Int{},
 					Payload:     nil,
