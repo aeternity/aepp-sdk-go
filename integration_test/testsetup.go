@@ -6,11 +6,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/aeternity/aepp-sdk-go/v8/account"
-	"github.com/aeternity/aepp-sdk-go/v8/aeternity"
-	"github.com/aeternity/aepp-sdk-go/v8/config"
-	"github.com/aeternity/aepp-sdk-go/v8/naet"
-	"github.com/aeternity/aepp-sdk-go/v8/transactions"
+	"github.com/aeternity/aepp-sdk-go/v9/account"
+	"github.com/aeternity/aepp-sdk-go/v9/aeternity"
+	"github.com/aeternity/aepp-sdk-go/v9/config"
+	"github.com/aeternity/aepp-sdk-go/v9/naet"
+	"github.com/aeternity/aepp-sdk-go/v9/transactions"
 )
 
 var alicePrivateKey = "e6a91d633c77cf5771329d3354b3bcef1bc5e032c43d70b6d35af923ce1eb74dcea7ade470c9f99d9d4e400880a86f1d49bb444b62f11a9ebb64bbcfeb73fef3"

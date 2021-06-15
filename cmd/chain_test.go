@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/v8/naet"
+	"github.com/aeternity/aepp-sdk-go/v9/naet"
 )
 
 // Prefixing each test with Example makes go-test check the stdout

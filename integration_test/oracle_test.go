@@ -5,11 +5,11 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/v8/account"
-	"github.com/aeternity/aepp-sdk-go/v8/aeternity"
-	"github.com/aeternity/aepp-sdk-go/v8/config"
-	"github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
-	"github.com/aeternity/aepp-sdk-go/v8/transactions"
+	"github.com/aeternity/aepp-sdk-go/v9/account"
+	"github.com/aeternity/aepp-sdk-go/v9/aeternity"
+	"github.com/aeternity/aepp-sdk-go/v9/config"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v9/transactions"
 )
 
 func myFunction(query string) (response string, err error) {

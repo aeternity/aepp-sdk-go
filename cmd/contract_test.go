@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/v8/naet"
+	"github.com/aeternity/aepp-sdk-go/v9/naet"
 )
 
 func Test_compileFunc(t *testing.T) {

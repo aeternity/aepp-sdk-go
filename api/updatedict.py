@@ -47,7 +47,7 @@ parsed['definitions']['UInt'] = {
   'minimum': 0,
   'x-go-type': {
     'import': {
-      'package': 'github.com/aeternity/aepp-sdk-go/v8/utils'
+      'package': 'github.com/aeternity/aepp-sdk-go/v9/utils'
     },
     'type': 'BigInt'
   }

@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 
-	"github.com/aeternity/aepp-sdk-go/v8/swagguard/compiler/models"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/compiler/models"
 )
 
 // EncodeCalldataReader is a Reader for the EncodeCalldata structure.

@@ -7,10 +7,10 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/aeternity/aepp-sdk-go/v8/binary"
-	"github.com/aeternity/aepp-sdk-go/v8/config"
-	"github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
-	"github.com/aeternity/aepp-sdk-go/v8/utils"
+	"github.com/aeternity/aepp-sdk-go/v9/binary"
+	"github.com/aeternity/aepp-sdk-go/v9/config"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v9/utils"
 	rlp "github.com/aeternity/rlp-go"
 )
 

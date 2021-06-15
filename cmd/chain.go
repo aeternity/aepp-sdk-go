@@ -18,9 +18,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/aeternity/aepp-sdk-go/v8/binary"
-	"github.com/aeternity/aepp-sdk-go/v8/config"
-	"github.com/aeternity/aepp-sdk-go/v8/naet"
+	"github.com/aeternity/aepp-sdk-go/v9/binary"
+	"github.com/aeternity/aepp-sdk-go/v9/config"
+	"github.com/aeternity/aepp-sdk-go/v9/naet"
 	"github.com/spf13/cobra"
 )
 

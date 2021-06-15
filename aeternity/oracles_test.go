@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/node/models"
 )
 
 type mockOracleQueryNode struct {

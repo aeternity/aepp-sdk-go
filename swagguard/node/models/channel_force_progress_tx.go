@@ -11,7 +11,7 @@ import (
 	"encoding/json"
 	"io"
 
-	"github.com/aeternity/aepp-sdk-go/v8/utils"
+	"github.com/aeternity/aepp-sdk-go/v9/utils"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
