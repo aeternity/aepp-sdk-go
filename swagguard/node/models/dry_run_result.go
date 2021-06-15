@@ -6,14 +6,16 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
 
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // DryRunResult dry run result
+//
 // swagger:model DryRunResult
 type DryRunResult struct {
 
@@ -55,7 +57,6 @@ func (m *DryRunResult) Validate(formats strfmt.Registry) error {
 }
 
 func (m *DryRunResult) validateCallObj(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.CallObj) { // not required
 		return nil
 	}
@@ -85,6 +86,34 @@ func (m *DryRunResult) validateType(formats strfmt.Registry) error {
 
 	if err := validate.Required("type", "body", m.Type); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this dry run result based on the context it is used
+func (m *DryRunResult) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateCallObj(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *DryRunResult) contextValidateCallObj(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.CallObj != nil {
+		if err := m.CallObj.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("call_obj")
+			}
+			return err
+		}
 	}
 
 	return nil

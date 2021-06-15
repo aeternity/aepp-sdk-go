@@ -6,22 +6,24 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
 
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // Protocol protocol
+//
 // swagger:model Protocol
 type Protocol struct {
 
-	// effective at height
+	// Height at which protocol becomes active
 	// Required: true
 	EffectiveAtHeight *uint64 `json:"effective_at_height"`
 
-	// version
+	// Protocol version (can include protocol activated by miner signalling)
 	// Required: true
 	Version *uint32 `json:"version"`
 }
@@ -59,6 +61,11 @@ func (m *Protocol) validateVersion(formats strfmt.Registry) error {
 		return err
 	}
 
+	return nil
+}
+
+// ContextValidate validates this protocol based on context it is used
+func (m *Protocol) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

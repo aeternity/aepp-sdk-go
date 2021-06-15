@@ -6,19 +6,23 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
 
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // ByteCode byte code
+// Example: {"bytecode":{}}
+//
 // swagger:model ByteCode
 type ByteCode struct {
 
 	// bytecode
 	// Required: true
-	Bytecode EncodedByteArray `json:"bytecode"`
+	Bytecode *EncodedByteArray `json:"bytecode"`
 }
 
 // Validate validates this byte code
@@ -37,11 +41,49 @@ func (m *ByteCode) Validate(formats strfmt.Registry) error {
 
 func (m *ByteCode) validateBytecode(formats strfmt.Registry) error {
 
-	if err := m.Bytecode.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("bytecode")
-		}
+	if err := validate.Required("bytecode", "body", m.Bytecode); err != nil {
 		return err
+	}
+
+	if err := validate.Required("bytecode", "body", m.Bytecode); err != nil {
+		return err
+	}
+
+	if m.Bytecode != nil {
+		if err := m.Bytecode.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("bytecode")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this byte code based on the context it is used
+func (m *ByteCode) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateBytecode(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *ByteCode) contextValidateBytecode(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Bytecode != nil {
+		if err := m.Bytecode.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("bytecode")
+			}
+			return err
+		}
 	}
 
 	return nil

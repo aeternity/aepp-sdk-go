@@ -13,56 +13,69 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
-
-	strfmt "github.com/go-openapi/strfmt"
+	"github.com/go-openapi/strfmt"
 )
 
-// NewGetPeerPubkeyParams creates a new GetPeerPubkeyParams object
-// with the default values initialized.
+// NewGetPeerPubkeyParams creates a new GetPeerPubkeyParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewGetPeerPubkeyParams() *GetPeerPubkeyParams {
-
 	return &GetPeerPubkeyParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewGetPeerPubkeyParamsWithTimeout creates a new GetPeerPubkeyParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewGetPeerPubkeyParamsWithTimeout(timeout time.Duration) *GetPeerPubkeyParams {
-
 	return &GetPeerPubkeyParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewGetPeerPubkeyParamsWithContext creates a new GetPeerPubkeyParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewGetPeerPubkeyParamsWithContext(ctx context.Context) *GetPeerPubkeyParams {
-
 	return &GetPeerPubkeyParams{
-
 		Context: ctx,
 	}
 }
 
 // NewGetPeerPubkeyParamsWithHTTPClient creates a new GetPeerPubkeyParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewGetPeerPubkeyParamsWithHTTPClient(client *http.Client) *GetPeerPubkeyParams {
-
 	return &GetPeerPubkeyParams{
 		HTTPClient: client,
 	}
 }
 
-/*GetPeerPubkeyParams contains all the parameters to send to the API endpoint
-for the get peer pubkey operation typically these are written to a http.Request
+/* GetPeerPubkeyParams contains all the parameters to send to the API endpoint
+   for the get peer pubkey operation.
+
+   Typically these are written to a http.Request.
 */
 type GetPeerPubkeyParams struct {
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the get peer pubkey params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetPeerPubkeyParams) WithDefaults() *GetPeerPubkeyParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the get peer pubkey params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetPeerPubkeyParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the get peer pubkey params

@@ -150,7 +150,7 @@ func (t *TxReceipt) Watch(mined chan bool, waitBlocks uint64, node transactionWa
 		}
 
 		if tx.BlockHeight.LargerThanZero() {
-			bh := big.Int(tx.BlockHeight)
+			bh := big.Int(*tx.BlockHeight)
 			t.BlockHeight = bh.Uint64()
 			t.BlockHash = *tx.BlockHash
 			t.Mined = true

@@ -6,18 +6,19 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
 
+	"github.com/aeternity/aepp-sdk-go/v8/utils"
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
-
-	utils "github.com/aeternity/aepp-sdk-go/v8/utils"
 )
 
-// ChannelSLASHTx channel slash tx
+// ChannelSlashTx channel slash tx
+//
 // swagger:model ChannelSlashTx
-type ChannelSLASHTx struct {
+type ChannelSlashTx struct {
 
 	// channel id
 	// Required: true
@@ -25,7 +26,7 @@ type ChannelSLASHTx struct {
 
 	// fee
 	// Required: true
-	Fee utils.BigInt `json:"fee"`
+	Fee *utils.BigInt `json:"fee"`
 
 	// from id
 	// Required: true
@@ -47,7 +48,7 @@ type ChannelSLASHTx struct {
 }
 
 // Validate validates this channel slash tx
-func (m *ChannelSLASHTx) Validate(formats strfmt.Registry) error {
+func (m *ChannelSlashTx) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateChannelID(formats); err != nil {
@@ -76,7 +77,7 @@ func (m *ChannelSLASHTx) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ChannelSLASHTx) validateChannelID(formats strfmt.Registry) error {
+func (m *ChannelSlashTx) validateChannelID(formats strfmt.Registry) error {
 
 	if err := validate.Required("channel_id", "body", m.ChannelID); err != nil {
 		return err
@@ -85,19 +86,29 @@ func (m *ChannelSLASHTx) validateChannelID(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ChannelSLASHTx) validateFee(formats strfmt.Registry) error {
+func (m *ChannelSlashTx) validateFee(formats strfmt.Registry) error {
 
-	if err := m.Fee.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("fee")
-		}
+	if err := validate.Required("fee", "body", m.Fee); err != nil {
 		return err
+	}
+
+	if err := validate.Required("fee", "body", m.Fee); err != nil {
+		return err
+	}
+
+	if m.Fee != nil {
+		if err := m.Fee.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("fee")
+			}
+			return err
+		}
 	}
 
 	return nil
 }
 
-func (m *ChannelSLASHTx) validateFromID(formats strfmt.Registry) error {
+func (m *ChannelSlashTx) validateFromID(formats strfmt.Registry) error {
 
 	if err := validate.Required("from_id", "body", m.FromID); err != nil {
 		return err
@@ -106,7 +117,7 @@ func (m *ChannelSLASHTx) validateFromID(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ChannelSLASHTx) validatePayload(formats strfmt.Registry) error {
+func (m *ChannelSlashTx) validatePayload(formats strfmt.Registry) error {
 
 	if err := validate.Required("payload", "body", m.Payload); err != nil {
 		return err
@@ -115,7 +126,7 @@ func (m *ChannelSLASHTx) validatePayload(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ChannelSLASHTx) validatePoi(formats strfmt.Registry) error {
+func (m *ChannelSlashTx) validatePoi(formats strfmt.Registry) error {
 
 	if err := validate.Required("poi", "body", m.Poi); err != nil {
 		return err
@@ -124,8 +135,36 @@ func (m *ChannelSLASHTx) validatePoi(formats strfmt.Registry) error {
 	return nil
 }
 
+// ContextValidate validate this channel slash tx based on the context it is used
+func (m *ChannelSlashTx) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateFee(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *ChannelSlashTx) contextValidateFee(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Fee != nil {
+		if err := m.Fee.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("fee")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 // MarshalBinary interface implementation
-func (m *ChannelSLASHTx) MarshalBinary() ([]byte, error) {
+func (m *ChannelSlashTx) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -133,8 +172,8 @@ func (m *ChannelSLASHTx) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *ChannelSLASHTx) UnmarshalBinary(b []byte) error {
-	var res ChannelSLASHTx
+func (m *ChannelSlashTx) UnmarshalBinary(b []byte) error {
+	var res ChannelSlashTx
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

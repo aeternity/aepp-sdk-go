@@ -13,65 +13,78 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
+	"github.com/go-openapi/strfmt"
 
-	strfmt "github.com/go-openapi/strfmt"
-
-	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/compiler/models"
+	"github.com/aeternity/aepp-sdk-go/v8/swagguard/compiler/models"
 )
 
-// NewCompileContractParams creates a new CompileContractParams object
-// with the default values initialized.
+// NewCompileContractParams creates a new CompileContractParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewCompileContractParams() *CompileContractParams {
-	var ()
 	return &CompileContractParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewCompileContractParamsWithTimeout creates a new CompileContractParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewCompileContractParamsWithTimeout(timeout time.Duration) *CompileContractParams {
-	var ()
 	return &CompileContractParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewCompileContractParamsWithContext creates a new CompileContractParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewCompileContractParamsWithContext(ctx context.Context) *CompileContractParams {
-	var ()
 	return &CompileContractParams{
-
 		Context: ctx,
 	}
 }
 
 // NewCompileContractParamsWithHTTPClient creates a new CompileContractParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewCompileContractParamsWithHTTPClient(client *http.Client) *CompileContractParams {
-	var ()
 	return &CompileContractParams{
 		HTTPClient: client,
 	}
 }
 
-/*CompileContractParams contains all the parameters to send to the API endpoint
-for the compile contract operation typically these are written to a http.Request
+/* CompileContractParams contains all the parameters to send to the API endpoint
+   for the compile contract operation.
+
+   Typically these are written to a http.Request.
 */
 type CompileContractParams struct {
 
-	/*Body
-	  contract code
+	/* Body.
 
+	   contract code
 	*/
 	Body *models.Contract
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the compile contract params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *CompileContractParams) WithDefaults() *CompileContractParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the compile contract params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *CompileContractParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the compile contract params
@@ -125,7 +138,6 @@ func (o *CompileContractParams) WriteToRequest(r runtime.ClientRequest, reg strf
 		return err
 	}
 	var res []error
-
 	if o.Body != nil {
 		if err := r.SetBodyParam(o.Body); err != nil {
 			return err

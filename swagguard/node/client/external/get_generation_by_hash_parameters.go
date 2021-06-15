@@ -13,63 +13,76 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
-
-	strfmt "github.com/go-openapi/strfmt"
+	"github.com/go-openapi/strfmt"
 )
 
-// NewGetGenerationByHashParams creates a new GetGenerationByHashParams object
-// with the default values initialized.
+// NewGetGenerationByHashParams creates a new GetGenerationByHashParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewGetGenerationByHashParams() *GetGenerationByHashParams {
-	var ()
 	return &GetGenerationByHashParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewGetGenerationByHashParamsWithTimeout creates a new GetGenerationByHashParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewGetGenerationByHashParamsWithTimeout(timeout time.Duration) *GetGenerationByHashParams {
-	var ()
 	return &GetGenerationByHashParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewGetGenerationByHashParamsWithContext creates a new GetGenerationByHashParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewGetGenerationByHashParamsWithContext(ctx context.Context) *GetGenerationByHashParams {
-	var ()
 	return &GetGenerationByHashParams{
-
 		Context: ctx,
 	}
 }
 
 // NewGetGenerationByHashParamsWithHTTPClient creates a new GetGenerationByHashParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewGetGenerationByHashParamsWithHTTPClient(client *http.Client) *GetGenerationByHashParams {
-	var ()
 	return &GetGenerationByHashParams{
 		HTTPClient: client,
 	}
 }
 
-/*GetGenerationByHashParams contains all the parameters to send to the API endpoint
-for the get generation by hash operation typically these are written to a http.Request
+/* GetGenerationByHashParams contains all the parameters to send to the API endpoint
+   for the get generation by hash operation.
+
+   Typically these are written to a http.Request.
 */
 type GetGenerationByHashParams struct {
 
-	/*Hash
-	  The hash of the generation
+	/* Hash.
 
+	   The hash of the generation
 	*/
 	Hash string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the get generation by hash params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetGenerationByHashParams) WithDefaults() *GetGenerationByHashParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the get generation by hash params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetGenerationByHashParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the get generation by hash params

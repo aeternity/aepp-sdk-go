@@ -10,10 +10,9 @@ import (
 	"io"
 
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 
-	strfmt "github.com/go-openapi/strfmt"
-
-	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
 )
 
 // GetMicroBlockTransactionByHashAndIndexReader is a Reader for the GetMicroBlockTransactionByHashAndIndex structure.
@@ -24,30 +23,26 @@ type GetMicroBlockTransactionByHashAndIndexReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *GetMicroBlockTransactionByHashAndIndexReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewGetMicroBlockTransactionByHashAndIndexOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 400:
 		result := NewGetMicroBlockTransactionByHashAndIndexBadRequest()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 404:
 		result := NewGetMicroBlockTransactionByHashAndIndexNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -56,7 +51,7 @@ func NewGetMicroBlockTransactionByHashAndIndexOK() *GetMicroBlockTransactionByHa
 	return &GetMicroBlockTransactionByHashAndIndexOK{}
 }
 
-/*GetMicroBlockTransactionByHashAndIndexOK handles this case with default header values.
+/* GetMicroBlockTransactionByHashAndIndexOK describes a response with status code 200, with default header values.
 
 Successful operation
 */
@@ -66,6 +61,9 @@ type GetMicroBlockTransactionByHashAndIndexOK struct {
 
 func (o *GetMicroBlockTransactionByHashAndIndexOK) Error() string {
 	return fmt.Sprintf("[GET /micro-blocks/hash/{hash}/transactions/index/{index}][%d] getMicroBlockTransactionByHashAndIndexOK  %+v", 200, o.Payload)
+}
+func (o *GetMicroBlockTransactionByHashAndIndexOK) GetPayload() *models.GenericSignedTx {
+	return o.Payload
 }
 
 func (o *GetMicroBlockTransactionByHashAndIndexOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -85,7 +83,7 @@ func NewGetMicroBlockTransactionByHashAndIndexBadRequest() *GetMicroBlockTransac
 	return &GetMicroBlockTransactionByHashAndIndexBadRequest{}
 }
 
-/*GetMicroBlockTransactionByHashAndIndexBadRequest handles this case with default header values.
+/* GetMicroBlockTransactionByHashAndIndexBadRequest describes a response with status code 400, with default header values.
 
 Invalid hash or index
 */
@@ -95,6 +93,9 @@ type GetMicroBlockTransactionByHashAndIndexBadRequest struct {
 
 func (o *GetMicroBlockTransactionByHashAndIndexBadRequest) Error() string {
 	return fmt.Sprintf("[GET /micro-blocks/hash/{hash}/transactions/index/{index}][%d] getMicroBlockTransactionByHashAndIndexBadRequest  %+v", 400, o.Payload)
+}
+func (o *GetMicroBlockTransactionByHashAndIndexBadRequest) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *GetMicroBlockTransactionByHashAndIndexBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -114,7 +115,7 @@ func NewGetMicroBlockTransactionByHashAndIndexNotFound() *GetMicroBlockTransacti
 	return &GetMicroBlockTransactionByHashAndIndexNotFound{}
 }
 
-/*GetMicroBlockTransactionByHashAndIndexNotFound handles this case with default header values.
+/* GetMicroBlockTransactionByHashAndIndexNotFound describes a response with status code 404, with default header values.
 
 Block not found
 */
@@ -124,6 +125,9 @@ type GetMicroBlockTransactionByHashAndIndexNotFound struct {
 
 func (o *GetMicroBlockTransactionByHashAndIndexNotFound) Error() string {
 	return fmt.Sprintf("[GET /micro-blocks/hash/{hash}/transactions/index/{index}][%d] getMicroBlockTransactionByHashAndIndexNotFound  %+v", 404, o.Payload)
+}
+func (o *GetMicroBlockTransactionByHashAndIndexNotFound) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *GetMicroBlockTransactionByHashAndIndexNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

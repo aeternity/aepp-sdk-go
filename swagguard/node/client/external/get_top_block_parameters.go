@@ -13,56 +13,69 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
-
-	strfmt "github.com/go-openapi/strfmt"
+	"github.com/go-openapi/strfmt"
 )
 
-// NewGetTopBlockParams creates a new GetTopBlockParams object
-// with the default values initialized.
+// NewGetTopBlockParams creates a new GetTopBlockParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewGetTopBlockParams() *GetTopBlockParams {
-
 	return &GetTopBlockParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewGetTopBlockParamsWithTimeout creates a new GetTopBlockParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewGetTopBlockParamsWithTimeout(timeout time.Duration) *GetTopBlockParams {
-
 	return &GetTopBlockParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewGetTopBlockParamsWithContext creates a new GetTopBlockParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewGetTopBlockParamsWithContext(ctx context.Context) *GetTopBlockParams {
-
 	return &GetTopBlockParams{
-
 		Context: ctx,
 	}
 }
 
 // NewGetTopBlockParamsWithHTTPClient creates a new GetTopBlockParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewGetTopBlockParamsWithHTTPClient(client *http.Client) *GetTopBlockParams {
-
 	return &GetTopBlockParams{
 		HTTPClient: client,
 	}
 }
 
-/*GetTopBlockParams contains all the parameters to send to the API endpoint
-for the get top block operation typically these are written to a http.Request
+/* GetTopBlockParams contains all the parameters to send to the API endpoint
+   for the get top block operation.
+
+   Typically these are written to a http.Request.
 */
 type GetTopBlockParams struct {
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the get top block params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetTopBlockParams) WithDefaults() *GetTopBlockParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the get top block params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetTopBlockParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the get top block params

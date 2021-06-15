@@ -177,10 +177,11 @@ func (tx *NamePreclaimTx) DecodeRLP(s *rlp.Stream) (err error) {
 
 // JSON representation of a Tx is useful for querying the node's debug endpoint
 func (tx *NamePreclaimTx) JSON() (string, error) {
+	fee := utils.BigInt(*tx.Fee)
 	swaggerT := models.NamePreclaimTx{
 		AccountID:    &tx.AccountID,
 		CommitmentID: &tx.CommitmentID,
-		Fee:          utils.BigInt(*tx.Fee),
+		Fee:          &fee,
 		Nonce:        tx.AccountNonce,
 		TTL:          tx.TTL,
 	}
@@ -319,11 +320,13 @@ func (tx *NameClaimTx) JSON() (string, error) {
 	// When talking JSON to the node, the name should be 'API encoded'
 	// (base58), not namehash-ed.
 	nameAPIEncoded := binary.Encode(binary.PrefixName, []byte(tx.Name))
+	fee := utils.BigInt(*tx.Fee)
+	nameSalt := utils.BigInt(*tx.NameSalt)
 	swaggerT := models.NameClaimTx{
 		AccountID: &tx.AccountID,
-		Fee:       utils.BigInt(*tx.Fee),
+		Fee:       &fee,
 		Name:      &nameAPIEncoded,
-		NameSalt:  utils.BigInt(*tx.NameSalt),
+		NameSalt:  &nameSalt,
 		NameFee:   utils.BigInt(*tx.NameFee),
 		Nonce:     tx.AccountNonce,
 		TTL:       tx.TTL,
@@ -628,10 +631,11 @@ func (tx *NameUpdateTx) JSON() (string, error) {
 		swaggerNamePointers = append(swaggerNamePointers, np.Swagger())
 	}
 
+	fee := utils.BigInt(*tx.Fee)
 	swaggerT := models.NameUpdateTx{
 		AccountID: &tx.AccountID,
 		ClientTTL: &tx.ClientTTL,
-		Fee:       utils.BigInt(*tx.Fee),
+		Fee:       &fee,
 		NameID:    &tx.NameID,
 		NameTTL:   &tx.NameTTL,
 		Nonce:     tx.AccountNonce,
@@ -769,9 +773,10 @@ func (tx *NameRevokeTx) DecodeRLP(s *rlp.Stream) (err error) {
 
 // JSON representation of a Tx is useful for querying the node's debug endpoint
 func (tx *NameRevokeTx) JSON() (string, error) {
+	fee := utils.BigInt(*tx.Fee)
 	swaggerT := models.NameRevokeTx{
 		AccountID: &tx.AccountID,
-		Fee:       utils.BigInt(*tx.Fee),
+		Fee:       &fee,
 		NameID:    &tx.NameID,
 		Nonce:     tx.AccountNonce,
 		TTL:       tx.TTL,
@@ -922,9 +927,10 @@ func (tx *NameTransferTx) DecodeRLP(s *rlp.Stream) (err error) {
 
 // JSON representation of a Tx is useful for querying the node's debug endpoint
 func (tx *NameTransferTx) JSON() (string, error) {
+	fee := utils.BigInt(*tx.Fee)
 	swaggerT := models.NameTransferTx{
 		AccountID:   &tx.AccountID,
-		Fee:         utils.BigInt(*tx.Fee),
+		Fee:         &fee,
 		NameID:      &tx.NameID,
 		Nonce:       tx.AccountNonce,
 		RecipientID: &tx.RecipientID,

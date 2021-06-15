@@ -13,65 +13,78 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
+	"github.com/go-openapi/strfmt"
 
-	strfmt "github.com/go-openapi/strfmt"
-
-	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/compiler/models"
+	"github.com/aeternity/aepp-sdk-go/v8/swagguard/compiler/models"
 )
 
-// NewDecodeDataParams creates a new DecodeDataParams object
-// with the default values initialized.
+// NewDecodeDataParams creates a new DecodeDataParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewDecodeDataParams() *DecodeDataParams {
-	var ()
 	return &DecodeDataParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewDecodeDataParamsWithTimeout creates a new DecodeDataParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewDecodeDataParamsWithTimeout(timeout time.Duration) *DecodeDataParams {
-	var ()
 	return &DecodeDataParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewDecodeDataParamsWithContext creates a new DecodeDataParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewDecodeDataParamsWithContext(ctx context.Context) *DecodeDataParams {
-	var ()
 	return &DecodeDataParams{
-
 		Context: ctx,
 	}
 }
 
 // NewDecodeDataParamsWithHTTPClient creates a new DecodeDataParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewDecodeDataParamsWithHTTPClient(client *http.Client) *DecodeDataParams {
-	var ()
 	return &DecodeDataParams{
 		HTTPClient: client,
 	}
 }
 
-/*DecodeDataParams contains all the parameters to send to the API endpoint
-for the decode data operation typically these are written to a http.Request
+/* DecodeDataParams contains all the parameters to send to the API endpoint
+   for the decode data operation.
+
+   Typically these are written to a http.Request.
 */
 type DecodeDataParams struct {
 
-	/*Body
-	  Binary data in Sophia ABI format
+	/* Body.
 
+	   Binary data in Sophia ABI format
 	*/
 	Body *models.SophiaBinaryData
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the decode data params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *DecodeDataParams) WithDefaults() *DecodeDataParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the decode data params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *DecodeDataParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the decode data params
@@ -125,7 +138,6 @@ func (o *DecodeDataParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Re
 		return err
 	}
 	var res []error
-
 	if o.Body != nil {
 		if err := r.SetBodyParam(o.Body); err != nil {
 			return err

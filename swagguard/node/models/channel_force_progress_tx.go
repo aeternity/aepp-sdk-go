@@ -7,20 +7,20 @@ package models
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io"
 
-	strfmt "github.com/go-openapi/strfmt"
-
+	"github.com/aeternity/aepp-sdk-go/v8/utils"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
-
-	utils "github.com/aeternity/aepp-sdk-go/v8/utils"
 )
 
 // ChannelForceProgressTx channel force progress tx
+//
 // swagger:model ChannelForceProgressTx
 type ChannelForceProgressTx struct {
 
@@ -30,7 +30,7 @@ type ChannelForceProgressTx struct {
 
 	// fee
 	// Required: true
-	Fee utils.BigInt `json:"fee"`
+	Fee *utils.BigInt `json:"fee"`
 
 	// from id
 	// Required: true
@@ -75,7 +75,7 @@ func (m *ChannelForceProgressTx) UnmarshalJSON(raw []byte) error {
 	var data struct {
 		ChannelID *string `json:"channel_id"`
 
-		Fee utils.BigInt `json:"fee"`
+		Fee *utils.BigInt `json:"fee"`
 
 		FromID *string `json:"from_id"`
 
@@ -150,7 +150,7 @@ func (m ChannelForceProgressTx) MarshalJSON() ([]byte, error) {
 	b1, err = json.Marshal(struct {
 		ChannelID *string `json:"channel_id"`
 
-		Fee utils.BigInt `json:"fee"`
+		Fee *utils.BigInt `json:"fee"`
 
 		FromID *string `json:"from_id"`
 
@@ -184,8 +184,7 @@ func (m ChannelForceProgressTx) MarshalJSON() ([]byte, error) {
 		StateHash: m.StateHash,
 
 		TTL: m.TTL,
-	},
-	)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -194,8 +193,7 @@ func (m ChannelForceProgressTx) MarshalJSON() ([]byte, error) {
 	}{
 
 		Update: m.updateField,
-	},
-	)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -252,11 +250,21 @@ func (m *ChannelForceProgressTx) validateChannelID(formats strfmt.Registry) erro
 
 func (m *ChannelForceProgressTx) validateFee(formats strfmt.Registry) error {
 
-	if err := m.Fee.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("fee")
-		}
+	if err := validate.Required("fee", "body", m.Fee); err != nil {
 		return err
+	}
+
+	if err := validate.Required("fee", "body", m.Fee); err != nil {
+		return err
+	}
+
+	if m.Fee != nil {
+		if err := m.Fee.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("fee")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -300,7 +308,55 @@ func (m *ChannelForceProgressTx) validateStateHash(formats strfmt.Registry) erro
 
 func (m *ChannelForceProgressTx) validateUpdate(formats strfmt.Registry) error {
 
+	if err := validate.Required("update", "body", m.Update()); err != nil {
+		return err
+	}
+
 	if err := m.Update().Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("update")
+		}
+		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this channel force progress tx based on the context it is used
+func (m *ChannelForceProgressTx) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateFee(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateUpdate(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *ChannelForceProgressTx) contextValidateFee(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Fee != nil {
+		if err := m.Fee.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("fee")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *ChannelForceProgressTx) contextValidateUpdate(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.Update().ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("update")
 		}

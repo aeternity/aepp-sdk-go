@@ -10,10 +10,9 @@ import (
 	"io"
 
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 
-	strfmt "github.com/go-openapi/strfmt"
-
-	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
 )
 
 // GetAccountByPubkeyAndHashReader is a Reader for the GetAccountByPubkeyAndHash structure.
@@ -24,30 +23,26 @@ type GetAccountByPubkeyAndHashReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *GetAccountByPubkeyAndHashReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewGetAccountByPubkeyAndHashOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 400:
 		result := NewGetAccountByPubkeyAndHashBadRequest()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 404:
 		result := NewGetAccountByPubkeyAndHashNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -56,7 +51,7 @@ func NewGetAccountByPubkeyAndHashOK() *GetAccountByPubkeyAndHashOK {
 	return &GetAccountByPubkeyAndHashOK{}
 }
 
-/*GetAccountByPubkeyAndHashOK handles this case with default header values.
+/* GetAccountByPubkeyAndHashOK describes a response with status code 200, with default header values.
 
 Successful operation
 */
@@ -66,6 +61,9 @@ type GetAccountByPubkeyAndHashOK struct {
 
 func (o *GetAccountByPubkeyAndHashOK) Error() string {
 	return fmt.Sprintf("[GET /accounts/{pubkey}/hash/{hash}][%d] getAccountByPubkeyAndHashOK  %+v", 200, o.Payload)
+}
+func (o *GetAccountByPubkeyAndHashOK) GetPayload() *models.Account {
+	return o.Payload
 }
 
 func (o *GetAccountByPubkeyAndHashOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -85,7 +83,7 @@ func NewGetAccountByPubkeyAndHashBadRequest() *GetAccountByPubkeyAndHashBadReque
 	return &GetAccountByPubkeyAndHashBadRequest{}
 }
 
-/*GetAccountByPubkeyAndHashBadRequest handles this case with default header values.
+/* GetAccountByPubkeyAndHashBadRequest describes a response with status code 400, with default header values.
 
 Invalid public key or invalid hash
 */
@@ -95,6 +93,9 @@ type GetAccountByPubkeyAndHashBadRequest struct {
 
 func (o *GetAccountByPubkeyAndHashBadRequest) Error() string {
 	return fmt.Sprintf("[GET /accounts/{pubkey}/hash/{hash}][%d] getAccountByPubkeyAndHashBadRequest  %+v", 400, o.Payload)
+}
+func (o *GetAccountByPubkeyAndHashBadRequest) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *GetAccountByPubkeyAndHashBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -114,7 +115,7 @@ func NewGetAccountByPubkeyAndHashNotFound() *GetAccountByPubkeyAndHashNotFound {
 	return &GetAccountByPubkeyAndHashNotFound{}
 }
 
-/*GetAccountByPubkeyAndHashNotFound handles this case with default header values.
+/* GetAccountByPubkeyAndHashNotFound describes a response with status code 404, with default header values.
 
 Account not found or hash not available
 */
@@ -124,6 +125,9 @@ type GetAccountByPubkeyAndHashNotFound struct {
 
 func (o *GetAccountByPubkeyAndHashNotFound) Error() string {
 	return fmt.Sprintf("[GET /accounts/{pubkey}/hash/{hash}][%d] getAccountByPubkeyAndHashNotFound  %+v", 404, o.Payload)
+}
+func (o *GetAccountByPubkeyAndHashNotFound) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *GetAccountByPubkeyAndHashNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

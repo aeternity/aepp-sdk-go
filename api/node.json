@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "description": "This is the [Aeternity](https://www.aeternity.com/) node API.",
-    "version": "5.0.0-rc.4",
+    "version": "5.11.0",
     "title": "Aeternity node",
     "termsOfService": "https://www.aeternity.com/terms/",
     "contact": {
@@ -139,7 +139,7 @@
               "type": "object",
               "properties": {
                 "hash": {
-                  "type": "string"
+                  "$ref": "#/definitions/EncodedHash"
                 }
               }
             }
@@ -172,8 +172,7 @@
               "type": "object",
               "properties": {
                 "height": {
-                  "type": "integer",
-                  "format": "uint64"
+                  "$ref": "#/definitions/UInt64"
                 }
               }
             }
@@ -281,7 +280,8 @@
             "description": "The height",
             "required": true,
             "type": "integer",
-            "format": "uint64"
+            "minimum": 0,
+            "maximum": 18446744073709551615
           }
         ],
         "responses": {
@@ -500,8 +500,7 @@
               "properties": {
                 "count": {
                   "description": "Count",
-                  "type": "integer",
-                  "format": "uint32"
+                  "$ref": "#/definitions/UInt32"
                 }
               }
             }
@@ -609,7 +608,8 @@
             "description": "The height",
             "required": true,
             "type": "integer",
-            "format": "uint64"
+            "minimum": 0,
+            "maximum": 18446744073709551615
           }
         ],
         "responses": {
@@ -695,7 +695,8 @@
             "description": "The height",
             "required": true,
             "type": "integer",
-            "format": "uint64"
+            "minimum": 0,
+            "maximum": 18446744073709551615
           }
         ],
         "responses": {
@@ -1012,45 +1013,6 @@
             "schema": {
               "$ref": "#/definitions/Error"
             }
-          }
-        }
-      }
-    },
-    "/contracts/{pubkey}/store": {
-      "get": {
-        "tags": [
-          "external",
-          "contract"
-        ],
-        "operationId": "GetContractStore",
-        "description": "Get contract store by pubkey",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "pubkey",
-            "description": "The pubkey of the contract",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Contract Store",
-            "schema": {
-              "$ref": "#/definitions/ContractStore"
-            }
-          },
-          "400": {
-            "description": "Invalid pubkey",
-            "schema": {
-              "$ref": "#/definitions/Error"
-            }
-          },
-          "404": {
-            "description": "Contract not found"
           }
         }
       }
@@ -1381,6 +1343,60 @@
             "description": "Successful operation",
             "schema": {
               "$ref": "#/definitions/Status"
+            }
+          }
+        }
+      }
+    },
+    "/status/chain-ends": {
+      "get": {
+        "tags": [
+          "external",
+          "chain"
+        ],
+        "operationId": "GetChainEnds",
+        "description": "Get oldest keyblock hashes counting from genesis including orphans",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/EncodedHash"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/debug/network": {
+      "get": {
+        "tags": [
+          "internal",
+          "node_info",
+          "debug"
+        ],
+        "operationId": "GetNetworkStatus",
+        "description": "Get detailed analytics on peers",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "404": {
+            "description": "Analytics disabled",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/NetworkStatus"
             }
           }
         }
@@ -2094,6 +2110,44 @@
         }
       }
     },
+    "/debug/channels/set-delegates": {
+      "post": {
+        "tags": [
+          "internal",
+          "channel",
+          "debug"
+        ],
+        "operationId": "PostChannelSetDelegates",
+        "description": "Get a channel_set_delegates_tx transaction object",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ChannelSetDelegatesTx"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/UnsignedTx"
+            }
+          },
+          "400": {
+            "description": "Invalid transaction",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
     "/debug/channels/close/mutual": {
       "post": {
         "tags": [
@@ -2295,7 +2349,6 @@
             "description": "Salt",
             "required": true,
             "type": "integer",
-            "format": "uint64",
             "minimum": 0
           }
         ],
@@ -2409,7 +2462,7 @@
           "debug"
         ],
         "operationId": "DryRunTxs",
-        "description": "Dry-run transactions on top of a given block. Supports SpendTx, ContractCreateTx and ContractCallTx",
+        "description": "Dry-run transactions on top of a given block. Supports all TXs except GAMetaTx, PayingForTx and OffchainTx",
         "consumes": [
           "application/json"
         ],
@@ -2461,7 +2514,8 @@
             "description": "The height",
             "required": true,
             "type": "integer",
-            "format": "uint64"
+            "minimum": 0,
+            "maximum": 18446744073709551615
           }
         ],
         "responses": {
@@ -2484,38 +2538,27 @@
   "definitions": {
     "UInt": {
       "type": "integer",
-      "minimum": 0,
-      "x-go-type": {
-        "import": {
-          "package": "github.com/aeternity/aepp-sdk-go/v8/utils"
-        },
-        "type": "BigInt"
-      },
-      "format": "uint64"
+      "minimum": 0
     },
     "UInt16": {
       "type": "integer",
       "minimum": 0,
-      "maximum": 65535,
-      "format": "uint64"
+      "maximum": 65535
     },
     "UInt32": {
       "type": "integer",
       "minimum": 0,
-      "maximum": 4294967295,
-      "format": "uint64"
+      "maximum": 4294967295
     },
     "UInt64": {
       "type": "integer",
       "minimum": 0,
-      "maximum": 18446744073709551615,
-      "format": "uint64"
+      "maximum": 18446744073709551615
     },
     "TxBlockHeight": {
       "type": "integer",
       "minimum": -1,
-      "maximum": 18446744073709551615,
-      "format": "uint64"
+      "maximum": 18446744073709551615
     },
     "EncodedHash": {
       "description": "Base58Check encoded tagged hash",
@@ -2536,8 +2579,7 @@
     "Pow": {
       "type": "array",
       "items": {
-        "type": "integer",
-        "format": "uint32"
+        "$ref": "#/definitions/UInt32"
       },
       "minItems": 42,
       "maxItems": 42
@@ -2546,48 +2588,43 @@
       "type": "object",
       "properties": {
         "hash": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedHash"
         },
         "height": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "prev_hash": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedHash"
         },
         "prev_key_hash": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedHash"
         },
         "state_hash": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedHash"
         },
         "miner": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "beneficiary": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "target": {
-          "type": "integer",
-          "format": "uint32"
+          "$ref": "#/definitions/UInt32"
         },
         "pow": {
           "$ref": "#/definitions/Pow"
         },
         "nonce": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "time": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "version": {
-          "type": "integer",
-          "format": "uint32"
+          "$ref": "#/definitions/UInt32"
         },
         "info": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedByteArray"
         }
       },
       "required": [
@@ -2608,38 +2645,35 @@
       "type": "object",
       "properties": {
         "hash": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedHash"
         },
         "height": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "pof_hash": {
           "description": "\"no_fraud\" | api encoded Proof of Fraud hash",
-          "type": "string"
+          "$ref": "#/definitions/EncodedHash"
         },
         "prev_hash": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedHash"
         },
         "prev_key_hash": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedHash"
         },
         "state_hash": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedHash"
         },
         "txs_hash": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedHash"
         },
         "signature": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedValue"
         },
         "time": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "version": {
-          "type": "integer",
-          "format": "uint32"
+          "$ref": "#/definitions/UInt32"
         }
       },
       "required": [
@@ -2685,7 +2719,7 @@
       "properties": {
         "id": {
           "description": "Public key",
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "balance": {
           "description": "Balance",
@@ -2693,8 +2727,7 @@
         },
         "nonce": {
           "description": "Nonce",
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "payable": {
           "description": "Payable",
@@ -2709,7 +2742,7 @@
         },
         "contract_id": {
           "description": "Id of authorization contract for generalized account",
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "auth_fun": {
           "description": "Name of authorization function for generalized account",
@@ -2726,7 +2759,7 @@
       "type": "object",
       "properties": {
         "tx": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedByteArray"
         }
       },
       "required": [
@@ -2737,7 +2770,7 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "query_format": {
           "type": "string"
@@ -2749,12 +2782,10 @@
           "$ref": "#/definitions/UInt"
         },
         "ttl": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "abi_version": {
-          "type": "integer",
-          "format": "uint16"
+          "$ref": "#/definitions/UInt16"
         }
       },
       "required": [
@@ -2770,17 +2801,16 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedValue"
         },
         "sender_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "sender_nonce": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "oracle_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "query": {
           "type": "string"
@@ -2789,8 +2819,7 @@
           "type": "string"
         },
         "ttl": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "response_ttl": {
           "$ref": "#/definitions/TTL"
@@ -2829,7 +2858,7 @@
       "type": "object",
       "properties": {
         "recipient_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "amount": {
           "$ref": "#/definitions/UInt"
@@ -2838,18 +2867,16 @@
           "$ref": "#/definitions/UInt"
         },
         "ttl": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "sender_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "nonce": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "payload": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedByteArray"
         }
       },
       "required": [
@@ -2876,22 +2903,19 @@
           "$ref": "#/definitions/TTL"
         },
         "account_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "nonce": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "fee": {
           "$ref": "#/definitions/UInt"
         },
         "ttl": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "abi_version": {
-          "type": "integer",
-          "format": "uint16"
+          "$ref": "#/definitions/UInt16"
         }
       },
       "required": [
@@ -2913,15 +2937,13 @@
           "$ref": "#/definitions/RelativeTTL"
         },
         "oracle_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "nonce": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "ttl": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         }
       },
       "required": [
@@ -2934,7 +2956,7 @@
       "type": "object",
       "properties": {
         "oracle_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "query": {
           "type": "string"
@@ -2952,16 +2974,14 @@
           "$ref": "#/definitions/UInt"
         },
         "ttl": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "sender_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "nonce": {
           "description": "Sender nonce",
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         }
       },
       "required": [
@@ -2978,7 +2998,7 @@
       "type": "object",
       "properties": {
         "query_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedValue"
         },
         "response": {
           "type": "string"
@@ -2990,15 +3010,13 @@
           "$ref": "#/definitions/UInt"
         },
         "ttl": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "oracle_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "nonce": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         }
       },
       "required": [
@@ -3020,8 +3038,7 @@
           ]
         },
         "value": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         }
       },
       "required": [
@@ -3039,8 +3056,7 @@
           ]
         },
         "value": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         }
       },
       "required": [
@@ -3052,11 +3068,13 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedValue"
+        },
+        "owner": {
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "ttl": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "pointers": {
           "type": "array",
@@ -3075,21 +3093,19 @@
       "type": "object",
       "properties": {
         "commitment_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedValue"
         },
         "fee": {
           "$ref": "#/definitions/UInt"
         },
         "ttl": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "account_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "nonce": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         }
       },
       "required": [
@@ -3114,15 +3130,13 @@
           "$ref": "#/definitions/UInt"
         },
         "ttl": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "account_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "nonce": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         }
       },
       "required": [
@@ -3136,11 +3150,10 @@
       "type": "object",
       "properties": {
         "name_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedValue"
         },
         "name_ttl": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "pointers": {
           "type": "array",
@@ -3149,22 +3162,19 @@
           }
         },
         "client_ttl": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "fee": {
           "$ref": "#/definitions/UInt"
         },
         "ttl": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "account_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "nonce": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         }
       },
       "required": [
@@ -3180,24 +3190,22 @@
       "type": "object",
       "properties": {
         "name_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedValue"
         },
         "recipient_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "fee": {
           "$ref": "#/definitions/UInt"
         },
         "ttl": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "account_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "nonce": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         }
       },
       "required": [
@@ -3211,21 +3219,19 @@
       "type": "object",
       "properties": {
         "name_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedValue"
         },
         "fee": {
           "$ref": "#/definitions/UInt"
         },
         "ttl": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "account_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "nonce": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         }
       },
       "required": [
@@ -3238,7 +3244,7 @@
       "type": "object",
       "properties": {
         "commitment_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedValue"
         }
       },
       "required": [
@@ -3249,7 +3255,7 @@
       "type": "object",
       "properties": {
         "name_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedValue"
         }
       },
       "required": [
@@ -3263,7 +3269,7 @@
           "type": "string"
         },
         "id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         }
       },
       "required": [
@@ -3275,13 +3281,13 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "initiator_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "responder_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "channel_amount": {
           "$ref": "#/definitions/UInt"
@@ -3295,30 +3301,20 @@
         "channel_reserve": {
           "$ref": "#/definitions/UInt"
         },
-        "delegate_ids": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
         "state_hash": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedHash"
         },
         "round": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "solo_round": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "lock_period": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "locked_until": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         }
       },
       "required": [
@@ -3329,7 +3325,6 @@
         "initiator_amount",
         "responder_amount",
         "channel_reserve",
-        "delegate_ids",
         "state_hash",
         "round",
         "solo_round",
@@ -3341,13 +3336,13 @@
       "type": "object",
       "properties": {
         "initiator_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "initiator_amount": {
           "$ref": "#/definitions/UInt"
         },
         "responder_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "responder_amount": {
           "$ref": "#/definitions/UInt"
@@ -3359,29 +3354,20 @@
           "$ref": "#/definitions/UInt"
         },
         "lock_period": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "ttl": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "fee": {
           "$ref": "#/definitions/UInt"
         },
         "nonce": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "state_hash": {
           "description": "Root hash of the channel's internal state tree",
-          "type": "string"
-        },
-        "delegate_ids": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+          "$ref": "#/definitions/EncodedHash"
         }
       },
       "required": [
@@ -3400,33 +3386,30 @@
       "type": "object",
       "properties": {
         "channel_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "from_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "amount": {
           "$ref": "#/definitions/UInt"
         },
         "ttl": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "fee": {
           "$ref": "#/definitions/UInt"
         },
         "nonce": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "state_hash": {
           "description": "Root hash of the channel's internal state tree after the deposit had been applied to it",
-          "type": "string"
+          "$ref": "#/definitions/EncodedHash"
         },
         "round": {
           "description": "Channel's next round",
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         }
       },
       "required": [
@@ -3443,33 +3426,30 @@
       "type": "object",
       "properties": {
         "channel_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "to_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "amount": {
           "$ref": "#/definitions/UInt"
         },
         "ttl": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "fee": {
           "$ref": "#/definitions/UInt"
         },
         "nonce": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "state_hash": {
           "description": "Root hash of the channel's internal state tree after the withdraw had been applied to it",
-          "type": "string"
+          "$ref": "#/definitions/EncodedHash"
         },
         "round": {
           "description": "Channel's next round",
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         }
       },
       "required": [
@@ -3486,18 +3466,17 @@
       "type": "object",
       "properties": {
         "channel_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "from_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "payload": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedByteArray"
         },
         "round": {
           "description": "Channel's next round",
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "update": {
           "description": "Update to be applied. Must be a OffChainCallContract",
@@ -3505,22 +3484,20 @@
         },
         "state_hash": {
           "description": "Channel's next state_hash",
-          "type": "string"
+          "$ref": "#/definitions/EncodedHash"
         },
         "ttl": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "fee": {
           "$ref": "#/definitions/UInt"
         },
         "nonce": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "offchain_trees": {
           "description": "The whole set of off-chain state trees",
-          "type": "string"
+          "$ref": "#/definitions/EncodedByteArray"
         }
       },
       "required": [
@@ -3537,10 +3514,10 @@
       "type": "object",
       "properties": {
         "channel_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "from_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "initiator_amount_final": {
           "$ref": "#/definitions/UInt"
@@ -3549,16 +3526,13 @@
           "$ref": "#/definitions/UInt"
         },
         "ttl": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "fee": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "nonce": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         }
       },
       "required": [
@@ -3574,28 +3548,26 @@
       "type": "object",
       "properties": {
         "channel_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "from_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "payload": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedByteArray"
         },
         "ttl": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "fee": {
           "$ref": "#/definitions/UInt"
         },
         "nonce": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "poi": {
           "description": "Proof of inclusion containing information for closing the channel",
-          "type": "string"
+          "$ref": "#/definitions/EncodedByteArray"
         }
       },
       "required": [
@@ -3610,28 +3582,26 @@
       "type": "object",
       "properties": {
         "channel_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "from_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "payload": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedByteArray"
         },
         "ttl": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "fee": {
           "$ref": "#/definitions/UInt"
         },
         "nonce": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "poi": {
           "description": "Proof of inclusion containing information for closing the channel",
-          "type": "string"
+          "$ref": "#/definitions/EncodedByteArray"
         }
       },
       "required": [
@@ -3646,10 +3616,10 @@
       "type": "object",
       "properties": {
         "channel_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "from_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "initiator_amount_final": {
           "$ref": "#/definitions/UInt"
@@ -3658,15 +3628,13 @@
           "$ref": "#/definitions/UInt"
         },
         "ttl": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "fee": {
           "$ref": "#/definitions/UInt"
         },
         "nonce": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         }
       },
       "required": [
@@ -3682,24 +3650,22 @@
       "type": "object",
       "properties": {
         "channel_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "from_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "payload": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedByteArray"
         },
         "ttl": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "fee": {
           "$ref": "#/definitions/UInt"
         },
         "nonce": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         }
       },
       "required": [
@@ -3709,11 +3675,48 @@
         "fee"
       ]
     },
+    "ChannelSetDelegatesTx": {
+      "type": "object",
+      "properties": {
+        "channel_id": {
+          "$ref": "#/definitions/EncodedPubkey"
+        },
+        "from_id": {
+          "$ref": "#/definitions/EncodedPubkey"
+        },
+        "state_hash": {
+          "$ref": "#/definitions/EncodedHash"
+        },
+        "round": {
+          "$ref": "#/definitions/UInt64"
+        },
+        "payload": {
+          "$ref": "#/definitions/EncodedByteArray"
+        },
+        "ttl": {
+          "$ref": "#/definitions/UInt64"
+        },
+        "fee": {
+          "$ref": "#/definitions/UInt"
+        },
+        "nonce": {
+          "$ref": "#/definitions/UInt64"
+        }
+      },
+      "required": [
+        "channel_id",
+        "from_id",
+        "state_hash",
+        "round",
+        "payload",
+        "fee"
+      ]
+    },
     "PeerPubKey": {
       "type": "object",
       "properties": {
         "pubkey": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         }
       },
       "required": [
@@ -3724,7 +3727,7 @@
       "type": "object",
       "properties": {
         "pub_key": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         }
       },
       "required": [
@@ -3735,15 +3738,13 @@
       "type": "object",
       "properties": {
         "genesis_key_block_hash": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedHash"
         },
         "solutions": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "difficulty": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "syncing": {
           "type": "boolean"
@@ -3751,8 +3752,8 @@
         "sync_progress": {
           "type": "number",
           "format": "float",
-          "minimum": 0,
-          "maximum": 100
+          "minimum": 0.0,
+          "maximum": 100.0
         },
         "listening": {
           "type": "boolean"
@@ -3770,25 +3771,25 @@
           "type": "string"
         },
         "peer_count": {
-          "type": "integer",
-          "format": "uint32"
+          "$ref": "#/definitions/UInt32"
+        },
+        "peer_connections": {
+          "$ref": "#/definitions/PeerConnections"
         },
         "pending_transactions_count": {
-          "type": "integer",
-          "format": "uint32"
+          "$ref": "#/definitions/UInt32"
         },
         "network_id": {
           "type": "string"
         },
         "peer_pubkey": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "top_key_block_hash": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedHash"
         },
         "top_block_height": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         }
       },
       "required": [
@@ -3801,6 +3802,7 @@
         "node_version",
         "node_revision",
         "peer_count",
+        "peer_connections",
         "pending_transactions_count",
         "network_id",
         "peer_pubkey",
@@ -3812,17 +3814,97 @@
       "type": "object",
       "properties": {
         "version": {
-          "type": "integer",
-          "format": "uint32"
+          "description": "Protocol version (can include protocol activated by miner signalling)",
+          "$ref": "#/definitions/UInt32"
         },
         "effective_at_height": {
-          "type": "integer",
-          "format": "uint64"
+          "description": "Height at which protocol becomes active",
+          "$ref": "#/definitions/UInt64"
         }
       },
       "required": [
         "version",
         "effective_at_height"
+      ]
+    },
+    "PeerConnections": {
+      "type": "object",
+      "properties": {
+        "inbound": {
+          "description": "Number of inbound peer connections",
+          "$ref": "#/definitions/UInt32"
+        },
+        "outbound": {
+          "description": "Number of outbound peer connections",
+          "$ref": "#/definitions/UInt32"
+        }
+      },
+      "required": [
+        "inbound",
+        "outbound"
+      ]
+    },
+    "NetworkStatus": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/PeerDetails"
+      }
+    },
+    "PeerDetails": {
+      "type": "object",
+      "properties": {
+        "host": {
+          "description": "Hostname of peer",
+          "type": "string"
+        },
+        "port": {
+          "description": "Port of peer",
+          "$ref": "#/definitions/UInt32"
+        },
+        "first_seen": {
+          "description": "Unix timestamp of when the peer was first pinged",
+          "$ref": "#/definitions/UInt32"
+        },
+        "last_seen": {
+          "description": "Unix timestamp of when the peer was last pinged",
+          "$ref": "#/definitions/UInt32"
+        },
+        "genesis_hash": {
+          "description": "The genesis hash the remote node reports",
+          "$ref": "#/definitions/EncodedHash"
+        },
+        "top_hash": {
+          "description": "The top hash the remote node reports",
+          "$ref": "#/definitions/EncodedHash"
+        },
+        "top_difficulty": {
+          "description": "The total top difficulty the node reports",
+          "$ref": "#/definitions/UInt64"
+        },
+        "network_id": {
+          "type": "string"
+        },
+        "node_version": {
+          "type": "string"
+        },
+        "node_revision": {
+          "type": "string"
+        },
+        "node_vendor": {
+          "type": "string"
+        },
+        "node_os": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "host",
+        "port",
+        "first_seen",
+        "last_seen",
+        "genesis_hash",
+        "top_hash",
+        "top_difficulty"
       ]
     },
     "GenericSignedTx": {
@@ -3832,20 +3914,20 @@
           "$ref": "#/definitions/GenericTx"
         },
         "block_height": {
-          "$ref": "#/definitions/UInt"
+          "$ref": "#/definitions/TxBlockHeight"
         },
         "block_hash": {
           "description": "Value \"none\" means no block in the chain includes the transaction",
-          "type": "string"
+          "$ref": "#/definitions/EncodedHash"
         },
         "hash": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedHash"
         },
         "signatures": {
           "description": "At least one signature is required unless for Generalized Account Meta transactions",
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "#/definitions/EncodedValue"
           }
         }
       },
@@ -3861,8 +3943,7 @@
       "discriminator": "type",
       "properties": {
         "version": {
-          "type": "integer",
-          "format": "uint32"
+          "$ref": "#/definitions/UInt32"
         },
         "type": {
           "type": "string"
@@ -4003,7 +4084,7 @@
         }
       ]
     },
-    "OracleRespondTxJSON": {
+    "OracleResponseTxJSON": {
       "allOf": [
         {
           "$ref": "#/definitions/GenericTx"
@@ -4121,25 +4202,22 @@
       "type": "object",
       "properties": {
         "caller_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "caller_nonce": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "height": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "contract_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "gas_price": {
           "$ref": "#/definitions/UInt"
         },
         "gas_used": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "log": {
           "type": "array",
@@ -4148,7 +4226,7 @@
           }
         },
         "return_value": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedByteArray"
         },
         "return_type": {
           "description": "The status of the call 'ok | error | revert'.",
@@ -4171,21 +4249,19 @@
       "type": "object",
       "properties": {
         "caller_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "height": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "gas_price": {
           "$ref": "#/definitions/UInt"
         },
         "gas_used": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "return_value": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedByteArray"
         },
         "return_type": {
           "description": "The status of the call 'ok | error'.",
@@ -4209,7 +4285,7 @@
       "properties": {
         "address": {
           "description": "Contract address",
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "topics": {
           "description": "Event topics",
@@ -4220,7 +4296,7 @@
         },
         "data": {
           "description": "Log event data (as contract byte array).",
-          "type": "string"
+          "$ref": "#/definitions/EncodedByteArray"
         }
       },
       "required": [
@@ -4244,18 +4320,16 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "owner_id": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "vm_version": {
-          "type": "integer",
-          "format": "uint16"
+          "$ref": "#/definitions/UInt16"
         },
         "abi_version": {
-          "type": "integer",
-          "format": "uint16"
+          "$ref": "#/definitions/UInt16"
         },
         "active": {
           "type": "boolean"
@@ -4263,12 +4337,11 @@
         "referrer_ids": {
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "#/definitions/EncodedPubkey"
           }
         },
         "deposit": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         }
       },
       "required": [
@@ -4281,33 +4354,11 @@
         "deposit"
       ]
     },
-    "ContractStore": {
-      "type": "object",
-      "properties": {
-        "store": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "key": {
-                "type": "string"
-              },
-              "value": {
-                "type": "string"
-              }
-            }
-          }
-        }
-      },
-      "required": [
-        "store"
-      ]
-    },
     "ByteCode": {
       "type": "object",
       "properties": {
         "bytecode": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedByteArray"
         }
       },
       "required": [
@@ -4318,7 +4369,7 @@
       "type": "object",
       "properties": {
         "top": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedHash"
         },
         "accounts": {
           "type": "array",
@@ -4333,6 +4384,11 @@
           "items": {
             "$ref": "#/definitions/DryRunInputItem"
           }
+        },
+        "tx_events": {
+          "type": "boolean",
+          "default": false,
+          "description": "Collect and return on-chain tx events that would result from the call"
         }
       },
       "required": [
@@ -4343,7 +4399,7 @@
       "type": "object",
       "properties": {
         "tx": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedByteArray"
         },
         "call_req": {
           "$ref": "#/definitions/DryRunCallReq"
@@ -4354,10 +4410,10 @@
       "type": "object",
       "properties": {
         "calldata": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedByteArray"
         },
         "contract": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "amount": {
           "$ref": "#/definitions/UInt"
@@ -4366,15 +4422,13 @@
           "$ref": "#/definitions/UInt"
         },
         "caller": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "nonce": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "abi_version": {
-          "type": "integer",
-          "format": "uint16"
+          "$ref": "#/definitions/UInt16"
         },
         "context": {
           "$ref": "#/definitions/DryRunCallContext"
@@ -4388,8 +4442,11 @@
     "DryRunCallContext": {
       "type": "object",
       "properties": {
+        "tx": {
+          "$ref": "#/definitions/EncodedByteArray"
+        },
         "tx_hash": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedHash"
         },
         "stateful": {
           "description": "This call will have effects on the next call in this dry-run (or not)",
@@ -4401,7 +4458,7 @@
       "type": "object",
       "properties": {
         "pub_key": {
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "amount": {
           "$ref": "#/definitions/UInt"
@@ -4420,6 +4477,13 @@
           "description": "results",
           "items": {
             "$ref": "#/definitions/DryRunResult"
+          }
+        },
+        "tx_events": {
+          "type": "array",
+          "description": "on-chain tx events",
+          "items": {
+            "$ref": "#/definitions/TxEvent"
           }
         }
       },
@@ -4447,6 +4511,9 @@
         "type",
         "result"
       ]
+    },
+    "TxEvent": {
+      "type": "object"
     },
     "Peer": {
       "type": "string",
@@ -4480,26 +4547,23 @@
       "properties": {
         "owner_id": {
           "description": "Contract owner pub_key",
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "nonce": {
           "description": "Owner's nonce",
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "code": {
           "description": "Contract's code",
-          "type": "string"
+          "$ref": "#/definitions/EncodedByteArray"
         },
         "vm_version": {
           "description": "Virtual machine's version",
-          "type": "integer",
-          "format": "uint16"
+          "$ref": "#/definitions/UInt16"
         },
         "abi_version": {
           "description": "ABI version",
-          "type": "integer",
-          "format": "uint16"
+          "$ref": "#/definitions/UInt16"
         },
         "deposit": {
           "$ref": "#/definitions/UInt"
@@ -4508,8 +4572,7 @@
           "$ref": "#/definitions/UInt"
         },
         "gas": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "gas_price": {
           "$ref": "#/definitions/UInt"
@@ -4518,12 +4581,11 @@
           "$ref": "#/definitions/UInt"
         },
         "ttl": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "call_data": {
           "description": "Contract call data",
-          "type": "string"
+          "$ref": "#/definitions/EncodedByteArray"
         }
       },
       "required": [
@@ -4544,42 +4606,38 @@
       "properties": {
         "caller_id": {
           "description": "Contract caller pub_key",
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "nonce": {
           "description": "Caller's nonce",
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "contract_id": {
           "description": "Contract's pub_key",
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "abi_version": {
           "description": "ABI version",
-          "type": "integer",
-          "format": "uint16"
+          "$ref": "#/definitions/UInt16"
         },
         "fee": {
           "$ref": "#/definitions/UInt"
         },
         "ttl": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "amount": {
           "$ref": "#/definitions/UInt"
         },
         "gas": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "gas_price": {
           "$ref": "#/definitions/UInt"
         },
         "call_data": {
           "description": "Contract call data",
-          "type": "string"
+          "$ref": "#/definitions/EncodedByteArray"
         }
       },
       "required": [
@@ -4598,7 +4656,7 @@
       "properties": {
         "tx": {
           "description": "Unsigned transaction object",
-          "type": "string"
+          "$ref": "#/definitions/EncodedByteArray"
         }
       },
       "required": [
@@ -4610,7 +4668,7 @@
       "properties": {
         "tx_hash": {
           "description": "Hash of a signed transaction",
-          "type": "string"
+          "$ref": "#/definitions/EncodedHash"
         }
       },
       "required": [
@@ -4627,7 +4685,7 @@
           "properties": {
             "contract_id": {
               "description": "Address of the contract to be created",
-              "type": "string"
+              "$ref": "#/definitions/EncodedPubkey"
             }
           },
           "required": [
@@ -4641,7 +4699,7 @@
       "properties": {
         "poi": {
           "description": "Proof of inclusion",
-          "type": "string"
+          "$ref": "#/definitions/EncodedByteArray"
         }
       },
       "required": [
@@ -4657,7 +4715,7 @@
         "micro_blocks": {
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "#/definitions/EncodedPubkey"
           }
         }
       },
@@ -4688,11 +4746,11 @@
           "properties": {
             "from": {
               "description": "Sender of tokens",
-              "type": "string"
+              "$ref": "#/definitions/EncodedPubkey"
             },
             "to": {
               "description": "Receiver of tokens",
-              "type": "string"
+              "$ref": "#/definitions/EncodedPubkey"
             },
             "amount": {
               "$ref": "#/definitions/UInt"
@@ -4716,7 +4774,7 @@
           "properties": {
             "to": {
               "description": "Withdrawer of tokens",
-              "type": "string"
+              "$ref": "#/definitions/EncodedPubkey"
             },
             "amount": {
               "$ref": "#/definitions/UInt"
@@ -4739,7 +4797,7 @@
           "properties": {
             "from": {
               "description": "Depositor of tokens",
-              "type": "string"
+              "$ref": "#/definitions/EncodedPubkey"
             },
             "amount": {
               "$ref": "#/definitions/UInt"
@@ -4762,15 +4820,13 @@
           "properties": {
             "owner": {
               "description": "Contract owner",
-              "type": "string"
+              "$ref": "#/definitions/EncodedPubkey"
             },
             "vm_version": {
-              "type": "integer",
-              "format": "uint16"
+              "$ref": "#/definitions/UInt16"
             },
             "abi_version": {
-              "type": "integer",
-              "format": "uint16"
+              "$ref": "#/definitions/UInt16"
             },
             "code": {
               "$ref": "#/definitions/ByteCode"
@@ -4780,7 +4836,7 @@
             },
             "call_data": {
               "description": "Contract call data",
-              "type": "string"
+              "$ref": "#/definitions/EncodedByteArray"
             }
           },
           "required": [
@@ -4804,29 +4860,27 @@
           "properties": {
             "caller": {
               "description": "Contract caller",
-              "type": "string"
+              "$ref": "#/definitions/EncodedPubkey"
             },
             "contract": {
               "description": "Contract address",
-              "type": "string"
+              "$ref": "#/definitions/EncodedPubkey"
             },
             "abi_version": {
-              "type": "integer",
-              "format": "uint16"
+              "$ref": "#/definitions/UInt16"
             },
             "amount": {
               "$ref": "#/definitions/UInt"
             },
             "gas": {
-              "type": "integer",
-              "format": "uint64"
+              "$ref": "#/definitions/UInt64"
             },
             "gas_price": {
               "$ref": "#/definitions/UInt"
             },
             "call_data": {
               "description": "Contract call data",
-              "type": "string"
+              "$ref": "#/definitions/EncodedByteArray"
             }
           },
           "required": [
@@ -4883,30 +4937,26 @@
       "properties": {
         "owner_id": {
           "description": "Contract owner pub_key",
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "nonce": {
           "description": "Owner's nonce",
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "code": {
           "description": "Contract's code",
-          "type": "string"
+          "$ref": "#/definitions/EncodedByteArray"
         },
         "vm_version": {
           "description": "Virtual machine's version",
-          "type": "integer",
-          "format": "uint16"
+          "$ref": "#/definitions/UInt16"
         },
         "abi_version": {
           "description": "ABI version",
-          "type": "integer",
-          "format": "uint16"
+          "$ref": "#/definitions/UInt16"
         },
         "gas": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "gas_price": {
           "$ref": "#/definitions/UInt"
@@ -4915,12 +4965,11 @@
           "$ref": "#/definitions/UInt"
         },
         "ttl": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "call_data": {
           "description": "Contract call data",
-          "type": "string"
+          "$ref": "#/definitions/EncodedByteArray"
         },
         "auth_fun": {
           "description": "Contract authorization function hash (hex encoded)",
@@ -4945,16 +4994,14 @@
       "properties": {
         "ga_id": {
           "description": "Account owner pub_key",
-          "type": "string"
+          "$ref": "#/definitions/EncodedPubkey"
         },
         "abi_version": {
           "description": "ABI version",
-          "type": "integer",
-          "format": "uint16"
+          "$ref": "#/definitions/UInt16"
         },
         "gas": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "gas_price": {
           "$ref": "#/definitions/UInt"
@@ -4963,12 +5010,11 @@
           "$ref": "#/definitions/UInt"
         },
         "ttl": {
-          "type": "integer",
-          "format": "uint64"
+          "$ref": "#/definitions/UInt64"
         },
         "auth_data": {
           "description": "Contract authorization function call data",
-          "type": "string"
+          "$ref": "#/definitions/EncodedByteArray"
         },
         "tx": {
           "description": "Enclosed signed transaction",
@@ -4984,6 +5030,25 @@
         "auth_data",
         "tx"
       ]
+    },
+    "DelegatesList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/EncodedPubkey"
+      }
+    },
+    "DelegatesObject": {
+      "type": "object",
+      "properties": {
+        "initiator": {
+          "description": "Initiator's delegates",
+          "$ref": "#/definitions/DelegatesList"
+        },
+        "responder": {
+          "description": "Responder's delegates",
+          "$ref": "#/definitions/DelegatesList"
+        }
+      }
     }
   },
   "externalDocs": {

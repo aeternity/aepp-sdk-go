@@ -1,851 +1,1027 @@
 {
-    "basePath": "/",
-    "definitions": {
-        "ACI": {
-            "example": {
-                "encoded_aci": "{}",
-                "interface": "interface"
-            },
-            "properties": {
-                "encoded_aci": {
-                    "properties": {},
-                    "type": "object"
-                },
-                "interface": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "encoded_aci",
-                "interface"
-            ],
+  "basePath": "/",
+  "definitions": {
+    "ACI": {
+      "example": {
+        "encoded_aci": "{}",
+        "external_encoded_aci": "",
+        "interface": "interface"
+      },
+      "properties": {
+        "encoded_aci": {
+          "properties": {},
+          "type": "object"
+        },
+        "external_encoded_aci": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        "interface": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "encoded_aci",
+        "interface"
+      ],
+      "type": "object"
+    },
+    "API": {
+      "description": "Swagger API description",
+      "type": "object"
+    },
+    "APIVersion": {
+      "example": {
+        "api-version": "api-version"
+      },
+      "properties": {
+        "api-version": {
+          "description": "API compiler version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "api-version"
+      ],
+      "type": "object"
+    },
+    "ByteCode": {
+      "example": {
+        "bytecode": {}
+      },
+      "properties": {
+        "bytecode": {
+          "$ref": "#/definitions/EncodedByteArray"
+        }
+      },
+      "required": [
+        "bytecode"
+      ],
+      "type": "object"
+    },
+    "ByteCodeInput": {
+      "example": {
+        "bytecode": {}
+      },
+      "properties": {
+        "bytecode": {
+          "$ref": "#/definitions/EncodedByteArray",
+          "description": "Compiled contract"
+        }
+      },
+      "required": [
+        "bytecode"
+      ],
+      "type": "object"
+    },
+    "BytecodeCallResultInput": {
+      "example": {
+        "backend": "fate",
+        "bytecode": {},
+        "call-result": "call-result",
+        "call-value": "call-value",
+        "function": "function"
+      },
+      "properties": {
+        "backend": {
+          "description": "Compiler backend; fate | aevm",
+          "enum": [
+            "fate",
+            "aevm"
+          ],
+          "type": "string"
+        },
+        "bytecode": {
+          "$ref": "#/definitions/EncodedByteArray",
+          "description": "Compiled contract"
+        },
+        "call-result": {
+          "description": "Call result type (ok | revert | error)",
+          "type": "string"
+        },
+        "call-value": {
+          "description": "Call result value (ABI encoded data or error string)",
+          "type": "string"
+        },
+        "function": {
+          "description": "Name of the called function",
+          "type": "string"
+        }
+      },
+      "required": [
+        "bytecode",
+        "call-result",
+        "call-value",
+        "function"
+      ],
+      "type": "object"
+    },
+    "Calldata": {
+      "example": {
+        "calldata": {}
+      },
+      "properties": {
+        "calldata": {
+          "$ref": "#/definitions/EncodedByteArray"
+        }
+      },
+      "required": [
+        "calldata"
+      ],
+      "type": "object"
+    },
+    "CompileOpts": {
+      "example": {
+        "backend": "fate",
+        "file_system": "{}",
+        "src_file": "src_file"
+      },
+      "properties": {
+        "backend": {
+          "description": "Compiler backend; fate | aevm",
+          "enum": [
+            "fate",
+            "aevm"
+          ],
+          "type": "string"
+        },
+        "file_system": {
+          "description": "An explicit file system, mapping file names to file content",
+          "properties": {},
+          "type": "object"
+        },
+        "src_file": {
+          "description": "Name of contract source file - only used in error messages",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "CompilerError": {
+      "properties": {
+        "context": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "pos": {
+          "$ref": "#/definitions/ErrorPos"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "message",
+        "pos",
+        "type"
+      ],
+      "type": "object"
+    },
+    "CompilerErrors": {
+      "items": {
+        "$ref": "#/definitions/CompilerError"
+      },
+      "type": "array"
+    },
+    "CompilerVersion": {
+      "example": {
+        "version": "version"
+      },
+      "properties": {
+        "version": {
+          "description": "Sophia compiler version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "version"
+      ],
+      "type": "object"
+    },
+    "Contract": {
+      "example": {
+        "code": "code",
+        "options": {
+          "backend": "fate",
+          "file_system": "{}",
+          "src_file": "src_file"
+        }
+      },
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "options": {
+          "$ref": "#/definitions/CompileOpts"
+        }
+      },
+      "required": [
+        "code",
+        "options"
+      ],
+      "type": "object"
+    },
+    "DecodeCalldataBytecode": {
+      "example": {
+        "backend": "fate",
+        "bytecode": null,
+        "calldata": {}
+      },
+      "properties": {
+        "backend": {
+          "description": "Compiler backend; fate | aevm",
+          "enum": [
+            "fate",
+            "aevm"
+          ],
+          "type": "string"
+        },
+        "bytecode": {
+          "$ref": "#/definitions/EncodedByteArray",
+          "description": "Compiled contract"
+        },
+        "calldata": {
+          "$ref": "#/definitions/EncodedByteArray",
+          "description": "Calldata to dissect"
+        }
+      },
+      "required": [
+        "bytecode",
+        "calldata"
+      ],
+      "type": "object"
+    },
+    "DecodeCalldataSource": {
+      "example": {
+        "calldata": {},
+        "function": "function",
+        "options": {
+          "backend": "fate",
+          "file_system": "{}",
+          "src_file": "src_file"
+        },
+        "source": "source"
+      },
+      "properties": {
+        "calldata": {
+          "$ref": "#/definitions/EncodedByteArray",
+          "description": "Calldata to dissect"
+        },
+        "function": {
+          "description": "Name of the function to call",
+          "type": "string"
+        },
+        "options": {
+          "$ref": "#/definitions/CompileOpts"
+        },
+        "source": {
+          "description": "(Possibly partial) Sophia contract code",
+          "type": "string"
+        }
+      },
+      "required": [
+        "calldata",
+        "function",
+        "source"
+      ],
+      "type": "object"
+    },
+    "DecodedCalldata": {
+      "example": {
+        "arguments": [
+          "{}",
+          "{}"
+        ],
+        "function": "function"
+      },
+      "properties": {
+        "arguments": {
+          "items": {
+            "properties": {},
             "type": "object"
+          },
+          "type": "array"
         },
-        "API": {
-            "description": "Swagger API description",
-            "type": "object"
+        "function": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "arguments",
+        "function"
+      ],
+      "type": "object"
+    },
+    "DecodedCallresult": {
+      "example": {
+        "function": "function",
+        "result": "{}"
+      },
+      "properties": {
+        "function": {
+          "type": "string"
         },
-        "APIVersion": {
-            "example": {
-                "api-version": "api-version"
-            },
-            "properties": {
-                "api-version": {
-                    "description": "API compiler version",
-                    "type": "string"
-                }
-            },
-            "required": [
-                "api-version"
-            ],
-            "type": "object"
+        "result": {
+          "properties": {},
+          "type": "object"
+        }
+      },
+      "required": [
+        "function",
+        "result"
+      ],
+      "type": "object"
+    },
+    "EncodedByteArray": {
+      "description": "Prefixed (cb_) Base64Check encoded byte array",
+      "type": "string"
+    },
+    "Error": {
+      "properties": {
+        "reason": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "reason"
+      ],
+      "type": "object"
+    },
+    "ErrorPos": {
+      "properties": {
+        "col": {
+          "type": "integer"
         },
-        "ByteCode": {
-            "example": {
-                "bytecode": {}
-            },
-            "properties": {
-                "bytecode": {
-                    "$ref": "#/definitions/EncodedByteArray"
-                }
-            },
-            "required": [
-                "bytecode"
-            ],
-            "type": "object"
+        "file": {
+          "type": "string"
         },
-        "BytecodeCallResultInput": {
-            "example": {
-                "backend": "fate",
-                "bytecode": {},
-                "call-result": "call-result",
-                "call-value": "call-value",
-                "function": "function"
-            },
-            "properties": {
-                "backend": {
-                    "description": "Compiler backend; fate | aevm",
-                    "enum": [
-                        "fate",
-                        "aevm"
-                    ],
-                    "type": "string"
-                },
-                "bytecode": {
-                    "$ref": "#/definitions/EncodedByteArray",
-                    "description": "Compiled contract"
-                },
-                "call-result": {
-                    "description": "Call result type (ok | revert | error)",
-                    "type": "string"
-                },
-                "call-value": {
-                    "description": "Call result value (ABI encoded data or error string)",
-                    "type": "string"
-                },
-                "function": {
-                    "description": "Name of the called function",
-                    "type": "string"
-                }
-            },
-            "required": [
-                "bytecode",
-                "call-result",
-                "call-value",
-                "function"
-            ],
-            "type": "object"
+        "line": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "col",
+        "line"
+      ],
+      "type": "object"
+    },
+    "FateAssembler": {
+      "example": {
+        "fate-assembler": "fate-assembler"
+      },
+      "properties": {
+        "fate-assembler": {
+          "description": "Fate assembler code",
+          "type": "string"
+        }
+      },
+      "required": [
+        "fate-assembler"
+      ],
+      "type": "object"
+    },
+    "FunctionCallInput": {
+      "example": {
+        "arguments": [
+          "arguments",
+          "arguments"
+        ],
+        "function": "function",
+        "options": {
+          "backend": "fate",
+          "file_system": "{}",
+          "src_file": "src_file"
         },
-        "Calldata": {
-            "example": {
-                "calldata": {}
-            },
-            "properties": {
-                "calldata": {
-                    "$ref": "#/definitions/EncodedByteArray"
-                }
-            },
-            "required": [
-                "calldata"
-            ],
-            "type": "object"
-        },
-        "CompileOpts": {
-            "example": {
-                "backend": "fate",
-                "file_system": "{}",
-                "src_file": "src_file"
-            },
-            "properties": {
-                "backend": {
-                    "description": "Compiler backend; fate | aevm",
-                    "enum": [
-                        "fate",
-                        "aevm"
-                    ],
-                    "type": "string"
-                },
-                "file_system": {
-                    "description": "An explicit file system, mapping file names to file content",
-                    "properties": {},
-                    "type": "object"
-                },
-                "src_file": {
-                    "description": "Name of contract source file - only used in error messages",
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
-        "CompilerError": {
-            "properties": {
-                "context": {
-                    "type": "string"
-                },
-                "message": {
-                    "type": "string"
-                },
-                "pos": {
-                    "$ref": "#/definitions/ErrorPos"
-                },
-                "type": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "message",
-                "pos",
-                "type"
-            ],
-            "type": "object"
-        },
-        "CompilerErrors": {
-            "items": {
-                "$ref": "#/definitions/CompilerError"
-            },
-            "type": "array"
-        },
-        "CompilerVersion": {
-            "example": {
-                "version": "version"
-            },
-            "properties": {
-                "version": {
-                    "description": "Sophia compiler version",
-                    "type": "string"
-                }
-            },
-            "required": [
-                "version"
-            ],
-            "type": "object"
-        },
-        "Contract": {
-            "example": {
-                "code": "code",
-                "options": {
-                    "backend": "fate",
-                    "file_system": "{}",
-                    "src_file": "src_file"
-                }
-            },
-            "properties": {
-                "code": {
-                    "type": "string"
-                },
-                "options": {
-                    "$ref": "#/definitions/CompileOpts"
-                }
-            },
-            "required": [
-                "code",
-                "options"
-            ],
-            "type": "object"
-        },
-        "DecodeCalldataBytecode": {
-            "example": {
-                "backend": "fate",
-                "bytecode": null,
-                "calldata": {}
-            },
-            "properties": {
-                "backend": {
-                    "description": "Compiler backend; fate | aevm",
-                    "enum": [
-                        "fate",
-                        "aevm"
-                    ],
-                    "type": "string"
-                },
-                "bytecode": {
-                    "$ref": "#/definitions/EncodedByteArray",
-                    "description": "Compiled contract"
-                },
-                "calldata": {
-                    "$ref": "#/definitions/EncodedByteArray",
-                    "description": "Calldata to dissect"
-                }
-            },
-            "required": [
-                "bytecode",
-                "calldata"
-            ],
-            "type": "object"
-        },
-        "DecodeCalldataSource": {
-            "example": {
-                "calldata": {},
-                "function": "function",
-                "options": {
-                    "backend": "fate",
-                    "file_system": "{}",
-                    "src_file": "src_file"
-                },
-                "source": "source"
-            },
-            "properties": {
-                "calldata": {
-                    "$ref": "#/definitions/EncodedByteArray",
-                    "description": "Calldata to dissect"
-                },
-                "function": {
-                    "description": "Name of the function to call",
-                    "type": "string"
-                },
-                "options": {
-                    "$ref": "#/definitions/CompileOpts"
-                },
-                "source": {
-                    "description": "(Possibly partial) Sophia contract code",
-                    "type": "string"
-                }
-            },
-            "required": [
-                "calldata",
-                "function",
-                "source"
-            ],
-            "type": "object"
-        },
-        "DecodedCalldata": {
-            "example": {
-                "arguments": [
-                    "{}",
-                    "{}"
-                ],
-                "function": "function"
-            },
-            "properties": {
-                "arguments": {
-                    "items": {
-                        "properties": {},
-                        "type": "object"
-                    },
-                    "type": "array"
-                },
-                "function": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "arguments",
-                "function"
-            ],
-            "type": "object"
-        },
-        "DecodedCallresult": {
-            "example": {
-                "function": "function",
-                "result": "{}"
-            },
-            "properties": {
-                "function": {
-                    "type": "string"
-                },
-                "result": {
-                    "properties": {},
-                    "type": "object"
-                }
-            },
-            "required": [
-                "function",
-                "result"
-            ],
-            "type": "object"
-        },
-        "EncodedByteArray": {
-            "description": "Prefixed (cb_) Base64Check encoded byte array",
+        "source": "source"
+      },
+      "properties": {
+        "arguments": {
+          "description": "Array of function call arguments",
+          "items": {
             "type": "string"
+          },
+          "type": "array"
         },
-        "Error": {
-            "properties": {
-                "reason": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "reason"
-            ],
-            "type": "object"
+        "function": {
+          "description": "Name of function to call",
+          "type": "string"
         },
-        "ErrorPos": {
-            "properties": {
-                "col": {
-                    "type": "integer"
-                },
-                "file": {
-                    "type": "string"
-                },
-                "line": {
-                    "type": "integer"
-                }
-            },
-            "required": [
-                "col",
-                "line"
-            ],
-            "type": "object"
+        "options": {
+          "$ref": "#/definitions/CompileOpts"
         },
-        "FunctionCallInput": {
-            "example": {
-                "arguments": [
-                    "arguments",
-                    "arguments"
-                ],
-                "function": "function",
-                "options": {
-                    "backend": "fate",
-                    "file_system": "{}",
-                    "src_file": "src_file"
-                },
-                "source": "source"
-            },
-            "properties": {
-                "arguments": {
-                    "description": "Array of function call arguments",
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
-                },
-                "function": {
-                    "description": "Name of function to call",
-                    "type": "string"
-                },
-                "options": {
-                    "$ref": "#/definitions/CompileOpts"
-                },
-                "source": {
-                    "description": "(Possibly partial) Sophia contract code",
-                    "type": "string"
-                }
-            },
-            "required": [
-                "arguments",
-                "function",
-                "source"
-            ],
-            "type": "object"
-        },
-        "SophiaBinaryData": {
-            "example": {
-                "data": "data",
-                "sophia-type": "sophia-type"
-            },
-            "properties": {
-                "data": {
-                    "type": "string"
-                },
-                "sophia-type": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "data",
-                "sophia-type"
-            ],
-            "type": "object"
-        },
-        "SophiaCallResult": {},
-        "SophiaCallResultInput": {
-            "example": {
-                "call-result": "call-result",
-                "call-value": "call-value",
-                "function": "function",
-                "options": {
-                    "backend": "fate",
-                    "file_system": "{}",
-                    "src_file": "src_file"
-                },
-                "source": "source"
-            },
-            "properties": {
-                "call-result": {
-                    "description": "Call result type (ok | revert | error)",
-                    "type": "string"
-                },
-                "call-value": {
-                    "description": "Call result value (ABI encoded data or error string)",
-                    "type": "string"
-                },
-                "function": {
-                    "description": "Name of the called function",
-                    "type": "string"
-                },
-                "options": {
-                    "$ref": "#/definitions/CompileOpts"
-                },
-                "source": {
-                    "description": "(Possibly partial) Sophia contract code/interface",
-                    "type": "string"
-                }
-            },
-            "required": [
-                "call-result",
-                "call-value",
-                "function",
-                "source"
-            ],
-            "type": "object"
-        },
-        "SophiaJsonData": {
-            "example": {
-                "data": "{}"
-            },
-            "properties": {
-                "data": {
-                    "properties": {},
-                    "type": "object"
-                }
-            },
-            "required": [
-                "data"
-            ],
-            "type": "object"
+        "source": {
+          "description": "(Possibly partial) Sophia contract code",
+          "type": "string"
         }
+      },
+      "required": [
+        "arguments",
+        "function",
+        "source"
+      ],
+      "type": "object"
     },
-    "info": {
-        "contact": {
-            "email": "apiteam@aeternity.com"
+    "SophiaBinaryData": {
+      "example": {
+        "data": "data",
+        "sophia-type": "sophia-type"
+      },
+      "properties": {
+        "data": {
+          "type": "string"
         },
-        "description": "This is the [Aeternity](https://www.aeternity.com/) compiler API.",
-        "termsOfService": "https://www.aeternity.com/terms/",
-        "title": "Aeternity node",
-        "version": "4.0.0-rc5"
-    },
-    "paths": {
-        "/aci": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "description": "Generate an Aeternity Contract Interface (ACI) for contract",
-                "operationId": "GenerateACI",
-                "parameters": [
-                    {
-                        "description": "contract code",
-                        "in": "body",
-                        "name": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/Contract"
-                        }
-                    }
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "ACI for contract",
-                        "schema": {
-                            "$ref": "#/definitions/ACI"
-                        }
-                    },
-                    "400": {
-                        "description": "Compiler errors",
-                        "schema": {
-                            "$ref": "#/definitions/CompilerErrors"
-                        }
-                    }
-                }
-            }
-        },
-        "/api": {
-            "get": {
-                "description": "Get the Api description",
-                "operationId": "Api",
-                "parameters": [],
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "API description",
-                        "schema": {
-                            "$ref": "#/definitions/API"
-                        }
-                    },
-                    "400": {
-                        "description": "Error",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/api-version": {
-            "get": {
-                "description": "Get the version of the API",
-                "operationId": "APIVersion",
-                "parameters": [],
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Sophia compiler version",
-                        "schema": {
-                            "$ref": "#/definitions/APIVersion"
-                        }
-                    },
-                    "500": {
-                        "description": "Error",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/compile": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "description": "Compile a sophia contract from source and return byte code",
-                "operationId": "CompileContract",
-                "parameters": [
-                    {
-                        "description": "contract code",
-                        "in": "body",
-                        "name": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/Contract"
-                        }
-                    }
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Byte code response",
-                        "schema": {
-                            "$ref": "#/definitions/ByteCode"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid contract",
-                        "schema": {
-                            "$ref": "#/definitions/CompilerErrors"
-                        }
-                    }
-                }
-            }
-        },
-        "/decode-call-result": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "description": "Decode the result of contract call",
-                "operationId": "DecodeCallResult",
-                "parameters": [
-                    {
-                        "description": "Binary data in Sophia ABI format",
-                        "in": "body",
-                        "name": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/SophiaCallResultInput"
-                        }
-                    }
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Json encoded data",
-                        "schema": {
-                            "$ref": "#/definitions/SophiaCallResult"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid data",
-                        "schema": {
-                            "$ref": "#/definitions/CompilerErrors"
-                        }
-                    }
-                }
-            }
-        },
-        "/decode-call-result/bytecode": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "description": "Decode the result of contract call from Bytecode",
-                "operationId": "DecodeCallResultBytecode",
-                "parameters": [
-                    {
-                        "description": "Call result + compiled contract",
-                        "in": "body",
-                        "name": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/BytecodeCallResultInput"
-                        }
-                    }
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Json encoded data",
-                        "schema": {
-                            "$ref": "#/definitions/DecodedCallresult"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid data",
-                        "schema": {
-                            "$ref": "#/definitions/CompilerErrors"
-                        }
-                    }
-                }
-            }
-        },
-        "/decode-calldata/bytecode": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "description": "Identify function name and arguments in Calldata for a compiled contract",
-                "operationId": "DecodeCalldataBytecode",
-                "parameters": [
-                    {
-                        "description": "Calldata + compiled contract",
-                        "in": "body",
-                        "name": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/DecodeCalldataBytecode"
-                        }
-                    }
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Binary encoded calldata",
-                        "schema": {
-                            "$ref": "#/definitions/DecodedCalldata"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid contract",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/decode-calldata/source": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "description": "Identify function name and arguments in Calldata for a (partial) contract",
-                "operationId": "DecodeCalldataSource",
-                "parameters": [
-                    {
-                        "description": "Calldata + contract (stub) code",
-                        "in": "body",
-                        "name": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/DecodeCalldataSource"
-                        }
-                    }
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Binary encoded calldata",
-                        "schema": {
-                            "$ref": "#/definitions/DecodedCalldata"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid data",
-                        "schema": {
-                            "$ref": "#/definitions/CompilerErrors"
-                        }
-                    }
-                }
-            }
-        },
-        "/decode-data": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "description": "Decode data as retuned by a contract call. - Legacy decoding",
-                "operationId": "DecodeData",
-                "parameters": [
-                    {
-                        "description": "Binary data in Sophia ABI format",
-                        "in": "body",
-                        "name": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/SophiaBinaryData"
-                        }
-                    }
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Json encoded data",
-                        "schema": {
-                            "$ref": "#/definitions/SophiaJsonData"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid data",
-                        "schema": {
-                            "$ref": "#/definitions/CompilerErrors"
-                        }
-                    }
-                }
-            }
-        },
-        "/encode-calldata": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "description": "Encode Sophia function call according to sophia ABI.",
-                "operationId": "EncodeCalldata",
-                "parameters": [
-                    {
-                        "description": "Sophia function call - contract code + function name + arguments",
-                        "in": "body",
-                        "name": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/FunctionCallInput"
-                        }
-                    }
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Binary encoded calldata",
-                        "schema": {
-                            "$ref": "#/definitions/Calldata"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid contract",
-                        "schema": {
-                            "$ref": "#/definitions/CompilerErrors"
-                        }
-                    }
-                }
-            }
-        },
-        "/version": {
-            "get": {
-                "description": "Get the version of the underlying Sophia compiler version",
-                "operationId": "Version",
-                "parameters": [],
-                "produces": [
-                    "application/json"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Sophia compiler version",
-                        "schema": {
-                            "$ref": "#/definitions/CompilerVersion"
-                        }
-                    },
-                    "500": {
-                        "description": "Error",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    }
-                }
-            }
+        "sophia-type": {
+          "type": "string"
         }
+      },
+      "required": [
+        "data",
+        "sophia-type"
+      ],
+      "type": "object"
     },
-    "schemes": [
-        "http"
-    ],
-    "swagger": "2.0"
+    "SophiaCallResult": {},
+    "SophiaCallResultInput": {
+      "example": {
+        "call-result": "call-result",
+        "call-value": "call-value",
+        "function": "function",
+        "options": {
+          "backend": "fate",
+          "file_system": "{}",
+          "src_file": "src_file"
+        },
+        "source": "source"
+      },
+      "properties": {
+        "call-result": {
+          "description": "Call result type (ok | revert | error)",
+          "type": "string"
+        },
+        "call-value": {
+          "description": "Call result value (ABI encoded data or error string)",
+          "type": "string"
+        },
+        "function": {
+          "description": "Name of the called function",
+          "type": "string"
+        },
+        "options": {
+          "$ref": "#/definitions/CompileOpts"
+        },
+        "source": {
+          "description": "(Possibly partial) Sophia contract code/interface",
+          "type": "string"
+        }
+      },
+      "required": [
+        "call-result",
+        "call-value",
+        "function",
+        "source"
+      ],
+      "type": "object"
+    },
+    "SophiaJsonData": {
+      "example": {
+        "data": "{}"
+      },
+      "properties": {
+        "data": {
+          "properties": {},
+          "type": "object"
+        }
+      },
+      "required": [
+        "data"
+      ],
+      "type": "object"
+    },
+    "ValidateByteCodeInput": {
+      "example": {
+        "bytecode": {},
+        "options": {
+          "backend": "fate",
+          "file_system": "{}",
+          "src_file": "src_file"
+        },
+        "source": "source"
+      },
+      "properties": {
+        "bytecode": {
+          "$ref": "#/definitions/EncodedByteArray",
+          "description": "Compiled contract"
+        },
+        "options": {
+          "$ref": "#/definitions/CompileOpts"
+        },
+        "source": {
+          "description": "Sophia contract source code",
+          "type": "string"
+        }
+      },
+      "required": [
+        "bytecode",
+        "options",
+        "source"
+      ],
+      "type": "object"
+    }
+  },
+  "info": {
+    "contact": {
+      "email": "apiteam@aeternity.com"
+    },
+    "description": "This is the [Aeternity](https://www.aeternity.com/) compiler API.",
+    "termsOfService": "https://www.aeternity.com/terms/",
+    "title": "Aeternity node",
+    "version": "4.3.2"
+  },
+  "paths": {
+    "/aci": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "description": "Generate an Aeternity Contract Interface (ACI) for contract",
+        "operationId": "GenerateACI",
+        "parameters": [
+          {
+            "description": "contract code",
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Contract"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "ACI for contract",
+            "schema": {
+              "$ref": "#/definitions/ACI"
+            }
+          },
+          "400": {
+            "description": "Compiler errors",
+            "schema": {
+              "$ref": "#/definitions/CompilerErrors"
+            }
+          }
+        }
+      }
+    },
+    "/api": {
+      "get": {
+        "description": "Get the Api description",
+        "operationId": "Api",
+        "parameters": [],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "API description",
+            "schema": {
+              "$ref": "#/definitions/API"
+            }
+          },
+          "400": {
+            "description": "Error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/api-version": {
+      "get": {
+        "description": "Get the version of the API",
+        "operationId": "APIVersion",
+        "parameters": [],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sophia compiler version",
+            "schema": {
+              "$ref": "#/definitions/APIVersion"
+            }
+          },
+          "500": {
+            "description": "Error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/compile": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "description": "Compile a sophia contract from source and return byte code",
+        "operationId": "CompileContract",
+        "parameters": [
+          {
+            "description": "contract code",
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Contract"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Byte code response",
+            "schema": {
+              "$ref": "#/definitions/ByteCode"
+            }
+          },
+          "400": {
+            "description": "Invalid contract",
+            "schema": {
+              "$ref": "#/definitions/CompilerErrors"
+            }
+          }
+        }
+      }
+    },
+    "/compiler-version": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "description": "Extract compiler version from bytecode",
+        "operationId": "GetCompilerVersion",
+        "parameters": [
+          {
+            "description": "contract byte array",
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ByteCodeInput"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "The compiler version",
+            "schema": {
+              "$ref": "#/definitions/CompilerVersion"
+            }
+          },
+          "400": {
+            "description": "Invalid data",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/decode-call-result": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "description": "Decode the result of contract call",
+        "operationId": "DecodeCallResult",
+        "parameters": [
+          {
+            "description": "Binary data in Sophia ABI format",
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/SophiaCallResultInput"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Json encoded data",
+            "schema": {
+              "$ref": "#/definitions/SophiaCallResult"
+            }
+          },
+          "400": {
+            "description": "Invalid data",
+            "schema": {
+              "$ref": "#/definitions/CompilerErrors"
+            }
+          }
+        }
+      }
+    },
+    "/decode-call-result/bytecode": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "description": "Decode the result of contract call from Bytecode",
+        "operationId": "DecodeCallResultBytecode",
+        "parameters": [
+          {
+            "description": "Call result + compiled contract",
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/BytecodeCallResultInput"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Json encoded data",
+            "schema": {
+              "$ref": "#/definitions/DecodedCallresult"
+            }
+          },
+          "400": {
+            "description": "Invalid data",
+            "schema": {
+              "$ref": "#/definitions/CompilerErrors"
+            }
+          }
+        }
+      }
+    },
+    "/decode-calldata/bytecode": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "description": "Identify function name and arguments in Calldata for a compiled contract",
+        "operationId": "DecodeCalldataBytecode",
+        "parameters": [
+          {
+            "description": "Calldata + compiled contract",
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DecodeCalldataBytecode"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Binary encoded calldata",
+            "schema": {
+              "$ref": "#/definitions/DecodedCalldata"
+            }
+          },
+          "400": {
+            "description": "Invalid contract",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/decode-calldata/source": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "description": "Identify function name and arguments in Calldata for a (partial) contract",
+        "operationId": "DecodeCalldataSource",
+        "parameters": [
+          {
+            "description": "Calldata + contract (stub) code",
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DecodeCalldataSource"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Binary encoded calldata",
+            "schema": {
+              "$ref": "#/definitions/DecodedCalldata"
+            }
+          },
+          "400": {
+            "description": "Invalid data",
+            "schema": {
+              "$ref": "#/definitions/CompilerErrors"
+            }
+          }
+        }
+      }
+    },
+    "/decode-data": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "description": "Decode data as retuned by a contract call. - Legacy decoding",
+        "operationId": "DecodeData",
+        "parameters": [
+          {
+            "description": "Binary data in Sophia ABI format",
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/SophiaBinaryData"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Json encoded data",
+            "schema": {
+              "$ref": "#/definitions/SophiaJsonData"
+            }
+          },
+          "400": {
+            "description": "Invalid data",
+            "schema": {
+              "$ref": "#/definitions/CompilerErrors"
+            }
+          }
+        }
+      }
+    },
+    "/encode-calldata": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "description": "Encode Sophia function call according to sophia ABI.",
+        "operationId": "EncodeCalldata",
+        "parameters": [
+          {
+            "description": "Sophia function call - contract code + function name + arguments",
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/FunctionCallInput"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Binary encoded calldata",
+            "schema": {
+              "$ref": "#/definitions/Calldata"
+            }
+          },
+          "400": {
+            "description": "Invalid contract",
+            "schema": {
+              "$ref": "#/definitions/CompilerErrors"
+            }
+          }
+        }
+      }
+    },
+    "/fate-assembler": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "description": "Get FATE assembler code from bytecode",
+        "operationId": "GetFateAssemblerCode",
+        "parameters": [
+          {
+            "description": "contract byte array",
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ByteCodeInput"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "The FATE assembler",
+            "schema": {
+              "$ref": "#/definitions/FateAssembler"
+            }
+          },
+          "400": {
+            "description": "Invalid data",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/validate-byte-code": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "description": "Verify that an encoded byte array is the result of compiling a given contract",
+        "operationId": "ValidateByteCode",
+        "parameters": [
+          {
+            "description": "contract byte array and source code",
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ValidateByteCodeInput"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Validation successful"
+          },
+          "400": {
+            "description": "Invalid contract",
+            "schema": {
+              "$ref": "#/definitions/CompilerErrors"
+            }
+          }
+        }
+      }
+    },
+    "/version": {
+      "get": {
+        "description": "Get the version of the underlying Sophia compiler version",
+        "operationId": "Version",
+        "parameters": [],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sophia compiler version",
+            "schema": {
+              "$ref": "#/definitions/CompilerVersion"
+            }
+          },
+          "500": {
+            "description": "Error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    }
+  },
+  "schemes": [
+    "http"
+  ],
+  "swagger": "2.0"
 }

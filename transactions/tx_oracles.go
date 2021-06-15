@@ -119,7 +119,7 @@ func (tx *OracleRegisterTx) DecodeRLP(s *rlp.Stream) (err error) {
 }
 
 // JSON representation of a Tx is useful for querying the node's debug endpoint
-// BUG: Account Nonce won't be represented in JSON output if nonce is 0, thanks to swagger.json
+// BUG: Account Nonce won't be represented in JSON output if nonce is 0, thanks to node.json
 func (tx *OracleRegisterTx) JSON() (string, error) {
 	// # Oracles
 	// ORACLE_TTL_TYPE_DELTA = 'delta'
@@ -138,17 +138,19 @@ func (tx *OracleRegisterTx) JSON() (string, error) {
 	// ABI_SOLIDITY = 2
 
 	ttlTypeStr := ttlTypeIntToStr(tx.OracleTTLType)
+	fee := utils.BigInt(*tx.Fee)
+	queryFee := utils.BigInt(*tx.QueryFee)
 
 	swaggerT := models.OracleRegisterTx{
 		AbiVersion: tx.AbiVersion,
 		AccountID:  &tx.AccountID,
-		Fee:        utils.BigInt(*tx.Fee),
+		Fee:        &fee,
 		Nonce:      tx.AccountNonce,
 		OracleTTL: &models.TTL{
 			Type:  &ttlTypeStr,
 			Value: &tx.OracleTTLValue,
 		},
-		QueryFee:       utils.BigInt(*tx.QueryFee),
+		QueryFee:       &queryFee,
 		QueryFormat:    &tx.QuerySpec,
 		ResponseFormat: &tx.ResponseSpec,
 		TTL:            tx.TTL,
@@ -276,9 +278,9 @@ func (tx *OracleExtendTx) DecodeRLP(s *rlp.Stream) (err error) {
 // JSON representation of a Tx is useful for querying the node's debug endpoint
 func (tx *OracleExtendTx) JSON() (string, error) {
 	oracleTTLTypeStr := ttlTypeIntToStr(tx.OracleTTLType)
-
+	fee := utils.BigInt(*tx.Fee)
 	swaggerT := models.OracleExtendTx{
-		Fee:      utils.BigInt(*tx.Fee),
+		Fee:      &fee,
 		Nonce:    tx.AccountNonce,
 		OracleID: &tx.OracleID,
 		OracleTTL: &models.RelativeTTL{
@@ -468,13 +470,14 @@ func (tx *OracleQueryTx) DecodeRLP(s *rlp.Stream) (err error) {
 func (tx *OracleQueryTx) JSON() (string, error) {
 	responseTTLTypeStr := ttlTypeIntToStr(tx.ResponseTTLType)
 	queryTTLTypeStr := ttlTypeIntToStr(tx.QueryTTLType)
-
+	fee := utils.BigInt(*tx.Fee)
+	queryFee := utils.BigInt(*tx.QueryFee)
 	swaggerT := models.OracleQueryTx{
-		Fee:      utils.BigInt(*tx.Fee),
+		Fee:      &fee,
 		Nonce:    tx.AccountNonce,
 		OracleID: &tx.OracleID,
 		Query:    &tx.Query,
-		QueryFee: utils.BigInt(*tx.QueryFee),
+		QueryFee: &queryFee,
 		QueryTTL: &models.TTL{
 			Type:  &queryTTLTypeStr,
 			Value: &tx.QueryTTLValue,
@@ -625,9 +628,9 @@ func (tx *OracleRespondTx) DecodeRLP(s *rlp.Stream) (err error) {
 // JSON representation of a Tx is useful for querying the node's debug endpoint
 func (tx *OracleRespondTx) JSON() (string, error) {
 	responseTTLTypeStr := ttlTypeIntToStr(tx.ResponseTTLType)
-
+	fee := utils.BigInt(*tx.Fee)
 	swaggerT := models.OracleRespondTx{
-		Fee:      utils.BigInt(*tx.Fee),
+		Fee:      &fee,
 		Nonce:    tx.AccountNonce,
 		OracleID: &tx.OracleID,
 		QueryID:  &tx.QueryID,

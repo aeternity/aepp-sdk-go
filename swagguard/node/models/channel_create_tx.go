@@ -6,33 +6,31 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
 
+	"github.com/aeternity/aepp-sdk-go/v8/utils"
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
-
-	utils "github.com/aeternity/aepp-sdk-go/v8/utils"
 )
 
 // ChannelCreateTx channel create tx
+//
 // swagger:model ChannelCreateTx
 type ChannelCreateTx struct {
 
 	// channel reserve
 	// Required: true
-	ChannelReserve utils.BigInt `json:"channel_reserve"`
-
-	// delegate ids
-	DelegateIds []string `json:"delegate_ids"`
+	ChannelReserve *utils.BigInt `json:"channel_reserve"`
 
 	// fee
 	// Required: true
-	Fee utils.BigInt `json:"fee"`
+	Fee *utils.BigInt `json:"fee"`
 
 	// initiator amount
 	// Required: true
-	InitiatorAmount utils.BigInt `json:"initiator_amount"`
+	InitiatorAmount *utils.BigInt `json:"initiator_amount"`
 
 	// initiator id
 	// Required: true
@@ -47,11 +45,11 @@ type ChannelCreateTx struct {
 
 	// push amount
 	// Required: true
-	PushAmount utils.BigInt `json:"push_amount"`
+	PushAmount *utils.BigInt `json:"push_amount"`
 
 	// responder amount
 	// Required: true
-	ResponderAmount utils.BigInt `json:"responder_amount"`
+	ResponderAmount *utils.BigInt `json:"responder_amount"`
 
 	// responder id
 	// Required: true
@@ -113,11 +111,21 @@ func (m *ChannelCreateTx) Validate(formats strfmt.Registry) error {
 
 func (m *ChannelCreateTx) validateChannelReserve(formats strfmt.Registry) error {
 
-	if err := m.ChannelReserve.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("channel_reserve")
-		}
+	if err := validate.Required("channel_reserve", "body", m.ChannelReserve); err != nil {
 		return err
+	}
+
+	if err := validate.Required("channel_reserve", "body", m.ChannelReserve); err != nil {
+		return err
+	}
+
+	if m.ChannelReserve != nil {
+		if err := m.ChannelReserve.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("channel_reserve")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -125,11 +133,21 @@ func (m *ChannelCreateTx) validateChannelReserve(formats strfmt.Registry) error 
 
 func (m *ChannelCreateTx) validateFee(formats strfmt.Registry) error {
 
-	if err := m.Fee.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("fee")
-		}
+	if err := validate.Required("fee", "body", m.Fee); err != nil {
 		return err
+	}
+
+	if err := validate.Required("fee", "body", m.Fee); err != nil {
+		return err
+	}
+
+	if m.Fee != nil {
+		if err := m.Fee.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("fee")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -137,11 +155,21 @@ func (m *ChannelCreateTx) validateFee(formats strfmt.Registry) error {
 
 func (m *ChannelCreateTx) validateInitiatorAmount(formats strfmt.Registry) error {
 
-	if err := m.InitiatorAmount.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("initiator_amount")
-		}
+	if err := validate.Required("initiator_amount", "body", m.InitiatorAmount); err != nil {
 		return err
+	}
+
+	if err := validate.Required("initiator_amount", "body", m.InitiatorAmount); err != nil {
+		return err
+	}
+
+	if m.InitiatorAmount != nil {
+		if err := m.InitiatorAmount.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("initiator_amount")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -167,11 +195,21 @@ func (m *ChannelCreateTx) validateLockPeriod(formats strfmt.Registry) error {
 
 func (m *ChannelCreateTx) validatePushAmount(formats strfmt.Registry) error {
 
-	if err := m.PushAmount.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("push_amount")
-		}
+	if err := validate.Required("push_amount", "body", m.PushAmount); err != nil {
 		return err
+	}
+
+	if err := validate.Required("push_amount", "body", m.PushAmount); err != nil {
+		return err
+	}
+
+	if m.PushAmount != nil {
+		if err := m.PushAmount.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("push_amount")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -179,11 +217,21 @@ func (m *ChannelCreateTx) validatePushAmount(formats strfmt.Registry) error {
 
 func (m *ChannelCreateTx) validateResponderAmount(formats strfmt.Registry) error {
 
-	if err := m.ResponderAmount.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("responder_amount")
-		}
+	if err := validate.Required("responder_amount", "body", m.ResponderAmount); err != nil {
 		return err
+	}
+
+	if err := validate.Required("responder_amount", "body", m.ResponderAmount); err != nil {
+		return err
+	}
+
+	if m.ResponderAmount != nil {
+		if err := m.ResponderAmount.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("responder_amount")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -202,6 +250,106 @@ func (m *ChannelCreateTx) validateStateHash(formats strfmt.Registry) error {
 
 	if err := validate.Required("state_hash", "body", m.StateHash); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this channel create tx based on the context it is used
+func (m *ChannelCreateTx) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateChannelReserve(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateFee(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateInitiatorAmount(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidatePushAmount(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateResponderAmount(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *ChannelCreateTx) contextValidateChannelReserve(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.ChannelReserve != nil {
+		if err := m.ChannelReserve.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("channel_reserve")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *ChannelCreateTx) contextValidateFee(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Fee != nil {
+		if err := m.Fee.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("fee")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *ChannelCreateTx) contextValidateInitiatorAmount(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.InitiatorAmount != nil {
+		if err := m.InitiatorAmount.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("initiator_amount")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *ChannelCreateTx) contextValidatePushAmount(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.PushAmount != nil {
+		if err := m.PushAmount.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("push_amount")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *ChannelCreateTx) contextValidateResponderAmount(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.ResponderAmount != nil {
+		if err := m.ResponderAmount.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("responder_amount")
+			}
+			return err
+		}
 	}
 
 	return nil

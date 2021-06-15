@@ -7,24 +7,24 @@ package models
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 
-	strfmt "github.com/go-openapi/strfmt"
-
+	"github.com/aeternity/aepp-sdk-go/v8/utils"
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
-
-	utils "github.com/aeternity/aepp-sdk-go/v8/utils"
 )
 
 // OffChainTransfer off chain transfer
+//
 // swagger:model OffChainTransfer
 type OffChainTransfer struct {
 
 	// amount
 	// Required: true
-	Amount utils.BigInt `json:"amount"`
+	Amount *utils.BigInt `json:"amount"`
 
 	// Sender of tokens
 	// Required: true
@@ -42,14 +42,7 @@ func (m *OffChainTransfer) Op() string {
 
 // SetOp sets the op of this subtype
 func (m *OffChainTransfer) SetOp(val string) {
-
 }
-
-// Amount gets the amount of this subtype
-
-// From gets the from of this subtype
-
-// To gets the to of this subtype
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
 func (m *OffChainTransfer) UnmarshalJSON(raw []byte) error {
@@ -57,7 +50,7 @@ func (m *OffChainTransfer) UnmarshalJSON(raw []byte) error {
 
 		// amount
 		// Required: true
-		Amount utils.BigInt `json:"amount"`
+		Amount *utils.BigInt `json:"amount"`
 
 		// Sender of tokens
 		// Required: true
@@ -96,9 +89,7 @@ func (m *OffChainTransfer) UnmarshalJSON(raw []byte) error {
 	}
 
 	result.Amount = data.Amount
-
 	result.From = data.From
-
 	result.To = data.To
 
 	*m = result
@@ -114,7 +105,7 @@ func (m OffChainTransfer) MarshalJSON() ([]byte, error) {
 
 		// amount
 		// Required: true
-		Amount utils.BigInt `json:"amount"`
+		Amount *utils.BigInt `json:"amount"`
 
 		// Sender of tokens
 		// Required: true
@@ -130,8 +121,7 @@ func (m OffChainTransfer) MarshalJSON() ([]byte, error) {
 		From: m.From,
 
 		To: m.To,
-	},
-	)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -140,8 +130,7 @@ func (m OffChainTransfer) MarshalJSON() ([]byte, error) {
 	}{
 
 		Op: m.Op(),
-	},
-	)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -173,11 +162,21 @@ func (m *OffChainTransfer) Validate(formats strfmt.Registry) error {
 
 func (m *OffChainTransfer) validateAmount(formats strfmt.Registry) error {
 
-	if err := m.Amount.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("amount")
-		}
+	if err := validate.Required("amount", "body", m.Amount); err != nil {
 		return err
+	}
+
+	if err := validate.Required("amount", "body", m.Amount); err != nil {
+		return err
+	}
+
+	if m.Amount != nil {
+		if err := m.Amount.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("amount")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -196,6 +195,34 @@ func (m *OffChainTransfer) validateTo(formats strfmt.Registry) error {
 
 	if err := validate.Required("to", "body", m.To); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this off chain transfer based on the context it is used
+func (m *OffChainTransfer) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateAmount(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *OffChainTransfer) contextValidateAmount(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Amount != nil {
+		if err := m.Amount.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("amount")
+			}
+			return err
+		}
 	}
 
 	return nil

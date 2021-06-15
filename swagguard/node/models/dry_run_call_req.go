@@ -6,16 +6,17 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
 
+	"github.com/aeternity/aepp-sdk-go/v8/utils"
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
-
-	utils "github.com/aeternity/aepp-sdk-go/v8/utils"
 )
 
 // DryRunCallReq dry run call req
+//
 // swagger:model DryRunCallReq
 type DryRunCallReq struct {
 
@@ -77,7 +78,6 @@ func (m *DryRunCallReq) Validate(formats strfmt.Registry) error {
 }
 
 func (m *DryRunCallReq) validateAmount(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Amount) { // not required
 		return nil
 	}
@@ -102,7 +102,6 @@ func (m *DryRunCallReq) validateCalldata(formats strfmt.Registry) error {
 }
 
 func (m *DryRunCallReq) validateContext(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Context) { // not required
 		return nil
 	}
@@ -129,12 +128,71 @@ func (m *DryRunCallReq) validateContract(formats strfmt.Registry) error {
 }
 
 func (m *DryRunCallReq) validateGas(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Gas) { // not required
 		return nil
 	}
 
 	if err := m.Gas.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("gas")
+		}
+		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this dry run call req based on the context it is used
+func (m *DryRunCallReq) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateAmount(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateContext(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateGas(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *DryRunCallReq) contextValidateAmount(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.Amount.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("amount")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *DryRunCallReq) contextValidateContext(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Context != nil {
+		if err := m.Context.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("context")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *DryRunCallReq) contextValidateGas(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.Gas.ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("gas")
 		}

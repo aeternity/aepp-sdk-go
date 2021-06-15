@@ -6,14 +6,16 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
 
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // ContractObject contract object
+//
 // swagger:model ContractObject
 type ContractObject struct {
 
@@ -144,6 +146,11 @@ func (m *ContractObject) validateVMVersion(formats strfmt.Registry) error {
 		return err
 	}
 
+	return nil
+}
+
+// ContextValidate validates this contract object based on context it is used
+func (m *ContractObject) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

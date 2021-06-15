@@ -8,8 +8,7 @@ package client
 import (
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
-
-	strfmt "github.com/go-openapi/strfmt"
+	"github.com/go-openapi/strfmt"
 
 	"github.com/aeternity/aepp-sdk-go/v8/swagguard/node/client/external"
 )
@@ -56,9 +55,7 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Node {
 
 	cli := new(Node)
 	cli.Transport = transport
-
 	cli.External = external.New(transport, formats)
-
 	return cli
 }
 
@@ -103,7 +100,7 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 
 // Node is a client for node
 type Node struct {
-	External *external.Client
+	External external.ClientService
 
 	Transport runtime.ClientTransport
 }
@@ -111,7 +108,5 @@ type Node struct {
 // SetTransport changes the transport on the client and all its subresources
 func (c *Node) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
-
 	c.External.SetTransport(transport)
-
 }

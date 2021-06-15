@@ -6,14 +6,17 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
 
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // FunctionCallInput function call input
+// Example: {"arguments":["arguments","arguments"],"function":"function","options":{"backend":"fate","file_system":"{}","src_file":"src_file"},"source":"source"}
+//
 // swagger:model FunctionCallInput
 type FunctionCallInput struct {
 
@@ -78,7 +81,6 @@ func (m *FunctionCallInput) validateFunction(formats strfmt.Registry) error {
 }
 
 func (m *FunctionCallInput) validateOptions(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Options) { // not required
 		return nil
 	}
@@ -99,6 +101,34 @@ func (m *FunctionCallInput) validateSource(formats strfmt.Registry) error {
 
 	if err := validate.Required("source", "body", m.Source); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this function call input based on the context it is used
+func (m *FunctionCallInput) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateOptions(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *FunctionCallInput) contextValidateOptions(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Options != nil {
+		if err := m.Options.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("options")
+			}
+			return err
+		}
 	}
 
 	return nil

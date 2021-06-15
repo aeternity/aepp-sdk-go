@@ -13,69 +13,85 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-
-	strfmt "github.com/go-openapi/strfmt"
 )
 
-// NewGetAccountByPubkeyAndHeightParams creates a new GetAccountByPubkeyAndHeightParams object
-// with the default values initialized.
+// NewGetAccountByPubkeyAndHeightParams creates a new GetAccountByPubkeyAndHeightParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewGetAccountByPubkeyAndHeightParams() *GetAccountByPubkeyAndHeightParams {
-	var ()
 	return &GetAccountByPubkeyAndHeightParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewGetAccountByPubkeyAndHeightParamsWithTimeout creates a new GetAccountByPubkeyAndHeightParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewGetAccountByPubkeyAndHeightParamsWithTimeout(timeout time.Duration) *GetAccountByPubkeyAndHeightParams {
-	var ()
 	return &GetAccountByPubkeyAndHeightParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewGetAccountByPubkeyAndHeightParamsWithContext creates a new GetAccountByPubkeyAndHeightParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewGetAccountByPubkeyAndHeightParamsWithContext(ctx context.Context) *GetAccountByPubkeyAndHeightParams {
-	var ()
 	return &GetAccountByPubkeyAndHeightParams{
-
 		Context: ctx,
 	}
 }
 
 // NewGetAccountByPubkeyAndHeightParamsWithHTTPClient creates a new GetAccountByPubkeyAndHeightParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewGetAccountByPubkeyAndHeightParamsWithHTTPClient(client *http.Client) *GetAccountByPubkeyAndHeightParams {
-	var ()
 	return &GetAccountByPubkeyAndHeightParams{
 		HTTPClient: client,
 	}
 }
 
-/*GetAccountByPubkeyAndHeightParams contains all the parameters to send to the API endpoint
-for the get account by pubkey and height operation typically these are written to a http.Request
+/* GetAccountByPubkeyAndHeightParams contains all the parameters to send to the API endpoint
+   for the get account by pubkey and height operation.
+
+   Typically these are written to a http.Request.
 */
 type GetAccountByPubkeyAndHeightParams struct {
 
-	/*Height
-	  The height
+	/* Height.
 
+	   The height
+
+	   Format: uint64
 	*/
 	Height uint64
-	/*Pubkey
-	  The public key of the account
 
+	/* Pubkey.
+
+	   The public key of the account
 	*/
 	Pubkey string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the get account by pubkey and height params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetAccountByPubkeyAndHeightParams) WithDefaults() *GetAccountByPubkeyAndHeightParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the get account by pubkey and height params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetAccountByPubkeyAndHeightParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the get account by pubkey and height params

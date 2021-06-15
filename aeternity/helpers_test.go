@@ -31,7 +31,7 @@ func (m *mockNodeForTxReceiptWatch) GetTransactionByHash(hash string) (tx *model
 	bh := "bh_someblockhash"
 	tx = &models.GenericSignedTx{
 		BlockHash:   &bh,
-		BlockHeight: utils.BigInt{},
+		BlockHeight: &utils.BigInt{},
 		Hash:        &hash,
 		Signatures:  nil,
 	}

@@ -6,16 +6,17 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
 
+	"github.com/aeternity/aepp-sdk-go/v8/utils"
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
-
-	utils "github.com/aeternity/aepp-sdk-go/v8/utils"
 )
 
 // OracleRegisterTx oracle register tx
+//
 // swagger:model OracleRegisterTx
 type OracleRegisterTx struct {
 
@@ -28,7 +29,7 @@ type OracleRegisterTx struct {
 
 	// fee
 	// Required: true
-	Fee utils.BigInt `json:"fee"`
+	Fee *utils.BigInt `json:"fee"`
 
 	// nonce
 	Nonce uint64 `json:"nonce,omitempty"`
@@ -39,7 +40,7 @@ type OracleRegisterTx struct {
 
 	// query fee
 	// Required: true
-	QueryFee utils.BigInt `json:"query_fee"`
+	QueryFee *utils.BigInt `json:"query_fee"`
 
 	// query format
 	// Required: true
@@ -98,11 +99,21 @@ func (m *OracleRegisterTx) validateAccountID(formats strfmt.Registry) error {
 
 func (m *OracleRegisterTx) validateFee(formats strfmt.Registry) error {
 
-	if err := m.Fee.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("fee")
-		}
+	if err := validate.Required("fee", "body", m.Fee); err != nil {
 		return err
+	}
+
+	if err := validate.Required("fee", "body", m.Fee); err != nil {
+		return err
+	}
+
+	if m.Fee != nil {
+		if err := m.Fee.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("fee")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -128,11 +139,21 @@ func (m *OracleRegisterTx) validateOracleTTL(formats strfmt.Registry) error {
 
 func (m *OracleRegisterTx) validateQueryFee(formats strfmt.Registry) error {
 
-	if err := m.QueryFee.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("query_fee")
-		}
+	if err := validate.Required("query_fee", "body", m.QueryFee); err != nil {
 		return err
+	}
+
+	if err := validate.Required("query_fee", "body", m.QueryFee); err != nil {
+		return err
+	}
+
+	if m.QueryFee != nil {
+		if err := m.QueryFee.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("query_fee")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -151,6 +172,70 @@ func (m *OracleRegisterTx) validateResponseFormat(formats strfmt.Registry) error
 
 	if err := validate.Required("response_format", "body", m.ResponseFormat); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this oracle register tx based on the context it is used
+func (m *OracleRegisterTx) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateFee(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateOracleTTL(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateQueryFee(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *OracleRegisterTx) contextValidateFee(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Fee != nil {
+		if err := m.Fee.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("fee")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *OracleRegisterTx) contextValidateOracleTTL(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.OracleTTL != nil {
+		if err := m.OracleTTL.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("oracle_ttl")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *OracleRegisterTx) contextValidateQueryFee(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.QueryFee != nil {
+		if err := m.QueryFee.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("query_fee")
+			}
+			return err
+		}
 	}
 
 	return nil

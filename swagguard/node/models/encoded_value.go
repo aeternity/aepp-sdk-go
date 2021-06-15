@@ -6,14 +6,22 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
+
+	"github.com/go-openapi/strfmt"
 )
 
 // EncodedValue Base58Check encoded tagged value
+//
 // swagger:model EncodedValue
 type EncodedValue string
 
 // Validate validates this encoded value
 func (m EncodedValue) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this encoded value based on context it is used
+func (m EncodedValue) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }

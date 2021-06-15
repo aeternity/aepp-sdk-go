@@ -39,7 +39,7 @@ func TestGeneralizedAccounts(t *testing.T) {
 	if err != nil {
 		expected.Set(amount)
 	} else {
-		bS := big.Int(bobState.Balance)
+		bS := big.Int(*bobState.Balance)
 		expected.Add(&bS, amount)
 	}
 
@@ -130,7 +130,7 @@ func TestGeneralizedAccounts(t *testing.T) {
 		}
 	}
 	delay(getBobsAccount)
-	b := big.Int(bobState.Balance)
+	b := big.Int(*bobState.Balance)
 
 	if expected.Cmp(&b) != 0 {
 		t.Fatalf("Bob should have %v, but has %v instead", expected.String(), bobState.Balance.String())

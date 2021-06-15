@@ -6,20 +6,23 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
 
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // DecodeCalldataSource decode calldata source
+// Example: {"calldata":{},"function":"function","options":{"backend":"fate","file_system":"{}","src_file":"src_file"},"source":"source"}
+//
 // swagger:model DecodeCalldataSource
 type DecodeCalldataSource struct {
 
 	// Calldata to dissect
 	// Required: true
-	Calldata EncodedByteArray `json:"calldata"`
+	Calldata *EncodedByteArray `json:"calldata"`
 
 	// Name of the function to call
 	// Required: true
@@ -61,11 +64,21 @@ func (m *DecodeCalldataSource) Validate(formats strfmt.Registry) error {
 
 func (m *DecodeCalldataSource) validateCalldata(formats strfmt.Registry) error {
 
-	if err := m.Calldata.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("calldata")
-		}
+	if err := validate.Required("calldata", "body", m.Calldata); err != nil {
 		return err
+	}
+
+	if err := validate.Required("calldata", "body", m.Calldata); err != nil {
+		return err
+	}
+
+	if m.Calldata != nil {
+		if err := m.Calldata.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("calldata")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -81,7 +94,6 @@ func (m *DecodeCalldataSource) validateFunction(formats strfmt.Registry) error {
 }
 
 func (m *DecodeCalldataSource) validateOptions(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Options) { // not required
 		return nil
 	}
@@ -102,6 +114,52 @@ func (m *DecodeCalldataSource) validateSource(formats strfmt.Registry) error {
 
 	if err := validate.Required("source", "body", m.Source); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this decode calldata source based on the context it is used
+func (m *DecodeCalldataSource) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateCalldata(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateOptions(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *DecodeCalldataSource) contextValidateCalldata(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Calldata != nil {
+		if err := m.Calldata.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("calldata")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *DecodeCalldataSource) contextValidateOptions(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Options != nil {
+		if err := m.Options.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("options")
+			}
+			return err
+		}
 	}
 
 	return nil

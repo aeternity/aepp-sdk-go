@@ -10,10 +10,9 @@ import (
 	"io"
 
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 
-	strfmt "github.com/go-openapi/strfmt"
-
-	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
 )
 
 // GetOracleQueriesByPubkeyReader is a Reader for the GetOracleQueriesByPubkey structure.
@@ -24,30 +23,26 @@ type GetOracleQueriesByPubkeyReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *GetOracleQueriesByPubkeyReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewGetOracleQueriesByPubkeyOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 400:
 		result := NewGetOracleQueriesByPubkeyBadRequest()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 404:
 		result := NewGetOracleQueriesByPubkeyNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -56,7 +51,7 @@ func NewGetOracleQueriesByPubkeyOK() *GetOracleQueriesByPubkeyOK {
 	return &GetOracleQueriesByPubkeyOK{}
 }
 
-/*GetOracleQueriesByPubkeyOK handles this case with default header values.
+/* GetOracleQueriesByPubkeyOK describes a response with status code 200, with default header values.
 
 Successful operation
 */
@@ -66,6 +61,9 @@ type GetOracleQueriesByPubkeyOK struct {
 
 func (o *GetOracleQueriesByPubkeyOK) Error() string {
 	return fmt.Sprintf("[GET /oracles/{pubkey}/queries][%d] getOracleQueriesByPubkeyOK  %+v", 200, o.Payload)
+}
+func (o *GetOracleQueriesByPubkeyOK) GetPayload() *models.OracleQueries {
+	return o.Payload
 }
 
 func (o *GetOracleQueriesByPubkeyOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -85,7 +83,7 @@ func NewGetOracleQueriesByPubkeyBadRequest() *GetOracleQueriesByPubkeyBadRequest
 	return &GetOracleQueriesByPubkeyBadRequest{}
 }
 
-/*GetOracleQueriesByPubkeyBadRequest handles this case with default header values.
+/* GetOracleQueriesByPubkeyBadRequest describes a response with status code 400, with default header values.
 
 Invalid public key
 */
@@ -95,6 +93,9 @@ type GetOracleQueriesByPubkeyBadRequest struct {
 
 func (o *GetOracleQueriesByPubkeyBadRequest) Error() string {
 	return fmt.Sprintf("[GET /oracles/{pubkey}/queries][%d] getOracleQueriesByPubkeyBadRequest  %+v", 400, o.Payload)
+}
+func (o *GetOracleQueriesByPubkeyBadRequest) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *GetOracleQueriesByPubkeyBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -114,7 +115,7 @@ func NewGetOracleQueriesByPubkeyNotFound() *GetOracleQueriesByPubkeyNotFound {
 	return &GetOracleQueriesByPubkeyNotFound{}
 }
 
-/*GetOracleQueriesByPubkeyNotFound handles this case with default header values.
+/* GetOracleQueriesByPubkeyNotFound describes a response with status code 404, with default header values.
 
 Oracle not found
 */
@@ -124,6 +125,9 @@ type GetOracleQueriesByPubkeyNotFound struct {
 
 func (o *GetOracleQueriesByPubkeyNotFound) Error() string {
 	return fmt.Sprintf("[GET /oracles/{pubkey}/queries][%d] getOracleQueriesByPubkeyNotFound  %+v", 404, o.Payload)
+}
+func (o *GetOracleQueriesByPubkeyNotFound) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *GetOracleQueriesByPubkeyNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

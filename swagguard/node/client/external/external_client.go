@@ -6,13 +6,14 @@ package external
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"github.com/go-openapi/runtime"
+	"fmt"
 
-	strfmt "github.com/go-openapi/strfmt"
+	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 )
 
 // New creates a new external API client.
-func New(transport runtime.ClientTransport, formats strfmt.Registry) *Client {
+func New(transport runtime.ClientTransport, formats strfmt.Registry) ClientService {
 	return &Client{transport: transport, formats: formats}
 }
 
@@ -24,884 +25,1265 @@ type Client struct {
 	formats   strfmt.Registry
 }
 
+// ClientOption is the option for Client methods
+type ClientOption func(*runtime.ClientOperation)
+
+// ClientService is the interface for Client methods
+type ClientService interface {
+	GetAccountByPubkey(params *GetAccountByPubkeyParams, opts ...ClientOption) (*GetAccountByPubkeyOK, error)
+
+	GetAccountByPubkeyAndHash(params *GetAccountByPubkeyAndHashParams, opts ...ClientOption) (*GetAccountByPubkeyAndHashOK, error)
+
+	GetAccountByPubkeyAndHeight(params *GetAccountByPubkeyAndHeightParams, opts ...ClientOption) (*GetAccountByPubkeyAndHeightOK, error)
+
+	GetChainEnds(params *GetChainEndsParams, opts ...ClientOption) (*GetChainEndsOK, error)
+
+	GetChannelByPubkey(params *GetChannelByPubkeyParams, opts ...ClientOption) (*GetChannelByPubkeyOK, error)
+
+	GetContract(params *GetContractParams, opts ...ClientOption) (*GetContractOK, error)
+
+	GetContractCode(params *GetContractCodeParams, opts ...ClientOption) (*GetContractCodeOK, error)
+
+	GetContractPoI(params *GetContractPoIParams, opts ...ClientOption) (*GetContractPoIOK, error)
+
+	GetCurrentGeneration(params *GetCurrentGenerationParams, opts ...ClientOption) (*GetCurrentGenerationOK, error)
+
+	GetCurrentKeyBlock(params *GetCurrentKeyBlockParams, opts ...ClientOption) (*GetCurrentKeyBlockOK, error)
+
+	GetCurrentKeyBlockHash(params *GetCurrentKeyBlockHashParams, opts ...ClientOption) (*GetCurrentKeyBlockHashOK, error)
+
+	GetCurrentKeyBlockHeight(params *GetCurrentKeyBlockHeightParams, opts ...ClientOption) (*GetCurrentKeyBlockHeightOK, error)
+
+	GetGenerationByHash(params *GetGenerationByHashParams, opts ...ClientOption) (*GetGenerationByHashOK, error)
+
+	GetGenerationByHeight(params *GetGenerationByHeightParams, opts ...ClientOption) (*GetGenerationByHeightOK, error)
+
+	GetKeyBlockByHash(params *GetKeyBlockByHashParams, opts ...ClientOption) (*GetKeyBlockByHashOK, error)
+
+	GetKeyBlockByHeight(params *GetKeyBlockByHeightParams, opts ...ClientOption) (*GetKeyBlockByHeightOK, error)
+
+	GetMicroBlockHeaderByHash(params *GetMicroBlockHeaderByHashParams, opts ...ClientOption) (*GetMicroBlockHeaderByHashOK, error)
+
+	GetMicroBlockTransactionByHashAndIndex(params *GetMicroBlockTransactionByHashAndIndexParams, opts ...ClientOption) (*GetMicroBlockTransactionByHashAndIndexOK, error)
+
+	GetMicroBlockTransactionsByHash(params *GetMicroBlockTransactionsByHashParams, opts ...ClientOption) (*GetMicroBlockTransactionsByHashOK, error)
+
+	GetMicroBlockTransactionsCountByHash(params *GetMicroBlockTransactionsCountByHashParams, opts ...ClientOption) (*GetMicroBlockTransactionsCountByHashOK, error)
+
+	GetNameEntryByName(params *GetNameEntryByNameParams, opts ...ClientOption) (*GetNameEntryByNameOK, error)
+
+	GetOracleByPubkey(params *GetOracleByPubkeyParams, opts ...ClientOption) (*GetOracleByPubkeyOK, error)
+
+	GetOracleQueriesByPubkey(params *GetOracleQueriesByPubkeyParams, opts ...ClientOption) (*GetOracleQueriesByPubkeyOK, error)
+
+	GetOracleQueryByPubkeyAndQueryID(params *GetOracleQueryByPubkeyAndQueryIDParams, opts ...ClientOption) (*GetOracleQueryByPubkeyAndQueryIDOK, error)
+
+	GetPeerPubkey(params *GetPeerPubkeyParams, opts ...ClientOption) (*GetPeerPubkeyOK, error)
+
+	GetPendingAccountTransactionsByPubkey(params *GetPendingAccountTransactionsByPubkeyParams, opts ...ClientOption) (*GetPendingAccountTransactionsByPubkeyOK, error)
+
+	GetPendingKeyBlock(params *GetPendingKeyBlockParams, opts ...ClientOption) (*GetPendingKeyBlockOK, error)
+
+	GetStatus(params *GetStatusParams, opts ...ClientOption) (*GetStatusOK, error)
+
+	GetTopBlock(params *GetTopBlockParams, opts ...ClientOption) (*GetTopBlockOK, error)
+
+	GetTransactionByHash(params *GetTransactionByHashParams, opts ...ClientOption) (*GetTransactionByHashOK, error)
+
+	GetTransactionInfoByHash(params *GetTransactionInfoByHashParams, opts ...ClientOption) (*GetTransactionInfoByHashOK, error)
+
+	PostTransaction(params *PostTransactionParams, opts ...ClientOption) (*PostTransactionOK, error)
+
+	SetTransport(transport runtime.ClientTransport)
+}
+
 /*
-GetAccountByPubkey Get an account by public key
+  GetAccountByPubkey Get an account by public key
 */
-func (a *Client) GetAccountByPubkey(params *GetAccountByPubkeyParams) (*GetAccountByPubkeyOK, error) {
+func (a *Client) GetAccountByPubkey(params *GetAccountByPubkeyParams, opts ...ClientOption) (*GetAccountByPubkeyOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetAccountByPubkeyParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetAccountByPubkey",
 		Method:             "GET",
 		PathPattern:        "/accounts/{pubkey}",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetAccountByPubkeyReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetAccountByPubkeyOK), nil
-
+	success, ok := result.(*GetAccountByPubkeyOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetAccountByPubkey: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-GetAccountByPubkeyAndHash Get an account by public key after the block indicated by hash
+  GetAccountByPubkeyAndHash Get an account by public key after the block indicated by hash
 */
-func (a *Client) GetAccountByPubkeyAndHash(params *GetAccountByPubkeyAndHashParams) (*GetAccountByPubkeyAndHashOK, error) {
+func (a *Client) GetAccountByPubkeyAndHash(params *GetAccountByPubkeyAndHashParams, opts ...ClientOption) (*GetAccountByPubkeyAndHashOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetAccountByPubkeyAndHashParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetAccountByPubkeyAndHash",
 		Method:             "GET",
 		PathPattern:        "/accounts/{pubkey}/hash/{hash}",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetAccountByPubkeyAndHashReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetAccountByPubkeyAndHashOK), nil
-
+	success, ok := result.(*GetAccountByPubkeyAndHashOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetAccountByPubkeyAndHash: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-GetAccountByPubkeyAndHeight Get an account by public key after the opening key block of the generation at height
+  GetAccountByPubkeyAndHeight Get an account by public key after the opening key block of the generation at height
 */
-func (a *Client) GetAccountByPubkeyAndHeight(params *GetAccountByPubkeyAndHeightParams) (*GetAccountByPubkeyAndHeightOK, error) {
+func (a *Client) GetAccountByPubkeyAndHeight(params *GetAccountByPubkeyAndHeightParams, opts ...ClientOption) (*GetAccountByPubkeyAndHeightOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetAccountByPubkeyAndHeightParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetAccountByPubkeyAndHeight",
 		Method:             "GET",
 		PathPattern:        "/accounts/{pubkey}/height/{height}",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetAccountByPubkeyAndHeightReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetAccountByPubkeyAndHeightOK), nil
-
+	success, ok := result.(*GetAccountByPubkeyAndHeightOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetAccountByPubkeyAndHeight: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-GetChannelByPubkey Get channel by public key
+  GetChainEnds Get oldest keyblock hashes counting from genesis including orphans
 */
-func (a *Client) GetChannelByPubkey(params *GetChannelByPubkeyParams) (*GetChannelByPubkeyOK, error) {
+func (a *Client) GetChainEnds(params *GetChainEndsParams, opts ...ClientOption) (*GetChainEndsOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetChainEndsParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "GetChainEnds",
+		Method:             "GET",
+		PathPattern:        "/status/chain-ends",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetChainEndsReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetChainEndsOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetChainEnds: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+  GetChannelByPubkey Get channel by public key
+*/
+func (a *Client) GetChannelByPubkey(params *GetChannelByPubkeyParams, opts ...ClientOption) (*GetChannelByPubkeyOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetChannelByPubkeyParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetChannelByPubkey",
 		Method:             "GET",
 		PathPattern:        "/channels/{pubkey}",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetChannelByPubkeyReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetChannelByPubkeyOK), nil
-
+	success, ok := result.(*GetChannelByPubkeyOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetChannelByPubkey: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-GetContract Get a contract by pubkey
+  GetContract Get a contract by pubkey
 */
-func (a *Client) GetContract(params *GetContractParams) (*GetContractOK, error) {
+func (a *Client) GetContract(params *GetContractParams, opts ...ClientOption) (*GetContractOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetContractParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetContract",
 		Method:             "GET",
 		PathPattern:        "/contracts/{pubkey}",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetContractReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetContractOK), nil
-
+	success, ok := result.(*GetContractOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetContract: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-GetContractCode Get contract code by pubkey
+  GetContractCode Get contract code by pubkey
 */
-func (a *Client) GetContractCode(params *GetContractCodeParams) (*GetContractCodeOK, error) {
+func (a *Client) GetContractCode(params *GetContractCodeParams, opts ...ClientOption) (*GetContractCodeOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetContractCodeParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetContractCode",
 		Method:             "GET",
 		PathPattern:        "/contracts/{pubkey}/code",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetContractCodeReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetContractCodeOK), nil
-
+	success, ok := result.(*GetContractCodeOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetContractCode: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-GetContractPoI Get a proof of inclusion for a contract
+  GetContractPoI Get a proof of inclusion for a contract
 */
-func (a *Client) GetContractPoI(params *GetContractPoIParams) (*GetContractPoIOK, error) {
+func (a *Client) GetContractPoI(params *GetContractPoIParams, opts ...ClientOption) (*GetContractPoIOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetContractPoIParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetContractPoI",
 		Method:             "GET",
 		PathPattern:        "/contracts/{pubkey}/poi",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetContractPoIReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetContractPoIOK), nil
-
+	success, ok := result.(*GetContractPoIOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetContractPoI: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-GetContractStore Get contract store by pubkey
+  GetCurrentGeneration Get the current generation
 */
-func (a *Client) GetContractStore(params *GetContractStoreParams) (*GetContractStoreOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetContractStoreParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "GetContractStore",
-		Method:             "GET",
-		PathPattern:        "/contracts/{pubkey}/store",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &GetContractStoreReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*GetContractStoreOK), nil
-
-}
-
-/*
-GetCurrentGeneration Get the current generation
-*/
-func (a *Client) GetCurrentGeneration(params *GetCurrentGenerationParams) (*GetCurrentGenerationOK, error) {
+func (a *Client) GetCurrentGeneration(params *GetCurrentGenerationParams, opts ...ClientOption) (*GetCurrentGenerationOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetCurrentGenerationParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetCurrentGeneration",
 		Method:             "GET",
 		PathPattern:        "/generations/current",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetCurrentGenerationReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetCurrentGenerationOK), nil
-
+	success, ok := result.(*GetCurrentGenerationOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetCurrentGeneration: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-GetCurrentKeyBlock Get the current key block
+  GetCurrentKeyBlock Get the current key block
 */
-func (a *Client) GetCurrentKeyBlock(params *GetCurrentKeyBlockParams) (*GetCurrentKeyBlockOK, error) {
+func (a *Client) GetCurrentKeyBlock(params *GetCurrentKeyBlockParams, opts ...ClientOption) (*GetCurrentKeyBlockOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetCurrentKeyBlockParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetCurrentKeyBlock",
 		Method:             "GET",
 		PathPattern:        "/key-blocks/current",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetCurrentKeyBlockReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetCurrentKeyBlockOK), nil
-
+	success, ok := result.(*GetCurrentKeyBlockOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetCurrentKeyBlock: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-GetCurrentKeyBlockHash Get the hash of the current key block
+  GetCurrentKeyBlockHash Get the hash of the current key block
 */
-func (a *Client) GetCurrentKeyBlockHash(params *GetCurrentKeyBlockHashParams) (*GetCurrentKeyBlockHashOK, error) {
+func (a *Client) GetCurrentKeyBlockHash(params *GetCurrentKeyBlockHashParams, opts ...ClientOption) (*GetCurrentKeyBlockHashOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetCurrentKeyBlockHashParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetCurrentKeyBlockHash",
 		Method:             "GET",
 		PathPattern:        "/key-blocks/current/hash",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetCurrentKeyBlockHashReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetCurrentKeyBlockHashOK), nil
-
+	success, ok := result.(*GetCurrentKeyBlockHashOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetCurrentKeyBlockHash: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-GetCurrentKeyBlockHeight Get the height of the current key block
+  GetCurrentKeyBlockHeight Get the height of the current key block
 */
-func (a *Client) GetCurrentKeyBlockHeight(params *GetCurrentKeyBlockHeightParams) (*GetCurrentKeyBlockHeightOK, error) {
+func (a *Client) GetCurrentKeyBlockHeight(params *GetCurrentKeyBlockHeightParams, opts ...ClientOption) (*GetCurrentKeyBlockHeightOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetCurrentKeyBlockHeightParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetCurrentKeyBlockHeight",
 		Method:             "GET",
 		PathPattern:        "/key-blocks/current/height",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetCurrentKeyBlockHeightReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetCurrentKeyBlockHeightOK), nil
-
+	success, ok := result.(*GetCurrentKeyBlockHeightOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetCurrentKeyBlockHeight: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-GetGenerationByHash Get a generation by hash
+  GetGenerationByHash Get a generation by hash
 */
-func (a *Client) GetGenerationByHash(params *GetGenerationByHashParams) (*GetGenerationByHashOK, error) {
+func (a *Client) GetGenerationByHash(params *GetGenerationByHashParams, opts ...ClientOption) (*GetGenerationByHashOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetGenerationByHashParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetGenerationByHash",
 		Method:             "GET",
 		PathPattern:        "/generations/hash/{hash}",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetGenerationByHashReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetGenerationByHashOK), nil
-
+	success, ok := result.(*GetGenerationByHashOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetGenerationByHash: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-GetGenerationByHeight Get a generation by height
+  GetGenerationByHeight Get a generation by height
 */
-func (a *Client) GetGenerationByHeight(params *GetGenerationByHeightParams) (*GetGenerationByHeightOK, error) {
+func (a *Client) GetGenerationByHeight(params *GetGenerationByHeightParams, opts ...ClientOption) (*GetGenerationByHeightOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetGenerationByHeightParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetGenerationByHeight",
 		Method:             "GET",
 		PathPattern:        "/generations/height/{height}",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetGenerationByHeightReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetGenerationByHeightOK), nil
-
+	success, ok := result.(*GetGenerationByHeightOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetGenerationByHeight: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-GetKeyBlockByHash Get a key block by hash
+  GetKeyBlockByHash Get a key block by hash
 */
-func (a *Client) GetKeyBlockByHash(params *GetKeyBlockByHashParams) (*GetKeyBlockByHashOK, error) {
+func (a *Client) GetKeyBlockByHash(params *GetKeyBlockByHashParams, opts ...ClientOption) (*GetKeyBlockByHashOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetKeyBlockByHashParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetKeyBlockByHash",
 		Method:             "GET",
 		PathPattern:        "/key-blocks/hash/{hash}",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetKeyBlockByHashReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetKeyBlockByHashOK), nil
-
+	success, ok := result.(*GetKeyBlockByHashOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetKeyBlockByHash: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-GetKeyBlockByHeight Get a key block by height
+  GetKeyBlockByHeight Get a key block by height
 */
-func (a *Client) GetKeyBlockByHeight(params *GetKeyBlockByHeightParams) (*GetKeyBlockByHeightOK, error) {
+func (a *Client) GetKeyBlockByHeight(params *GetKeyBlockByHeightParams, opts ...ClientOption) (*GetKeyBlockByHeightOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetKeyBlockByHeightParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetKeyBlockByHeight",
 		Method:             "GET",
 		PathPattern:        "/key-blocks/height/{height}",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetKeyBlockByHeightReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetKeyBlockByHeightOK), nil
-
+	success, ok := result.(*GetKeyBlockByHeightOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetKeyBlockByHeight: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-GetMicroBlockHeaderByHash Get a micro block header by hash
+  GetMicroBlockHeaderByHash Get a micro block header by hash
 */
-func (a *Client) GetMicroBlockHeaderByHash(params *GetMicroBlockHeaderByHashParams) (*GetMicroBlockHeaderByHashOK, error) {
+func (a *Client) GetMicroBlockHeaderByHash(params *GetMicroBlockHeaderByHashParams, opts ...ClientOption) (*GetMicroBlockHeaderByHashOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetMicroBlockHeaderByHashParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetMicroBlockHeaderByHash",
 		Method:             "GET",
 		PathPattern:        "/micro-blocks/hash/{hash}/header",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetMicroBlockHeaderByHashReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetMicroBlockHeaderByHashOK), nil
-
+	success, ok := result.(*GetMicroBlockHeaderByHashOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetMicroBlockHeaderByHash: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-GetMicroBlockTransactionByHashAndIndex Get a micro block transaction by hash and index
+  GetMicroBlockTransactionByHashAndIndex Get a micro block transaction by hash and index
 */
-func (a *Client) GetMicroBlockTransactionByHashAndIndex(params *GetMicroBlockTransactionByHashAndIndexParams) (*GetMicroBlockTransactionByHashAndIndexOK, error) {
+func (a *Client) GetMicroBlockTransactionByHashAndIndex(params *GetMicroBlockTransactionByHashAndIndexParams, opts ...ClientOption) (*GetMicroBlockTransactionByHashAndIndexOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetMicroBlockTransactionByHashAndIndexParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetMicroBlockTransactionByHashAndIndex",
 		Method:             "GET",
 		PathPattern:        "/micro-blocks/hash/{hash}/transactions/index/{index}",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetMicroBlockTransactionByHashAndIndexReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetMicroBlockTransactionByHashAndIndexOK), nil
-
+	success, ok := result.(*GetMicroBlockTransactionByHashAndIndexOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetMicroBlockTransactionByHashAndIndex: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-GetMicroBlockTransactionsByHash Get micro block transactions by hash
+  GetMicroBlockTransactionsByHash Get micro block transactions by hash
 */
-func (a *Client) GetMicroBlockTransactionsByHash(params *GetMicroBlockTransactionsByHashParams) (*GetMicroBlockTransactionsByHashOK, error) {
+func (a *Client) GetMicroBlockTransactionsByHash(params *GetMicroBlockTransactionsByHashParams, opts ...ClientOption) (*GetMicroBlockTransactionsByHashOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetMicroBlockTransactionsByHashParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetMicroBlockTransactionsByHash",
 		Method:             "GET",
 		PathPattern:        "/micro-blocks/hash/{hash}/transactions",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetMicroBlockTransactionsByHashReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetMicroBlockTransactionsByHashOK), nil
-
+	success, ok := result.(*GetMicroBlockTransactionsByHashOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetMicroBlockTransactionsByHash: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-GetMicroBlockTransactionsCountByHash Get micro block transaction count by hash
+  GetMicroBlockTransactionsCountByHash Get micro block transaction count by hash
 */
-func (a *Client) GetMicroBlockTransactionsCountByHash(params *GetMicroBlockTransactionsCountByHashParams) (*GetMicroBlockTransactionsCountByHashOK, error) {
+func (a *Client) GetMicroBlockTransactionsCountByHash(params *GetMicroBlockTransactionsCountByHashParams, opts ...ClientOption) (*GetMicroBlockTransactionsCountByHashOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetMicroBlockTransactionsCountByHashParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetMicroBlockTransactionsCountByHash",
 		Method:             "GET",
 		PathPattern:        "/micro-blocks/hash/{hash}/transactions/count",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetMicroBlockTransactionsCountByHashReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetMicroBlockTransactionsCountByHashOK), nil
-
+	success, ok := result.(*GetMicroBlockTransactionsCountByHashOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetMicroBlockTransactionsCountByHash: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-GetNameEntryByName Get name entry from naming system
+  GetNameEntryByName Get name entry from naming system
 */
-func (a *Client) GetNameEntryByName(params *GetNameEntryByNameParams) (*GetNameEntryByNameOK, error) {
+func (a *Client) GetNameEntryByName(params *GetNameEntryByNameParams, opts ...ClientOption) (*GetNameEntryByNameOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetNameEntryByNameParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetNameEntryByName",
 		Method:             "GET",
 		PathPattern:        "/names/{name}",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetNameEntryByNameReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetNameEntryByNameOK), nil
-
+	success, ok := result.(*GetNameEntryByNameOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetNameEntryByName: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-GetOracleByPubkey Get an oracle by public key
+  GetOracleByPubkey Get an oracle by public key
 */
-func (a *Client) GetOracleByPubkey(params *GetOracleByPubkeyParams) (*GetOracleByPubkeyOK, error) {
+func (a *Client) GetOracleByPubkey(params *GetOracleByPubkeyParams, opts ...ClientOption) (*GetOracleByPubkeyOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetOracleByPubkeyParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetOracleByPubkey",
 		Method:             "GET",
 		PathPattern:        "/oracles/{pubkey}",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetOracleByPubkeyReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetOracleByPubkeyOK), nil
-
+	success, ok := result.(*GetOracleByPubkeyOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetOracleByPubkey: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-GetOracleQueriesByPubkey Get oracle queries by public key
+  GetOracleQueriesByPubkey Get oracle queries by public key
 */
-func (a *Client) GetOracleQueriesByPubkey(params *GetOracleQueriesByPubkeyParams) (*GetOracleQueriesByPubkeyOK, error) {
+func (a *Client) GetOracleQueriesByPubkey(params *GetOracleQueriesByPubkeyParams, opts ...ClientOption) (*GetOracleQueriesByPubkeyOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetOracleQueriesByPubkeyParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetOracleQueriesByPubkey",
 		Method:             "GET",
 		PathPattern:        "/oracles/{pubkey}/queries",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetOracleQueriesByPubkeyReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetOracleQueriesByPubkeyOK), nil
-
+	success, ok := result.(*GetOracleQueriesByPubkeyOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetOracleQueriesByPubkey: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-GetOracleQueryByPubkeyAndQueryID Get an oracle query by public key and query ID
+  GetOracleQueryByPubkeyAndQueryID Get an oracle query by public key and query ID
 */
-func (a *Client) GetOracleQueryByPubkeyAndQueryID(params *GetOracleQueryByPubkeyAndQueryIDParams) (*GetOracleQueryByPubkeyAndQueryIDOK, error) {
+func (a *Client) GetOracleQueryByPubkeyAndQueryID(params *GetOracleQueryByPubkeyAndQueryIDParams, opts ...ClientOption) (*GetOracleQueryByPubkeyAndQueryIDOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetOracleQueryByPubkeyAndQueryIDParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetOracleQueryByPubkeyAndQueryId",
 		Method:             "GET",
 		PathPattern:        "/oracles/{pubkey}/queries/{query-id}",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetOracleQueryByPubkeyAndQueryIDReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetOracleQueryByPubkeyAndQueryIDOK), nil
-
+	success, ok := result.(*GetOracleQueryByPubkeyAndQueryIDOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetOracleQueryByPubkeyAndQueryId: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-GetPeerPubkey Get peer public key
+  GetPeerPubkey Get peer public key
 */
-func (a *Client) GetPeerPubkey(params *GetPeerPubkeyParams) (*GetPeerPubkeyOK, error) {
+func (a *Client) GetPeerPubkey(params *GetPeerPubkeyParams, opts ...ClientOption) (*GetPeerPubkeyOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetPeerPubkeyParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetPeerPubkey",
 		Method:             "GET",
 		PathPattern:        "/peers/pubkey",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetPeerPubkeyReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetPeerPubkeyOK), nil
-
+	success, ok := result.(*GetPeerPubkeyOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetPeerPubkey: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-GetPendingAccountTransactionsByPubkey Get pending account transactions by public key
+  GetPendingAccountTransactionsByPubkey Get pending account transactions by public key
 */
-func (a *Client) GetPendingAccountTransactionsByPubkey(params *GetPendingAccountTransactionsByPubkeyParams) (*GetPendingAccountTransactionsByPubkeyOK, error) {
+func (a *Client) GetPendingAccountTransactionsByPubkey(params *GetPendingAccountTransactionsByPubkeyParams, opts ...ClientOption) (*GetPendingAccountTransactionsByPubkeyOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetPendingAccountTransactionsByPubkeyParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetPendingAccountTransactionsByPubkey",
 		Method:             "GET",
 		PathPattern:        "/accounts/{pubkey}/transactions/pending",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetPendingAccountTransactionsByPubkeyReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetPendingAccountTransactionsByPubkeyOK), nil
-
+	success, ok := result.(*GetPendingAccountTransactionsByPubkeyOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetPendingAccountTransactionsByPubkey: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-GetPendingKeyBlock Get the pending key block
+  GetPendingKeyBlock Get the pending key block
 */
-func (a *Client) GetPendingKeyBlock(params *GetPendingKeyBlockParams) (*GetPendingKeyBlockOK, error) {
+func (a *Client) GetPendingKeyBlock(params *GetPendingKeyBlockParams, opts ...ClientOption) (*GetPendingKeyBlockOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetPendingKeyBlockParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetPendingKeyBlock",
 		Method:             "GET",
 		PathPattern:        "/key-blocks/pending",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetPendingKeyBlockReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetPendingKeyBlockOK), nil
-
+	success, ok := result.(*GetPendingKeyBlockOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetPendingKeyBlock: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-GetStatus Get the status of a node
+  GetStatus Get the status of a node
 */
-func (a *Client) GetStatus(params *GetStatusParams) (*GetStatusOK, error) {
+func (a *Client) GetStatus(params *GetStatusParams, opts ...ClientOption) (*GetStatusOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetStatusParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetStatus",
 		Method:             "GET",
 		PathPattern:        "/status",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetStatusReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetStatusOK), nil
-
+	success, ok := result.(*GetStatusOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetStatus: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-GetTopBlock Get the top block (either key or micro block)
+  GetTopBlock Get the top block (either key or micro block)
 */
-func (a *Client) GetTopBlock(params *GetTopBlockParams) (*GetTopBlockOK, error) {
+func (a *Client) GetTopBlock(params *GetTopBlockParams, opts ...ClientOption) (*GetTopBlockOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetTopBlockParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetTopBlock",
 		Method:             "GET",
 		PathPattern:        "/blocks/top",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetTopBlockReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetTopBlockOK), nil
-
+	success, ok := result.(*GetTopBlockOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetTopBlock: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-GetTransactionByHash Get a transaction by hash
+  GetTransactionByHash Get a transaction by hash
 */
-func (a *Client) GetTransactionByHash(params *GetTransactionByHashParams) (*GetTransactionByHashOK, error) {
+func (a *Client) GetTransactionByHash(params *GetTransactionByHashParams, opts ...ClientOption) (*GetTransactionByHashOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetTransactionByHashParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetTransactionByHash",
 		Method:             "GET",
 		PathPattern:        "/transactions/{hash}",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetTransactionByHashReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetTransactionByHashOK), nil
-
+	success, ok := result.(*GetTransactionByHashOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetTransactionByHash: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-GetTransactionInfoByHash get transaction info by hash API
+  GetTransactionInfoByHash get transaction info by hash API
 */
-func (a *Client) GetTransactionInfoByHash(params *GetTransactionInfoByHashParams) (*GetTransactionInfoByHashOK, error) {
+func (a *Client) GetTransactionInfoByHash(params *GetTransactionInfoByHashParams, opts ...ClientOption) (*GetTransactionInfoByHashOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetTransactionInfoByHashParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "GetTransactionInfoByHash",
 		Method:             "GET",
 		PathPattern:        "/transactions/{hash}/info",
 		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{""},
+		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetTransactionInfoByHashReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetTransactionInfoByHashOK), nil
-
+	success, ok := result.(*GetTransactionInfoByHashOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetTransactionInfoByHash: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
-PostTransaction Post a new transaction
+  PostTransaction Post a new transaction
 */
-func (a *Client) PostTransaction(params *PostTransactionParams) (*PostTransactionOK, error) {
+func (a *Client) PostTransaction(params *PostTransactionParams, opts ...ClientOption) (*PostTransactionOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewPostTransactionParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "PostTransaction",
 		Method:             "POST",
 		PathPattern:        "/transactions",
@@ -912,12 +1294,23 @@ func (a *Client) PostTransaction(params *PostTransactionParams) (*PostTransactio
 		Reader:             &PostTransactionReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	return result.(*PostTransactionOK), nil
-
+	success, ok := result.(*PostTransactionOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for PostTransaction: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 // SetTransport changes the transport on the client

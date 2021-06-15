@@ -10,10 +10,9 @@ import (
 	"io"
 
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 
-	strfmt "github.com/go-openapi/strfmt"
-
-	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/compiler/models"
+	"github.com/aeternity/aepp-sdk-go/v8/swagguard/compiler/models"
 )
 
 // EncodeCalldataReader is a Reader for the EncodeCalldata structure.
@@ -24,23 +23,20 @@ type EncodeCalldataReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *EncodeCalldataReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewEncodeCalldataOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 400:
 		result := NewEncodeCalldataBadRequest()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -49,7 +45,7 @@ func NewEncodeCalldataOK() *EncodeCalldataOK {
 	return &EncodeCalldataOK{}
 }
 
-/*EncodeCalldataOK handles this case with default header values.
+/* EncodeCalldataOK describes a response with status code 200, with default header values.
 
 Binary encoded calldata
 */
@@ -59,6 +55,9 @@ type EncodeCalldataOK struct {
 
 func (o *EncodeCalldataOK) Error() string {
 	return fmt.Sprintf("[POST /encode-calldata][%d] encodeCalldataOK  %+v", 200, o.Payload)
+}
+func (o *EncodeCalldataOK) GetPayload() *models.Calldata {
+	return o.Payload
 }
 
 func (o *EncodeCalldataOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -78,7 +77,7 @@ func NewEncodeCalldataBadRequest() *EncodeCalldataBadRequest {
 	return &EncodeCalldataBadRequest{}
 }
 
-/*EncodeCalldataBadRequest handles this case with default header values.
+/* EncodeCalldataBadRequest describes a response with status code 400, with default header values.
 
 Invalid contract
 */
@@ -88,6 +87,9 @@ type EncodeCalldataBadRequest struct {
 
 func (o *EncodeCalldataBadRequest) Error() string {
 	return fmt.Sprintf("[POST /encode-calldata][%d] encodeCalldataBadRequest  %+v", 400, o.Payload)
+}
+func (o *EncodeCalldataBadRequest) GetPayload() models.CompilerErrors {
+	return o.Payload
 }
 
 func (o *EncodeCalldataBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

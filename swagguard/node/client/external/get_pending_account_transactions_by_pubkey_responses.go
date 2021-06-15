@@ -10,10 +10,9 @@ import (
 	"io"
 
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 
-	strfmt "github.com/go-openapi/strfmt"
-
-	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
 )
 
 // GetPendingAccountTransactionsByPubkeyReader is a Reader for the GetPendingAccountTransactionsByPubkey structure.
@@ -24,30 +23,26 @@ type GetPendingAccountTransactionsByPubkeyReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *GetPendingAccountTransactionsByPubkeyReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewGetPendingAccountTransactionsByPubkeyOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 400:
 		result := NewGetPendingAccountTransactionsByPubkeyBadRequest()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 404:
 		result := NewGetPendingAccountTransactionsByPubkeyNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -56,7 +51,7 @@ func NewGetPendingAccountTransactionsByPubkeyOK() *GetPendingAccountTransactions
 	return &GetPendingAccountTransactionsByPubkeyOK{}
 }
 
-/*GetPendingAccountTransactionsByPubkeyOK handles this case with default header values.
+/* GetPendingAccountTransactionsByPubkeyOK describes a response with status code 200, with default header values.
 
 Successful operation
 */
@@ -66,6 +61,9 @@ type GetPendingAccountTransactionsByPubkeyOK struct {
 
 func (o *GetPendingAccountTransactionsByPubkeyOK) Error() string {
 	return fmt.Sprintf("[GET /accounts/{pubkey}/transactions/pending][%d] getPendingAccountTransactionsByPubkeyOK  %+v", 200, o.Payload)
+}
+func (o *GetPendingAccountTransactionsByPubkeyOK) GetPayload() *models.GenericTxs {
+	return o.Payload
 }
 
 func (o *GetPendingAccountTransactionsByPubkeyOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -85,7 +83,7 @@ func NewGetPendingAccountTransactionsByPubkeyBadRequest() *GetPendingAccountTran
 	return &GetPendingAccountTransactionsByPubkeyBadRequest{}
 }
 
-/*GetPendingAccountTransactionsByPubkeyBadRequest handles this case with default header values.
+/* GetPendingAccountTransactionsByPubkeyBadRequest describes a response with status code 400, with default header values.
 
 Invalid public key
 */
@@ -95,6 +93,9 @@ type GetPendingAccountTransactionsByPubkeyBadRequest struct {
 
 func (o *GetPendingAccountTransactionsByPubkeyBadRequest) Error() string {
 	return fmt.Sprintf("[GET /accounts/{pubkey}/transactions/pending][%d] getPendingAccountTransactionsByPubkeyBadRequest  %+v", 400, o.Payload)
+}
+func (o *GetPendingAccountTransactionsByPubkeyBadRequest) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *GetPendingAccountTransactionsByPubkeyBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -114,7 +115,7 @@ func NewGetPendingAccountTransactionsByPubkeyNotFound() *GetPendingAccountTransa
 	return &GetPendingAccountTransactionsByPubkeyNotFound{}
 }
 
-/*GetPendingAccountTransactionsByPubkeyNotFound handles this case with default header values.
+/* GetPendingAccountTransactionsByPubkeyNotFound describes a response with status code 404, with default header values.
 
 Account not found
 */
@@ -124,6 +125,9 @@ type GetPendingAccountTransactionsByPubkeyNotFound struct {
 
 func (o *GetPendingAccountTransactionsByPubkeyNotFound) Error() string {
 	return fmt.Sprintf("[GET /accounts/{pubkey}/transactions/pending][%d] getPendingAccountTransactionsByPubkeyNotFound  %+v", 404, o.Payload)
+}
+func (o *GetPendingAccountTransactionsByPubkeyNotFound) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *GetPendingAccountTransactionsByPubkeyNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
