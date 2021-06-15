@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/aeternity/aepp-sdk-go/v8/config"
 	"github.com/aeternity/aepp-sdk-go/v8/naet"
 	"github.com/spf13/cobra"
 )
@@ -35,7 +34,7 @@ func compileFunc(conn naet.CompileContracter, args []string) (err error) {
 		return err
 	}
 
-	bytecode, err := conn.CompileContract(s, config.Compiler.Backend)
+	bytecode, err := conn.CompileContract(s)
 	fmt.Println(bytecode)
 	return err
 }
@@ -58,7 +57,7 @@ func encodeCalldataFunc(conn naet.EncodeCalldataer, args []string) (err error) {
 		return err
 	}
 
-	callData, err := conn.EncodeCalldata(s, args[1], args[2:], config.Compiler.Backend)
+	callData, err := conn.EncodeCalldata(s, args[1], args[2:])
 	if err != nil {
 		return err
 	}
@@ -91,7 +90,7 @@ func decodeCalldataBytecodeFunc(conn decodeCalldataer, args []string) (err error
 		return fmt.Errorf("%s is not bytecode", args[0])
 	}
 
-	r, err := conn.DecodeCalldataBytecode(args[0], args[1], config.Compiler.Backend)
+	r, err := conn.DecodeCalldataBytecode(args[0], args[1])
 	if err != nil {
 		return
 	}
@@ -121,7 +120,7 @@ func decodeCalldataSourceFunc(conn decodeCalldataer, args []string) (err error) 
 		return fmt.Errorf("%s is not bytecode", args[0])
 	}
 
-	r, err := conn.DecodeCalldataSource(source, args[1], args[2], config.Compiler.Backend)
+	r, err := conn.DecodeCalldataSource(source, args[1], args[2])
 
 	fmt.Println(*r.Function, r.Arguments)
 	return
@@ -145,7 +144,7 @@ func generateAciFunc(conn naet.GenerateACIer, args []string) (err error) {
 		return
 	}
 
-	aci, err := conn.GenerateACI(source, config.Compiler.Backend)
+	aci, err := conn.GenerateACI(source)
 	if err != nil {
 		return
 	}

@@ -26,7 +26,7 @@ type GAAttachTx struct {
 
 	// Contract authorization function hash (hex encoded)
 	// Required: true
-	// Pattern: ^(0x|0X)?[a-fA-F0-9]+$'
+	// Pattern: ^(0x|0X)?[a-fA-F0-9]+$
 	AuthFun *string `json:"auth_fun"`
 
 	// Contract call data
@@ -125,7 +125,7 @@ func (m *GAAttachTx) validateAuthFun(formats strfmt.Registry) error {
 		return err
 	}
 
-	if err := validate.Pattern("auth_fun", "body", *m.AuthFun, `^(0x|0X)?[a-fA-F0-9]+$'`); err != nil {
+	if err := validate.Pattern("auth_fun", "body", *m.AuthFun, `^(0x|0X)?[a-fA-F0-9]+$`); err != nil {
 		return err
 	}
 

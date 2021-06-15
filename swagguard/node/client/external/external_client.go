@@ -94,6 +94,8 @@ type ClientService interface {
 
 	PostTransaction(params *PostTransactionParams, opts ...ClientOption) (*PostTransactionOK, error)
 
+	ProtectedDryRunTxs(params *ProtectedDryRunTxsParams, opts ...ClientOption) (*ProtectedDryRunTxsOK, error)
+
 	SetTransport(transport runtime.ClientTransport)
 }
 
@@ -1310,6 +1312,44 @@ func (a *Client) PostTransaction(params *PostTransactionParams, opts ...ClientOp
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for PostTransaction: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+  ProtectedDryRunTxs Dry-run transactions on top of a given block. Supports all TXs except GAMetaTx, PayingForTx and OffchainTx. The maximum gas limit of all calls is capped. The maximum gas limit per request is a global node setting. Since DryRunCallReq object do not have a mandatory gas field, if not set a default value of 1000000 is being used instead.
+*/
+func (a *Client) ProtectedDryRunTxs(params *ProtectedDryRunTxsParams, opts ...ClientOption) (*ProtectedDryRunTxsOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewProtectedDryRunTxsParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "ProtectedDryRunTxs",
+		Method:             "POST",
+		PathPattern:        "/dry-run",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &ProtectedDryRunTxsReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*ProtectedDryRunTxsOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for ProtectedDryRunTxs: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

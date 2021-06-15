@@ -212,7 +212,6 @@ func TestSignBroadcast(t *testing.T) {
 func Test_findVMABIVersion(t *testing.T) {
 	type args struct {
 		nodeVersion     string
-		compilerBackend string
 	}
 	tests := []struct {
 		name           string
@@ -222,53 +221,24 @@ func Test_findVMABIVersion(t *testing.T) {
 		wantErr        bool
 	}{
 		{
-			name: "node version 5, FATE backend",
+			name: "node version 6, FATE backend",
 			args: args{
-				nodeVersion:     "5",
-				compilerBackend: "fate",
+				nodeVersion:     "6",
 			},
-			wantVMVersion:  5,
+			wantVMVersion:  7,
 			wantABIVersion: 3,
-		},
-		{
-			name: "node version 5, AEVM backend",
-			args: args{
-				nodeVersion:     "5",
-				compilerBackend: "aevm",
-			},
-			wantVMVersion:  6,
-			wantABIVersion: 1,
-		},
-		{
-			name: "node version 4, AEVM backend",
-			args: args{
-				nodeVersion:     "4",
-				compilerBackend: "aevm",
-			},
-			wantVMVersion:  4,
-			wantABIVersion: 1,
-		},
-		{
-			name: "node version 4, does not actually support FATE, so it should return answer for AEVM anyway",
-			args: args{
-				nodeVersion:     "4",
-				compilerBackend: "fate",
-			},
-			wantVMVersion:  4,
-			wantABIVersion: 1,
 		},
 		{
 			name: "Other versions of the node are not supported",
 			args: args{
 				nodeVersion:     "3",
-				compilerBackend: "aevm",
 			},
 			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotVMVersion, gotABIVersion, err := findVMABIVersion(tt.args.nodeVersion, tt.args.compilerBackend)
+			gotVMVersion, gotABIVersion, err := findVMABIVersion(tt.args.nodeVersion)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("findVMABIVersion() error = %v, wantErr %v", err, tt.wantErr)
 				return

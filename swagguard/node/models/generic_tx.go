@@ -248,6 +248,12 @@ func unmarshalGenericTx(data []byte, consumer runtime.Consumer) (GenericTx, erro
 			return nil, err
 		}
 		return &result, nil
+	case "PayingForTxJSON", "PayingForTx":
+		var result PayingForTxJSON
+		if err := consumer.Consume(buf2, &result); err != nil {
+			return nil, err
+		}
+		return &result, nil
 	case "SpendTxJSON", "SpendTx":
 		var result SpendTxJSON
 		if err := consumer.Consume(buf2, &result); err != nil {

@@ -45,11 +45,11 @@ func TestGeneralizedAccounts(t *testing.T) {
 
 	authorizeSource := string(golden.Get(t, "authorize.aes"))
 	// Read the auth contract from a file, compile and prepare its init() calldata
-	authBytecode, err := compiler.CompileContract(authorizeSource, config.Compiler.Backend)
+	authBytecode, err := compiler.CompileContract(authorizeSource)
 	if err != nil {
 		t.Fatal(err)
 	}
-	authInitCalldata, err := compiler.EncodeCalldata(authorizeSource, "init", []string{alice.Address}, config.Compiler.Backend)
+	authInitCalldata, err := compiler.EncodeCalldata(authorizeSource, "init", []string{alice.Address})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -98,7 +98,7 @@ func TestGeneralizedAccounts(t *testing.T) {
 	// GAMetaTx
 	// spendTx will be wrapped in a SignedTx with 0 signatures before being
 	// included in GAMetaTx. The constructor NewGAMetaTx() does this for you.
-	authData, err := compiler.EncodeCalldata(authorizeSource, "authorize", []string{"3"}, config.Compiler.Backend)
+	authData, err := compiler.EncodeCalldata(authorizeSource, "authorize", []string{"3"})
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -176,7 +176,6 @@ type GAMetaTx struct {
 	GasLimit   *big.Int
 	GasPrice   *big.Int
 	Fee        *big.Int
-	TTL        uint64
 	Tx         *SignedTx
 }
 
@@ -197,14 +196,13 @@ func (tx *GAMetaTx) EncodeRLP(w io.Writer) (err error) {
 
 	rlpRawMsg, err := buildRLPMessage(
 		ObjectTagGeneralizedAccountMetaTransaction,
-		rlpMessageVersion,
+		rlpMessageVersion2,
 		aID,
 		authDataBinary,
 		tx.AbiVersion,
 		tx.Fee,
 		tx.GasLimit,
 		tx.GasPrice,
-		tx.TTL,
 		txRLP,
 	)
 
@@ -227,7 +225,6 @@ type gaMetaRLP struct {
 	Fee               *big.Int
 	GasLimit          *big.Int
 	GasPrice          *big.Int
-	TTL               uint64
 	WrappedTx         []byte
 }
 
@@ -265,7 +262,6 @@ func (tx *GAMetaTx) DecodeRLP(s *rlp.Stream) (err error) {
 	tx.GasLimit = gtx.GasLimit
 	tx.GasPrice = gtx.GasPrice
 	tx.Fee = gtx.Fee
-	tx.TTL = gtx.TTL
 	tx.Tx = wtx.(*SignedTx)
 	return
 }
@@ -295,11 +291,6 @@ func (tx *GAMetaTx) CalcGas() (g *big.Int, err error) {
 
 // NewGAMetaTx creates a GAMetaTx
 func NewGAMetaTx(accountID string, authData string, abiVersion uint16, gasLimit *big.Int, gasPrice *big.Int, wrappedTx Transaction, ttlnoncer TTLNoncer) (tx *GAMetaTx, err error) {
-	ttl, _, _, err := ttlnoncer(accountID, config.Client.TTL)
-	if err != nil {
-		return
-	}
-
 	tx = &GAMetaTx{
 		AccountID:  accountID,
 		AuthData:   authData,
@@ -307,7 +298,6 @@ func NewGAMetaTx(accountID string, authData string, abiVersion uint16, gasLimit 
 		GasLimit:   gasLimit,
 		GasPrice:   gasPrice,
 		Fee:        config.Client.Fee,
-		TTL:        ttl,
 		Tx: &SignedTx{
 			Signatures: [][]byte{},
 			Tx:         wrappedTx,

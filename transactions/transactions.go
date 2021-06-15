@@ -41,6 +41,7 @@ func TransactionTypes() map[uint]Transaction {
 // RLP message version used in RLP serialization
 const (
 	rlpMessageVersion uint = 1
+	rlpMessageVersion2 uint = 2
 )
 
 // Address-like bytearrays are converted in to an ID (uint8 bytearray) for RLP

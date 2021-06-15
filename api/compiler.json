@@ -540,7 +540,7 @@
     "description": "This is the [Aeternity](https://www.aeternity.com/) compiler API.",
     "termsOfService": "https://www.aeternity.com/terms/",
     "title": "Aeternity node",
-    "version": "4.3.2"
+    "version": "6.0.0"
   },
   "paths": {
     "/aci": {
