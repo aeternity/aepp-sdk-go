@@ -6,15 +6,17 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
 
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/validate"
 )
 
 // TxBlockHeight tx block height
+//
 // swagger:model TxBlockHeight
-type TxBlockHeight uint64
+type TxBlockHeight int64
 
 // Validate validates this tx block height
 func (m TxBlockHeight) Validate(formats strfmt.Registry) error {
@@ -27,5 +29,10 @@ func (m TxBlockHeight) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+// ContextValidate validates this tx block height based on context it is used
+func (m TxBlockHeight) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }

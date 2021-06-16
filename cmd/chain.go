@@ -18,9 +18,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/aeternity/aepp-sdk-go/v8/binary"
-	"github.com/aeternity/aepp-sdk-go/v8/config"
-	"github.com/aeternity/aepp-sdk-go/v8/naet"
+	"github.com/aeternity/aepp-sdk-go/v9/binary"
+	"github.com/aeternity/aepp-sdk-go/v9/config"
+	"github.com/aeternity/aepp-sdk-go/v9/naet"
 	"github.com/spf13/cobra"
 )
 
@@ -93,7 +93,7 @@ func playFunc(conn playFuncInterface, args []string) (err error) {
 
 	// deal with the height parameter
 	if startFromHeight > blockHeight {
-		err := fmt.Errorf("Height (%d) is greater that the top block (%d)", startFromHeight, blockHeight)
+		err := fmt.Errorf("height (%d) is greater that the top block (%d)", startFromHeight, blockHeight)
 		return err
 	}
 
@@ -133,8 +133,7 @@ func broadcastFunc(conn naet.PostTransactioner, args []string) (err error) {
 	txSignedBase64 := args[0]
 
 	if len(txSignedBase64) == 0 || txSignedBase64[0:3] != "tx_" {
-		err := errors.New("Error, missing or invalid recipient address")
-		return err
+		return errors.New("missing or invalid recipient address")
 	}
 
 	// Transform tx_ string back to an RLP bytearray to calculate its hash
@@ -150,8 +149,7 @@ func broadcastFunc(conn naet.PostTransactioner, args []string) (err error) {
 
 	err = conn.PostTransaction(txSignedBase64, signedEncodedTxHash)
 	if err != nil {
-		errFinal := fmt.Errorf("Error while broadcasting transaction: %v", err)
-		return errFinal
+		return fmt.Errorf("can't broadcast transaction: %v", err)
 	}
 
 	return nil
@@ -171,7 +169,7 @@ var ttlCmd = &cobra.Command{
 func ttlFunc(conn naet.GetHeighter, args []string) (err error) {
 	height, err := conn.GetHeight()
 	if err != nil {
-		errFinal := fmt.Errorf("Error getting height from the node: %v", err)
+		errFinal := fmt.Errorf("can't get height from the node: %v", err)
 		return errFinal
 	}
 	ttl = height + config.Client.TTL
@@ -193,8 +191,7 @@ var networkIDCmd = &cobra.Command{
 func networkIDFunc(conn naet.GetStatuser, args []string) (err error) {
 	resp, err := conn.GetStatus()
 	if err != nil {
-		errFinal := fmt.Errorf("Error getting status information from the node: %v", err)
-		return errFinal
+		return fmt.Errorf("can't get status information from the node: %v", err)
 	}
 	fmt.Println(*resp.NetworkID)
 	return nil

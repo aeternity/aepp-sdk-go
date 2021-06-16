@@ -10,10 +10,9 @@ import (
 	"io"
 
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 
-	strfmt "github.com/go-openapi/strfmt"
-
-	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/node/models"
 )
 
 // PostTransactionReader is a Reader for the PostTransaction structure.
@@ -24,23 +23,20 @@ type PostTransactionReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *PostTransactionReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewPostTransactionOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 400:
 		result := NewPostTransactionBadRequest()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -49,7 +45,7 @@ func NewPostTransactionOK() *PostTransactionOK {
 	return &PostTransactionOK{}
 }
 
-/*PostTransactionOK handles this case with default header values.
+/* PostTransactionOK describes a response with status code 200, with default header values.
 
 Successful operation
 */
@@ -59,6 +55,9 @@ type PostTransactionOK struct {
 
 func (o *PostTransactionOK) Error() string {
 	return fmt.Sprintf("[POST /transactions][%d] postTransactionOK  %+v", 200, o.Payload)
+}
+func (o *PostTransactionOK) GetPayload() *models.PostTxResponse {
+	return o.Payload
 }
 
 func (o *PostTransactionOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -78,7 +77,7 @@ func NewPostTransactionBadRequest() *PostTransactionBadRequest {
 	return &PostTransactionBadRequest{}
 }
 
-/*PostTransactionBadRequest handles this case with default header values.
+/* PostTransactionBadRequest describes a response with status code 400, with default header values.
 
 Invalid transaction
 */
@@ -88,6 +87,9 @@ type PostTransactionBadRequest struct {
 
 func (o *PostTransactionBadRequest) Error() string {
 	return fmt.Sprintf("[POST /transactions][%d] postTransactionBadRequest  %+v", 400, o.Payload)
+}
+func (o *PostTransactionBadRequest) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *PostTransactionBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

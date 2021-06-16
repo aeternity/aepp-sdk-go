@@ -6,13 +6,15 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
 
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
 
 // DryRunInputItem dry run input item
+//
 // swagger:model DryRunInputItem
 type DryRunInputItem struct {
 
@@ -38,13 +40,40 @@ func (m *DryRunInputItem) Validate(formats strfmt.Registry) error {
 }
 
 func (m *DryRunInputItem) validateCallReq(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.CallReq) { // not required
 		return nil
 	}
 
 	if m.CallReq != nil {
 		if err := m.CallReq.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("call_req")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this dry run input item based on the context it is used
+func (m *DryRunInputItem) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateCallReq(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *DryRunInputItem) contextValidateCallReq(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.CallReq != nil {
+		if err := m.CallReq.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("call_req")
 			}

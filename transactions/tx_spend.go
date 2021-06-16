@@ -4,11 +4,11 @@ import (
 	"io"
 	"math/big"
 
-	"github.com/aeternity/aepp-sdk-go/v8/binary"
-	"github.com/aeternity/aepp-sdk-go/v8/config"
-	"github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
-	"github.com/aeternity/aepp-sdk-go/v8/utils"
-	rlp "github.com/randomshinichi/rlpae"
+	"github.com/aeternity/aepp-sdk-go/v9/binary"
+	"github.com/aeternity/aepp-sdk-go/v9/config"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v9/utils"
+	rlp "github.com/aeternity/rlp-go"
 )
 
 // SpendTx represents a simple transaction where one party sends another AE
@@ -106,9 +106,11 @@ func (tx *SpendTx) DecodeRLP(s *rlp.Stream) (err error) {
 // JSON representation of a Tx is useful for querying the node's debug endpoint
 func (tx *SpendTx) JSON() (string, error) {
 	baseEncodedPayload := binary.Encode(binary.PrefixByteArray, tx.Payload)
+	amount := utils.BigInt(*tx.Amount)
+	fee := utils.BigInt(*tx.Fee)
 	swaggerT := models.SpendTx{
-		Amount:      utils.BigInt(*tx.Amount),
-		Fee:         utils.BigInt(*tx.Fee),
+		Amount:      &amount,
+		Fee:         &fee,
 		Nonce:       tx.Nonce,
 		Payload:     &baseEncodedPayload,
 		RecipientID: &tx.RecipientID,

@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	config "github.com/aeternity/aepp-sdk-go/v8/config"
+	config "github.com/aeternity/aepp-sdk-go/v9/config"
 	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/argon2"
 	"golang.org/x/crypto/nacl/secretbox"
@@ -59,6 +59,9 @@ func KeystoreOpen(data []byte, password string) (account *Account, err error) {
 	}
 	// build the key from the password
 	salt, err := hex.DecodeString(k.Crypto.KdfParams.Salt)
+	if err != nil {
+		return
+	}
 	argonKey := argon2.IDKey([]byte(password), salt,
 		k.Crypto.KdfParams.Opslimit,
 		k.Crypto.KdfParams.Memlimit,
@@ -68,14 +71,20 @@ func KeystoreOpen(data []byte, password string) (account *Account, err error) {
 	copy(key[:], argonKey)
 	// retrieve the nonce
 	v, err := hex.DecodeString(k.Crypto.CipherParams.Nonce)
+	if err != nil {
+		return
+	}
 	var decryptNonce [24]byte
 	copy(decryptNonce[:], v)
 	// now retrieve the cypertext
 	v, err = hex.DecodeString(k.Crypto.Ciphertext)
-	//
+	if err != nil {
+		return
+	}
+
 	decrypted, ok := secretbox.Open(nil, v, &decryptNonce, &key)
 	if !ok {
-		err = fmt.Errorf("Cannot decrypt secret")
+		err = fmt.Errorf("cannot decrypt secret")
 		return
 	}
 	// now load the account
@@ -97,7 +106,7 @@ func randomBytes(n int) ([]byte, error) {
 }
 
 // KeystoreSeal create an encrypted json keystore with the private key of the account
-func KeystoreSeal(account *Account, password string) (j []byte, e error) {
+func KeystoreSeal(account *Account, password string) (j []byte, err error) {
 	// normalize pwd
 	salt, err := randomBytes(16)
 	if err != nil {

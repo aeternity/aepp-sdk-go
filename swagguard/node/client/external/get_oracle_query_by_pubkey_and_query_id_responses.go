@@ -10,10 +10,9 @@ import (
 	"io"
 
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 
-	strfmt "github.com/go-openapi/strfmt"
-
-	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/node/models"
 )
 
 // GetOracleQueryByPubkeyAndQueryIDReader is a Reader for the GetOracleQueryByPubkeyAndQueryID structure.
@@ -24,30 +23,26 @@ type GetOracleQueryByPubkeyAndQueryIDReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *GetOracleQueryByPubkeyAndQueryIDReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewGetOracleQueryByPubkeyAndQueryIDOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 400:
 		result := NewGetOracleQueryByPubkeyAndQueryIDBadRequest()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 404:
 		result := NewGetOracleQueryByPubkeyAndQueryIDNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -56,7 +51,7 @@ func NewGetOracleQueryByPubkeyAndQueryIDOK() *GetOracleQueryByPubkeyAndQueryIDOK
 	return &GetOracleQueryByPubkeyAndQueryIDOK{}
 }
 
-/*GetOracleQueryByPubkeyAndQueryIDOK handles this case with default header values.
+/* GetOracleQueryByPubkeyAndQueryIDOK describes a response with status code 200, with default header values.
 
 Successful operation
 */
@@ -66,6 +61,9 @@ type GetOracleQueryByPubkeyAndQueryIDOK struct {
 
 func (o *GetOracleQueryByPubkeyAndQueryIDOK) Error() string {
 	return fmt.Sprintf("[GET /oracles/{pubkey}/queries/{query-id}][%d] getOracleQueryByPubkeyAndQueryIdOK  %+v", 200, o.Payload)
+}
+func (o *GetOracleQueryByPubkeyAndQueryIDOK) GetPayload() *models.OracleQuery {
+	return o.Payload
 }
 
 func (o *GetOracleQueryByPubkeyAndQueryIDOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -85,7 +83,7 @@ func NewGetOracleQueryByPubkeyAndQueryIDBadRequest() *GetOracleQueryByPubkeyAndQ
 	return &GetOracleQueryByPubkeyAndQueryIDBadRequest{}
 }
 
-/*GetOracleQueryByPubkeyAndQueryIDBadRequest handles this case with default header values.
+/* GetOracleQueryByPubkeyAndQueryIDBadRequest describes a response with status code 400, with default header values.
 
 Invalid public key or query ID
 */
@@ -95,6 +93,9 @@ type GetOracleQueryByPubkeyAndQueryIDBadRequest struct {
 
 func (o *GetOracleQueryByPubkeyAndQueryIDBadRequest) Error() string {
 	return fmt.Sprintf("[GET /oracles/{pubkey}/queries/{query-id}][%d] getOracleQueryByPubkeyAndQueryIdBadRequest  %+v", 400, o.Payload)
+}
+func (o *GetOracleQueryByPubkeyAndQueryIDBadRequest) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *GetOracleQueryByPubkeyAndQueryIDBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -114,7 +115,7 @@ func NewGetOracleQueryByPubkeyAndQueryIDNotFound() *GetOracleQueryByPubkeyAndQue
 	return &GetOracleQueryByPubkeyAndQueryIDNotFound{}
 }
 
-/*GetOracleQueryByPubkeyAndQueryIDNotFound handles this case with default header values.
+/* GetOracleQueryByPubkeyAndQueryIDNotFound describes a response with status code 404, with default header values.
 
 Oracle query not found
 */
@@ -124,6 +125,9 @@ type GetOracleQueryByPubkeyAndQueryIDNotFound struct {
 
 func (o *GetOracleQueryByPubkeyAndQueryIDNotFound) Error() string {
 	return fmt.Sprintf("[GET /oracles/{pubkey}/queries/{query-id}][%d] getOracleQueryByPubkeyAndQueryIdNotFound  %+v", 404, o.Payload)
+}
+func (o *GetOracleQueryByPubkeyAndQueryIDNotFound) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *GetOracleQueryByPubkeyAndQueryIDNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

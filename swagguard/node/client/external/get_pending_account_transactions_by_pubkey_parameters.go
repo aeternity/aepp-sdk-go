@@ -13,63 +13,76 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
-
-	strfmt "github.com/go-openapi/strfmt"
+	"github.com/go-openapi/strfmt"
 )
 
-// NewGetPendingAccountTransactionsByPubkeyParams creates a new GetPendingAccountTransactionsByPubkeyParams object
-// with the default values initialized.
+// NewGetPendingAccountTransactionsByPubkeyParams creates a new GetPendingAccountTransactionsByPubkeyParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewGetPendingAccountTransactionsByPubkeyParams() *GetPendingAccountTransactionsByPubkeyParams {
-	var ()
 	return &GetPendingAccountTransactionsByPubkeyParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewGetPendingAccountTransactionsByPubkeyParamsWithTimeout creates a new GetPendingAccountTransactionsByPubkeyParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewGetPendingAccountTransactionsByPubkeyParamsWithTimeout(timeout time.Duration) *GetPendingAccountTransactionsByPubkeyParams {
-	var ()
 	return &GetPendingAccountTransactionsByPubkeyParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewGetPendingAccountTransactionsByPubkeyParamsWithContext creates a new GetPendingAccountTransactionsByPubkeyParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewGetPendingAccountTransactionsByPubkeyParamsWithContext(ctx context.Context) *GetPendingAccountTransactionsByPubkeyParams {
-	var ()
 	return &GetPendingAccountTransactionsByPubkeyParams{
-
 		Context: ctx,
 	}
 }
 
 // NewGetPendingAccountTransactionsByPubkeyParamsWithHTTPClient creates a new GetPendingAccountTransactionsByPubkeyParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewGetPendingAccountTransactionsByPubkeyParamsWithHTTPClient(client *http.Client) *GetPendingAccountTransactionsByPubkeyParams {
-	var ()
 	return &GetPendingAccountTransactionsByPubkeyParams{
 		HTTPClient: client,
 	}
 }
 
-/*GetPendingAccountTransactionsByPubkeyParams contains all the parameters to send to the API endpoint
-for the get pending account transactions by pubkey operation typically these are written to a http.Request
+/* GetPendingAccountTransactionsByPubkeyParams contains all the parameters to send to the API endpoint
+   for the get pending account transactions by pubkey operation.
+
+   Typically these are written to a http.Request.
 */
 type GetPendingAccountTransactionsByPubkeyParams struct {
 
-	/*Pubkey
-	  The public key of the account
+	/* Pubkey.
 
+	   The public key of the account
 	*/
 	Pubkey string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the get pending account transactions by pubkey params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetPendingAccountTransactionsByPubkeyParams) WithDefaults() *GetPendingAccountTransactionsByPubkeyParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the get pending account transactions by pubkey params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetPendingAccountTransactionsByPubkeyParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the get pending account transactions by pubkey params

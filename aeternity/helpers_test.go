@@ -6,12 +6,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/aeternity/aepp-sdk-go/v8/account"
-	"github.com/aeternity/aepp-sdk-go/v8/config"
-	"github.com/aeternity/aepp-sdk-go/v8/naet"
-	"github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
-	"github.com/aeternity/aepp-sdk-go/v8/transactions"
-	"github.com/aeternity/aepp-sdk-go/v8/utils"
+	"github.com/aeternity/aepp-sdk-go/v9/account"
+	"github.com/aeternity/aepp-sdk-go/v9/config"
+	"github.com/aeternity/aepp-sdk-go/v9/naet"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v9/transactions"
+	"github.com/aeternity/aepp-sdk-go/v9/utils"
 )
 
 type mockNodeForTxReceiptWatch struct {
@@ -31,7 +31,7 @@ func (m *mockNodeForTxReceiptWatch) GetTransactionByHash(hash string) (tx *model
 	bh := "bh_someblockhash"
 	tx = &models.GenericSignedTx{
 		BlockHash:   &bh,
-		BlockHeight: utils.BigInt{},
+		BlockHeight: &utils.BigInt{},
 		Hash:        &hash,
 		Signatures:  nil,
 	}
@@ -100,7 +100,7 @@ func Example() {
 		fmt.Println("Could not create alice's Account:", err)
 	}
 
-	bobAddress := "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v"
+	bobAddress := "ak_wJ3iKZcqvgdnQ6YVz8pY2xPjtVTNNEL61qF4AYQdksZfXZLks"
 
 	// create a connection to a node, represented by *Node
 	node := naet.NewNode("http://localhost:3013", false)
@@ -166,7 +166,7 @@ func TestSignBroadcast(t *testing.T) {
 			args: args{
 				tx: &transactions.SpendTx{
 					SenderID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
-					RecipientID: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
+					RecipientID: "ak_wJ3iKZcqvgdnQ6YVz8pY2xPjtVTNNEL61qF4AYQdksZfXZLks",
 					Amount:      &big.Int{},
 					Fee:         &big.Int{},
 					Payload:     nil,
@@ -184,7 +184,7 @@ func TestSignBroadcast(t *testing.T) {
 			args: args{
 				tx: &transactions.SpendTx{
 					SenderID:    "ak_2a1j2Mk9YSmC1gioUq4PWRm3bsv887MbuRVwyv4KaUGoR1eiKi",
-					RecipientID: "ak_Egp9yVdpxmvAfQ7vsXGvpnyfNq71msbdUpkMNYGTeTe8kPL3v",
+					RecipientID: "ak_wJ3iKZcqvgdnQ6YVz8pY2xPjtVTNNEL61qF4AYQdksZfXZLks",
 					Amount:      &big.Int{},
 					Fee:         &big.Int{},
 					Payload:     nil,
@@ -212,7 +212,6 @@ func TestSignBroadcast(t *testing.T) {
 func Test_findVMABIVersion(t *testing.T) {
 	type args struct {
 		nodeVersion     string
-		compilerBackend string
 	}
 	tests := []struct {
 		name           string
@@ -222,53 +221,24 @@ func Test_findVMABIVersion(t *testing.T) {
 		wantErr        bool
 	}{
 		{
-			name: "node version 5, FATE backend",
+			name: "node version 6, FATE backend",
 			args: args{
-				nodeVersion:     "5",
-				compilerBackend: "fate",
+				nodeVersion:     "6",
 			},
-			wantVMVersion:  5,
+			wantVMVersion:  7,
 			wantABIVersion: 3,
-		},
-		{
-			name: "node version 5, AEVM backend",
-			args: args{
-				nodeVersion:     "5",
-				compilerBackend: "aevm",
-			},
-			wantVMVersion:  6,
-			wantABIVersion: 1,
-		},
-		{
-			name: "node version 4, AEVM backend",
-			args: args{
-				nodeVersion:     "4",
-				compilerBackend: "aevm",
-			},
-			wantVMVersion:  4,
-			wantABIVersion: 1,
-		},
-		{
-			name: "node version 4, does not actually support FATE, so it should return answer for AEVM anyway",
-			args: args{
-				nodeVersion:     "4",
-				compilerBackend: "fate",
-			},
-			wantVMVersion:  4,
-			wantABIVersion: 1,
 		},
 		{
 			name: "Other versions of the node are not supported",
 			args: args{
 				nodeVersion:     "3",
-				compilerBackend: "aevm",
 			},
 			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotVMVersion, gotABIVersion, err := findVMABIVersion(tt.args.nodeVersion, tt.args.compilerBackend)
+			gotVMVersion, gotABIVersion, err := findVMABIVersion(tt.args.nodeVersion)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("findVMABIVersion() error = %v, wantErr %v", err, tt.wantErr)
 				return

@@ -10,10 +10,9 @@ import (
 	"io"
 
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 
-	strfmt "github.com/go-openapi/strfmt"
-
-	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/node/models"
 )
 
 // GetCurrentKeyBlockReader is a Reader for the GetCurrentKeyBlock structure.
@@ -24,23 +23,20 @@ type GetCurrentKeyBlockReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *GetCurrentKeyBlockReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewGetCurrentKeyBlockOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 404:
 		result := NewGetCurrentKeyBlockNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -49,7 +45,7 @@ func NewGetCurrentKeyBlockOK() *GetCurrentKeyBlockOK {
 	return &GetCurrentKeyBlockOK{}
 }
 
-/*GetCurrentKeyBlockOK handles this case with default header values.
+/* GetCurrentKeyBlockOK describes a response with status code 200, with default header values.
 
 Successful operation
 */
@@ -59,6 +55,9 @@ type GetCurrentKeyBlockOK struct {
 
 func (o *GetCurrentKeyBlockOK) Error() string {
 	return fmt.Sprintf("[GET /key-blocks/current][%d] getCurrentKeyBlockOK  %+v", 200, o.Payload)
+}
+func (o *GetCurrentKeyBlockOK) GetPayload() *models.KeyBlock {
+	return o.Payload
 }
 
 func (o *GetCurrentKeyBlockOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -78,7 +77,7 @@ func NewGetCurrentKeyBlockNotFound() *GetCurrentKeyBlockNotFound {
 	return &GetCurrentKeyBlockNotFound{}
 }
 
-/*GetCurrentKeyBlockNotFound handles this case with default header values.
+/* GetCurrentKeyBlockNotFound describes a response with status code 404, with default header values.
 
 Block not found
 */
@@ -88,6 +87,9 @@ type GetCurrentKeyBlockNotFound struct {
 
 func (o *GetCurrentKeyBlockNotFound) Error() string {
 	return fmt.Sprintf("[GET /key-blocks/current][%d] getCurrentKeyBlockNotFound  %+v", 404, o.Payload)
+}
+func (o *GetCurrentKeyBlockNotFound) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *GetCurrentKeyBlockNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

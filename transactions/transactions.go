@@ -6,13 +6,13 @@ import (
 	"io"
 	"math/big"
 
-	"github.com/aeternity/aepp-sdk-go/v8/binary"
-	"github.com/aeternity/aepp-sdk-go/v8/config"
-	"github.com/aeternity/aepp-sdk-go/v8/naet"
+	"github.com/aeternity/aepp-sdk-go/v9/binary"
+	"github.com/aeternity/aepp-sdk-go/v9/config"
+	"github.com/aeternity/aepp-sdk-go/v9/naet"
 
-	"github.com/aeternity/aepp-sdk-go/v8/account"
-	"github.com/aeternity/aepp-sdk-go/v8/utils"
-	rlp "github.com/randomshinichi/rlpae"
+	"github.com/aeternity/aepp-sdk-go/v9/account"
+	"github.com/aeternity/aepp-sdk-go/v9/utils"
+	rlp "github.com/aeternity/rlp-go"
 )
 
 // TransactionTypes is a map between the ObjectTags defined above and the
@@ -41,6 +41,7 @@ func TransactionTypes() map[uint]Transaction {
 // RLP message version used in RLP serialization
 const (
 	rlpMessageVersion uint = 1
+	rlpMessageVersion2 uint = 2
 )
 
 // Address-like bytearrays are converted in to an ID (uint8 bytearray) for RLP
@@ -539,6 +540,10 @@ func CreateNoncer(n naet.GetAccounter) Noncer {
 	return func(accountID string) (nextNonce uint64, err error) {
 		a, err := n.GetAccount(accountID)
 		if err != nil {
+			if err.Error() == "Account not found" {
+				nextNonce = 0
+				err = nil
+			}
 			return
 		}
 		nextNonce = *a.Nonce + 1

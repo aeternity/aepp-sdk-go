@@ -10,10 +10,9 @@ import (
 	"io"
 
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 
-	strfmt "github.com/go-openapi/strfmt"
-
-	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/node/models"
 )
 
 // GetTransactionInfoByHashReader is a Reader for the GetTransactionInfoByHash structure.
@@ -24,30 +23,26 @@ type GetTransactionInfoByHashReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *GetTransactionInfoByHashReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewGetTransactionInfoByHashOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 400:
 		result := NewGetTransactionInfoByHashBadRequest()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 404:
 		result := NewGetTransactionInfoByHashNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -56,7 +51,7 @@ func NewGetTransactionInfoByHashOK() *GetTransactionInfoByHashOK {
 	return &GetTransactionInfoByHashOK{}
 }
 
-/*GetTransactionInfoByHashOK handles this case with default header values.
+/* GetTransactionInfoByHashOK describes a response with status code 200, with default header values.
 
 Successful operation
 */
@@ -66,6 +61,9 @@ type GetTransactionInfoByHashOK struct {
 
 func (o *GetTransactionInfoByHashOK) Error() string {
 	return fmt.Sprintf("[GET /transactions/{hash}/info][%d] getTransactionInfoByHashOK  %+v", 200, o.Payload)
+}
+func (o *GetTransactionInfoByHashOK) GetPayload() *models.TxInfoObject {
+	return o.Payload
 }
 
 func (o *GetTransactionInfoByHashOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -85,7 +83,7 @@ func NewGetTransactionInfoByHashBadRequest() *GetTransactionInfoByHashBadRequest
 	return &GetTransactionInfoByHashBadRequest{}
 }
 
-/*GetTransactionInfoByHashBadRequest handles this case with default header values.
+/* GetTransactionInfoByHashBadRequest describes a response with status code 400, with default header values.
 
 Invalid hash
 */
@@ -95,6 +93,9 @@ type GetTransactionInfoByHashBadRequest struct {
 
 func (o *GetTransactionInfoByHashBadRequest) Error() string {
 	return fmt.Sprintf("[GET /transactions/{hash}/info][%d] getTransactionInfoByHashBadRequest  %+v", 400, o.Payload)
+}
+func (o *GetTransactionInfoByHashBadRequest) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *GetTransactionInfoByHashBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -114,7 +115,7 @@ func NewGetTransactionInfoByHashNotFound() *GetTransactionInfoByHashNotFound {
 	return &GetTransactionInfoByHashNotFound{}
 }
 
-/*GetTransactionInfoByHashNotFound handles this case with default header values.
+/* GetTransactionInfoByHashNotFound describes a response with status code 404, with default header values.
 
 Transaction not found
 */
@@ -124,6 +125,9 @@ type GetTransactionInfoByHashNotFound struct {
 
 func (o *GetTransactionInfoByHashNotFound) Error() string {
 	return fmt.Sprintf("[GET /transactions/{hash}/info][%d] getTransactionInfoByHashNotFound  %+v", 404, o.Payload)
+}
+func (o *GetTransactionInfoByHashNotFound) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *GetTransactionInfoByHashNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

@@ -10,10 +10,9 @@ import (
 	"io"
 
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 
-	strfmt "github.com/go-openapi/strfmt"
-
-	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/node/models"
 )
 
 // GetMicroBlockTransactionsByHashReader is a Reader for the GetMicroBlockTransactionsByHash structure.
@@ -24,30 +23,26 @@ type GetMicroBlockTransactionsByHashReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *GetMicroBlockTransactionsByHashReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewGetMicroBlockTransactionsByHashOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 400:
 		result := NewGetMicroBlockTransactionsByHashBadRequest()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 404:
 		result := NewGetMicroBlockTransactionsByHashNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -56,7 +51,7 @@ func NewGetMicroBlockTransactionsByHashOK() *GetMicroBlockTransactionsByHashOK {
 	return &GetMicroBlockTransactionsByHashOK{}
 }
 
-/*GetMicroBlockTransactionsByHashOK handles this case with default header values.
+/* GetMicroBlockTransactionsByHashOK describes a response with status code 200, with default header values.
 
 Successful operation
 */
@@ -66,6 +61,9 @@ type GetMicroBlockTransactionsByHashOK struct {
 
 func (o *GetMicroBlockTransactionsByHashOK) Error() string {
 	return fmt.Sprintf("[GET /micro-blocks/hash/{hash}/transactions][%d] getMicroBlockTransactionsByHashOK  %+v", 200, o.Payload)
+}
+func (o *GetMicroBlockTransactionsByHashOK) GetPayload() *models.GenericTxs {
+	return o.Payload
 }
 
 func (o *GetMicroBlockTransactionsByHashOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -85,7 +83,7 @@ func NewGetMicroBlockTransactionsByHashBadRequest() *GetMicroBlockTransactionsBy
 	return &GetMicroBlockTransactionsByHashBadRequest{}
 }
 
-/*GetMicroBlockTransactionsByHashBadRequest handles this case with default header values.
+/* GetMicroBlockTransactionsByHashBadRequest describes a response with status code 400, with default header values.
 
 Invalid hash
 */
@@ -95,6 +93,9 @@ type GetMicroBlockTransactionsByHashBadRequest struct {
 
 func (o *GetMicroBlockTransactionsByHashBadRequest) Error() string {
 	return fmt.Sprintf("[GET /micro-blocks/hash/{hash}/transactions][%d] getMicroBlockTransactionsByHashBadRequest  %+v", 400, o.Payload)
+}
+func (o *GetMicroBlockTransactionsByHashBadRequest) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *GetMicroBlockTransactionsByHashBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -114,7 +115,7 @@ func NewGetMicroBlockTransactionsByHashNotFound() *GetMicroBlockTransactionsByHa
 	return &GetMicroBlockTransactionsByHashNotFound{}
 }
 
-/*GetMicroBlockTransactionsByHashNotFound handles this case with default header values.
+/* GetMicroBlockTransactionsByHashNotFound describes a response with status code 404, with default header values.
 
 Block not found
 */
@@ -124,6 +125,9 @@ type GetMicroBlockTransactionsByHashNotFound struct {
 
 func (o *GetMicroBlockTransactionsByHashNotFound) Error() string {
 	return fmt.Sprintf("[GET /micro-blocks/hash/{hash}/transactions][%d] getMicroBlockTransactionsByHashNotFound  %+v", 404, o.Payload)
+}
+func (o *GetMicroBlockTransactionsByHashNotFound) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *GetMicroBlockTransactionsByHashNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

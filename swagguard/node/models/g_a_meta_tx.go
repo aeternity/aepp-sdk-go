@@ -6,16 +6,17 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
 
+	"github.com/aeternity/aepp-sdk-go/v9/utils"
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
-
-	utils "github.com/aeternity/aepp-sdk-go/v8/utils"
 )
 
 // GAMetaTx g a meta tx
+//
 // swagger:model GAMetaTx
 type GAMetaTx struct {
 
@@ -29,7 +30,7 @@ type GAMetaTx struct {
 
 	// fee
 	// Required: true
-	Fee utils.BigInt `json:"fee"`
+	Fee *utils.BigInt `json:"fee"`
 
 	// Account owner pub_key
 	// Required: true
@@ -41,7 +42,7 @@ type GAMetaTx struct {
 
 	// gas price
 	// Required: true
-	GasPrice utils.BigInt `json:"gas_price"`
+	GasPrice *utils.BigInt `json:"gas_price"`
 
 	// ttl
 	TTL uint64 `json:"ttl,omitempty"`
@@ -109,11 +110,21 @@ func (m *GAMetaTx) validateAuthData(formats strfmt.Registry) error {
 
 func (m *GAMetaTx) validateFee(formats strfmt.Registry) error {
 
-	if err := m.Fee.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("fee")
-		}
+	if err := validate.Required("fee", "body", m.Fee); err != nil {
 		return err
+	}
+
+	if err := validate.Required("fee", "body", m.Fee); err != nil {
+		return err
+	}
+
+	if m.Fee != nil {
+		if err := m.Fee.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("fee")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -139,11 +150,21 @@ func (m *GAMetaTx) validateGas(formats strfmt.Registry) error {
 
 func (m *GAMetaTx) validateGasPrice(formats strfmt.Registry) error {
 
-	if err := m.GasPrice.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("gas_price")
-		}
+	if err := validate.Required("gas_price", "body", m.GasPrice); err != nil {
 		return err
+	}
+
+	if err := validate.Required("gas_price", "body", m.GasPrice); err != nil {
+		return err
+	}
+
+	if m.GasPrice != nil {
+		if err := m.GasPrice.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("gas_price")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -157,6 +178,70 @@ func (m *GAMetaTx) validateTx(formats strfmt.Registry) error {
 
 	if m.Tx != nil {
 		if err := m.Tx.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("tx")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this g a meta tx based on the context it is used
+func (m *GAMetaTx) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateFee(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateGasPrice(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateTx(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *GAMetaTx) contextValidateFee(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Fee != nil {
+		if err := m.Fee.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("fee")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *GAMetaTx) contextValidateGasPrice(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.GasPrice != nil {
+		if err := m.GasPrice.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("gas_price")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *GAMetaTx) contextValidateTx(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Tx != nil {
+		if err := m.Tx.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("tx")
 			}

@@ -6,13 +6,15 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
 
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
 
 // TxInfoObject tx info object
+//
 // swagger:model TxInfoObject
 type TxInfoObject struct {
 
@@ -45,7 +47,6 @@ func (m *TxInfoObject) Validate(formats strfmt.Registry) error {
 }
 
 func (m *TxInfoObject) validateCallInfo(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.CallInfo) { // not required
 		return nil
 	}
@@ -63,13 +64,58 @@ func (m *TxInfoObject) validateCallInfo(formats strfmt.Registry) error {
 }
 
 func (m *TxInfoObject) validateGaInfo(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.GaInfo) { // not required
 		return nil
 	}
 
 	if m.GaInfo != nil {
 		if err := m.GaInfo.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("ga_info")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this tx info object based on the context it is used
+func (m *TxInfoObject) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateCallInfo(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateGaInfo(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *TxInfoObject) contextValidateCallInfo(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.CallInfo != nil {
+		if err := m.CallInfo.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("call_info")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *TxInfoObject) contextValidateGaInfo(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.GaInfo != nil {
+		if err := m.GaInfo.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("ga_info")
 			}

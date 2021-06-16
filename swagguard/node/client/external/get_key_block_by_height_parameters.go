@@ -13,64 +13,79 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-
-	strfmt "github.com/go-openapi/strfmt"
 )
 
-// NewGetKeyBlockByHeightParams creates a new GetKeyBlockByHeightParams object
-// with the default values initialized.
+// NewGetKeyBlockByHeightParams creates a new GetKeyBlockByHeightParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewGetKeyBlockByHeightParams() *GetKeyBlockByHeightParams {
-	var ()
 	return &GetKeyBlockByHeightParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewGetKeyBlockByHeightParamsWithTimeout creates a new GetKeyBlockByHeightParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewGetKeyBlockByHeightParamsWithTimeout(timeout time.Duration) *GetKeyBlockByHeightParams {
-	var ()
 	return &GetKeyBlockByHeightParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewGetKeyBlockByHeightParamsWithContext creates a new GetKeyBlockByHeightParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewGetKeyBlockByHeightParamsWithContext(ctx context.Context) *GetKeyBlockByHeightParams {
-	var ()
 	return &GetKeyBlockByHeightParams{
-
 		Context: ctx,
 	}
 }
 
 // NewGetKeyBlockByHeightParamsWithHTTPClient creates a new GetKeyBlockByHeightParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewGetKeyBlockByHeightParamsWithHTTPClient(client *http.Client) *GetKeyBlockByHeightParams {
-	var ()
 	return &GetKeyBlockByHeightParams{
 		HTTPClient: client,
 	}
 }
 
-/*GetKeyBlockByHeightParams contains all the parameters to send to the API endpoint
-for the get key block by height operation typically these are written to a http.Request
+/* GetKeyBlockByHeightParams contains all the parameters to send to the API endpoint
+   for the get key block by height operation.
+
+   Typically these are written to a http.Request.
 */
 type GetKeyBlockByHeightParams struct {
 
-	/*Height
-	  The height
+	/* Height.
 
+	   The height
+
+	   Format: uint64
 	*/
 	Height uint64
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the get key block by height params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetKeyBlockByHeightParams) WithDefaults() *GetKeyBlockByHeightParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the get key block by height params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetKeyBlockByHeightParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the get key block by height params

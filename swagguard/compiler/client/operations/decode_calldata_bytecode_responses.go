@@ -10,10 +10,9 @@ import (
 	"io"
 
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 
-	strfmt "github.com/go-openapi/strfmt"
-
-	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/compiler/models"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/compiler/models"
 )
 
 // DecodeCalldataBytecodeReader is a Reader for the DecodeCalldataBytecode structure.
@@ -24,23 +23,20 @@ type DecodeCalldataBytecodeReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *DecodeCalldataBytecodeReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewDecodeCalldataBytecodeOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 400:
 		result := NewDecodeCalldataBytecodeBadRequest()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -49,7 +45,7 @@ func NewDecodeCalldataBytecodeOK() *DecodeCalldataBytecodeOK {
 	return &DecodeCalldataBytecodeOK{}
 }
 
-/*DecodeCalldataBytecodeOK handles this case with default header values.
+/* DecodeCalldataBytecodeOK describes a response with status code 200, with default header values.
 
 Binary encoded calldata
 */
@@ -59,6 +55,9 @@ type DecodeCalldataBytecodeOK struct {
 
 func (o *DecodeCalldataBytecodeOK) Error() string {
 	return fmt.Sprintf("[POST /decode-calldata/bytecode][%d] decodeCalldataBytecodeOK  %+v", 200, o.Payload)
+}
+func (o *DecodeCalldataBytecodeOK) GetPayload() *models.DecodedCalldata {
+	return o.Payload
 }
 
 func (o *DecodeCalldataBytecodeOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -78,7 +77,7 @@ func NewDecodeCalldataBytecodeBadRequest() *DecodeCalldataBytecodeBadRequest {
 	return &DecodeCalldataBytecodeBadRequest{}
 }
 
-/*DecodeCalldataBytecodeBadRequest handles this case with default header values.
+/* DecodeCalldataBytecodeBadRequest describes a response with status code 400, with default header values.
 
 Invalid contract
 */
@@ -88,6 +87,9 @@ type DecodeCalldataBytecodeBadRequest struct {
 
 func (o *DecodeCalldataBytecodeBadRequest) Error() string {
 	return fmt.Sprintf("[POST /decode-calldata/bytecode][%d] decodeCalldataBytecodeBadRequest  %+v", 400, o.Payload)
+}
+func (o *DecodeCalldataBytecodeBadRequest) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *DecodeCalldataBytecodeBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

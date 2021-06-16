@@ -13,65 +13,78 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
+	"github.com/go-openapi/strfmt"
 
-	strfmt "github.com/go-openapi/strfmt"
-
-	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/node/models"
 )
 
-// NewPostTransactionParams creates a new PostTransactionParams object
-// with the default values initialized.
+// NewPostTransactionParams creates a new PostTransactionParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewPostTransactionParams() *PostTransactionParams {
-	var ()
 	return &PostTransactionParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewPostTransactionParamsWithTimeout creates a new PostTransactionParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewPostTransactionParamsWithTimeout(timeout time.Duration) *PostTransactionParams {
-	var ()
 	return &PostTransactionParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewPostTransactionParamsWithContext creates a new PostTransactionParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewPostTransactionParamsWithContext(ctx context.Context) *PostTransactionParams {
-	var ()
 	return &PostTransactionParams{
-
 		Context: ctx,
 	}
 }
 
 // NewPostTransactionParamsWithHTTPClient creates a new PostTransactionParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewPostTransactionParamsWithHTTPClient(client *http.Client) *PostTransactionParams {
-	var ()
 	return &PostTransactionParams{
 		HTTPClient: client,
 	}
 }
 
-/*PostTransactionParams contains all the parameters to send to the API endpoint
-for the post transaction operation typically these are written to a http.Request
+/* PostTransactionParams contains all the parameters to send to the API endpoint
+   for the post transaction operation.
+
+   Typically these are written to a http.Request.
 */
 type PostTransactionParams struct {
 
-	/*Body
-	  The new transaction
+	/* Body.
 
+	   The new transaction
 	*/
 	Body *models.Tx
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the post transaction params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *PostTransactionParams) WithDefaults() *PostTransactionParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the post transaction params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *PostTransactionParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the post transaction params
@@ -125,7 +138,6 @@ func (o *PostTransactionParams) WriteToRequest(r runtime.ClientRequest, reg strf
 		return err
 	}
 	var res []error
-
 	if o.Body != nil {
 		if err := r.SetBodyParam(o.Body); err != nil {
 			return err

@@ -7,18 +7,18 @@ package models
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 
-	strfmt "github.com/go-openapi/strfmt"
-
+	"github.com/aeternity/aepp-sdk-go/v9/utils"
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
-
-	utils "github.com/aeternity/aepp-sdk-go/v8/utils"
 )
 
 // OffChainNewContract off chain new contract
+//
 // swagger:model OffChainNewContract
 type OffChainNewContract struct {
 
@@ -36,7 +36,7 @@ type OffChainNewContract struct {
 
 	// deposit
 	// Required: true
-	Deposit utils.BigInt `json:"deposit"`
+	Deposit *utils.BigInt `json:"deposit"`
 
 	// Contract owner
 	// Required: true
@@ -54,20 +54,7 @@ func (m *OffChainNewContract) Op() string {
 
 // SetOp sets the op of this subtype
 func (m *OffChainNewContract) SetOp(val string) {
-
 }
-
-// AbiVersion gets the abi version of this subtype
-
-// CallData gets the call data of this subtype
-
-// Code gets the code of this subtype
-
-// Deposit gets the deposit of this subtype
-
-// Owner gets the owner of this subtype
-
-// VMVersion gets the vm version of this subtype
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
 func (m *OffChainNewContract) UnmarshalJSON(raw []byte) error {
@@ -87,7 +74,7 @@ func (m *OffChainNewContract) UnmarshalJSON(raw []byte) error {
 
 		// deposit
 		// Required: true
-		Deposit utils.BigInt `json:"deposit"`
+		Deposit *utils.BigInt `json:"deposit"`
 
 		// Contract owner
 		// Required: true
@@ -126,15 +113,10 @@ func (m *OffChainNewContract) UnmarshalJSON(raw []byte) error {
 	}
 
 	result.AbiVersion = data.AbiVersion
-
 	result.CallData = data.CallData
-
 	result.Code = data.Code
-
 	result.Deposit = data.Deposit
-
 	result.Owner = data.Owner
-
 	result.VMVersion = data.VMVersion
 
 	*m = result
@@ -162,7 +144,7 @@ func (m OffChainNewContract) MarshalJSON() ([]byte, error) {
 
 		// deposit
 		// Required: true
-		Deposit utils.BigInt `json:"deposit"`
+		Deposit *utils.BigInt `json:"deposit"`
 
 		// Contract owner
 		// Required: true
@@ -184,8 +166,7 @@ func (m OffChainNewContract) MarshalJSON() ([]byte, error) {
 		Owner: m.Owner,
 
 		VMVersion: m.VMVersion,
-	},
-	)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -194,8 +175,7 @@ func (m OffChainNewContract) MarshalJSON() ([]byte, error) {
 	}{
 
 		Op: m.Op(),
-	},
-	)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -275,11 +255,21 @@ func (m *OffChainNewContract) validateCode(formats strfmt.Registry) error {
 
 func (m *OffChainNewContract) validateDeposit(formats strfmt.Registry) error {
 
-	if err := m.Deposit.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("deposit")
-		}
+	if err := validate.Required("deposit", "body", m.Deposit); err != nil {
 		return err
+	}
+
+	if err := validate.Required("deposit", "body", m.Deposit); err != nil {
+		return err
+	}
+
+	if m.Deposit != nil {
+		if err := m.Deposit.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("deposit")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -298,6 +288,52 @@ func (m *OffChainNewContract) validateVMVersion(formats strfmt.Registry) error {
 
 	if err := validate.Required("vm_version", "body", m.VMVersion); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this off chain new contract based on the context it is used
+func (m *OffChainNewContract) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateCode(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateDeposit(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *OffChainNewContract) contextValidateCode(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Code != nil {
+		if err := m.Code.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("code")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *OffChainNewContract) contextValidateDeposit(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Deposit != nil {
+		if err := m.Deposit.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("deposit")
+			}
+			return err
+		}
 	}
 
 	return nil

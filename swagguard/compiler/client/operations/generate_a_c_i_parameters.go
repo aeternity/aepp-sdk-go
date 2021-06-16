@@ -13,65 +13,78 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
+	"github.com/go-openapi/strfmt"
 
-	strfmt "github.com/go-openapi/strfmt"
-
-	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/compiler/models"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/compiler/models"
 )
 
-// NewGenerateACIParams creates a new GenerateACIParams object
-// with the default values initialized.
+// NewGenerateACIParams creates a new GenerateACIParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewGenerateACIParams() *GenerateACIParams {
-	var ()
 	return &GenerateACIParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewGenerateACIParamsWithTimeout creates a new GenerateACIParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewGenerateACIParamsWithTimeout(timeout time.Duration) *GenerateACIParams {
-	var ()
 	return &GenerateACIParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewGenerateACIParamsWithContext creates a new GenerateACIParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewGenerateACIParamsWithContext(ctx context.Context) *GenerateACIParams {
-	var ()
 	return &GenerateACIParams{
-
 		Context: ctx,
 	}
 }
 
 // NewGenerateACIParamsWithHTTPClient creates a new GenerateACIParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewGenerateACIParamsWithHTTPClient(client *http.Client) *GenerateACIParams {
-	var ()
 	return &GenerateACIParams{
 		HTTPClient: client,
 	}
 }
 
-/*GenerateACIParams contains all the parameters to send to the API endpoint
-for the generate a c i operation typically these are written to a http.Request
+/* GenerateACIParams contains all the parameters to send to the API endpoint
+   for the generate a c i operation.
+
+   Typically these are written to a http.Request.
 */
 type GenerateACIParams struct {
 
-	/*Body
-	  contract code
+	/* Body.
 
+	   contract code
 	*/
 	Body *models.Contract
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the generate a c i params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GenerateACIParams) WithDefaults() *GenerateACIParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the generate a c i params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GenerateACIParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the generate a c i params
@@ -125,7 +138,6 @@ func (o *GenerateACIParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.R
 		return err
 	}
 	var res []error
-
 	if o.Body != nil {
 		if err := r.SetBodyParam(o.Body); err != nil {
 			return err

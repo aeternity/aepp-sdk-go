@@ -28,14 +28,11 @@ Let's start from the bottom upwards.
 
 # Testing
 ## Unit tests
-`go test $(go list ./... |grep -v integration_test)`
+`make test-unit`
 
 ## Integration tests
 ```
 # ensure .env has the node/compiler versions you want to test
-docker-compose up node compiler
-
-export AETERNITY_ALICE_PRIVATE_KEY=.....
-export AETERNITY_BOB_PRIVATE_KEY=.....
-go test ./integration_test -count=1 # count is needed because Go caches test results if they were successful.
+docker-compose up
+make test-integration
 ```

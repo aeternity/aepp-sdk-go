@@ -6,14 +6,16 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
 
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // CreateContractUnsignedTx create contract unsigned tx
+//
 // swagger:model CreateContractUnsignedTx
 type CreateContractUnsignedTx struct {
 	UnsignedTx
@@ -54,7 +56,6 @@ func (m CreateContractUnsignedTx) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 	_parts = append(_parts, aO0)
-
 	var dataAO1 struct {
 		ContractID *string `json:"contract_id"`
 	}
@@ -66,7 +67,6 @@ func (m CreateContractUnsignedTx) MarshalJSON() ([]byte, error) {
 		return nil, errAO1
 	}
 	_parts = append(_parts, jsonDataAO1)
-
 	return swag.ConcatJSON(_parts...), nil
 }
 
@@ -95,6 +95,21 @@ func (m *CreateContractUnsignedTx) validateContractID(formats strfmt.Registry) e
 		return err
 	}
 
+	return nil
+}
+
+// ContextValidate validate this create contract unsigned tx based on the context it is used
+func (m *CreateContractUnsignedTx) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	// validation for a type composition with UnsignedTx
+	if err := m.UnsignedTx.ContextValidate(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
 	return nil
 }
 

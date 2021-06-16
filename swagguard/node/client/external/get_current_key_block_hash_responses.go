@@ -6,15 +6,15 @@ package external
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"fmt"
 	"io"
 
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
-	strfmt "github.com/go-openapi/strfmt"
-
-	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/node/models"
 )
 
 // GetCurrentKeyBlockHashReader is a Reader for the GetCurrentKeyBlockHash structure.
@@ -25,23 +25,20 @@ type GetCurrentKeyBlockHashReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *GetCurrentKeyBlockHashReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewGetCurrentKeyBlockHashOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 404:
 		result := NewGetCurrentKeyBlockHashNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -50,7 +47,7 @@ func NewGetCurrentKeyBlockHashOK() *GetCurrentKeyBlockHashOK {
 	return &GetCurrentKeyBlockHashOK{}
 }
 
-/*GetCurrentKeyBlockHashOK handles this case with default header values.
+/* GetCurrentKeyBlockHashOK describes a response with status code 200, with default header values.
 
 Successful operation
 */
@@ -60,6 +57,9 @@ type GetCurrentKeyBlockHashOK struct {
 
 func (o *GetCurrentKeyBlockHashOK) Error() string {
 	return fmt.Sprintf("[GET /key-blocks/current/hash][%d] getCurrentKeyBlockHashOK  %+v", 200, o.Payload)
+}
+func (o *GetCurrentKeyBlockHashOK) GetPayload() *GetCurrentKeyBlockHashOKBody {
+	return o.Payload
 }
 
 func (o *GetCurrentKeyBlockHashOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -79,7 +79,7 @@ func NewGetCurrentKeyBlockHashNotFound() *GetCurrentKeyBlockHashNotFound {
 	return &GetCurrentKeyBlockHashNotFound{}
 }
 
-/*GetCurrentKeyBlockHashNotFound handles this case with default header values.
+/* GetCurrentKeyBlockHashNotFound describes a response with status code 404, with default header values.
 
 Block not found
 */
@@ -89,6 +89,9 @@ type GetCurrentKeyBlockHashNotFound struct {
 
 func (o *GetCurrentKeyBlockHashNotFound) Error() string {
 	return fmt.Sprintf("[GET /key-blocks/current/hash][%d] getCurrentKeyBlockHashNotFound  %+v", 404, o.Payload)
+}
+func (o *GetCurrentKeyBlockHashNotFound) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *GetCurrentKeyBlockHashNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -114,6 +117,11 @@ type GetCurrentKeyBlockHashOKBody struct {
 
 // Validate validates this get current key block hash o k body
 func (o *GetCurrentKeyBlockHashOKBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this get current key block hash o k body based on context it is used
+func (o *GetCurrentKeyBlockHashOKBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

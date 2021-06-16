@@ -6,16 +6,17 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
 
+	"github.com/aeternity/aepp-sdk-go/v9/utils"
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
-
-	utils "github.com/aeternity/aepp-sdk-go/v8/utils"
 )
 
 // GAObject g a object
+//
 // swagger:model GAObject
 type GAObject struct {
 
@@ -25,7 +26,7 @@ type GAObject struct {
 
 	// gas price
 	// Required: true
-	GasPrice utils.BigInt `json:"gas_price"`
+	GasPrice *utils.BigInt `json:"gas_price"`
 
 	// gas used
 	// Required: true
@@ -96,11 +97,21 @@ func (m *GAObject) validateCallerID(formats strfmt.Registry) error {
 
 func (m *GAObject) validateGasPrice(formats strfmt.Registry) error {
 
-	if err := m.GasPrice.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("gas_price")
-		}
+	if err := validate.Required("gas_price", "body", m.GasPrice); err != nil {
 		return err
+	}
+
+	if err := validate.Required("gas_price", "body", m.GasPrice); err != nil {
+		return err
+	}
+
+	if m.GasPrice != nil {
+		if err := m.GasPrice.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("gas_price")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -125,7 +136,6 @@ func (m *GAObject) validateHeight(formats strfmt.Registry) error {
 }
 
 func (m *GAObject) validateInnerObject(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.InnerObject) { // not required
 		return nil
 	}
@@ -155,6 +165,52 @@ func (m *GAObject) validateReturnValue(formats strfmt.Registry) error {
 
 	if err := validate.Required("return_value", "body", m.ReturnValue); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this g a object based on the context it is used
+func (m *GAObject) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateGasPrice(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateInnerObject(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *GAObject) contextValidateGasPrice(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.GasPrice != nil {
+		if err := m.GasPrice.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("gas_price")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *GAObject) contextValidateInnerObject(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.InnerObject != nil {
+		if err := m.InnerObject.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("inner_object")
+			}
+			return err
+		}
 	}
 
 	return nil

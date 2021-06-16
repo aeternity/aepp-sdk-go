@@ -6,16 +6,17 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
 
+	"github.com/aeternity/aepp-sdk-go/v9/utils"
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
-
-	utils "github.com/aeternity/aepp-sdk-go/v8/utils"
 )
 
 // ContractCallTx contract call tx
+//
 // swagger:model ContractCallTx
 type ContractCallTx struct {
 
@@ -25,7 +26,7 @@ type ContractCallTx struct {
 
 	// amount
 	// Required: true
-	Amount utils.BigInt `json:"amount"`
+	Amount *utils.BigInt `json:"amount"`
 
 	// Contract call data
 	// Required: true
@@ -41,7 +42,7 @@ type ContractCallTx struct {
 
 	// fee
 	// Required: true
-	Fee utils.BigInt `json:"fee"`
+	Fee *utils.BigInt `json:"fee"`
 
 	// gas
 	// Required: true
@@ -49,7 +50,7 @@ type ContractCallTx struct {
 
 	// gas price
 	// Required: true
-	GasPrice utils.BigInt `json:"gas_price"`
+	GasPrice *utils.BigInt `json:"gas_price"`
 
 	// Caller's nonce
 	Nonce uint64 `json:"nonce,omitempty"`
@@ -111,11 +112,21 @@ func (m *ContractCallTx) validateAbiVersion(formats strfmt.Registry) error {
 
 func (m *ContractCallTx) validateAmount(formats strfmt.Registry) error {
 
-	if err := m.Amount.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("amount")
-		}
+	if err := validate.Required("amount", "body", m.Amount); err != nil {
 		return err
+	}
+
+	if err := validate.Required("amount", "body", m.Amount); err != nil {
+		return err
+	}
+
+	if m.Amount != nil {
+		if err := m.Amount.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("amount")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -150,11 +161,21 @@ func (m *ContractCallTx) validateContractID(formats strfmt.Registry) error {
 
 func (m *ContractCallTx) validateFee(formats strfmt.Registry) error {
 
-	if err := m.Fee.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("fee")
-		}
+	if err := validate.Required("fee", "body", m.Fee); err != nil {
 		return err
+	}
+
+	if err := validate.Required("fee", "body", m.Fee); err != nil {
+		return err
+	}
+
+	if m.Fee != nil {
+		if err := m.Fee.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("fee")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -171,11 +192,85 @@ func (m *ContractCallTx) validateGas(formats strfmt.Registry) error {
 
 func (m *ContractCallTx) validateGasPrice(formats strfmt.Registry) error {
 
-	if err := m.GasPrice.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("gas_price")
-		}
+	if err := validate.Required("gas_price", "body", m.GasPrice); err != nil {
 		return err
+	}
+
+	if err := validate.Required("gas_price", "body", m.GasPrice); err != nil {
+		return err
+	}
+
+	if m.GasPrice != nil {
+		if err := m.GasPrice.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("gas_price")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this contract call tx based on the context it is used
+func (m *ContractCallTx) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateAmount(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateFee(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateGasPrice(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *ContractCallTx) contextValidateAmount(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Amount != nil {
+		if err := m.Amount.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("amount")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *ContractCallTx) contextValidateFee(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Fee != nil {
+		if err := m.Fee.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("fee")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *ContractCallTx) contextValidateGasPrice(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.GasPrice != nil {
+		if err := m.GasPrice.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("gas_price")
+			}
+			return err
+		}
 	}
 
 	return nil

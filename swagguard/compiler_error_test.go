@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/v8/swagguard/compiler/client/operations"
-	"github.com/aeternity/aepp-sdk-go/v8/swagguard/compiler/models"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/compiler/client/operations"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/compiler/models"
 )
 
 func TestCompilerErrorModelDereferencing(t *testing.T) {
@@ -14,7 +14,7 @@ func TestCompilerErrorModelDereferencing(t *testing.T) {
 	internalServerErr := operations.APIVersionInternalServerError{}
 	err := models.Error{Reason: &reason}
 	internalServerErr.Payload = &err
-	printedError := fmt.Sprintf("BadRequest %s", internalServerErr)
+	printedError := fmt.Sprintf("BadRequest %v", internalServerErr)
 	if !strings.Contains(printedError, reason) {
 		t.Errorf("Expected to find %s when printing out the models.Error: got %s instead", reason, printedError)
 	}
@@ -27,13 +27,16 @@ func TestCompilerCompilationErrorsModelDereferencing(t *testing.T) {
 	err2.UnmarshalBinary([]byte(`{"message":"Also I don't like your face","pos":{"col":0,"line":0},"type":"wrong_programmer_error"}`))
 
 	compileContractErr := operations.CompileContractBadRequest{
-		Payload: []*models.CompilerError{err1, err2},
+		Payload: models.CompilerErrors{err1, err2},
 	}
-	printedError := fmt.Sprintf("%s", compileContractErr)
-	lookForError1 := "Unbound variable ae_addres"
-	lookForError2 := "Also I don't like your face"
+	printedError := compileContractErr.Error()
 
-	if !(strings.Contains(printedError, lookForError1) && strings.Contains(printedError, lookForError2)) {
-		t.Errorf("Expected []*models.CompilerError to include the messages %s and %s; got %s instead", lookForError1, lookForError2, printedError)
+	for _, message := range []string{
+		"Unbound variable ae_addres",
+		"Also I don't like your face",
+	} {
+		if !strings.Contains(printedError, message) {
+			t.Errorf("Expected error to include %s; got %s instead", message, printedError)
+		}
 	}
 }

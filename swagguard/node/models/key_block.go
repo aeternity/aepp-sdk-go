@@ -6,14 +6,16 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
 
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // KeyBlock key block
+//
 // swagger:model KeyBlock
 type KeyBlock struct {
 
@@ -172,7 +174,6 @@ func (m *KeyBlock) validateMiner(formats strfmt.Registry) error {
 }
 
 func (m *KeyBlock) validatePow(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Pow) { // not required
 		return nil
 	}
@@ -235,6 +236,32 @@ func (m *KeyBlock) validateTime(formats strfmt.Registry) error {
 func (m *KeyBlock) validateVersion(formats strfmt.Registry) error {
 
 	if err := validate.Required("version", "body", m.Version); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this key block based on the context it is used
+func (m *KeyBlock) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidatePow(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *KeyBlock) contextValidatePow(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.Pow.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("pow")
+		}
 		return err
 	}
 

@@ -6,10 +6,10 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/aeternity/aepp-sdk-go/v8/account"
-	"github.com/aeternity/aepp-sdk-go/v8/config"
-	"github.com/aeternity/aepp-sdk-go/v8/naet"
-	"github.com/aeternity/aepp-sdk-go/v8/transactions"
+	"github.com/aeternity/aepp-sdk-go/v9/account"
+	"github.com/aeternity/aepp-sdk-go/v9/config"
+	"github.com/aeternity/aepp-sdk-go/v9/naet"
+	"github.com/aeternity/aepp-sdk-go/v9/transactions"
 )
 
 // GetAnythingByNameFunc describes a function that returns lookup results for a
@@ -150,7 +150,7 @@ func (t *TxReceipt) Watch(mined chan bool, waitBlocks uint64, node transactionWa
 		}
 
 		if tx.BlockHeight.LargerThanZero() {
-			bh := big.Int(tx.BlockHeight)
+			bh := big.Int(*tx.BlockHeight)
 			t.BlockHeight = bh.Uint64()
 			t.BlockHash = *tx.BlockHash
 			t.Mined = true
@@ -163,14 +163,9 @@ func (t *TxReceipt) Watch(mined chan bool, waitBlocks uint64, node transactionWa
 	mined <- false
 }
 
-func findVMABIVersion(nodeVersion, compilerBackend string) (VMVersion, ABIVersion uint16, err error) {
-	if nodeVersion[0] == '5' && compilerBackend == "fate" {
-		return 5, 3, nil
-	} else if nodeVersion[0] == '5' && compilerBackend == "aevm" {
-		return 6, 1, nil
-	} else if nodeVersion[0] == '4' {
-		return 4, 1, nil
-	} else {
-		return 0, 0, errors.New("Other node versions unsupported")
+func findVMABIVersion(nodeVersion string) (VMVersion, ABIVersion uint16, err error) {
+	if nodeVersion[0] == '6' {
+		return 7, 3, nil
 	}
+	return 0, 0, errors.New("node is unsupported")
 }

@@ -13,56 +13,69 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
-
-	strfmt "github.com/go-openapi/strfmt"
+	"github.com/go-openapi/strfmt"
 )
 
-// NewAPIVersionParams creates a new APIVersionParams object
-// with the default values initialized.
+// NewAPIVersionParams creates a new APIVersionParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewAPIVersionParams() *APIVersionParams {
-
 	return &APIVersionParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewAPIVersionParamsWithTimeout creates a new APIVersionParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewAPIVersionParamsWithTimeout(timeout time.Duration) *APIVersionParams {
-
 	return &APIVersionParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewAPIVersionParamsWithContext creates a new APIVersionParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewAPIVersionParamsWithContext(ctx context.Context) *APIVersionParams {
-
 	return &APIVersionParams{
-
 		Context: ctx,
 	}
 }
 
 // NewAPIVersionParamsWithHTTPClient creates a new APIVersionParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewAPIVersionParamsWithHTTPClient(client *http.Client) *APIVersionParams {
-
 	return &APIVersionParams{
 		HTTPClient: client,
 	}
 }
 
-/*APIVersionParams contains all the parameters to send to the API endpoint
-for the API version operation typically these are written to a http.Request
+/* APIVersionParams contains all the parameters to send to the API endpoint
+   for the API version operation.
+
+   Typically these are written to a http.Request.
 */
 type APIVersionParams struct {
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the API version params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *APIVersionParams) WithDefaults() *APIVersionParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the API version params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *APIVersionParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the API version params

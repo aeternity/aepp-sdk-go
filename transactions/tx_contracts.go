@@ -4,11 +4,11 @@ import (
 	"io"
 	"math/big"
 
-	"github.com/aeternity/aepp-sdk-go/v8/binary"
-	"github.com/aeternity/aepp-sdk-go/v8/config"
-	"github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
-	"github.com/aeternity/aepp-sdk-go/v8/utils"
-	rlp "github.com/randomshinichi/rlpae"
+	"github.com/aeternity/aepp-sdk-go/v9/binary"
+	"github.com/aeternity/aepp-sdk-go/v9/config"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v9/utils"
+	rlp "github.com/aeternity/rlp-go"
 )
 
 // ABIVersionFATE indicates that the bytecode payload is for the FATE VM. Only
@@ -157,18 +157,22 @@ func (tx *ContractCreateTx) DecodeRLP(s *rlp.Stream) (err error) {
 
 // JSON representation of a Tx is useful for querying the node's debug endpoint
 func (tx *ContractCreateTx) JSON() (string, error) {
-	g := tx.GasLimit.Uint64()
+	deposit := utils.BigInt(*tx.Deposit)
+	amount := utils.BigInt(*tx.Amount)
+	gas := tx.GasLimit.Uint64()
+	gasPrice := utils.BigInt(*tx.GasPrice)
+	fee := utils.BigInt(*tx.Fee)
 	swaggerT := models.ContractCreateTx{
 		OwnerID:    &tx.OwnerID,
 		Nonce:      tx.AccountNonce,
 		Code:       &tx.Code,
 		VMVersion:  &tx.VMVersion,
 		AbiVersion: &tx.AbiVersion,
-		Deposit:    utils.BigInt(*tx.Deposit),
-		Amount:     utils.BigInt(*tx.Amount),
-		Gas:        &g,
-		GasPrice:   utils.BigInt(*tx.GasPrice),
-		Fee:        utils.BigInt(*tx.Fee),
+		Deposit:    &deposit,
+		Amount:     &amount,
+		Gas:        &gas,
+		GasPrice:   &gasPrice,
+		Fee:        &fee,
 		TTL:        tx.TTL,
 		CallData:   &tx.CallData,
 	}
@@ -199,7 +203,6 @@ func (tx *ContractCreateTx) CalcGas() (g *big.Int, err error) {
 	if err != nil {
 		return
 	}
-	g = new(big.Int)
 	g = baseGas.Add(baseGas, gasComponent)
 	return
 }
@@ -340,17 +343,20 @@ func (tx *ContractCallTx) DecodeRLP(s *rlp.Stream) (err error) {
 
 // JSON representation of a Tx is useful for querying the node's debug endpoint
 func (tx *ContractCallTx) JSON() (string, error) {
+	amount := utils.BigInt(*tx.Amount)
 	gas := tx.GasLimit.Uint64()
+	gasPrice := utils.BigInt(*tx.GasPrice)
+	fee := utils.BigInt(*tx.Fee)
 	swaggerT := models.ContractCallTx{
 		CallerID:   &tx.CallerID,
 		Nonce:      tx.AccountNonce,
 		ContractID: &tx.ContractID,
-		Amount:     utils.BigInt(*tx.Amount),
+		Amount:     &amount,
 		Gas:        &gas,
-		GasPrice:   utils.BigInt(*tx.GasPrice),
+		GasPrice:   &gasPrice,
 		AbiVersion: &tx.AbiVersion,
 		CallData:   &tx.CallData,
-		Fee:        utils.BigInt(*tx.Fee),
+		Fee:        &fee,
 		TTL:        tx.TTL,
 	}
 	output, err := swaggerT.MarshalBinary()
@@ -379,7 +385,6 @@ func (tx *ContractCallTx) CalcGas() (g *big.Int, err error) {
 	if err != nil {
 		return
 	}
-	g = new(big.Int)
 	g = baseGas.Add(baseGas, gasComponent)
 	return
 }

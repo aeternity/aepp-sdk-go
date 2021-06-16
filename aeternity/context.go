@@ -1,9 +1,9 @@
 package aeternity
 
 import (
-	"github.com/aeternity/aepp-sdk-go/v8/account"
-	"github.com/aeternity/aepp-sdk-go/v8/naet"
-	"github.com/aeternity/aepp-sdk-go/v8/transactions"
+	"github.com/aeternity/aepp-sdk-go/v9/account"
+	"github.com/aeternity/aepp-sdk-go/v9/naet"
+	"github.com/aeternity/aepp-sdk-go/v9/transactions"
 )
 
 type transactionSender interface {
@@ -100,6 +100,9 @@ func (c *Context) SignBroadcast(tx transactions.Transaction, blocks uint64) (txR
 // mined.
 func (c *Context) SignBroadcastWait(tx transactions.Transaction, blocks uint64) (txReceipt *TxReceipt, err error) {
 	txReceipt, err = c.SignBroadcast(tx, blocks)
+	if err != nil {
+		return
+	}
 	err = WaitSynchronous(txReceipt, blocks, c.txSender)
 	return
 }

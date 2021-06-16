@@ -6,12 +6,10 @@ package client
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/compiler/client/operations"
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
-
-	strfmt "github.com/go-openapi/strfmt"
-
-	"github.com/aeternity/aepp-sdk-go/v8/swagguard/compiler/client/operations"
+	"github.com/go-openapi/strfmt"
 )
 
 // Default compiler HTTP client.
@@ -56,9 +54,7 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Compiler {
 
 	cli := new(Compiler)
 	cli.Transport = transport
-
 	cli.Operations = operations.New(transport, formats)
-
 	return cli
 }
 
@@ -103,7 +99,7 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 
 // Compiler is a client for compiler
 type Compiler struct {
-	Operations *operations.Client
+	Operations operations.ClientService
 
 	Transport runtime.ClientTransport
 }
@@ -111,7 +107,5 @@ type Compiler struct {
 // SetTransport changes the transport on the client and all its subresources
 func (c *Compiler) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
-
 	c.Operations.SetTransport(transport)
-
 }

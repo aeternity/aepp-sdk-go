@@ -12,17 +12,11 @@ const (
 	// NetworkIDMainnet is the network ID for aeternity mainnet
 	NetworkIDMainnet = "ae_mainnet"
 	// URLMainnet is the URL to an aeternity Foundation maintained node
-	URLMainnet = "https://sdk-mainnet.aepps.com"
+	URLMainnet = "https://mainnet.aeternity.io"
 	// NetworkIDTestnet is the network ID for aeternity testnet
 	NetworkIDTestnet = "ae_uat"
 	// URLTestnet is the URL to an aeternity Foundation maintained node
-	URLTestnet = "https://sdk-testnet.aepps.com"
-	// CompilerBackendFATE indicates that the compiler should use the FATE VM
-	// for contract bytecode execution
-	CompilerBackendFATE = "fate"
-	// CompilerBackendAEVM indicates that the compiler should use the AEVM for
-	// contract bytecode execution
-	CompilerBackendAEVM = "aevm"
+	URLTestnet = "https://testnet.aeternity.io"
 	// OracleTTLTypeDelta indicates that the accompanying TTL value (in blocks)
 	// should be interpreted as currentHeight + TTLValue
 	OracleTTLTypeDelta = 0
@@ -45,7 +39,6 @@ type NodeConfig struct {
 // CompilerConfig configuration for the compiler
 type CompilerConfig struct {
 	URL     string `json:"url" yaml:"url" mapstructure:"url"`
-	Backend string `json:"backend" yaml:"backend" mapstructure:"backend"`
 }
 
 // AensConfig contains default parameters for AENS
@@ -152,16 +145,15 @@ type ProfileConfig struct {
 
 // Node holds default settings for NodeConfig
 var Node = NodeConfig{
-	URL:         "https://sdk-mainnet.aepps.com",
-	URLInternal: "https://sdk-mainnet.aepps.com",
-	URLChannels: "https://sdk-mainnet.aepps.com",
+	URL:         "https://mainnet.aeternity.io",
+	URLInternal: "https://mainnet.aeternity.io",
+	URLChannels: "https://mainnet.aeternity.io",
 	NetworkID:   "ae_mainnet",
 }
 
 // Compiler holds default settings for CompilerConfig
 var Compiler = CompilerConfig{
 	URL:     "http://localhost:3080",
-	Backend: CompilerBackendFATE,
 }
 
 // Client holds default settings for ClientConfig
@@ -182,7 +174,7 @@ var Client = ClientConfig{
 		GasLimit:    big.NewInt(1e6),
 		Amount:      new(big.Int),
 		Deposit:     new(big.Int),
-		VMVersion:   5,
+		VMVersion:   7,
 		ABIVersion:  3,
 	},
 	Oracles: OracleConfig{

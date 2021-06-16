@@ -13,69 +13,85 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-
-	strfmt "github.com/go-openapi/strfmt"
 )
 
-// NewGetMicroBlockTransactionByHashAndIndexParams creates a new GetMicroBlockTransactionByHashAndIndexParams object
-// with the default values initialized.
+// NewGetMicroBlockTransactionByHashAndIndexParams creates a new GetMicroBlockTransactionByHashAndIndexParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewGetMicroBlockTransactionByHashAndIndexParams() *GetMicroBlockTransactionByHashAndIndexParams {
-	var ()
 	return &GetMicroBlockTransactionByHashAndIndexParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewGetMicroBlockTransactionByHashAndIndexParamsWithTimeout creates a new GetMicroBlockTransactionByHashAndIndexParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewGetMicroBlockTransactionByHashAndIndexParamsWithTimeout(timeout time.Duration) *GetMicroBlockTransactionByHashAndIndexParams {
-	var ()
 	return &GetMicroBlockTransactionByHashAndIndexParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewGetMicroBlockTransactionByHashAndIndexParamsWithContext creates a new GetMicroBlockTransactionByHashAndIndexParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewGetMicroBlockTransactionByHashAndIndexParamsWithContext(ctx context.Context) *GetMicroBlockTransactionByHashAndIndexParams {
-	var ()
 	return &GetMicroBlockTransactionByHashAndIndexParams{
-
 		Context: ctx,
 	}
 }
 
 // NewGetMicroBlockTransactionByHashAndIndexParamsWithHTTPClient creates a new GetMicroBlockTransactionByHashAndIndexParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewGetMicroBlockTransactionByHashAndIndexParamsWithHTTPClient(client *http.Client) *GetMicroBlockTransactionByHashAndIndexParams {
-	var ()
 	return &GetMicroBlockTransactionByHashAndIndexParams{
 		HTTPClient: client,
 	}
 }
 
-/*GetMicroBlockTransactionByHashAndIndexParams contains all the parameters to send to the API endpoint
-for the get micro block transaction by hash and index operation typically these are written to a http.Request
+/* GetMicroBlockTransactionByHashAndIndexParams contains all the parameters to send to the API endpoint
+   for the get micro block transaction by hash and index operation.
+
+   Typically these are written to a http.Request.
 */
 type GetMicroBlockTransactionByHashAndIndexParams struct {
 
-	/*Hash
-	  The hash of the block
+	/* Hash.
 
+	   The hash of the block
 	*/
 	Hash string
-	/*Index
-	  The index of the transaction in a block
 
+	/* Index.
+
+	   The index of the transaction in a block
+
+	   Format: uint64
 	*/
-	Index int64
+	Index uint64
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the get micro block transaction by hash and index params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetMicroBlockTransactionByHashAndIndexParams) WithDefaults() *GetMicroBlockTransactionByHashAndIndexParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the get micro block transaction by hash and index params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetMicroBlockTransactionByHashAndIndexParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the get micro block transaction by hash and index params
@@ -123,13 +139,13 @@ func (o *GetMicroBlockTransactionByHashAndIndexParams) SetHash(hash string) {
 }
 
 // WithIndex adds the index to the get micro block transaction by hash and index params
-func (o *GetMicroBlockTransactionByHashAndIndexParams) WithIndex(index int64) *GetMicroBlockTransactionByHashAndIndexParams {
+func (o *GetMicroBlockTransactionByHashAndIndexParams) WithIndex(index uint64) *GetMicroBlockTransactionByHashAndIndexParams {
 	o.SetIndex(index)
 	return o
 }
 
 // SetIndex adds the index to the get micro block transaction by hash and index params
-func (o *GetMicroBlockTransactionByHashAndIndexParams) SetIndex(index int64) {
+func (o *GetMicroBlockTransactionByHashAndIndexParams) SetIndex(index uint64) {
 	o.Index = index
 }
 
@@ -147,7 +163,7 @@ func (o *GetMicroBlockTransactionByHashAndIndexParams) WriteToRequest(r runtime.
 	}
 
 	// path param index
-	if err := r.SetPathParam("index", swag.FormatInt64(o.Index)); err != nil {
+	if err := r.SetPathParam("index", swag.FormatUint64(o.Index)); err != nil {
 		return err
 	}
 

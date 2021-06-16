@@ -10,10 +10,9 @@ import (
 	"io"
 
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 
-	strfmt "github.com/go-openapi/strfmt"
-
-	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/node/models"
 )
 
 // GetAccountByPubkeyAndHeightReader is a Reader for the GetAccountByPubkeyAndHeight structure.
@@ -24,30 +23,26 @@ type GetAccountByPubkeyAndHeightReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *GetAccountByPubkeyAndHeightReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewGetAccountByPubkeyAndHeightOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 400:
 		result := NewGetAccountByPubkeyAndHeightBadRequest()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 404:
 		result := NewGetAccountByPubkeyAndHeightNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -56,7 +51,7 @@ func NewGetAccountByPubkeyAndHeightOK() *GetAccountByPubkeyAndHeightOK {
 	return &GetAccountByPubkeyAndHeightOK{}
 }
 
-/*GetAccountByPubkeyAndHeightOK handles this case with default header values.
+/* GetAccountByPubkeyAndHeightOK describes a response with status code 200, with default header values.
 
 Successful operation
 */
@@ -66,6 +61,9 @@ type GetAccountByPubkeyAndHeightOK struct {
 
 func (o *GetAccountByPubkeyAndHeightOK) Error() string {
 	return fmt.Sprintf("[GET /accounts/{pubkey}/height/{height}][%d] getAccountByPubkeyAndHeightOK  %+v", 200, o.Payload)
+}
+func (o *GetAccountByPubkeyAndHeightOK) GetPayload() *models.Account {
+	return o.Payload
 }
 
 func (o *GetAccountByPubkeyAndHeightOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -85,7 +83,7 @@ func NewGetAccountByPubkeyAndHeightBadRequest() *GetAccountByPubkeyAndHeightBadR
 	return &GetAccountByPubkeyAndHeightBadRequest{}
 }
 
-/*GetAccountByPubkeyAndHeightBadRequest handles this case with default header values.
+/* GetAccountByPubkeyAndHeightBadRequest describes a response with status code 400, with default header values.
 
 Invalid public key or invalid height
 */
@@ -95,6 +93,9 @@ type GetAccountByPubkeyAndHeightBadRequest struct {
 
 func (o *GetAccountByPubkeyAndHeightBadRequest) Error() string {
 	return fmt.Sprintf("[GET /accounts/{pubkey}/height/{height}][%d] getAccountByPubkeyAndHeightBadRequest  %+v", 400, o.Payload)
+}
+func (o *GetAccountByPubkeyAndHeightBadRequest) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *GetAccountByPubkeyAndHeightBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -114,7 +115,7 @@ func NewGetAccountByPubkeyAndHeightNotFound() *GetAccountByPubkeyAndHeightNotFou
 	return &GetAccountByPubkeyAndHeightNotFound{}
 }
 
-/*GetAccountByPubkeyAndHeightNotFound handles this case with default header values.
+/* GetAccountByPubkeyAndHeightNotFound describes a response with status code 404, with default header values.
 
 Account not found or height not available
 */
@@ -124,6 +125,9 @@ type GetAccountByPubkeyAndHeightNotFound struct {
 
 func (o *GetAccountByPubkeyAndHeightNotFound) Error() string {
 	return fmt.Sprintf("[GET /accounts/{pubkey}/height/{height}][%d] getAccountByPubkeyAndHeightNotFound  %+v", 404, o.Payload)
+}
+func (o *GetAccountByPubkeyAndHeightNotFound) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *GetAccountByPubkeyAndHeightNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

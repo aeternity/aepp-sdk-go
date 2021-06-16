@@ -7,21 +7,23 @@ package models
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io"
 	"io/ioutil"
 
-	strfmt "github.com/go-openapi/strfmt"
-
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/validate"
 )
 
 // GenericTx generic tx
+//
 // swagger:discriminator GenericTx type
 type GenericTx interface {
 	runtime.Validatable
+	runtime.ContextValidatable
 
 	// type
 	// Required: true
@@ -32,6 +34,9 @@ type GenericTx interface {
 	// Required: true
 	Version() *uint32
 	SetVersion(*uint32)
+
+	// AdditionalProperties in base type shoud be handled just like regular properties
+	// At this moment, the base type property is pushed down to the subtype
 }
 
 type genericTx struct {
@@ -47,7 +52,6 @@ func (m *genericTx) Type() string {
 
 // SetType sets the type of this polymorphic type
 func (m *genericTx) SetType(val string) {
-
 }
 
 // Version gets the version of this polymorphic type
@@ -112,171 +116,152 @@ func unmarshalGenericTx(data []byte, consumer runtime.Consumer) (GenericTx, erro
 			return nil, err
 		}
 		return &result, nil
-
 	case "ChannelCloseSoloTxJSON", "ChannelCloseSoloTx":
 		var result ChannelCloseSoloTxJSON
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
-
 	case "ChannelCreateTxJSON", "ChannelCreateTx":
 		var result ChannelCreateTxJSON
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
-
 	case "ChannelDepositTxJSON", "ChannelDepositTx":
 		var result ChannelDepositTxJSON
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
-
 	case "ChannelForceProgressTxJSON", "ChannelForceProgressTx":
 		var result ChannelForceProgressTxJSON
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
-
 	case "ChannelSettleTxJSON", "ChannelSettleTx":
 		var result ChannelSettleTxJSON
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
-
 	case "ChannelSlashTxJSON", "ChannelSlashTx":
-		var result ChannelSLASHTxJSON
+		var result ChannelSlashTxJSON
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
-
 	case "ChannelSnapshotSoloTxJSON", "ChannelSnapshotSoloTx":
 		var result ChannelSnapshotSoloTxJSON
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
-
 	case "ChannelWithdrawalTxJSON", "ChannelWithdrawalTx":
 		var result ChannelWithdrawalTxJSON
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
-
 	case "ContractCallTxJSON", "ContractCallTx":
 		var result ContractCallTxJSON
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
-
 	case "ContractCreateTxJSON", "ContractCreateTx":
 		var result ContractCreateTxJSON
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
-
 	case "GAAttachTxJSON", "GAAttachTx":
 		var result GAAttachTxJSON
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
-
 	case "GAMetaTxJSON", "GAMetaTx":
 		var result GAMetaTxJSON
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
-
 	case "GenericTx":
 		var result genericTx
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
-
 	case "NameClaimTxJSON", "NameClaimTx":
 		var result NameClaimTxJSON
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
-
 	case "NamePreclaimTxJSON", "NamePreclaimTx":
 		var result NamePreclaimTxJSON
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
-
 	case "NameRevokeTxJSON", "NameRevokeTx":
 		var result NameRevokeTxJSON
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
-
 	case "NameTransferTxJSON", "NameTransferTx":
 		var result NameTransferTxJSON
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
-
 	case "NameUpdateTxJSON", "NameUpdateTx":
 		var result NameUpdateTxJSON
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
-
 	case "OracleExtendTxJSON", "OracleExtendTx":
 		var result OracleExtendTxJSON
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
-
 	case "OracleQueryTxJSON", "OracleQueryTx":
 		var result OracleQueryTxJSON
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
-
 	case "OracleRegisterTxJSON", "OracleRegisterTx":
 		var result OracleRegisterTxJSON
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
-
 	case "OracleRespondTxJSON", "OracleRespondTx":
 		var result OracleRespondTxJSON
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
-
+	case "PayingForTxJSON", "PayingForTx":
+		var result PayingForTxJSON
+		if err := consumer.Consume(buf2, &result); err != nil {
+			return nil, err
+		}
+		return &result, nil
 	case "SpendTxJSON", "SpendTx":
 		var result SpendTxJSON
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
-
 	}
 	return nil, errors.New(422, "invalid type value: %q", getType.Type)
-
 }
 
 // Validate validates this generic tx
@@ -299,5 +284,10 @@ func (m *genericTx) validateVersion(formats strfmt.Registry) error {
 		return err
 	}
 
+	return nil
+}
+
+// ContextValidate validates this generic tx based on context it is used
+func (m *genericTx) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }

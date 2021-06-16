@@ -6,16 +6,17 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"strconv"
 
-	strfmt "github.com/go-openapi/strfmt"
-
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // Status status
+//
 // swagger:model Status
 type Status struct {
 
@@ -42,6 +43,10 @@ type Status struct {
 	// node version
 	// Required: true
 	NodeVersion *string `json:"node_version"`
+
+	// peer connections
+	// Required: true
+	PeerConnections *PeerConnections `json:"peer_connections"`
 
 	// peer count
 	// Required: true
@@ -106,6 +111,10 @@ func (m *Status) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateNodeVersion(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePeerConnections(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -205,6 +214,24 @@ func (m *Status) validateNodeVersion(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *Status) validatePeerConnections(formats strfmt.Registry) error {
+
+	if err := validate.Required("peer_connections", "body", m.PeerConnections); err != nil {
+		return err
+	}
+
+	if m.PeerConnections != nil {
+		if err := m.PeerConnections.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("peer_connections")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (m *Status) validatePeerCount(formats strfmt.Registry) error {
 
 	if err := validate.Required("peer_count", "body", m.PeerCount); err != nil {
@@ -267,7 +294,6 @@ func (m *Status) validateSolutions(formats strfmt.Registry) error {
 }
 
 func (m *Status) validateSyncProgress(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.SyncProgress) { // not required
 		return nil
 	}
@@ -305,6 +331,56 @@ func (m *Status) validateTopKeyBlockHash(formats strfmt.Registry) error {
 
 	if err := validate.Required("top_key_block_hash", "body", m.TopKeyBlockHash); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this status based on the context it is used
+func (m *Status) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidatePeerConnections(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateProtocols(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *Status) contextValidatePeerConnections(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.PeerConnections != nil {
+		if err := m.PeerConnections.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("peer_connections")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *Status) contextValidateProtocols(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.Protocols); i++ {
+
+		if m.Protocols[i] != nil {
+			if err := m.Protocols[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("protocols" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil

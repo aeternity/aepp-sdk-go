@@ -10,10 +10,9 @@ import (
 	"io"
 
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 
-	strfmt "github.com/go-openapi/strfmt"
-
-	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/compiler/models"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/compiler/models"
 )
 
 // VersionReader is a Reader for the Version structure.
@@ -24,23 +23,20 @@ type VersionReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *VersionReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewVersionOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 500:
 		result := NewVersionInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -49,7 +45,7 @@ func NewVersionOK() *VersionOK {
 	return &VersionOK{}
 }
 
-/*VersionOK handles this case with default header values.
+/* VersionOK describes a response with status code 200, with default header values.
 
 Sophia compiler version
 */
@@ -59,6 +55,9 @@ type VersionOK struct {
 
 func (o *VersionOK) Error() string {
 	return fmt.Sprintf("[GET /version][%d] versionOK  %+v", 200, o.Payload)
+}
+func (o *VersionOK) GetPayload() *models.CompilerVersion {
+	return o.Payload
 }
 
 func (o *VersionOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -78,7 +77,7 @@ func NewVersionInternalServerError() *VersionInternalServerError {
 	return &VersionInternalServerError{}
 }
 
-/*VersionInternalServerError handles this case with default header values.
+/* VersionInternalServerError describes a response with status code 500, with default header values.
 
 Error
 */
@@ -88,6 +87,9 @@ type VersionInternalServerError struct {
 
 func (o *VersionInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /version][%d] versionInternalServerError  %+v", 500, o.Payload)
+}
+func (o *VersionInternalServerError) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *VersionInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

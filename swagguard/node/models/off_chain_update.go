@@ -7,26 +7,31 @@ package models
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io"
 	"io/ioutil"
 
-	strfmt "github.com/go-openapi/strfmt"
-
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/validate"
 )
 
 // OffChainUpdate off chain update
+//
 // swagger:discriminator OffChainUpdate op
 type OffChainUpdate interface {
 	runtime.Validatable
+	runtime.ContextValidatable
 
 	// op
 	// Required: true
 	Op() string
 	SetOp(string)
+
+	// AdditionalProperties in base type shoud be handled just like regular properties
+	// At this moment, the base type property is pushed down to the subtype
 }
 
 type offChainUpdate struct {
@@ -40,7 +45,6 @@ func (m *offChainUpdate) Op() string {
 
 // SetOp sets the op of this polymorphic type
 func (m *offChainUpdate) SetOp(val string) {
-
 }
 
 // UnmarshalOffChainUpdateSlice unmarshals polymorphic slices of OffChainUpdate
@@ -95,48 +99,46 @@ func unmarshalOffChainUpdate(data []byte, consumer runtime.Consumer) (OffChainUp
 			return nil, err
 		}
 		return &result, nil
-
 	case "OffChainDeposit":
 		var result OffChainDeposit
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
-
 	case "OffChainNewContract":
 		var result OffChainNewContract
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
-
 	case "OffChainTransfer":
 		var result OffChainTransfer
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
-
 	case "OffChainUpdate":
 		var result offChainUpdate
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
-
 	case "OffChainWithdrawal":
 		var result OffChainWithdrawal
 		if err := consumer.Consume(buf2, &result); err != nil {
 			return nil, err
 		}
 		return &result, nil
-
 	}
 	return nil, errors.New(422, "invalid op value: %q", getType.Op)
-
 }
 
 // Validate validates this off chain update
 func (m *offChainUpdate) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this off chain update based on context it is used
+func (m *offChainUpdate) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }

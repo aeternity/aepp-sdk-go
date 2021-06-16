@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/v8/utils"
+	"github.com/aeternity/aepp-sdk-go/v9/utils"
 )
 
 func Test_printIf_BigIntBalancePrinted(t *testing.T) {

@@ -20,16 +20,15 @@ import (
 	"runtime"
 	"sync"
 
-	"github.com/aeternity/aepp-sdk-go/v8/account"
-	"github.com/aeternity/aepp-sdk-go/v8/config"
-	"github.com/aeternity/aepp-sdk-go/v8/naet"
-	"github.com/aeternity/aepp-sdk-go/v8/transactions"
+	"github.com/aeternity/aepp-sdk-go/v9/account"
+	"github.com/aeternity/aepp-sdk-go/v9/config"
+	"github.com/aeternity/aepp-sdk-go/v9/naet"
+	"github.com/aeternity/aepp-sdk-go/v9/transactions"
 
 	"github.com/spf13/cobra"
 )
 
 var (
-	waitForTx       bool
 	spendTxPayload  string
 	printPrivateKey bool
 	accountFileName string
@@ -61,10 +60,7 @@ func getPassword() (p string, err error) {
 		return password, nil
 	}
 	p, err = AskPassword("Enter the password to unlock the keystore: ")
-	if err != nil {
-		return "", err
-	}
-	return p, nil
+	return
 }
 
 func addressFunc(cmd *cobra.Command, args []string) error {
@@ -134,6 +130,9 @@ var balanceCmd = &cobra.Command{
 
 func balanceFunc(conn naet.GetAccounter, args []string) (err error) {
 	p, err := getPassword()
+	if err != nil {
+		return err
+	}
 
 	// load the account
 	account, err := account.LoadFromKeyStoreFile(args[0], p)
@@ -161,6 +160,9 @@ var signCmd = &cobra.Command{
 
 func signFunc(cmd *cobra.Command, args []string) (err error) {
 	p, err := getPassword()
+	if err != nil {
+		return err
+	}
 
 	// load the account
 	account, err := account.LoadFromKeyStoreFile(args[0], p)
@@ -210,6 +212,9 @@ func saveFunc(cmd *cobra.Command, args []string) (err error) {
 	}
 
 	p, err := getPassword()
+	if err != nil {
+		return err
+	}
 
 	f, err := account.StoreToKeyStoreFile(acc, p, accountFileName)
 	if err != nil {

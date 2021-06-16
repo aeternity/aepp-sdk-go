@@ -6,16 +6,17 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"encoding/json"
 
-	strfmt "github.com/go-openapi/strfmt"
-
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // RelativeTTL relative TTL
+//
 // swagger:model RelativeTTL
 type RelativeTTL struct {
 
@@ -67,7 +68,7 @@ const (
 
 // prop value enum
 func (m *RelativeTTL) validateTypeEnum(path, location string, value string) error {
-	if err := validate.Enum(path, location, value, relativeTtlTypeTypePropEnum); err != nil {
+	if err := validate.EnumCase(path, location, value, relativeTtlTypeTypePropEnum, true); err != nil {
 		return err
 	}
 	return nil
@@ -93,6 +94,11 @@ func (m *RelativeTTL) validateValue(formats strfmt.Registry) error {
 		return err
 	}
 
+	return nil
+}
+
+// ContextValidate validates this relative TTL based on context it is used
+func (m *RelativeTTL) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

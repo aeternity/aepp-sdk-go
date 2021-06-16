@@ -3,10 +3,10 @@ package integrationtest
 import (
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/v8/aeternity"
-	"github.com/aeternity/aepp-sdk-go/v8/config"
-	"github.com/aeternity/aepp-sdk-go/v8/naet"
-	"github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v9/aeternity"
+	"github.com/aeternity/aepp-sdk-go/v9/config"
+	"github.com/aeternity/aepp-sdk-go/v9/naet"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/node/models"
 )
 
 func TestCreateContract(t *testing.T) {
@@ -24,7 +24,7 @@ contract SimpleStorage =
   function get() : int = state.data
   stateful function set(value : int) = put(state{data = value})`
 
-	ctID, _, err := contract.Deploy(simplestorage, "init", []string{"42"}, config.CompilerBackendFATE)
+	ctID, _, err := contract.Deploy(simplestorage, "init", []string{"42"})
 	if err != nil {
 		t.Error(err)
 	}
@@ -50,12 +50,12 @@ contract SimpleStorage =
   function get() : int = state.data
   stateful function set(value : int) = put(state{data = value})`
 
-	ctID, _, err := contract.Deploy(simplestorage, "init", []string{"42"}, config.CompilerBackendFATE)
+	ctID, _, err := contract.Deploy(simplestorage, "init", []string{"42"})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	callReceipt, err := contract.Call(ctID, simplestorage, "get", []string{}, config.CompilerBackendFATE)
+	callReceipt, err := contract.Call(ctID, simplestorage, "get", []string{})
 	if err != nil {
 		t.Error(err)
 	}
@@ -63,7 +63,7 @@ contract SimpleStorage =
 	callInfoChan := make(chan *models.ContractCallObject)
 	errChan := make(chan error)
 	go aeternity.DefaultCallResultListener(n, callReceipt.Hash, callInfoChan, errChan, config.Tuning.ChainPollInterval)
-	_ = <-callInfoChan
+	<-callInfoChan
 	err = <-errChan
 	if err != nil {
 		t.Fatal(err)

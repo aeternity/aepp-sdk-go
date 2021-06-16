@@ -4,8 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/v8/config"
-	"github.com/aeternity/aepp-sdk-go/v8/naet"
+	"github.com/aeternity/aepp-sdk-go/v9/naet"
 	"gotest.tools/golden"
 )
 
@@ -23,7 +22,7 @@ func TestCompiler(t *testing.T) {
 		}
 	})
 	t.Run("CompileContract", func(t *testing.T) {
-		_, err := c.CompileContract(string(golden.Get(t, simplestorageSource)), config.Compiler.Backend)
+		_, err := c.CompileContract(string(golden.Get(t, simplestorageSource)))
 		if err != nil {
 			t.Error(err)
 		}
@@ -39,27 +38,27 @@ func TestCompiler(t *testing.T) {
 			ae_addres
 	`
 
-		_, err := c.CompileContract(wontcompileSource, config.Compiler.Backend)
+		_, err := c.CompileContract(wontcompileSource)
 		errtype := reflect.TypeOf(err).String()
 		if errtype != "*operations.CompileContractBadRequest" {
 			t.Error(err)
 		}
 	})
 	t.Run("DecodeCallResult", func(t *testing.T) {
-		// taken from contract_test.go running main(42) on identity.aes, GET /transactions/th_.../info
-		_, err := c.DecodeCallResult("ok", "cb_VNLOFXc=", "main", string(golden.Get(t, identitySource)), config.Compiler.Backend)
+		// taken from contract_test.go running getArg(5) on identity.aes, GET /transactions/th_.../info
+		_, err := c.DecodeCallResult("ok", "cb_CpyCcgE=", "getArg", string(golden.Get(t, identitySource)))
 		if err != nil {
 			t.Error(err)
 		}
 	})
 	t.Run("DecodeCalldataBytecode", func(t *testing.T) {
-		_, err := c.DecodeCalldataBytecode(string(golden.Get(t, simplestorageBytecode)), string(golden.Get(t, simplestorageCalldata)), config.Compiler.Backend)
+		_, err := c.DecodeCalldataBytecode(string(golden.Get(t, simplestorageBytecode)), string(golden.Get(t, simplestorageCalldata)))
 		if err != nil {
 			t.Error(err)
 		}
 	})
 	t.Run("DecodeCalldataSource", func(t *testing.T) {
-		_, err := c.DecodeCalldataSource(string(golden.Get(t, simplestorageSource)), "init", string(golden.Get(t, simplestorageCalldata)), config.Compiler.Backend)
+		_, err := c.DecodeCalldataSource(string(golden.Get(t, simplestorageSource)), "init", string(golden.Get(t, simplestorageCalldata)))
 		if err != nil {
 			t.Error(err)
 		}
@@ -72,21 +71,21 @@ func TestCompiler(t *testing.T) {
 		}
 	})
 	t.Run("EncodeCalldata SimpleStorage set(123)", func(t *testing.T) {
-		encodedCalldata, err := c.EncodeCalldata(string(golden.Get(t, simplestorageSource)), "set", []string{"123"}, config.Compiler.Backend)
+		encodedCalldata, err := c.EncodeCalldata(string(golden.Get(t, simplestorageSource)), "set", []string{"123"})
 		if err != nil {
 			t.Error(err)
 		}
 		golden.Assert(t, encodedCalldata, "simplestorage_set123.txt")
 	})
 	t.Run("EncodeCalldata SimpleStorage init(42)", func(t *testing.T) {
-		encodedCalldata, err := c.EncodeCalldata(string(golden.Get(t, simplestorageSource)), "init", []string{"42"}, config.Compiler.Backend)
+		encodedCalldata, err := c.EncodeCalldata(string(golden.Get(t, simplestorageSource)), "init", []string{"42"})
 		if err != nil {
 			t.Error(err)
 		}
 		golden.Assert(t, encodedCalldata, "simplestorage_init42.txt")
 	})
 	t.Run("GenerateACI", func(t *testing.T) {
-		_, err := c.GenerateACI(string(golden.Get(t, simplestorageSource)), config.Compiler.Backend)
+		_, err := c.GenerateACI(string(golden.Get(t, simplestorageSource)))
 		if err != nil {
 			t.Error(err)
 		}

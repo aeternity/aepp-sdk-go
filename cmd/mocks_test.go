@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	compilermodels "github.com/aeternity/aepp-sdk-go/v8/swagguard/compiler/models"
-	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
+	compilermodels "github.com/aeternity/aepp-sdk-go/v9/swagguard/compiler/models"
+	models "github.com/aeternity/aepp-sdk-go/v9/swagguard/node/models"
 )
 
 type mockGetHeighter struct {
@@ -107,13 +107,13 @@ func (m *mockGetNameEntryByNamer) GetNameEntryByName(name string) (nameEntry *mo
 
 type mockCompileContracter struct{}
 
-func (m *mockCompileContracter) CompileContract(source string, backend string) (bytecode string, err error) {
+func (m *mockCompileContracter) CompileContract(source string) (bytecode string, err error) {
 	return "cb_+QYYRgKg+HOI9x+n5+MOEpnQ/zO+GoibqhQxGO4bgnvASx0vzB75BKX5AUmgOoWULXtHOgf10E7h2cFqXOqxa3kc6pKJYRpEw/nlugeDc2V0uMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoP//////////////////////////////////////////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC4YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///////////////////////////////////////////jJoEnsSQdsAgNxJqQzA+rc5DsuLDKUV7ETxQp+ItyJgJS3g2dldLhgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA///////////////////////////////////////////uEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+QKLoOIjHWzfyTkW3kyzqYV79lz0D8JW9KFJiz9+fJgMGZNEhGluaXS4wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACg//////////////////////////////////////////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALkBoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEA//////////////////////////////////////////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYD//////////////////////////////////////////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuQFEYgAAj2IAAMKRgICAUX9J7EkHbAIDcSakMwPq3OQ7LiwylFexE8UKfiLciYCUtxRiAAE5V1CAgFF/4iMdbN/JORbeTLOphXv2XPQPwlb0oUmLP358mAwZk0QUYgAA0VdQgFF/OoWULXtHOgf10E7h2cFqXOqxa3kc6pKJYRpEw/nlugcUYgABG1dQYAEZUQBbYAAZWWAgAZCBUmAgkANgAFmQgVKBUllgIAGQgVJgIJADYAOBUpBZYABRWVJgAFJgAPNbYACAUmAA81tgAFFRkFZbYCABUVGQUIOSUICRUFCAWZCBUllgIAGQgVJgIJADYAAZWWAgAZCBUmAgkANgAFmQgVKBUllgIAGQgVJgIJADYAOBUoFSkFCQVltgIAFRUVlQgJFQUGAAUYFZkIFSkFBgAFJZkFCQVltQUFlQUGIAAMpWhTMuMS4wHchc+w==", nil
 }
 
 type mockEncodeCalldataer struct{}
 
-func (m *mockEncodeCalldataer) EncodeCalldata(source string, function string, args []string, backend string) (bytecode string, err error) {
+func (m *mockEncodeCalldataer) EncodeCalldata(source string, function string, args []string) (bytecode string, err error) {
 	return "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACDiIx1s38k5Ft5Ms6mFe/Zc9A/CVvShSYs/fnyYDBmTRAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACo7j+li", nil
 }
 
@@ -121,12 +121,12 @@ type mockdecodeCalldataer struct {
 	decodedCalldata string
 }
 
-func (m *mockdecodeCalldataer) DecodeCalldataSource(source string, function string, callData string, backend string) (decodedCallData *compilermodels.DecodedCalldata, err error) {
+func (m *mockdecodeCalldataer) DecodeCalldataSource(source string, function string, callData string) (decodedCallData *compilermodels.DecodedCalldata, err error) {
 	decodedCallData = &compilermodels.DecodedCalldata{}
 	decodedCallData.UnmarshalBinary([]byte(m.decodedCalldata))
 	return decodedCallData, nil
 }
-func (m *mockdecodeCalldataer) DecodeCalldataBytecode(bytecode string, calldata string, backend string) (decodedCallData *compilermodels.DecodedCalldata, err error) {
+func (m *mockdecodeCalldataer) DecodeCalldataBytecode(bytecode string, calldata string) (decodedCallData *compilermodels.DecodedCalldata, err error) {
 	decodedCallData = &compilermodels.DecodedCalldata{}
 	decodedCallData.UnmarshalBinary([]byte(m.decodedCalldata))
 	return decodedCallData, nil
@@ -136,7 +136,7 @@ type mockGenerateACIer struct {
 	aci string
 }
 
-func (m *mockGenerateACIer) GenerateACI(source string, backend string) (aci *compilermodels.ACI, err error) {
+func (m *mockGenerateACIer) GenerateACI(source string) (aci *compilermodels.ACI, err error) {
 	aci = &compilermodels.ACI{}
 	err = aci.UnmarshalBinary([]byte(m.aci))
 	return aci, err

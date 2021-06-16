@@ -5,14 +5,14 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/v8/account"
-	"github.com/aeternity/aepp-sdk-go/v8/aeternity"
-	"github.com/aeternity/aepp-sdk-go/v8/config"
-	"github.com/aeternity/aepp-sdk-go/v8/models"
-	"github.com/aeternity/aepp-sdk-go/v8/naet"
-	"github.com/aeternity/aepp-sdk-go/v8/transactions"
-	"github.com/aeternity/aepp-sdk-go/v8/utils"
-	rlp "github.com/randomshinichi/rlpae"
+	"github.com/aeternity/aepp-sdk-go/v9/account"
+	"github.com/aeternity/aepp-sdk-go/v9/aeternity"
+	"github.com/aeternity/aepp-sdk-go/v9/binary"
+	"github.com/aeternity/aepp-sdk-go/v9/config"
+	"github.com/aeternity/aepp-sdk-go/v9/naet"
+	"github.com/aeternity/aepp-sdk-go/v9/transactions"
+	"github.com/aeternity/aepp-sdk-go/v9/utils"
+	rlp "github.com/aeternity/rlp-go"
 	"gotest.tools/golden"
 )
 
@@ -39,17 +39,17 @@ func TestGeneralizedAccounts(t *testing.T) {
 	if err != nil {
 		expected.Set(amount)
 	} else {
-		bS := big.Int(bobState.Balance)
+		bS := big.Int(*bobState.Balance)
 		expected.Add(&bS, amount)
 	}
 
 	authorizeSource := string(golden.Get(t, "authorize.aes"))
 	// Read the auth contract from a file, compile and prepare its init() calldata
-	authBytecode, err := compiler.CompileContract(authorizeSource, config.Compiler.Backend)
+	authBytecode, err := compiler.CompileContract(authorizeSource)
 	if err != nil {
 		t.Fatal(err)
 	}
-	authInitCalldata, err := compiler.EncodeCalldata(authorizeSource, "init", []string{alice.Address}, config.Compiler.Backend)
+	authInitCalldata, err := compiler.EncodeCalldata(authorizeSource, "init", []string{alice.Address})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -69,15 +69,15 @@ func TestGeneralizedAccounts(t *testing.T) {
 	}
 
 	// GAAttachTx
-	// Create a Contract{} struct from the compiled bytecode to get its authfunc hash
-	auth, err := models.NewContractFromString(authBytecode)
+	authFuncHash, err := binary.Blake2bHash([]byte("authorize"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	gaTx, err := transactions.NewGAAttachTx(testAccount.Address, authBytecode, auth.TypeInfo[0].FuncHash, config.Client.Contracts.VMVersion, config.Client.Contracts.ABIVersion, config.Client.Contracts.GasLimit, config.Client.GasPrice, authInitCalldata, ctx.TTLNoncer())
+	gaTx, err := transactions.NewGAAttachTx(testAccount.Address, authBytecode, authFuncHash, config.Client.Contracts.VMVersion, config.Client.Contracts.ABIVersion, config.Client.Contracts.GasLimit, config.Client.GasPrice, authInitCalldata, ctx.TTLNoncer())
 	if err != nil {
 		t.Fatal(err)
 	}
+	ctx.SigningAccount = testAccount
 	_, err = ctx.SignBroadcastWait(gaTx, config.Client.WaitBlocks)
 	if err != nil {
 		t.Fatal(err)
@@ -98,15 +98,17 @@ func TestGeneralizedAccounts(t *testing.T) {
 	// GAMetaTx
 	// spendTx will be wrapped in a SignedTx with 0 signatures before being
 	// included in GAMetaTx. The constructor NewGAMetaTx() does this for you.
-	// authData is authorize(3)
-	authData := "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACBGtXufEG2HuMYcRcNwsGAeqymslunKf692bHnvwI5K6wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAU3aKBNm"
+	authData, err := compiler.EncodeCalldata(authorizeSource, "authorize", []string{"3"})
+	if err != nil {
+		t.Fatal(err)
+	}
 	metaTxTTLNoncer := func(accountID string, offset uint64) (ttl, height, nonce uint64, err error) {
 		return 0, 0, 0, nil
 	}
 	spendTx, err := transactions.NewSpendTx(testAccount.Address, bob.Address, big.NewInt(5000), []byte{}, metaTxTTLNoncer)
-	gaMetaTx, err := transactions.NewGAMetaTx(testAccount.Address, authData, config.Client.Contracts.ABIVersion, config.Client.GasPrice, config.Client.GasPrice, spendTx, ctx.TTLNoncer())
+	gaMetaTx, err := transactions.NewGAMetaTx(testAccount.Address, authData, config.Client.Contracts.ABIVersion, big.NewInt(50000), config.Client.GasPrice, spendTx, ctx.TTLNoncer())
 
-	gaMetaTxFinal, hash, _, err := transactions.SignHashTx(testAccount, gaMetaTx, config.Node.NetworkID)
+	gaMetaTxFinal, hash, _, err := transactions.SignHashTx(alice, gaMetaTx, config.Node.NetworkID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -128,7 +130,7 @@ func TestGeneralizedAccounts(t *testing.T) {
 		}
 	}
 	delay(getBobsAccount)
-	b := big.Int(bobState.Balance)
+	b := big.Int(*bobState.Balance)
 
 	if expected.Cmp(&b) != 0 {
 		t.Fatalf("Bob should have %v, but has %v instead", expected.String(), bobState.Balance.String())

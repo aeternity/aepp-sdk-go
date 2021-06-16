@@ -1,64 +1,56 @@
-from pprint import pprint
-from dotted.collection import DottedDict
 import json
 import argparse
 
-json_objects = []
-json_leaves = []
-def traverse(data, parents):
-    for key in data:
-        # If we're in an "example": {"fee": 5} object, don't traverse into it.
-        if key == "example":
-            continue 
-        if not isinstance(data[key], dict):
-            json_leaves.append(".".join(parents + [key]))
-            continue
+def no_implicit_int64(el, p = []):
+    if isinstance(el, list):
+        for i, d in enumerate(el):
+            no_implicit_int64(d, p + [str(i)])
+    if isinstance(el, dict):
+        if el.get('type') == 'integer' and el.get('format') is None:
+            if el.get('minimum', 0) >= 0:
+                el['format'] = 'uint64'
+                print('added uint64 in', '.'.join(p), el)
+            el.pop('maximum', None)
+        for k, v in el.items():
+            no_implicit_int64(v, p + [k])
 
-        json_objects.append(".".join(parents + [key]))
-        parents.append(key)
-        traverse(data[key], parents)
-    
-    try:
-        parents.pop()
-    except IndexError:
-        # We have reached the JSON's root.
-        pass
+replaces = [
+    ['"$ref": "#/definitions/UInt64"', '"type":"integer", "format":"uint64"'],
+    ['"$ref": "#/definitions/UInt32"', '"type":"integer", "format":"uint32"'],
+    ['"$ref": "#/definitions/UInt16"', '"type":"integer", "format":"uint16"'],
 
-def no_implicit_int64(data):
-    swaggerD = DottedDict(data)
-    for l in json_objects:
-        n = swaggerD[l]
-        if n.get("type") == "integer" and n.get("format") is None:
-            n.format = "uint64"
-            print(l, n)
-    
-    return swaggerD.to_python()
+    ['"$ref": "#/definitions/EncodedPubkey"', '"type":"string"'],
+    ['"$ref": "#/definitions/EncodedHash"', '"type":"string"'],
+    ['"$ref": "#/definitions/EncodedValue"', '"type":"string"'],
+    ['"$ref": "#/definitions/EncodedByteArray"', '"type":"string"'],
 
-def add_uint_bigint(data):
-    bigint =  {
-      "type": "integer",
-      "minimum": 0,
-      "x-go-type": {
-        "import": {
-          "package": "github.com/aeternity/aepp-sdk-go/v8/utils"
-        },
-        "type": "BigInt"
-      }
-    }
-    data["definitions"]["UInt"] = bigint
-    return data
+    ['"#/definitions/TxBlockHeight"', '"#/definitions/UInt"'],
+    ['OracleResponseTxJSON', 'OracleRespondTxJSON'],
+]
 
-parser = argparse.ArgumentParser(description="Modify a swagger.json in ways that cannot be done via simple search/replace")
+parser = argparse.ArgumentParser(description='Modify a node.json')
 parser.add_argument('infile', type=open)
 parser.add_argument('outfile', type=argparse.FileType('w'))
 args = parser.parse_args()
 
-swagger = json.load(args.infile)
-traverse(swagger, [])
+api = args.infile.read()
 
+for replace in replaces:
+    api = api.replace(*replace)
 
-swagger_n = add_uint_bigint(swagger)
-swagger_n = no_implicit_int64(swagger_n)
+parsed = json.loads(api)
 
+no_implicit_int64(parsed)
 
-json.dump(swagger_n, args.outfile, indent=2)
+parsed['definitions']['UInt'] = {
+  'type': 'integer',
+  'minimum': 0,
+  'x-go-type': {
+    'import': {
+      'package': 'github.com/aeternity/aepp-sdk-go/v9/utils'
+    },
+    'type': 'BigInt'
+  }
+}
+
+json.dump(parsed, args.outfile, indent=2)

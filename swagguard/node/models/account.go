@@ -6,18 +6,18 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"encoding/json"
 
-	strfmt "github.com/go-openapi/strfmt"
-
+	"github.com/aeternity/aepp-sdk-go/v9/utils"
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
-
-	utils "github.com/aeternity/aepp-sdk-go/v8/utils"
 )
 
 // Account account
+//
 // swagger:model Account
 type Account struct {
 
@@ -26,7 +26,7 @@ type Account struct {
 
 	// Balance
 	// Required: true
-	Balance utils.BigInt `json:"balance"`
+	Balance *utils.BigInt `json:"balance"`
 
 	// Id of authorization contract for generalized account
 	ContractID string `json:"contract_id,omitempty"`
@@ -75,11 +75,21 @@ func (m *Account) Validate(formats strfmt.Registry) error {
 
 func (m *Account) validateBalance(formats strfmt.Registry) error {
 
-	if err := m.Balance.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("balance")
-		}
+	if err := validate.Required("balance", "body", m.Balance); err != nil {
 		return err
+	}
+
+	if err := validate.Required("balance", "body", m.Balance); err != nil {
+		return err
+	}
+
+	if m.Balance != nil {
+		if err := m.Balance.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("balance")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -117,14 +127,13 @@ const (
 
 // prop value enum
 func (m *Account) validateKindEnum(path, location string, value string) error {
-	if err := validate.Enum(path, location, value, accountTypeKindPropEnum); err != nil {
+	if err := validate.EnumCase(path, location, value, accountTypeKindPropEnum, true); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (m *Account) validateKind(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Kind) { // not required
 		return nil
 	}
@@ -141,6 +150,34 @@ func (m *Account) validateNonce(formats strfmt.Registry) error {
 
 	if err := validate.Required("nonce", "body", m.Nonce); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this account based on the context it is used
+func (m *Account) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateBalance(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *Account) contextValidateBalance(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Balance != nil {
+		if err := m.Balance.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("balance")
+			}
+			return err
+		}
 	}
 
 	return nil

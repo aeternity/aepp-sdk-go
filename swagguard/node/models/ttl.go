@@ -6,16 +6,17 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"encoding/json"
 
-	strfmt "github.com/go-openapi/strfmt"
-
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // TTL TTL
+//
 // swagger:model TTL
 type TTL struct {
 
@@ -70,7 +71,7 @@ const (
 
 // prop value enum
 func (m *TTL) validateTypeEnum(path, location string, value string) error {
-	if err := validate.Enum(path, location, value, ttlTypeTypePropEnum); err != nil {
+	if err := validate.EnumCase(path, location, value, ttlTypeTypePropEnum, true); err != nil {
 		return err
 	}
 	return nil
@@ -96,6 +97,11 @@ func (m *TTL) validateValue(formats strfmt.Registry) error {
 		return err
 	}
 
+	return nil
+}
+
+// ContextValidate validates this TTL based on context it is used
+func (m *TTL) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

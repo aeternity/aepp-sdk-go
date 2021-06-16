@@ -1,18 +1,5 @@
 version: '3'
 services:
-  sdk:
-    build:
-      context: .
-      dockerfile: Dockerfile.ci
-    depends_on: [node]
-    entrypoint: docker/wait-for-it.sh node:3013 --
-    env_file: [./build/docker/sdk.env]
-    environment:
-      - WALLET_PRIV=${WALLET_PRIV}
-      - WALLET_PUB=${WALLET_PUB}
-    volumes:
-      - .:/go/src/app
-
   node:
     image: aeternity/aeternity:${TAG}
     hostname: node
@@ -21,17 +8,12 @@ services:
       - "3113:3113"
     environment:
       AETERNITY_CONFIG: /home/aeternity/aeternity.yaml
-    command: bin/aeternity console -noinput -aecore expected_mine_rate ${AETERNITY_MINE_RATE:-15000}
+    command: bin/aeternity console -noinput -aecore
     volumes:
-      - ${PWD}/build/docker/aeternity_node_mean16.yaml:/home/aeternity/aeternity.yaml
-      - ${PWD}/build/docker/accounts.json:/home/aeternity/node/data/aecore/.genesis/accounts_test.json
-      - ${PWD}/build/docker/keys/node:/home/aeternity/node/keys
-      - node_db:/home/aeternity/node/data/mnesia
+      - ${PWD}/docker/aeternity_node_mean16.yaml:/home/aeternity/aeternity.yaml
+      - ${PWD}/docker/accounts.json:/home/aeternity/node/data/aecore/.genesis/accounts_test.json
   compiler:
     image: aeternity/aesophia_http:${COMPILER_TAG}
     hostname: compiler
     ports:
       - "3080:3080"
-volumes:
-  node_db:
-  node_keys:

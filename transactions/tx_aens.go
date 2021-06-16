@@ -8,11 +8,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/aeternity/aepp-sdk-go/v8/binary"
-	"github.com/aeternity/aepp-sdk-go/v8/config"
-	"github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
-	"github.com/aeternity/aepp-sdk-go/v8/utils"
-	rlp "github.com/randomshinichi/rlpae"
+	"github.com/aeternity/aepp-sdk-go/v9/binary"
+	"github.com/aeternity/aepp-sdk-go/v9/config"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v9/utils"
+	rlp "github.com/aeternity/rlp-go"
 )
 
 // NameID computes the nm_ string of a given AENS name.
@@ -68,7 +68,7 @@ func computeCommitmentID(name string, salt []byte) (ch string, err error) {
 		// includes an extra byte at the start and end of the string, messing up
 		// the hashing process.
 		if !isPrintable(name) {
-			return "", fmt.Errorf("The name %s must contain only printable characters", name)
+			return "", fmt.Errorf("the name %s must contain only printable characters", name)
 		}
 
 		nh = append([]byte(name), salt...)
@@ -177,10 +177,11 @@ func (tx *NamePreclaimTx) DecodeRLP(s *rlp.Stream) (err error) {
 
 // JSON representation of a Tx is useful for querying the node's debug endpoint
 func (tx *NamePreclaimTx) JSON() (string, error) {
+	fee := utils.BigInt(*tx.Fee)
 	swaggerT := models.NamePreclaimTx{
 		AccountID:    &tx.AccountID,
 		CommitmentID: &tx.CommitmentID,
-		Fee:          utils.BigInt(*tx.Fee),
+		Fee:          &fee,
 		Nonce:        tx.AccountNonce,
 		TTL:          tx.TTL,
 	}
@@ -206,7 +207,6 @@ func (tx *NamePreclaimTx) CalcGas() (g *big.Int, err error) {
 	if err != nil {
 		return
 	}
-	g = new(big.Int)
 	g = baseGas.Add(baseGas, gasComponent)
 	return
 }
@@ -320,11 +320,13 @@ func (tx *NameClaimTx) JSON() (string, error) {
 	// When talking JSON to the node, the name should be 'API encoded'
 	// (base58), not namehash-ed.
 	nameAPIEncoded := binary.Encode(binary.PrefixName, []byte(tx.Name))
+	fee := utils.BigInt(*tx.Fee)
+	nameSalt := utils.BigInt(*tx.NameSalt)
 	swaggerT := models.NameClaimTx{
 		AccountID: &tx.AccountID,
-		Fee:       utils.BigInt(*tx.Fee),
+		Fee:       &fee,
 		Name:      &nameAPIEncoded,
-		NameSalt:  utils.BigInt(*tx.NameSalt),
+		NameSalt:  &nameSalt,
 		NameFee:   utils.BigInt(*tx.NameFee),
 		Nonce:     tx.AccountNonce,
 		TTL:       tx.TTL,
@@ -352,7 +354,6 @@ func (tx *NameClaimTx) CalcGas() (g *big.Int, err error) {
 	if err != nil {
 		return
 	}
-	g = new(big.Int)
 	g = baseGas.Add(baseGas, gasComponent)
 	return
 }
@@ -473,27 +474,27 @@ func (np *NamePointer) Validate() (err error) {
 
 func (np *NamePointer) validateAccountPubkey() error {
 	if !strings.HasPrefix(np.Pointer, string(binary.PrefixAccountPubkey)) {
-		return fmt.Errorf("If the Key is \"account_pubkey\", the Pointer must start with %s", binary.PrefixAccountPubkey)
+		return fmt.Errorf("if the Key is \"account_pubkey\", the Pointer must start with %s", binary.PrefixAccountPubkey)
 	}
 	return nil
 }
 func (np *NamePointer) validateOraclePubkey() error {
 	if !strings.HasPrefix(np.Pointer, string(binary.PrefixOraclePubkey)) {
-		return fmt.Errorf("If the Key is \"oracle_pubkey\", the Pointer must start with %s", binary.PrefixOraclePubkey)
+		return fmt.Errorf("if the Key is \"oracle_pubkey\", the Pointer must start with %s", binary.PrefixOraclePubkey)
 	}
 	return nil
 }
 
 func (np *NamePointer) validateContractPubkey() error {
 	if !strings.HasPrefix(np.Pointer, string(binary.PrefixContractPubkey)) {
-		return fmt.Errorf("If the Key is \"contract_pubkey\", the Pointer must start with %s", binary.PrefixContractPubkey)
+		return fmt.Errorf("if the Key is \"contract_pubkey\", the Pointer must start with %s", binary.PrefixContractPubkey)
 	}
 	return nil
 }
 
 func (np *NamePointer) validateChannel() error {
 	if !strings.HasPrefix(np.Pointer, string(binary.PrefixChannel)) {
-		return fmt.Errorf("If the Key is \"channel\", the Pointer must start with %s", binary.PrefixChannel)
+		return fmt.Errorf("if the Key is \"channel\", the Pointer must start with %s", binary.PrefixChannel)
 	}
 	return nil
 }
@@ -630,10 +631,11 @@ func (tx *NameUpdateTx) JSON() (string, error) {
 		swaggerNamePointers = append(swaggerNamePointers, np.Swagger())
 	}
 
+	fee := utils.BigInt(*tx.Fee)
 	swaggerT := models.NameUpdateTx{
 		AccountID: &tx.AccountID,
 		ClientTTL: &tx.ClientTTL,
-		Fee:       utils.BigInt(*tx.Fee),
+		Fee:       &fee,
 		NameID:    &tx.NameID,
 		NameTTL:   &tx.NameTTL,
 		Nonce:     tx.AccountNonce,
@@ -663,7 +665,6 @@ func (tx *NameUpdateTx) CalcGas() (g *big.Int, err error) {
 	if err != nil {
 		return
 	}
-	g = new(big.Int)
 	g = baseGas.Add(baseGas, gasComponent)
 	return
 }
@@ -772,9 +773,10 @@ func (tx *NameRevokeTx) DecodeRLP(s *rlp.Stream) (err error) {
 
 // JSON representation of a Tx is useful for querying the node's debug endpoint
 func (tx *NameRevokeTx) JSON() (string, error) {
+	fee := utils.BigInt(*tx.Fee)
 	swaggerT := models.NameRevokeTx{
 		AccountID: &tx.AccountID,
-		Fee:       utils.BigInt(*tx.Fee),
+		Fee:       &fee,
 		NameID:    &tx.NameID,
 		Nonce:     tx.AccountNonce,
 		TTL:       tx.TTL,
@@ -802,7 +804,6 @@ func (tx *NameRevokeTx) CalcGas() (g *big.Int, err error) {
 	if err != nil {
 		return
 	}
-	g = new(big.Int)
 	g = baseGas.Add(baseGas, gasComponent)
 	return
 }
@@ -926,9 +927,10 @@ func (tx *NameTransferTx) DecodeRLP(s *rlp.Stream) (err error) {
 
 // JSON representation of a Tx is useful for querying the node's debug endpoint
 func (tx *NameTransferTx) JSON() (string, error) {
+	fee := utils.BigInt(*tx.Fee)
 	swaggerT := models.NameTransferTx{
 		AccountID:   &tx.AccountID,
-		Fee:         utils.BigInt(*tx.Fee),
+		Fee:         &fee,
 		NameID:      &tx.NameID,
 		Nonce:       tx.AccountNonce,
 		RecipientID: &tx.RecipientID,
@@ -957,7 +959,6 @@ func (tx *NameTransferTx) CalcGas() (g *big.Int, err error) {
 	if err != nil {
 		return
 	}
-	g = new(big.Int)
 	g = baseGas.Add(baseGas, gasComponent)
 	return
 }

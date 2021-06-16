@@ -13,56 +13,69 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
-
-	strfmt "github.com/go-openapi/strfmt"
+	"github.com/go-openapi/strfmt"
 )
 
-// NewGetCurrentKeyBlockHeightParams creates a new GetCurrentKeyBlockHeightParams object
-// with the default values initialized.
+// NewGetCurrentKeyBlockHeightParams creates a new GetCurrentKeyBlockHeightParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewGetCurrentKeyBlockHeightParams() *GetCurrentKeyBlockHeightParams {
-
 	return &GetCurrentKeyBlockHeightParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewGetCurrentKeyBlockHeightParamsWithTimeout creates a new GetCurrentKeyBlockHeightParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewGetCurrentKeyBlockHeightParamsWithTimeout(timeout time.Duration) *GetCurrentKeyBlockHeightParams {
-
 	return &GetCurrentKeyBlockHeightParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewGetCurrentKeyBlockHeightParamsWithContext creates a new GetCurrentKeyBlockHeightParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewGetCurrentKeyBlockHeightParamsWithContext(ctx context.Context) *GetCurrentKeyBlockHeightParams {
-
 	return &GetCurrentKeyBlockHeightParams{
-
 		Context: ctx,
 	}
 }
 
 // NewGetCurrentKeyBlockHeightParamsWithHTTPClient creates a new GetCurrentKeyBlockHeightParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewGetCurrentKeyBlockHeightParamsWithHTTPClient(client *http.Client) *GetCurrentKeyBlockHeightParams {
-
 	return &GetCurrentKeyBlockHeightParams{
 		HTTPClient: client,
 	}
 }
 
-/*GetCurrentKeyBlockHeightParams contains all the parameters to send to the API endpoint
-for the get current key block height operation typically these are written to a http.Request
+/* GetCurrentKeyBlockHeightParams contains all the parameters to send to the API endpoint
+   for the get current key block height operation.
+
+   Typically these are written to a http.Request.
 */
 type GetCurrentKeyBlockHeightParams struct {
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the get current key block height params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetCurrentKeyBlockHeightParams) WithDefaults() *GetCurrentKeyBlockHeightParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the get current key block height params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetCurrentKeyBlockHeightParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the get current key block height params

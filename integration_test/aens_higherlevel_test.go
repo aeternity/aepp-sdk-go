@@ -3,8 +3,8 @@ package integrationtest
 import (
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/v8/aeternity"
-	"github.com/aeternity/aepp-sdk-go/v8/transactions"
+	"github.com/aeternity/aepp-sdk-go/v9/aeternity"
+	"github.com/aeternity/aepp-sdk-go/v9/transactions"
 )
 
 func TestRegisterName(t *testing.T) {
@@ -12,7 +12,7 @@ func TestRegisterName(t *testing.T) {
 	alice, _ := setupAccounts(t)
 
 	ctx := aeternity.NewContext(alice, n)
-	name := "somelongnamefdsafdffsa.chain"
+	name := randomName(22)
 	nameFee := transactions.CalculateMinNameFee(name)
 
 	aens := aeternity.NewAENS(ctx)

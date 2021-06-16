@@ -6,20 +6,26 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"context"
 
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // ACI a c i
+// Example: {"encoded_aci":"{}","external_encoded_aci":"","interface":"interface"}
+//
 // swagger:model ACI
 type ACI struct {
 
 	// encoded aci
 	// Required: true
 	EncodedAci interface{} `json:"encoded_aci"`
+
+	// external encoded aci
+	ExternalEncodedAci []interface{} `json:"external_encoded_aci"`
 
 	// interface
 	// Required: true
@@ -46,8 +52,8 @@ func (m *ACI) Validate(formats strfmt.Registry) error {
 
 func (m *ACI) validateEncodedAci(formats strfmt.Registry) error {
 
-	if err := validate.Required("encoded_aci", "body", m.EncodedAci); err != nil {
-		return err
+	if m.EncodedAci == nil {
+		return errors.Required("encoded_aci", "body", nil)
 	}
 
 	return nil
@@ -59,6 +65,11 @@ func (m *ACI) validateInterface(formats strfmt.Registry) error {
 		return err
 	}
 
+	return nil
+}
+
+// ContextValidate validates this a c i based on context it is used
+func (m *ACI) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

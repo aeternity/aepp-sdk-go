@@ -8,8 +8,8 @@ import (
 
 	"time"
 
-	"github.com/aeternity/aepp-sdk-go/v8/config"
-	"github.com/aeternity/aepp-sdk-go/v8/naet"
+	"github.com/aeternity/aepp-sdk-go/v9/config"
+	"github.com/aeternity/aepp-sdk-go/v9/naet"
 )
 
 func times(str string, n int) (out string) {
@@ -22,12 +22,6 @@ func times(str string, n int) (out string) {
 var (
 	defaultIndentSize = 50
 )
-
-// Left left-pads the string with pad up to len runes
-// len may be exceeded if
-func left(str string, length int, pad string) string {
-	return times(pad, length-len(str)) + str
-}
 
 // Right right-pads the string with pad up to len runes
 func right(str string, length int, pad string) string {

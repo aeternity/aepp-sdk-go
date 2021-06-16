@@ -10,10 +10,9 @@ import (
 	"io"
 
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 
-	strfmt "github.com/go-openapi/strfmt"
-
-	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/node/models"
 )
 
 // GetNameEntryByNameReader is a Reader for the GetNameEntryByName structure.
@@ -24,30 +23,26 @@ type GetNameEntryByNameReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *GetNameEntryByNameReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewGetNameEntryByNameOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 400:
 		result := NewGetNameEntryByNameBadRequest()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 404:
 		result := NewGetNameEntryByNameNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -56,7 +51,7 @@ func NewGetNameEntryByNameOK() *GetNameEntryByNameOK {
 	return &GetNameEntryByNameOK{}
 }
 
-/*GetNameEntryByNameOK handles this case with default header values.
+/* GetNameEntryByNameOK describes a response with status code 200, with default header values.
 
 Successful operation
 */
@@ -66,6 +61,9 @@ type GetNameEntryByNameOK struct {
 
 func (o *GetNameEntryByNameOK) Error() string {
 	return fmt.Sprintf("[GET /names/{name}][%d] getNameEntryByNameOK  %+v", 200, o.Payload)
+}
+func (o *GetNameEntryByNameOK) GetPayload() *models.NameEntry {
+	return o.Payload
 }
 
 func (o *GetNameEntryByNameOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -85,7 +83,7 @@ func NewGetNameEntryByNameBadRequest() *GetNameEntryByNameBadRequest {
 	return &GetNameEntryByNameBadRequest{}
 }
 
-/*GetNameEntryByNameBadRequest handles this case with default header values.
+/* GetNameEntryByNameBadRequest describes a response with status code 400, with default header values.
 
 Invalid name
 */
@@ -95,6 +93,9 @@ type GetNameEntryByNameBadRequest struct {
 
 func (o *GetNameEntryByNameBadRequest) Error() string {
 	return fmt.Sprintf("[GET /names/{name}][%d] getNameEntryByNameBadRequest  %+v", 400, o.Payload)
+}
+func (o *GetNameEntryByNameBadRequest) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *GetNameEntryByNameBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -114,7 +115,7 @@ func NewGetNameEntryByNameNotFound() *GetNameEntryByNameNotFound {
 	return &GetNameEntryByNameNotFound{}
 }
 
-/*GetNameEntryByNameNotFound handles this case with default header values.
+/* GetNameEntryByNameNotFound describes a response with status code 404, with default header values.
 
 Name not found
 */
@@ -124,6 +125,9 @@ type GetNameEntryByNameNotFound struct {
 
 func (o *GetNameEntryByNameNotFound) Error() string {
 	return fmt.Sprintf("[GET /names/{name}][%d] getNameEntryByNameNotFound  %+v", 404, o.Payload)
+}
+func (o *GetNameEntryByNameNotFound) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *GetNameEntryByNameNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

@@ -3,10 +3,10 @@ package aeternity
 import (
 	"time"
 
-	"github.com/aeternity/aepp-sdk-go/v8/config"
-	"github.com/aeternity/aepp-sdk-go/v8/naet"
-	"github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
-	"github.com/aeternity/aepp-sdk-go/v8/transactions"
+	"github.com/aeternity/aepp-sdk-go/v9/config"
+	"github.com/aeternity/aepp-sdk-go/v9/naet"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v9/transactions"
 )
 
 type callResultListener interface {
@@ -44,12 +44,12 @@ func DefaultCallResultListener(node callResultListener, txHash string, callResul
 }
 
 // Deploy lets one deploy a contract with minimum fuss.
-func (c *Contract) Deploy(source, function string, args []string, backend string) (ctID string, createTxReceipt *TxReceipt, err error) {
-	bytecode, err := c.ctx.Compiler().CompileContract(source, backend)
+func (c *Contract) Deploy(source, function string, args []string) (ctID string, createTxReceipt *TxReceipt, err error) {
+	bytecode, err := c.ctx.Compiler().CompileContract(source)
 	if err != nil {
 		return
 	}
-	calldata, err := c.ctx.Compiler().EncodeCalldata(source, function, args, backend)
+	calldata, err := c.ctx.Compiler().EncodeCalldata(source, function, args)
 	if err != nil {
 		return
 	}
@@ -58,7 +58,7 @@ func (c *Contract) Deploy(source, function string, args []string, backend string
 	if err != nil {
 		return
 	}
-	VMVersion, ABIVersion, err := findVMABIVersion(version, backend)
+	VMVersion, ABIVersion, err := findVMABIVersion(version)
 	if err != nil {
 		return
 	}
@@ -78,8 +78,8 @@ func (c *Contract) Deploy(source, function string, args []string, backend string
 
 // Call calls a smart contract's function, automatically calling the
 // compiler to transform the arguments into bytecode.
-func (c *Contract) Call(ctID, source, function string, args []string, backend string) (txReceipt *TxReceipt, err error) {
-	callData, err := c.ctx.Compiler().EncodeCalldata(source, function, args, backend)
+func (c *Contract) Call(ctID, source, function string, args []string) (txReceipt *TxReceipt, err error) {
+	callData, err := c.ctx.Compiler().EncodeCalldata(source, function, args)
 	if err != nil {
 		return
 	}

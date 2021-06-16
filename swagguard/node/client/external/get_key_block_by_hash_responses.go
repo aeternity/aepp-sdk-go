@@ -10,10 +10,9 @@ import (
 	"io"
 
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 
-	strfmt "github.com/go-openapi/strfmt"
-
-	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/node/models"
 )
 
 // GetKeyBlockByHashReader is a Reader for the GetKeyBlockByHash structure.
@@ -24,30 +23,26 @@ type GetKeyBlockByHashReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *GetKeyBlockByHashReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewGetKeyBlockByHashOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 400:
 		result := NewGetKeyBlockByHashBadRequest()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 404:
 		result := NewGetKeyBlockByHashNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -56,7 +51,7 @@ func NewGetKeyBlockByHashOK() *GetKeyBlockByHashOK {
 	return &GetKeyBlockByHashOK{}
 }
 
-/*GetKeyBlockByHashOK handles this case with default header values.
+/* GetKeyBlockByHashOK describes a response with status code 200, with default header values.
 
 Successful operation
 */
@@ -66,6 +61,9 @@ type GetKeyBlockByHashOK struct {
 
 func (o *GetKeyBlockByHashOK) Error() string {
 	return fmt.Sprintf("[GET /key-blocks/hash/{hash}][%d] getKeyBlockByHashOK  %+v", 200, o.Payload)
+}
+func (o *GetKeyBlockByHashOK) GetPayload() *models.KeyBlock {
+	return o.Payload
 }
 
 func (o *GetKeyBlockByHashOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -85,7 +83,7 @@ func NewGetKeyBlockByHashBadRequest() *GetKeyBlockByHashBadRequest {
 	return &GetKeyBlockByHashBadRequest{}
 }
 
-/*GetKeyBlockByHashBadRequest handles this case with default header values.
+/* GetKeyBlockByHashBadRequest describes a response with status code 400, with default header values.
 
 Invalid hash
 */
@@ -95,6 +93,9 @@ type GetKeyBlockByHashBadRequest struct {
 
 func (o *GetKeyBlockByHashBadRequest) Error() string {
 	return fmt.Sprintf("[GET /key-blocks/hash/{hash}][%d] getKeyBlockByHashBadRequest  %+v", 400, o.Payload)
+}
+func (o *GetKeyBlockByHashBadRequest) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *GetKeyBlockByHashBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -114,7 +115,7 @@ func NewGetKeyBlockByHashNotFound() *GetKeyBlockByHashNotFound {
 	return &GetKeyBlockByHashNotFound{}
 }
 
-/*GetKeyBlockByHashNotFound handles this case with default header values.
+/* GetKeyBlockByHashNotFound describes a response with status code 404, with default header values.
 
 Block not found
 */
@@ -124,6 +125,9 @@ type GetKeyBlockByHashNotFound struct {
 
 func (o *GetKeyBlockByHashNotFound) Error() string {
 	return fmt.Sprintf("[GET /key-blocks/hash/{hash}][%d] getKeyBlockByHashNotFound  %+v", 404, o.Payload)
+}
+func (o *GetKeyBlockByHashNotFound) GetPayload() *models.Error {
+	return o.Payload
 }
 
 func (o *GetKeyBlockByHashNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

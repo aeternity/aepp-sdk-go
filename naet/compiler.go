@@ -1,9 +1,9 @@
 package naet
 
 import (
-	compiler_client "github.com/aeternity/aepp-sdk-go/v8/swagguard/compiler/client"
-	"github.com/aeternity/aepp-sdk-go/v8/swagguard/compiler/client/operations"
-	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/compiler/models"
+	compiler_client "github.com/aeternity/aepp-sdk-go/v9/swagguard/compiler/client"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/compiler/client/operations"
+	models "github.com/aeternity/aepp-sdk-go/v9/swagguard/compiler/models"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 )
@@ -50,13 +50,12 @@ func (c *Compiler) APIVersion() (version string, err error) {
 // CompileContracter guarantees that one can run a CompileContract() method on
 // the mocked/real network connection to the aesophia compiler
 type CompileContracter interface {
-	CompileContract(source string, backend string) (bytecode string, err error)
+	CompileContract(source string) (bytecode string, err error)
 }
 
 // CompileContract abstracts away the swagger specifics of posting to /compile
-func (c *Compiler) CompileContract(source string, backend string) (bytecode string, err error) {
+func (c *Compiler) CompileContract(source string) (bytecode string, err error) {
 	contract := &models.Contract{Code: &source, Options: &models.CompileOpts{
-		Backend:    backend,
 		FileSystem: nil,
 		SrcFile:    "",
 	}}
@@ -65,25 +64,24 @@ func (c *Compiler) CompileContract(source string, backend string) (bytecode stri
 	if err != nil {
 		return "", err
 	}
-	bytecode = string(result.Payload.Bytecode)
+	bytecode = string(*result.Payload.Bytecode)
 	return
 }
 
 // DecodeCallResulter guarantees that one can run a DecodeCallResult() method on
 // the mocked/real network connection to the aesophia compiler
 type DecodeCallResulter interface {
-	DecodeCallResult(callResult string, callValue string, function string, source string, backend string) (answer interface{}, err error)
+	DecodeCallResult(callResult string, callValue string, function string, source string) (answer interface{}, err error)
 }
 
 // DecodeCallResult abstracts away the swagger specifics of posting to
 // /decode-call-result
-func (c *Compiler) DecodeCallResult(callResult string, callValue string, function string, source string, backend string) (answer interface{}, err error) {
+func (c *Compiler) DecodeCallResult(callResult string, callValue string, function string, source string) (answer interface{}, err error) {
 	sophiaCallResultInput := &models.SophiaCallResultInput{
 		CallResult: &callResult,
 		CallValue:  &callValue,
 		Function:   &function,
 		Options: &models.CompileOpts{
-			Backend:    backend,
 			FileSystem: nil,
 			SrcFile:    "",
 		},
@@ -102,16 +100,17 @@ func (c *Compiler) DecodeCallResult(callResult string, callValue string, functio
 // DecodeCalldataBytecode() method on the mocked/real network connection to the
 // aesophia compiler
 type DecodeCalldataBytecoder interface {
-	DecodeCalldataBytecode(bytecode string, calldata string, backend string) (decodedCallData *models.DecodedCalldata, err error)
+	DecodeCalldataBytecode(bytecode string, calldata string) (decodedCallData *models.DecodedCalldata, err error)
 }
 
 // DecodeCalldataBytecode abstracts away the swagger specifics of posting to
 // /decode-calldata/bytecode
-func (c *Compiler) DecodeCalldataBytecode(bytecode string, calldata string, backend string) (decodedCallData *models.DecodedCalldata, err error) {
+func (c *Compiler) DecodeCalldataBytecode(bytecode string, calldata string) (decodedCallData *models.DecodedCalldata, err error) {
+	bytecodeEba := models.EncodedByteArray(bytecode)
+	calldataEba := models.EncodedByteArray(calldata)
 	decodeCalldataBytecode := &models.DecodeCalldataBytecode{
-		Bytecode: models.EncodedByteArray(bytecode),
-		Calldata: models.EncodedByteArray(calldata),
-		Backend:  backend,
+		Bytecode: &bytecodeEba,
+		Calldata: &calldataEba,
 	}
 	params := operations.NewDecodeCalldataBytecodeParams().WithBody(decodeCalldataBytecode)
 	result, err := c.Compiler.Operations.DecodeCalldataBytecode(params)
@@ -125,17 +124,17 @@ func (c *Compiler) DecodeCalldataBytecode(bytecode string, calldata string, back
 // DecodeCalldataSourcer guarantees that one can run a DecodeCalldataSource()
 // method on the mocked/real network connection to the aesophia compiler
 type DecodeCalldataSourcer interface {
-	DecodeCalldataSource(source string, function string, callData string, backend string) (decodedCallData *models.DecodedCalldata, err error)
+	DecodeCalldataSource(source string, function string, callData string) (decodedCallData *models.DecodedCalldata, err error)
 }
 
 // DecodeCalldataSource abstracts away the swagger specifics of posting to
 // /decode-calldata/source
-func (c *Compiler) DecodeCalldataSource(source string, function string, callData string, backend string) (decodedCallData *models.DecodedCalldata, err error) {
+func (c *Compiler) DecodeCalldataSource(source string, function string, callData string) (decodedCallData *models.DecodedCalldata, err error) {
+	callDataEba := models.EncodedByteArray(callData)
 	p := &models.DecodeCalldataSource{
-		Calldata: models.EncodedByteArray(callData),
+		Calldata: &callDataEba,
 		Function: &function,
 		Options: &models.CompileOpts{
-			Backend:    backend,
 			FileSystem: nil,
 			SrcFile:    "",
 		},
@@ -174,17 +173,16 @@ func (c *Compiler) DecodeData(data string, sophiaType string) (decodedData *mode
 // EncodeCalldataer guarantees that one can run a EncodeCalldata() method on the
 // mocked/real network connection to the aesophia compiler
 type EncodeCalldataer interface {
-	EncodeCalldata(source string, function string, args []string, backend string) (callData string, err error)
+	EncodeCalldata(source string, function string, args []string) (callData string, err error)
 }
 
 // EncodeCalldata abstracts away the swagger specifics of posting to
 // /encode-calldata
-func (c *Compiler) EncodeCalldata(source string, function string, args []string, backend string) (callData string, err error) {
+func (c *Compiler) EncodeCalldata(source string, function string, args []string) (callData string, err error) {
 	f := &models.FunctionCallInput{
 		Arguments: args,
 		Function:  &function,
 		Options: &models.CompileOpts{
-			Backend:    backend,
 			FileSystem: nil,
 			SrcFile:    "",
 		},
@@ -196,20 +194,19 @@ func (c *Compiler) EncodeCalldata(source string, function string, args []string,
 		return
 	}
 
-	s := string(result.Payload.Calldata)
+	s := string(*result.Payload.Calldata)
 	return s, err
 }
 
 // GenerateACIer guarantees that one can run a GenerateACI() method on the
 // mocked/real network connection to the aesophia compiler
 type GenerateACIer interface {
-	GenerateACI(source string, backend string) (aci *models.ACI, err error)
+	GenerateACI(source string) (aci *models.ACI, err error)
 }
 
 // GenerateACI abstracts away the swagger specifics of posting to /aci
-func (c *Compiler) GenerateACI(source string, backend string) (aci *models.ACI, err error) {
+func (c *Compiler) GenerateACI(source string) (aci *models.ACI, err error) {
 	contract := &models.Contract{Code: &source, Options: &models.CompileOpts{
-		Backend:    backend,
 		FileSystem: nil,
 		SrcFile:    "",
 	}}

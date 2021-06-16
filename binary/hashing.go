@@ -3,10 +3,11 @@ package binary
 import (
 	"crypto/sha256"
 	"encoding/base64"
+	"errors"
 	"fmt"
 
+	rlp "github.com/aeternity/rlp-go"
 	"github.com/btcsuite/btcutil/base58"
-	rlp "github.com/randomshinichi/rlpae"
 	"golang.org/x/crypto/blake2b"
 )
 
@@ -31,9 +32,8 @@ func Encode(prefix HashPrefix, data []byte) string {
 	case Base64c:
 		return fmt.Sprint(prefix, base64.StdEncoding.EncodeToString(in))
 	default:
-		panic(fmt.Sprint("Encoding not supported"))
+		panic("Encoding not supported")
 	}
-
 }
 
 // Decode a string encoded with base58/base64 + checksum to a byte array
@@ -52,7 +52,7 @@ func Decode(in string) (out []byte, err error) {
 	// 3 (**_) + 5 (Single byte, prefixed with Base58 4 character hash)
 	// then split it into p(refix) and h(ash)
 	if len(in) <= 8 || string(in[2]) != PrefixSeparator {
-		err = fmt.Errorf("Invalid object encoding")
+		err = errors.New("invalid object encoding")
 		return
 	}
 	p = HashPrefix(in[0:3])
@@ -65,12 +65,12 @@ func Decode(in string) (out []byte, err error) {
 		raw, _ = base64.StdEncoding.DecodeString(h)
 	}
 	if len(raw) < 5 {
-		err = fmt.Errorf("Invalid input, %s cannot be decoded", in)
+		err = fmt.Errorf("invalid input, %s cannot be decoded", in)
 		return nil, err
 	}
 	out = raw[:len(raw)-4]
 	if chk := Encode(p, out); in != chk {
-		err = fmt.Errorf("Invalid checksum, expected %s got %s", chk, in)
+		err = fmt.Errorf("invalid checksum, expected %s got %s", chk, in)
 		return nil, err
 	}
 	return out, nil

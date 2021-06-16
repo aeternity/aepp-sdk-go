@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/aeternity/aepp-sdk-go/v8/binary"
+	"github.com/aeternity/aepp-sdk-go/v9/binary"
 	"golang.org/x/crypto/ed25519"
 )
 
@@ -21,7 +21,7 @@ type Account struct {
 func loadFromPrivateKeyRaw(privb []byte) (account *Account, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = fmt.Errorf("Invalid private key")
+			err = fmt.Errorf("invalid private key")
 		}
 	}()
 	account = loadFromPrivateKey(ed25519.PrivateKey(privb))
