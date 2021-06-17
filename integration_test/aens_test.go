@@ -7,10 +7,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/aeternity/aepp-sdk-go/v8/aeternity"
-	"github.com/aeternity/aepp-sdk-go/v8/config"
-	"github.com/aeternity/aepp-sdk-go/v8/naet"
-	"github.com/aeternity/aepp-sdk-go/v8/transactions"
+	"github.com/aeternity/aepp-sdk-go/v9/aeternity"
+	"github.com/aeternity/aepp-sdk-go/v9/config"
+	"github.com/aeternity/aepp-sdk-go/v9/naet"
+	"github.com/aeternity/aepp-sdk-go/v9/transactions"
 )
 
 func getNameEntry(t *testing.T, node *naet.Node, name string) (responseJSON string) {

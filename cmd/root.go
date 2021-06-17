@@ -18,8 +18,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/aeternity/aepp-sdk-go/v8/config"
-	"github.com/aeternity/aepp-sdk-go/v8/naet"
+	"github.com/aeternity/aepp-sdk-go/v9/config"
+	"github.com/aeternity/aepp-sdk-go/v9/naet"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

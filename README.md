@@ -4,10 +4,10 @@
 golang sdk for aeternity blockchain
 
 ## Setup
-`go get github.com/aeternity/aepp-sdk-go`
+`go get github.com/aeternity/aepp-sdk-go/v9`
 
 If your project uses Go Modules (go.mod, go.sum files), you must include the major version in the import line like this:
-`import github.com/aepp-sdk-go/v8/aeternity`
+`import github.com/aepp-sdk-go/v9/aeternity`
 
 If your project won't use Go Modules (no go.mod, go.sum files), ensure your `$GOPATH/src/github.com/aeternity/aepp-sdk-go` is on the correct branch. Then your import should be:
 `import github.com/aepp-sdk-go/aeternity`

@@ -5,8 +5,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/v8/config"
-	"github.com/aeternity/aepp-sdk-go/v8/utils"
+	"github.com/aeternity/aepp-sdk-go/v9/config"
+	"github.com/aeternity/aepp-sdk-go/v9/utils"
 )
 
 func TestOracleTx_ID(t *testing.T) {

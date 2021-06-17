@@ -9,7 +9,7 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/aeternity/aepp-sdk-go/v8/utils"
+	"github.com/aeternity/aepp-sdk-go/v9/utils"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"

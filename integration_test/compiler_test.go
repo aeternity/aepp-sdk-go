@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/v8/naet"
+	"github.com/aeternity/aepp-sdk-go/v9/naet"
 	"gotest.tools/golden"
 )
 

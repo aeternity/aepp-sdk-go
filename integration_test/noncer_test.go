@@ -3,9 +3,9 @@ package integrationtest
 import (
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/v8/account"
-	"github.com/aeternity/aepp-sdk-go/v8/aeternity"
-	"github.com/aeternity/aepp-sdk-go/v8/config"
+	"github.com/aeternity/aepp-sdk-go/v9/account"
+	"github.com/aeternity/aepp-sdk-go/v9/aeternity"
+	"github.com/aeternity/aepp-sdk-go/v9/config"
 )
 
 func TestNoncer(t *testing.T) {

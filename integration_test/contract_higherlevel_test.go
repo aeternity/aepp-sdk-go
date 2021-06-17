@@ -3,10 +3,10 @@ package integrationtest
 import (
 	"testing"
 
-	"github.com/aeternity/aepp-sdk-go/v8/aeternity"
-	"github.com/aeternity/aepp-sdk-go/v8/config"
-	"github.com/aeternity/aepp-sdk-go/v8/naet"
-	"github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v9/aeternity"
+	"github.com/aeternity/aepp-sdk-go/v9/config"
+	"github.com/aeternity/aepp-sdk-go/v9/naet"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/node/models"
 )
 
 func TestCreateContract(t *testing.T) {

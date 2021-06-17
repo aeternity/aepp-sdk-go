@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/aeternity/aepp-sdk-go/v8/binary"
-	"github.com/aeternity/aepp-sdk-go/v8/config"
-	"github.com/aeternity/aepp-sdk-go/v8/transactions"
-	"github.com/aeternity/aepp-sdk-go/v8/utils"
+	"github.com/aeternity/aepp-sdk-go/v9/binary"
+	"github.com/aeternity/aepp-sdk-go/v9/config"
+	"github.com/aeternity/aepp-sdk-go/v9/transactions"
+	"github.com/aeternity/aepp-sdk-go/v9/utils"
 
 	"github.com/spf13/cobra"
 )

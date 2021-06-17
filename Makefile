@@ -52,3 +52,6 @@ clean:
 	@echo remove $(OUTPUTFOLDER) folder
 	@rm -rf $(OUTPUTFOLDER)
 	@echo done
+
+changelog:
+	git-chglog -o CHANGELOG.md

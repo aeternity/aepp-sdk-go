@@ -1,9 +1,9 @@
 package naet
 
 import (
-	compiler_client "github.com/aeternity/aepp-sdk-go/v8/swagguard/compiler/client"
-	"github.com/aeternity/aepp-sdk-go/v8/swagguard/compiler/client/operations"
-	models "github.com/aeternity/aepp-sdk-go/v8/swagguard/compiler/models"
+	compiler_client "github.com/aeternity/aepp-sdk-go/v9/swagguard/compiler/client"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/compiler/client/operations"
+	models "github.com/aeternity/aepp-sdk-go/v9/swagguard/compiler/models"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 )

@@ -10,7 +10,7 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 
-	"github.com/aeternity/aepp-sdk-go/v8/swagguard/node/client/external"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/node/client/external"
 )
 
 // Default node HTTP client.

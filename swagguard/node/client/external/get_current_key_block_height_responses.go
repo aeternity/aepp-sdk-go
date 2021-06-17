@@ -14,7 +14,7 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
-	"github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/node/models"
 )
 
 // GetCurrentKeyBlockHeightReader is a Reader for the GetCurrentKeyBlockHeight structure.

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/aeternity/aepp-sdk-go/v8/swagguard/node/client/external"
-	"github.com/aeternity/aepp-sdk-go/v8/swagguard/node/models"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/node/client/external"
+	"github.com/aeternity/aepp-sdk-go/v9/swagguard/node/models"
 )
 
 // getErrorReason parses the external.*BadRequest structs returned by the
