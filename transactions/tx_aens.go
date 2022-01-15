@@ -671,18 +671,17 @@ func (tx *NameUpdateTx) CalcGas() (g *big.Int, err error) {
 
 // NewNameUpdateTx is a constructor for a NameUpdateTx struct
 func NewNameUpdateTx(accountID, name string, pointers []*NamePointer, clientTTL uint64, ttlnoncer TTLNoncer) (tx *NameUpdateTx, err error) {
-	ttl, height, accountNonce, err := ttlnoncer(accountID, config.Client.TTL)
+	ttl, _, accountNonce, err := ttlnoncer(accountID, config.Client.TTL)
 	if err != nil {
 		return
 	}
-	nameTTL := height + config.Client.Names.NameTTL
 
 	nm, err := NameID(name)
 	if err != nil {
 		return
 	}
 
-	tx = &NameUpdateTx{accountID, nm, pointers, nameTTL, clientTTL, config.Client.Fee, ttl, accountNonce}
+	tx = &NameUpdateTx{accountID, nm, pointers, config.Client.Names.NameTTL, clientTTL, config.Client.Fee, ttl, accountNonce}
 	CalculateFee(tx)
 	return
 }

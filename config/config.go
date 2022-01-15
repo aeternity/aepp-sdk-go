@@ -165,7 +165,7 @@ var Client = ClientConfig{
 	Fee:        big.NewInt(2e14),
 	WaitBlocks: 10,
 	Names: AensConfig{
-		NameTTL:              500,
+		NameTTL:              180000,
 		ClientTTL:            500,
 		NameAuctionMaxLength: 12,
 	},
