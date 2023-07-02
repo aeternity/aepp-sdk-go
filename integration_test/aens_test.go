@@ -11,6 +11,7 @@ import (
 	"github.com/aeternity/aepp-sdk-go/v9/config"
 	"github.com/aeternity/aepp-sdk-go/v9/naet"
 	"github.com/aeternity/aepp-sdk-go/v9/transactions"
+	"gotest.tools/assert"
 )
 
 func getNameEntry(t *testing.T, node *naet.Node, name string) (responseJSON string) {
@@ -82,6 +83,7 @@ func TestAENSWorkflow(t *testing.T) {
 		t.Fatal(err)
 	}
 	updateTx, err := transactions.NewNameUpdateTx(alice.Address, name, []*transactions.NamePointer{alicesAddress}, config.Client.Names.ClientTTL, ctxAlice.TTLNoncer())
+	assert.Equal(t, updateTx.NameTTL, uint64(180000))
 	if err != nil {
 		t.Fatal(err)
 	}
