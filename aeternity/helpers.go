@@ -135,6 +135,7 @@ func (t *TxReceipt) Watch(mined chan bool, waitBlocks uint64, node transactionWa
 	if err != nil {
 		t.Error = err
 		mined <- false
+		return
 	}
 	endHeight := nodeHeight + waitBlocks
 	for nodeHeight <= endHeight {
@@ -142,11 +143,13 @@ func (t *TxReceipt) Watch(mined chan bool, waitBlocks uint64, node transactionWa
 		if err != nil {
 			t.Error = err
 			mined <- false
+			return
 		}
 		tx, err := node.GetTransactionByHash(t.Hash)
 		if err != nil {
 			t.Error = err
 			mined <- false
+			return
 		}
 
 		if tx.BlockHeight.LargerThanZero() {

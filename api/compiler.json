@@ -850,43 +850,6 @@
         }
       }
     },
-    "/decode-data": {
-      "post": {
-        "consumes": [
-          "application/json"
-        ],
-        "description": "Decode data as retuned by a contract call. - Legacy decoding",
-        "operationId": "DecodeData",
-        "parameters": [
-          {
-            "description": "Binary data in Sophia ABI format",
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/SophiaBinaryData"
-            }
-          }
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "responses": {
-          "200": {
-            "description": "Json encoded data",
-            "schema": {
-              "$ref": "#/definitions/SophiaJsonData"
-            }
-          },
-          "400": {
-            "description": "Invalid data",
-            "schema": {
-              "$ref": "#/definitions/CompilerErrors"
-            }
-          }
-        }
-      }
-    },
     "/encode-calldata": {
       "post": {
         "consumes": [

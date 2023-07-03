@@ -63,13 +63,6 @@ func TestCompiler(t *testing.T) {
 			t.Error(err)
 		}
 	})
-	t.Run("DecodeData", func(t *testing.T) {
-		// taken from testnet Contract Call Tx th_toPLrggySMKVecSkEdy7QYF7VEQ4nANAdSiwNXomtwhdp6ZNw
-		_, err := c.DecodeData("cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAArMtts", "int")
-		if err != nil {
-			t.Error(err)
-		}
-	})
 	t.Run("EncodeCalldata SimpleStorage set(123)", func(t *testing.T) {
 		encodedCalldata, err := c.EncodeCalldata(string(golden.Get(t, simplestorageSource)), "set", []string{"123"})
 		if err != nil {
