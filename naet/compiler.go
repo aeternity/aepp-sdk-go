@@ -149,27 +149,6 @@ func (c *Compiler) DecodeCalldataSource(source string, function string, callData
 	return result.Payload, err
 }
 
-// DecodeDataer guarantees that one can run a DecodeData() method on the
-// mocked/real network connection to the aesophia compiler
-type DecodeDataer interface {
-	DecodeData(data string, sophiaType string) (decodedData *models.SophiaJSONData, err error)
-}
-
-// DecodeData abstracts away the swagger specifics of posting to /decode-data
-func (c *Compiler) DecodeData(data string, sophiaType string) (decodedData *models.SophiaJSONData, err error) {
-	p := &models.SophiaBinaryData{
-		Data:       &data,
-		SophiaType: &sophiaType,
-	}
-	params := operations.NewDecodeDataParams().WithBody(p)
-	result, err := c.Compiler.Operations.DecodeData(params)
-	if err != nil {
-		return
-	}
-
-	return result.Payload, err
-}
-
 // EncodeCalldataer guarantees that one can run a EncodeCalldata() method on the
 // mocked/real network connection to the aesophia compiler
 type EncodeCalldataer interface {

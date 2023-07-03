@@ -44,8 +44,6 @@ type ClientService interface {
 
 	DecodeCalldataSource(params *DecodeCalldataSourceParams, opts ...ClientOption) (*DecodeCalldataSourceOK, error)
 
-	DecodeData(params *DecodeDataParams, opts ...ClientOption) (*DecodeDataOK, error)
-
 	EncodeCalldata(params *EncodeCalldataParams, opts ...ClientOption) (*EncodeCalldataOK, error)
 
 	GenerateACI(params *GenerateACIParams, opts ...ClientOption) (*GenerateACIOK, error)
@@ -324,44 +322,6 @@ func (a *Client) DecodeCalldataSource(params *DecodeCalldataSourceParams, opts .
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for DecodeCalldataSource: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
-}
-
-/*
-  DecodeData Decode data as retuned by a contract call. - Legacy decoding
-*/
-func (a *Client) DecodeData(params *DecodeDataParams, opts ...ClientOption) (*DecodeDataOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewDecodeDataParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "DecodeData",
-		Method:             "POST",
-		PathPattern:        "/decode-data",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http"},
-		Params:             params,
-		Reader:             &DecodeDataReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*DecodeDataOK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for DecodeData: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
