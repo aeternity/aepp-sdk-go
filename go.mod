@@ -26,8 +26,8 @@ require (
 	github.com/spf13/viper v1.7.1
 	github.com/tyler-smith/go-bip39 v1.1.0
 	go.mongodb.org/mongo-driver v1.5.3 // indirect
-	golang.org/x/crypto v0.1.0
-	golang.org/x/term v0.1.0
+	golang.org/x/crypto v0.17.0
+	golang.org/x/term v0.15.0
 	gopkg.in/ini.v1 v1.62.0 // indirect
 	gotest.tools v2.2.0+incompatible
 )
